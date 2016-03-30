@@ -8,7 +8,7 @@
       "name": "Huachao Mao",
       "email": "huachaomao@gmail.com"
   },
-  "icons": "images/rest.png",
+  "icon": "images/rest.png",
   "license": "MIT",
   "bugs": {
       "url": "https://github.com/Huachao/vscode-restclient/issues",
