@@ -1,0 +1,62 @@
+{
+  "name": "rest-client",
+  "displayName": "REST Client",
+  "description": "REST Client for Visual Studio Code",
+  "version": "0.0.1",
+  "publisher": "humao",
+  "author": {
+      "name": "Huachao Mao",
+      "email": "huachaomao@gmail.com"
+  },
+  "icons": "images/rest.png",
+  "license": "MIT",
+  "bugs": {
+      "url": "https://github.com/Huachao/vscode-restclient/issues",
+      "email": "huachaomao@gmail.com"
+   },
+   "homepage": "https://github.com/Huachao/vscode-restclient/blob/master/README.md",
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/Huachao/vscode-restclient.git"
+  },
+  "engines": {
+    "vscode": "^0.10.10"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "REST",
+    "Http"
+  ],
+  "activationEvents": [
+    "onCommand:rest-client.request"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rest-client.request",
+        "title": "Rest Client: Send Request"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "rest-client.request",
+        "key": "ctrl+alt+r"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.5",
+    "vscode": "^0.11.0"
+  },
+  "dependencies": {
+    "request": "^2.69.0"
+  }
+}
