@@ -15,7 +15,7 @@ export function activate(context: ExtensionContext) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "rest-client" is now active!');
 
-    let outChannel= window.createOutputChannel('REST');
+    let outChannel = window.createOutputChannel('REST');
     let statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left)
 
     // The command has been defined in the package.json file
@@ -26,7 +26,7 @@ export function activate(context: ExtensionContext) {
         if (!editor || !editor.document) {
             return;
         }
-        
+
         // Get selected text of selected lines or full document
         let selectedText: string;
         if (editor.selection.isEmpty) {
@@ -58,7 +58,7 @@ export function activate(context: ExtensionContext) {
 
         // send http request
         let startTime = new Date(Date.now());
-        request(options, function (error, response, body) {
+        request(options, function(error, response, body) {
             statusBarItem.text = `$(cloud-download)`;
             if (error) {
                 outChannel.appendLine(`${error}\n`);

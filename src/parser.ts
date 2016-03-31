@@ -22,7 +22,7 @@ export class RequestParser {
         let requestLine = RequestParser.parseRequestLine(lines[0]);
 
         // get headers range
-        let headers: {[key: string]: string};
+        let headers: { [key: string]: string };
         let body: string;
         let headerStartLine = RequestParser.firstIndexOf(lines, value => value.trim() !== '', 1);
         if (headerStartLine !== -1) {
@@ -30,7 +30,7 @@ export class RequestParser {
             let firstEmptyLine = RequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
             let headerEndLine = firstEmptyLine == -1 ? lines.length : firstEmptyLine;
             headers = RequestParser.parseRequestHeaders(lines.slice(headerStartLine, headerEndLine));
-            
+
             // get body range
             let bodyStartLine = RequestParser.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
             if (bodyStartLine !== -1) {
@@ -64,10 +64,10 @@ export class RequestParser {
             "url": url
         };
     }
-    
-    private static parseRequestHeaders(headerLines: string[]): {[key: string]: string} {
+
+    private static parseRequestHeaders(headerLines: string[]): { [key: string]: string } {
         // message-header = field-name ":" [ field-value ]
-        let headers: {[key: string]: string} = {};
+        let headers: { [key: string]: string } = {};
         headerLines.forEach(headerLine => {
             let headerParts = headerLine.split(':', 2).filter(Boolean);
             let fieldName: string;
@@ -93,17 +93,17 @@ export class RequestParser {
     }
 
     private static skipWhile<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean): T[] {
-         let result: T[];
-         let index = 0;
-         for (; index < items.length; index++) {
-             if (!callbackfn(items[index], index, items)) {
-                 break;
-             }
-         }
+        let result: T[];
+        let index = 0;
+        for (; index < items.length; index++) {
+            if (!callbackfn(items[index], index, items)) {
+                break;
+            }
+        }
 
-         return items.slice(index);
+        return items.slice(index);
     };
-    
+
     private static firstIndexOf<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean, start?: number): number {
         if (!start) {
             start = 0;
@@ -111,10 +111,10 @@ export class RequestParser {
 
         let index = start;
         for (; index < items.length; index++) {
-             if (callbackfn(items[index], index, items)) {
-                 break;
-             }
-         }
+            if (callbackfn(items[index], index, items)) {
+                break;
+            }
+        }
 
         return index >= items.length ? -1 : index;
     }
