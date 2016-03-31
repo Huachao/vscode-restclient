@@ -49,7 +49,18 @@
                 "command": "rest-client.request",
                 "key": "ctrl+alt+r"
             }
-        ]
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "REST Client configuration",
+            "properties": {
+                "rest-client.clearoutput": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Clear previous output for each request."
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "node ./node_modules/vscode/bin/compile",

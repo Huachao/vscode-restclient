@@ -4,6 +4,7 @@
 import { ExtensionContext, commands, window, workspace, Uri, StatusBarAlignment } from 'vscode';
 import { RequestParser } from './parser'
 import { HttpRequest } from './models/httpRequest'
+import { RestClientSettings } from './models/configurationSettings'
 
 var request = require('request')
 
@@ -37,6 +38,11 @@ export function activate(context: ExtensionContext) {
 
         if (selectedText === '') {
             return;
+        }
+
+        let restClientSettings = new RestClientSettings();
+        if (restClientSettings.clearOutput) {
+            outChannel.clear();
         }
 
         // clear status bar
