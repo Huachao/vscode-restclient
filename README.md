@@ -65,9 +65,9 @@ authorization: token xxx
 ## License
 [MIT License](LICENSE)
 
-## Changelog
+## Change Log
 ### 0.0.4
-* __Add Configuration Setting__: Allow clear output windows before sending a new request
+* __Add Configuration Setting__: Allow clear output window before sending a new request
 
 ### 0.0.3
 Initial release!
