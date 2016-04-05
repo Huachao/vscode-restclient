@@ -66,6 +66,10 @@ authorization: token xxx
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.0.5
+* __Add Configuration Setting__: Follow HTTP 3xx responses as redirects, default is `TRUE`
+* __Add Configuration Setting__: Add default user agent if user not specified, default value is `vscode-restclient`
+
 ### 0.0.4
 * __Add Configuration Setting__: Allow clear output window before sending a new request
 

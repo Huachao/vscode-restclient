@@ -58,6 +58,16 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Clear previous output for each request."
+                },
+                "rest-client.followredirect": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Follow HTTP 3xx responses as redirects."
+                },
+                "rest-client.defaultuseragent": {
+                    "type": "string",
+                    "default": "vscode-restclient",
+                    "description": "If User-Agent header is omitted in request header, this value will be added as user agent for each request."
                 }
             }
         }

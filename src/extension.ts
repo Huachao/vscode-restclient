@@ -59,8 +59,18 @@ export function activate(context: ExtensionContext) {
             url: httpRequest.url,
             headers: httpRequest.headers,
             method: httpRequest.method,
-            body: httpRequest.body
+            body: httpRequest.body,
+            followRedirect: restClientSettings.followRedirect
         };
+
+        if (!options.headers) {
+            options.headers = {};
+        }
+
+        // add default user agent if not specified
+        if (!options.headers['user-agent']) {
+            options.headers['user-agent'] = restClientSettings.defaultUserAgent;
+        }
 
         // send http request
         let startTime = new Date(Date.now());
