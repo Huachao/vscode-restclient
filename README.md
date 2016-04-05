@@ -40,7 +40,7 @@ https://example.com/comments/1
 If request method is omitted, request will be treated as __GET__, so above requests are the same after parsing.
 
 ### Request Headers
-The lines immediately after the request line to first empty empty line are parsed as _Request Headers_. Please provide headers with the standard `field-name: field-value` format, each line represents one header.
+The lines immediately after the request line to first empty line are parsed as _Request Headers_. Please provide headers with the standard `field-name: field-value` format, each line represents one header.
 Below are examples of _Request Headers_:
 ```
 user-agent: rest-client
