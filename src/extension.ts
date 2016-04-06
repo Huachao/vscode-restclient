@@ -18,6 +18,7 @@ export function activate(context: ExtensionContext) {
 
     let outChannel = window.createOutputChannel('REST');
     let statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left)
+    let restClientSettings = new RestClientSettings();
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
@@ -40,7 +41,6 @@ export function activate(context: ExtensionContext) {
             return;
         }
 
-        let restClientSettings = new RestClientSettings();
         if (restClientSettings.clearOutput) {
             outChannel.clear();
         }
