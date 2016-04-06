@@ -60,6 +60,7 @@ export function activate(context: ExtensionContext) {
             headers: httpRequest.headers,
             method: httpRequest.method,
             body: httpRequest.body,
+            time: true,
             followRedirect: restClientSettings.followRedirect
         };
 
@@ -73,7 +74,6 @@ export function activate(context: ExtensionContext) {
         }
 
         // send http request
-        let startTime = new Date(Date.now());
         request(options, function(error, response, body) {
             statusBarItem.text = `$(cloud-download)`;
             if (error) {
@@ -81,8 +81,7 @@ export function activate(context: ExtensionContext) {
                 outChannel.show(true);
                 return;
             }
-            let endTime = new Date(Date.now());
-            let duration = endTime.valueOf() - startTime.valueOf();
+            let duration = response.elapsedTime;
             let output = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}\n`
             for (var header in response.headers) {
                 if (response.headers.hasOwnProperty(header)) {
