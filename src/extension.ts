@@ -61,6 +61,7 @@ export function activate(context: ExtensionContext) {
             method: httpRequest.method,
             body: httpRequest.body,
             time: true,
+            strictSSL: false,
             followRedirect: restClientSettings.followRedirect
         };
 
