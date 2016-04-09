@@ -62,12 +62,17 @@ authorization: token xxx
 </request>
 ```
 
+## Settings
+* `rest-client.clearoutput`: Clear previous output for each request. (Default is __false__)
+* `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
+* `rest-client.defaultuseragent`: If User-Agent header is omitted in request header, this value will be added as user agent for each request. (Default is __vscode-restclient__)
+
 ## License
 [MIT License](LICENSE)
 
 ## Change Log
 ## 0.0.6
-Allow self-signed certificate
+* Allow self-signed certificate
 
 ### 0.0.5
 * __Add Configuration Setting__: Follow HTTP 3xx responses as redirects, default is `TRUE`
@@ -77,7 +82,7 @@ Allow self-signed certificate
 * __Add Configuration Setting__: Allow clear output window before sending a new request
 
 ### 0.0.3
-Initial release!
+* Initial release!
 
 ## Feedback
 Please provide feedback through the [GitHub Issue](https://github.com/Huachao/vscode-restclient/issues) system, or fork the repository and submit PR.
