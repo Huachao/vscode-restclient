@@ -71,6 +71,9 @@ authorization: token xxx
 [MIT License](LICENSE)
 
 ## Change Log
+## 0.1.1
+* Update image in README.md
+
 ## 0.1.0
 * Refactor code for rest call
 * Beautify JSON response
