@@ -71,6 +71,10 @@ authorization: token xxx
 [MIT License](LICENSE)
 
 ## Change Log
+## 0.1.0
+* Refactor code for rest call
+* Beautify JSON response
+
 ## 0.0.6
 * Allow self-signed certificate
 

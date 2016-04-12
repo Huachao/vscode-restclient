@@ -3,10 +3,10 @@
 // Import the module and reference it with the alias vscode in your code below
 import { ExtensionContext, commands, window, workspace, Uri, StatusBarAlignment } from 'vscode';
 import { RequestParser } from './parser'
+import { MimeUtility } from './mimeUtility'
+import { HttpClient } from './httpClient'
 import { HttpRequest } from './models/httpRequest'
 import { RestClientSettings } from './models/configurationSettings'
-
-var request = require('request')
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -55,49 +55,39 @@ export function activate(context: ExtensionContext) {
             return;
         }
 
-        let options = {
-            url: httpRequest.url,
-            headers: httpRequest.headers,
-            method: httpRequest.method,
-            body: httpRequest.body,
-            time: true,
-            strictSSL: false,
-            followRedirect: restClientSettings.followRedirect
-        };
+        // set http request
+        let httpClient = new HttpClient(restClientSettings);
+        httpClient.send(httpRequest)
+            .then(response => {
+                let output = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}\n`
+                for (var header in response.headers) {
+                    if (response.headers.hasOwnProperty(header)) {
+                        var value = response.headers[header];
+                        output += `${header}: ${value}\n`
+                    }
+                }
 
-        if (!options.headers) {
-            options.headers = {};
-        }
+                let body = response.body;
+                let contentType = response.headers['content-type'];
+                if (contentType) {
+                    let type = MimeUtility.parse(contentType).type;
+                    if (type === 'application/json') {
+                        body = JSON.stringify(JSON.parse(body), null, 4);
+                    }
+                }
 
-        // add default user agent if not specified
-        if (!options.headers['user-agent']) {
-            options.headers['user-agent'] = restClientSettings.defaultUserAgent;
-        }
+                output += `\n${body}`;
+                outChannel.appendLine(`${output}\n`);
+                outChannel.show(true);
 
-        // send http request
-        request(options, function(error, response, body) {
-            statusBarItem.text = `$(cloud-download)`;
-            if (error) {
+                statusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
+                statusBarItem.tooltip = 'duration';
+            })
+            .catch(error => {
+                statusBarItem.text = '';
                 outChannel.appendLine(`${error}\n`);
                 outChannel.show(true);
-                return;
-            }
-            let duration = response.elapsedTime;
-            let output = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}\n`
-            for (var header in response.headers) {
-                if (response.headers.hasOwnProperty(header)) {
-                    var value = response.headers[header];
-                    output += `${header}: ${value}\n`
-                }
-            }
-
-            output += `\n${body}`;
-            outChannel.appendLine(`${output}\n`);
-            outChannel.show(true);
-
-            statusBarItem.text += ` $(clock) ${duration}ms`;
-            statusBarItem.tooltip = 'duration';
-        })
+            });
     });
 
     context.subscriptions.push(disposable);
