@@ -71,14 +71,14 @@ authorization: token xxx
 [MIT License](LICENSE)
 
 ## Change Log
-## 0.1.1
+### 0.1.1
 * Update image in README.md
 
-## 0.1.0
+### 0.1.0
 * Refactor code for rest call
 * Beautify JSON response
 
-## 0.0.6
+### 0.0.6
 * Allow self-signed certificate
 
 ### 0.0.5
