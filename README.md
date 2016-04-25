@@ -1,5 +1,5 @@
 # REST Client
-[![Dependency Status](https://david-dm.org/Huachao/vscode-restclient.svg)](https://david-dm.org/Huachao/vscode-restclient)
+![Marketplace Version](http://vsmarketplacebadge.apphb.com/version/humao.rest-client.svg)![Installs](http://vsmarketplacebadge.apphb.com/installs/humao.rest-client.svg)[![Dependency Status](https://david-dm.org/Huachao/vscode-restclient.svg)](https://david-dm.org/Huachao/vscode-restclient)
 
 REST Client allows you to send HTTP request and view the response in Visual Studio Code directly.
 
