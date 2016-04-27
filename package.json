@@ -2,7 +2,7 @@
     "name": "rest-client",
     "displayName": "REST Client",
     "description": "REST Client for Visual Studio Code",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "publisher": "humao",
     "author": {
         "name": "Huachao Mao",
@@ -34,7 +34,8 @@
         "Http"
     ],
     "activationEvents": [
-        "onCommand:rest-client.request"
+        "onCommand:rest-client.request",
+        "onCommand:rest-client.history"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -42,12 +43,20 @@
             {
                 "command": "rest-client.request",
                 "title": "Rest Client: Send Request"
+            },
+            {
+                "command": "rest-client.history",
+                "title": "Rest Client: Request History"
             }
         ],
         "keybindings": [
             {
                 "command": "rest-client.request",
                 "key": "ctrl+alt+r"
+            },
+            {
+                "command": "rest-client.history",
+                "key": "ctrl+alt+h"
             }
         ],
         "configuration": {
@@ -82,6 +91,7 @@
         "vscode": "^0.11.0"
     },
     "dependencies": {
-        "request": "^2.69.0"
+        "request": "^2.69.0",
+        "tmp": "^0.0.28"
     }
 }

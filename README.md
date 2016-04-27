@@ -64,6 +64,10 @@ authorization: token xxx
 </request>
 ```
 
+## Request History
+![request-history](images/request-history.png)
+Each time we sent a http request, the request details(method, url, headers and body) would be persisted into file. By using shortcut `Ctrl+Alt+H`, or press `F1` and then select/type `Rest Client: Request History`, you can view the last __50__ request items in the time reversing order, you can select any request you wish to trigger again. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
+
 ## Settings
 * `rest-client.clearoutput`: Clear previous output for each request. (Default is __false__)
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
@@ -73,6 +77,9 @@ authorization: token xxx
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.2.0
+* Add http request history
+
 ### 0.1.1
 * Update image in README.md
 

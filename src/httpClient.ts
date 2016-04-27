@@ -25,7 +25,7 @@ export class HttpClient {
         };
 
         if (!options.headers) {
-            options.headers = {};
+            options.headers = httpRequest.headers = {};
         }
 
         // add default user agent if not specified
