@@ -42,7 +42,7 @@ export class HistoryController {
             })
         }).catch(error => this.errorHandler(error));
     }
-    
+
     private createRequestInTempFile(request: HttpRequest): Promise<string> {
         return new Promise((resolve, reject) => {
             tmp.file({ prefix: 'vscode-restclient-' }, function _tempFileCreated(err, tmpFilePath, fd) {
