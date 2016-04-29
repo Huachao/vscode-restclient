@@ -26,6 +26,9 @@ export class HistoryController {
                 // TODO: add headers and body in pick item?
                 let item = new HistoryQuickPickItem();
                 item.label = `${request.method.toUpperCase()} ${request.url}`;
+                if (request.body && request.body.length > 0) {
+                    item.description = `${request.body.length} body bytes`;
+                }
                 item.rawRequest = request;
                 return item;
             });
