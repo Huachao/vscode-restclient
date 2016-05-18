@@ -17,7 +17,7 @@ export class PersistUtility {
             PersistUtility.serializeToHistoryFile(requests);
         }).catch(error => {});
     }
-    
+
     static load(): Promise<HttpRequest[]> {
         return PersistUtility.deserializeFromHistoryFile();
     }
@@ -30,10 +30,8 @@ export class PersistUtility {
         }
     }
 
-    private static serializeToHistoryFile(requests: HttpRequest[]): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            fs.writeFile(PersistUtility.historyFilePath, JSON.stringify(requests));
-        });
+    private static serializeToHistoryFile(requests: HttpRequest[]): void {
+        fs.writeFileSync(PersistUtility.historyFilePath, JSON.stringify(requests));
     }
 
     private static deserializeFromHistoryFile(): Promise<HttpRequest[]> {
@@ -41,6 +39,12 @@ export class PersistUtility {
             fs.readFile(PersistUtility.historyFilePath, (error, data) => {
                 if (error) {
                     PersistUtility.createHistoryFileIfNotExist();
+                    let previousRequests = PersistUtility.retrieveRequestsFromPreviousVersions();
+                    if (previousRequests && previousRequests.length > 0) {
+                        PersistUtility.serializeToHistoryFile(previousRequests);
+                        resolve(previousRequests);
+                        return;
+                    }
                 } else {
                     let fileContent = data.toString();
                     if (fileContent) {
@@ -51,5 +55,36 @@ export class PersistUtility {
                 resolve(PersistUtility.emptyHttpRequestItems);
             })
         });
+    }
+
+    private static retrieveRequestsFromPreviousVersions(): HttpRequest[] {
+        let extensionsFolderPath = path.dirname(path.dirname(PersistUtility.historyFilePath));
+        let folders = fs.readdirSync(extensionsFolderPath).filter(function (file) {
+            let filePath = path.join(extensionsFolderPath, file);
+            return fs.statSync(filePath).isDirectory() && file.startsWith('humao.rest-client-');
+        }).sort().reverse();
+
+        let previousRequests: HttpRequest[] = [];
+        for (var i in folders) {
+            let historyFile = path.join(extensionsFolderPath, folders[i], Constants.HistoryFileName);
+            try {
+                fs.statSync(historyFile);
+                let fileContent = fs.readFileSync(historyFile).toString();
+                if (fileContent) {
+                    let requests = <HttpRequest[]>JSON.parse(fileContent)
+                    if (requests) {
+                        previousRequests.push(...requests);
+                        if (previousRequests.length >= Constants.HistoryItemsMaxCount) {
+                            previousRequests = previousRequests.slice(0, Constants.HistoryItemsMaxCount);
+                            break;
+                        }
+                    }
+                }
+            } catch (error) {
+                continue;
+            }
+        }
+
+        return previousRequests;
     }
 }
