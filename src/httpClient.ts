@@ -20,6 +20,7 @@ export class HttpClient {
             method: httpRequest.method,
             body: httpRequest.body,
             time: true,
+            timeout: this._settings.timeoutInMilliseconds,
             strictSSL: false,
             followRedirect: this._settings.followRedirect
         };

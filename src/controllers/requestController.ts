@@ -84,6 +84,9 @@ export class RequestController {
                 PersistUtility.save(httpRequest);
             })
             .catch(error => {
+                if (error.code === 'ETIMEDOUT') {
+                    error = `Error: Timed out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
+                }
                 this._statusBarItem.text = '';
                 this._outputChannel.appendLine(`${error}\n`);
                 this._outputChannel.show(true);

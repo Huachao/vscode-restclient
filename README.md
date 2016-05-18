@@ -75,6 +75,9 @@ Each time we sent a http request, the request details(method, url, headers and b
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.2.1
+* __Add Configuration Setting__: Timeout in milliseconds, less or equal than 0 represents for infinity, default is `0` 
+
 ### 0.2.0
 * Add http request history
 

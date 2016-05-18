@@ -6,12 +6,14 @@ export interface IRestClientSettings {
     clearOutput: boolean;
     followRedirect: boolean;
     defaultUserAgent: string;
+    timeoutInMilliseconds: number;
 }
 
 export class RestClientSettings implements IRestClientSettings {
     clearOutput: boolean;
     followRedirect: boolean;
     defaultUserAgent: string;
+    timeoutInMilliseconds: number;
 
     constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -26,5 +28,9 @@ export class RestClientSettings implements IRestClientSettings {
         this.clearOutput = restClientSettings.get<boolean>("clearoutput", false);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultUserAgent = restClientSettings.get<string>("defaultuseragent", "vscode-restclient");
+        this.timeoutInMilliseconds = restClientSettings.get<number>("timeoutinmilliseconds", 0);
+        if (this.timeoutInMilliseconds < 0) {
+            this.timeoutInMilliseconds = 0;
+        }
     }
 }

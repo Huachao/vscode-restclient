@@ -2,7 +2,7 @@
     "name": "rest-client",
     "displayName": "REST Client",
     "description": "REST Client for Visual Studio Code",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "publisher": "humao",
     "author": {
         "name": "Huachao Mao",
@@ -77,6 +77,11 @@
                     "type": "string",
                     "default": "vscode-restclient",
                     "description": "If User-Agent header is omitted in request header, this value will be added as user agent for each request."
+                },
+                "rest-client.timeoutinmilliseconds": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Timeout in milliseconds. 0 for infinity"
                 }
             }
         }
