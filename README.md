@@ -70,6 +70,7 @@ Each time we sent a http request, the request details(method, url, headers and b
 * `rest-client.clearoutput`: Clear previous output for each request. (Default is __false__)
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
 * `rest-client.defaultuseragent`: If User-Agent header is omitted in request header, this value will be added as user agent for each request. (Default is __vscode-restclient__)
+* `rest-client.timeoutinmilliseconds`: Timeout in milliseconds. 0 for infinity. (Default is __0__)
 
 ## License
 [MIT License](LICENSE)
