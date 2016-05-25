@@ -3,8 +3,6 @@
 import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable } from 'vscode';
 import { RequestParser } from '../parser'
 import { HttpClient } from '../httpClient'
-import { HttpRequest } from '../models/httpRequest'
-import { HttpResponse } from '../models/httpResponse'
 import { RestClientSettings } from '../models/configurationSettings'
 import { PersistUtility } from '../persistUtility'
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
@@ -67,7 +65,7 @@ export class RequestController {
                     }, (reason) => {
                         window.showErrorMessage(reason);
                     });
- 
+
                 // persist to history json file
                 PersistUtility.save(httpRequest);
             })

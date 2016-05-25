@@ -41,11 +41,11 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
     get onDidChange(): Event<Uri> {
         return this._onDidChange.event;
     }
-    
+
     public update(uri: Uri) {
         this._onDidChange.fire(uri);
     }
-    
+
     private static formatHeaders(headers: { [key: string]: string }): string {
         let headerString = '';
         for (var header in headers) {

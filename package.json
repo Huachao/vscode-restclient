@@ -1,102 +1,104 @@
 {
-    "name": "rest-client",
-    "displayName": "REST Client",
-    "description": "REST Client for Visual Studio Code",
-    "version": "0.3.0",
-    "publisher": "humao",
-    "author": {
-        "name": "Huachao Mao",
-        "email": "huachaomao@gmail.com"
-    },
-    "icon": "images/rest.png",
-    "galleryBanner": {
-        "color": "#4dffff",
-        "theme": "light"
-    },
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/Huachao/vscode-restclient/issues",
-        "email": "huachaomao@gmail.com"
-    },
-    "homepage": "https://github.com/Huachao/vscode-restclient/blob/master/README.md",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Huachao/vscode-restclient.git"
-    },
-    "engines": {
-        "vscode": "^0.10.10"
-    },
-    "categories": [
-        "Other"
+  "name": "rest-client",
+  "displayName": "REST Client",
+  "description": "REST Client for Visual Studio Code",
+  "version": "0.3.0",
+  "publisher": "humao",
+  "author": {
+    "name": "Huachao Mao",
+    "email": "huachaomao@gmail.com"
+  },
+  "icon": "images/rest.png",
+  "galleryBanner": {
+    "color": "#4dffff",
+    "theme": "light"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Huachao/vscode-restclient/issues",
+    "email": "huachaomao@gmail.com"
+  },
+  "homepage": "https://github.com/Huachao/vscode-restclient/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Huachao/vscode-restclient.git"
+  },
+  "engines": {
+    "vscode": "^0.10.10"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "REST",
+    "Http"
+  ],
+  "activationEvents": [
+    "onCommand:rest-client.request",
+    "onCommand:rest-client.history"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rest-client.request",
+        "title": "Rest Client: Send Request"
+      },
+      {
+        "command": "rest-client.history",
+        "title": "Rest Client: Request History"
+      }
     ],
-    "keywords": [
-        "REST",
-        "Http"
+    "keybindings": [
+      {
+        "command": "rest-client.request",
+        "key": "ctrl+alt+r"
+      },
+      {
+        "command": "rest-client.history",
+        "key": "ctrl+alt+h"
+      }
     ],
-    "activationEvents": [
-        "onCommand:rest-client.request",
-        "onCommand:rest-client.history"
-    ],
-    "main": "./out/src/extension",
-    "contributes": {
-        "commands": [
-            {
-                "command": "rest-client.request",
-                "title": "Rest Client: Send Request"
-            },
-            {
-                "command": "rest-client.history",
-                "title": "Rest Client: Request History"
-            }
-        ],
-        "keybindings": [
-            {
-                "command": "rest-client.request",
-                "key": "ctrl+alt+r"
-            },
-            {
-                "command": "rest-client.history",
-                "key": "ctrl+alt+h"
-            }
-        ],
-        "configuration": {
-            "type": "object",
-            "title": "REST Client configuration",
-            "properties": {
-                "rest-client.clearoutput": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Clear previous output for each request."
-                },
-                "rest-client.followredirect": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Follow HTTP 3xx responses as redirects."
-                },
-                "rest-client.defaultuseragent": {
-                    "type": "string",
-                    "default": "vscode-restclient",
-                    "description": "If User-Agent header is omitted in request header, this value will be added as user agent for each request."
-                },
-                "rest-client.timeoutinmilliseconds": {
-                    "type": "integer",
-                    "default": 0,
-                    "description": "Timeout in milliseconds. 0 for infinity"
-                }
-            }
+    "configuration": {
+      "type": "object",
+      "title": "REST Client configuration",
+      "properties": {
+        "rest-client.clearoutput": {
+          "type": "boolean",
+          "default": false,
+          "description": "Clear previous output for each request."
+        },
+        "rest-client.followredirect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Follow HTTP 3xx responses as redirects."
+        },
+        "rest-client.defaultuseragent": {
+          "type": "string",
+          "default": "vscode-restclient",
+          "description": "If User-Agent header is omitted in request header, this value will be added as user agent for each request."
+        },
+        "rest-client.timeoutinmilliseconds": {
+          "type": "integer",
+          "default": 0,
+          "description": "Timeout in milliseconds. 0 for infinity"
         }
-    },
-    "scripts": {
-        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install"
-    },
-    "devDependencies": {
-        "typescript": "^1.8.5",
-        "vscode": "^0.11.0"
-    },
-    "dependencies": {
-        "request": "^2.69.0",
-        "tmp": "^0.0.28"
+      }
     }
+  },
+  "scripts": {
+    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "tslint": "tslint -c tslint.json src/**/*.ts"
+  },
+  "devDependencies": {
+    "tslint": "^3.10.2",
+    "typescript": "^1.8.5",
+    "vscode": "^0.11.0"
+  },
+  "dependencies": {
+    "request": "^2.69.0",
+    "tmp": "^0.0.28"
+  }
 }

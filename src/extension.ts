@@ -1,7 +1,7 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext, commands, Disposable } from 'vscode';
+import { ExtensionContext, commands } from 'vscode';
 import { RequestController } from './controllers/requestController'
 import { HistoryController } from './controllers/historyController'
 

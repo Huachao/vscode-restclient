@@ -93,7 +93,6 @@ export class RequestParser {
     }
 
     private static skipWhile<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean): T[] {
-        let result: T[];
         let index = 0;
         for (; index < items.length; index++) {
             if (!callbackfn(items[index], index, items)) {

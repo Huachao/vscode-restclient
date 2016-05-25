@@ -1,6 +1,6 @@
 'use strict';
 
-import { extensions, Extension, window } from 'vscode';
+import { extensions } from 'vscode';
 import { HttpRequest } from './models/httpRequest'
 import * as Constants from './constants'
 import * as fs from 'fs'

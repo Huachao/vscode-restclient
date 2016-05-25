@@ -1,6 +1,6 @@
 "use strict";
 
-import { window, workspace, QuickPickItem, OutputChannel } from 'vscode';
+import { window, workspace, OutputChannel } from 'vscode';
 import { PersistUtility } from '../persistUtility'
 import { HttpRequest } from '../models/httpRequest'
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem'
