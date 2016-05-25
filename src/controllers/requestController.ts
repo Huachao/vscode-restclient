@@ -1,24 +1,28 @@
 "use strict";
 
-import { window, workspace, Uri, StatusBarItem, StatusBarAlignment, OutputChannel } from 'vscode';
+import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable } from 'vscode';
 import { RequestParser } from '../parser'
-import { MimeUtility } from '../mimeUtility'
 import { HttpClient } from '../httpClient'
 import { HttpRequest } from '../models/httpRequest'
+import { HttpResponse } from '../models/httpResponse'
 import { RestClientSettings } from '../models/configurationSettings'
 import { PersistUtility } from '../persistUtility'
+import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
 
 export class RequestController {
-    private _outputChannel: OutputChannel;
     private _statusBarItem: StatusBarItem;
     private _restClientSettings: RestClientSettings;
     private _httpClient: HttpClient;
+    private _responseTextProvider: HttpResponseTextDocumentContentProvider;
+    private _registration: Disposable;
 
     constructor() {
-        this._outputChannel = window.createOutputChannel('REST');
         this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._restClientSettings = new RestClientSettings();
         this._httpClient = new HttpClient(this._restClientSettings);
+
+        this._responseTextProvider = new HttpResponseTextDocumentContentProvider(null);
+        this._registration = workspace.registerTextDocumentContentProvider('rest-response', this._responseTextProvider);
     }
 
     run() {
@@ -39,10 +43,6 @@ export class RequestController {
             return;
         }
 
-        if (this._restClientSettings.clearOutput) {
-            this._outputChannel.clear();
-        }
-
         // clear status bar
         this._statusBarItem.text = `$(cloud-upload)`;
         this._statusBarItem.show();
@@ -56,30 +56,18 @@ export class RequestController {
         // set http request
         this._httpClient.send(httpRequest)
             .then(response => {
-                let output = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}\n`
-                for (var header in response.headers) {
-                    if (response.headers.hasOwnProperty(header)) {
-                        var value = response.headers[header];
-                        output += `${header}: ${value}\n`
-                    }
-                }
-
-                let body = response.body;
-                let contentType = response.headers['content-type'];
-                if (contentType) {
-                    let type = MimeUtility.parse(contentType).type;
-                    if (type === 'application/json') {
-                        body = JSON.stringify(JSON.parse(body), null, 4);
-                    }
-                }
-
-                output += `\n${body}`;
-                this._outputChannel.appendLine(`${output}\n`);
-                this._outputChannel.show(true);
-
                 this._statusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
                 this._statusBarItem.tooltip = 'duration';
 
+                this._responseTextProvider.response = response;
+
+                let previewUri = Uri.parse(`rest-response://authority/response-preview-${Date.now()}`);
+
+                commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two).then((success) => {
+                    }, (reason) => {
+                        window.showErrorMessage(reason);
+                    });
+ 
                 // persist to history json file
                 PersistUtility.save(httpRequest);
             })
@@ -88,13 +76,12 @@ export class RequestController {
                     error = `Error: Timed out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
                 }
                 this._statusBarItem.text = '';
-                this._outputChannel.appendLine(`${error}\n`);
-                this._outputChannel.show(true);
+                window.showErrorMessage(error.message);
             });
     }
 
     dispose() {
-        this._outputChannel.dispose();
         this._statusBarItem.dispose();
+        this._registration.dispose();
     }
 }
