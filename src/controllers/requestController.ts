@@ -13,6 +13,7 @@ export class RequestController {
     private _httpClient: HttpClient;
     private _responseTextProvider: HttpResponseTextDocumentContentProvider;
     private _registration: Disposable;
+    private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
 
     constructor() {
         this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
@@ -58,10 +59,9 @@ export class RequestController {
                 this._statusBarItem.tooltip = 'duration';
 
                 this._responseTextProvider.response = response;
+                this._responseTextProvider.update(this._previewUri);
 
-                let previewUri = Uri.parse(`rest-response://authority/response-preview-${Date.now()}`);
-
-                commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two).then((success) => {
+                commands.executeCommand('vscode.previewHtml', this._previewUri, ViewColumn.Two).then((success) => {
                     }, (reason) => {
                         window.showErrorMessage(reason);
                     });
