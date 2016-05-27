@@ -77,7 +77,7 @@ Each time we sent a http request, the request details(method, url, headers and b
 
 ## Change Log
 ### 0.3.0
-* Display response in a seperate panel with syntax highlight
+* Display response in a separate pane with syntax highlight
 
 ### 0.2.2
 * __Fix__: Getting history request items from previous versions
