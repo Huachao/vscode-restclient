@@ -1,0 +1,18 @@
+{
+	"Get request block": {
+		"prefix": "get",
+		"body": [
+			"GET ${url} HTTP/1.1"
+		]
+	},
+    "Post request block": {
+		"prefix": "post",
+		"body": [
+			"POST ${url} HTTP/1.1",
+			"\t",
+			"${field-name}: ${field-value}",
+			"\t",
+			"${content}"
+		]
+	}
+}

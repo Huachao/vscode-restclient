@@ -20,6 +20,8 @@ content-type: application/json
 ```
 Once you prepared a request, use shortcut `Ctrl+Alt+R`, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in seperate panel of Visual Studio Code.
 
+![Snippet](images/snippet.gif)
+
 ## Install
 Press `F1`, type `ext install rest-client`.
 
