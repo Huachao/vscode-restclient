@@ -78,6 +78,9 @@ Each time we sent a http request, the request details(method, url, headers and b
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.3.1
+* Add get and post code snippet
+
 ### 0.3.0
 * Display response in a separate pane with syntax highlight
 
