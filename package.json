@@ -27,7 +27,7 @@
     "vscode": "^0.10.10"
   },
   "categories": [
-    "Productivity",
+    "Other",
     "Snippets"
   ],
   "keywords": [
@@ -41,11 +41,11 @@
   "main": "./out/src/extension",
   "contributes": {
     "snippets": [
-			{
-				"language": "plaintext",
-				"path": "./snippets/http.json"
-			}
-		],
+      {
+        "language": "plaintext",
+        "path": "./snippets/http.json"
+      }
+    ],
     "commands": [
       {
         "command": "rest-client.request",
