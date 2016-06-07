@@ -61,7 +61,7 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
         if (contentType) {
             let type = MimeUtility.parse(contentType).type;
             if (type === 'application/json') {
-                return JSON.stringify(JSON.parse(body), null, 8);
+                return JSON.stringify(JSON.parse(body), null, 4);
             }
         }
 
