@@ -10,7 +10,7 @@
         "body": [
             "POST ${url} HTTP/1.1",
             "${field-name}: ${field-value}",
-            "\t",
+            "",
             "${content}"
         ]
     }
