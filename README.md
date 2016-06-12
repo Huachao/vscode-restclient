@@ -64,6 +64,10 @@ authorization: token xxx
 </request>
 ```
 
+## Making CURL Request
+![CURL Request](images/curl-request.png)
+We add the capability to directly run [curl request](https://curl.haxx.se/) in REST Client extension. The making request command is the same as previous one. REST Client will automatically parse the request with specified parser.
+
 ## Request History
 ![request-history](images/request-history.png)
 Each time we sent a http request, the request details(method, url, headers and body) would be persisted into file. By using shortcut `Ctrl+Alt+H`, or press `F1` and then select/type `Rest Client: Request History`, you can view the last __50__ request items in the time reversing order, you can select any request you wish to trigger again. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
@@ -78,6 +82,9 @@ Each time we sent a http request, the request details(method, url, headers and b
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.4.0
+* Add capability to directly run [curl request](https://curl.haxx.se/)
+
 ### 0.3.1
 * Add get and post code snippet
 
