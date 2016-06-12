@@ -22,6 +22,7 @@ export class HttpClient {
             time: true,
             timeout: this._settings.timeoutInMilliseconds,
             strictSSL: false,
+            gzip: true,
             followRedirect: this._settings.followRedirect
         };
 

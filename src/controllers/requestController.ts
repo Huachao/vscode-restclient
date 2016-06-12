@@ -1,7 +1,7 @@
 "use strict";
 
 import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable } from 'vscode';
-import { RequestParser } from '../parser'
+import { RequestParserFactory } from '../models/requestParserFactory'
 import { HttpClient } from '../httpClient'
 import { RestClientSettings } from '../models/configurationSettings'
 import { PersistUtility } from '../persistUtility'
@@ -47,7 +47,7 @@ export class RequestController {
         this._statusBarItem.show();
 
         // parse http request
-        let httpRequest = RequestParser.parseHttpRequest(selectedText);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText);
         if (!httpRequest) {
             return;
         }

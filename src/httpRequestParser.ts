@@ -1,40 +1,42 @@
 "use strict";
 
 import { HttpRequest } from './models/httpRequest'
+import { IRequestParser } from './models/IRequestParser'
+import { RequestParserUtil } from './requestParserUtil'
 import { EOL } from 'os';
 
-export class RequestParser {
+export class HttpRequestParser implements IRequestParser {
     private static defaultMethod = 'GET';
 
-    static parseHttpRequest(requestRawText: string): HttpRequest {
+    parseHttpRequest(requestRawText: string): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
         // split the request raw text into lines
         let lines: string[] = requestRawText.split(EOL);
 
         // skip leading empty lines
-        lines = RequestParser.skipWhile(lines, value => value.trim() === '')
+        lines = HttpRequestParser.skipWhile(lines, value => value.trim() === '')
 
         if (lines.length == 0) {
             return null;
         }
 
         // parse request line
-        let requestLine = RequestParser.parseRequestLine(lines[0]);
+        let requestLine = HttpRequestParser.parseRequestLine(lines[0]);
 
         // get headers range
         let headers: { [key: string]: string };
         let body: string;
-        let headerStartLine = RequestParser.firstIndexOf(lines, value => value.trim() !== '', 1);
+        let headerStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', 1);
         if (headerStartLine !== -1) {
             // parse request headers
-            let firstEmptyLine = RequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
+            let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
             let headerEndLine = firstEmptyLine == -1 ? lines.length : firstEmptyLine;
-            headers = RequestParser.parseRequestHeaders(lines.slice(headerStartLine, headerEndLine));
+            headers = RequestParserUtil.parseRequestHeaders(lines.slice(headerStartLine, headerEndLine));
 
             // get body range
-            let bodyStartLine = RequestParser.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
+            let bodyStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
             if (bodyStartLine !== -1) {
-                firstEmptyLine = RequestParser.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
+                firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
                 let bodyEndLine = firstEmptyLine == -1 ? lines.length : firstEmptyLine;
                 body = lines.slice(bodyStartLine, bodyEndLine).join(EOL);
             }
@@ -51,7 +53,7 @@ export class RequestParser {
         let url: string;
         if (words.length === 1) {
             // Only provides request url
-            method = RequestParser.defaultMethod;
+            method = HttpRequestParser.defaultMethod;
             url = words[0];
         } else {
             // Provides both request method and url
@@ -63,33 +65,6 @@ export class RequestParser {
             "method": method,
             "url": url
         };
-    }
-
-    private static parseRequestHeaders(headerLines: string[]): { [key: string]: string } {
-        // message-header = field-name ":" [ field-value ]
-        let headers: { [key: string]: string } = {};
-        headerLines.forEach(headerLine => {
-            let headerParts = headerLine.split(':', 2).filter(Boolean);
-            let fieldName: string;
-            let fieldValue: string;
-            if (headerParts.length === 2) {
-                fieldName = headerParts[0];
-                fieldValue = headerParts[1];
-            } else if (headerParts.length == 1) {
-                fieldName = headerParts[0];
-                fieldValue = '';
-            }
-
-            let normalizedfieldName = fieldName.trim().toLowerCase();
-            let normalizedfieldValue = fieldValue.trim();
-            if (!headers[normalizedfieldName]) {
-                headers[normalizedfieldName] = normalizedfieldValue;
-            } else {
-                headers[normalizedfieldName] += `,${normalizedfieldValue}`;
-            }
-        });
-
-        return headers;
     }
 
     private static skipWhile<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean): T[] {
