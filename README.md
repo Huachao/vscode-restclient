@@ -8,7 +8,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Send __CURL command__ in editor
 * View request history
 * Code snippets for operations like `GET` and `POST`
-* Add HTTP language support, together with syntax highlight
+* Add HTTP language support, together with _syntax highlight_ and _autocomplete_
 
 ## Usage
 In editor, type a HTTP request as simple as below:
@@ -80,7 +80,7 @@ We add the capability to directly run [curl request](https://curl.haxx.se/) in R
 Each time we sent a http request, the request details(method, url, headers and body) would be persisted into file. By using shortcut `Ctrl+Alt+H`, or press `F1` and then select/type `Rest Client: Request History`, you can view the last __50__ request items in the time reversing order, you can select any request you wish to trigger again. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
 
 ## HTTP Language
-Add language support for HTTP request, with this feature, you can have syntax highlight when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:
+Add language support for HTTP request, with __syntax highlight__ and __autocomplete__, when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:
 1. File with extension `.http` and `.rest`
 2. First line of file follows standard request line in [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html), with `Method SP Request-URI SP HTTP-Version` format
 
@@ -98,6 +98,9 @@ If you want to enable language association in other cases, just change the langu
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.5.1
+* Add autocomplete for HTTP language
+
 ### 0.5.0
 * Add HTTP language and syntax highlight
 * Add `.http` and `.rest` file extension associations with HTTP language
