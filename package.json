@@ -38,7 +38,8 @@
   ],
   "activationEvents": [
     "onCommand:rest-client.request",
-    "onCommand:rest-client.history"
+    "onCommand:rest-client.history",
+    "onLanguage:http"
   ],
   "main": "./out/src/extension",
   "contributes": {
