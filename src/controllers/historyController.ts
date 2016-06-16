@@ -48,7 +48,7 @@ export class HistoryController {
 
     private createRequestInTempFile(request: HttpRequest): Promise<string> {
         return new Promise((resolve, reject) => {
-            tmp.file({ prefix: 'vscode-restclient-' }, function _tempFileCreated(err, tmpFilePath, fd) {
+            tmp.file({ prefix: 'vscode-restclient-', postfix: ".http" }, function _tempFileCreated(err, tmpFilePath, fd) {
                 if (err) {
                     reject(err);
                     return;

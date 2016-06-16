@@ -28,7 +28,9 @@
   },
   "categories": [
     "Other",
-    "Snippets"
+    "Productivity",
+    "Snippets",
+    "Languages"
   ],
   "keywords": [
     "REST",
@@ -40,7 +42,22 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
+    "languages": [{
+      "id": "http",
+      "aliases": ["HTTP", "Http", "http"],
+      "extensions": [".http", ".rest"],
+      "firstLine": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+(.*?)HTTP\/[0-9\\.]+$"
+    }],
+    "grammars": [{
+      "language": "http",
+      "scopeName": "source.http",
+      "path": "./syntaxes/http.tmLanguage"
+    }],
     "snippets": [
+      {
+        "language": "http",
+        "path": "./snippets/http.json"
+      },
       {
         "language": "plaintext",
         "path": "./snippets/http.json"
