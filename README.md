@@ -81,6 +81,7 @@ Each time we sent a http request, the request details(method, url, headers and b
 
 ## HTTP Language
 Add language support for HTTP request, with __syntax highlight__ and __autocomplete__, when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:
+
 1. File with extension `.http` and `.rest`
 2. First line of file follows standard request line in [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html), with `Method SP Request-URI SP HTTP-Version` format
 
