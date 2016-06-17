@@ -30,6 +30,7 @@ export class HttpElementFactory {
         elements.push(new HttpElement('Content-Length', ElementType.Header));
         elements.push(new HttpElement('Content-MD5', ElementType.Header));
         elements.push(new HttpElement('Content-Type', ElementType.Header));
+        elements.push(new HttpElement('Cookie', ElementType.Header));
         elements.push(new HttpElement('Date', ElementType.Header));
         elements.push(new HttpElement('Expect', ElementType.Header));
         elements.push(new HttpElement('Forwarded', ElementType.Header));
