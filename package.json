@@ -88,11 +88,6 @@
       "type": "object",
       "title": "REST Client configuration",
       "properties": {
-        "rest-client.clearoutput": {
-          "type": "boolean",
-          "default": false,
-          "description": "Clear previous output for each request."
-        },
         "rest-client.followredirect": {
           "type": "boolean",
           "default": true,

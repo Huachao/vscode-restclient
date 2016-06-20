@@ -90,7 +90,6 @@ If you want to enable language association in other cases, just change the langu
 ![HTTP Language](images/http.png)
 
 ## Settings
-* `rest-client.clearoutput`: Clear previous output for each request. (Default is __false__)
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
 * `rest-client.defaultuseragent`: If User-Agent header is omitted in request header, this value will be added as user agent for each request. (Default is __vscode-restclient__)
 * `rest-client.timeoutinmilliseconds`: Timeout in milliseconds. 0 for infinity. (Default is __0__)
