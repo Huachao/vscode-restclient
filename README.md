@@ -8,7 +8,8 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Send __CURL command__ in editor
 * View request history
 * Code snippets for operations like `GET` and `POST`
-* Add HTTP language support, together with _syntax highlight_ and _autocomplete_
+* Add HTTP language support with _syntax highlight_
+* Add HTTP language _auto completition_ for method, header, and mime types
 
 ## Usage
 In editor, type a HTTP request as simple as below:
@@ -88,6 +89,10 @@ Add language support for HTTP request, with __syntax highlight__ and __autocompl
 If you want to enable language association in other cases, just change the language mode to `HTTP`.
 
 ![HTTP Language](images/http.png)
+Currently we will auto complete for three cases:
+1. HTTP Method
+2. HTTP Header
+3. MIME Types for `Accept` and `Content-Type` headers
 
 ## Settings
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
@@ -98,6 +103,9 @@ If you want to enable language association in other cases, just change the langu
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.5.2
+* Add autocompletition of MIME type for specific headers like `Content-Type` and `Accept`
+
 ### 0.5.1
 * Add autocomplete for HTTP language
 
