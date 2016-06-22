@@ -8,11 +8,15 @@ export class HttpCompletionItemProvider implements CompletionItemProvider {
     public provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): CompletionItem[] {
         let completionItems: CompletionItem[] = [];
 
-        var elements = HttpElementFactory.getHttpElements();
+        var elements = HttpElementFactory.getHttpElements(document.lineAt(position).text);
         elements.map(e => {
             let item = new CompletionItem(e.name);
             item.detail = `HTTP ${ElementType[e.type]}`;
-            item.insertText = e.type === ElementType.Header ? `${e.name}: ` : `${e.name} `;
+            item.insertText = e.type === ElementType.Header
+                                            ? `${e.name}: `
+                                            : (e.type === ElementType.Method
+                                                ? `${e.name} `
+                                                : `${e.name}`);
             item.kind = CompletionItemKind.Text;
             completionItems.push(item);
         });
