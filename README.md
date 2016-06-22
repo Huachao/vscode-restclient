@@ -90,6 +90,7 @@ If you want to enable language association in other cases, just change the langu
 
 ![HTTP Language](images/http.png)
 Currently we will auto complete for three cases:
+
 1. HTTP Method
 2. HTTP Header
 3. MIME Types for `Accept` and `Content-Type` headers
