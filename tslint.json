@@ -2,6 +2,10 @@
     "rules": {
         "no-unused-variable": true,
         "no-unused-expression": true,
-        "no-trailing-whitespace": true
+        "no-trailing-whitespace": true,
+        "no-unreachable": true,
+        "no-duplicate-variable": true,
+        "no-duplicate-key": true,
+        "triple-equals": true
     }
 }

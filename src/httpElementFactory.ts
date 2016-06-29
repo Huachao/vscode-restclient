@@ -1,7 +1,6 @@
 "use strict";
 
 import { HttpElement, ElementType } from './models/httpElement';
-import * as fs from 'fs'
 
 export class HttpElementFactory {
     static getHttpElements(line: string) : HttpElement[] {

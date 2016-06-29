@@ -16,7 +16,7 @@ export class HttpRequestParser implements IRequestParser {
         // skip leading empty lines
         lines = HttpRequestParser.skipWhile(lines, value => value.trim() === '')
 
-        if (lines.length == 0) {
+        if (lines.length === 0) {
             return null;
         }
 
@@ -30,14 +30,14 @@ export class HttpRequestParser implements IRequestParser {
         if (headerStartLine !== -1) {
             // parse request headers
             let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
-            let headerEndLine = firstEmptyLine == -1 ? lines.length : firstEmptyLine;
+            let headerEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
             headers = RequestParserUtil.parseRequestHeaders(lines.slice(headerStartLine, headerEndLine));
 
             // get body range
             let bodyStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
             if (bodyStartLine !== -1) {
                 firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
-                let bodyEndLine = firstEmptyLine == -1 ? lines.length : firstEmptyLine;
+                let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                 body = lines.slice(bodyStartLine, bodyEndLine).join(EOL);
             }
         }
