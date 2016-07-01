@@ -6,7 +6,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 ## Features
 * Send __HTTP request__ in editor and view response in a separate pane with syntax highlight
 * Send __CURL command__ in editor
-* View request history
+* Auto save and view request history
 * Code snippets for operations like `GET` and `POST`
 * Add HTTP language support with _syntax highlight_
 * Add HTTP language _auto completition_ for method, header, and mime types
