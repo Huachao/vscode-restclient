@@ -50,7 +50,7 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
         let headerString = '';
         for (var header in headers) {
             if (headers.hasOwnProperty(header)) {
-                var value = headers[header];
+                var value = HttpResponseTextDocumentContentProvider.escase(headers[header]);
                 headerString += `${header}: ${value}\n`;
             }
         }
