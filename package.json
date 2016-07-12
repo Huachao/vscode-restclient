@@ -43,17 +43,28 @@
   ],
   "main": "./out/src/extension",
   "contributes": {
-    "languages": [{
-      "id": "http",
-      "aliases": ["HTTP", "Http", "http"],
-      "extensions": [".http", ".rest"],
-      "firstLine": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+(.*?)HTTP\/[0-9\\.]+$"
-    }],
-    "grammars": [{
-      "language": "http",
-      "scopeName": "source.http",
-      "path": "./syntaxes/http.tmLanguage"
-    }],
+    "languages": [
+      {
+        "id": "http",
+        "aliases": [
+          "HTTP",
+          "Http",
+          "http"
+        ],
+        "extensions": [
+          ".http",
+          ".rest"
+        ],
+        "firstLine": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+(.*?)HTTP/[0-9\\.]+$"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "http",
+        "scopeName": "source.http",
+        "path": "./syntaxes/http.tmLanguage"
+      }
+    ],
     "snippets": [
       {
         "language": "http",
@@ -118,6 +129,7 @@
     "vscode": "^0.11.0"
   },
   "dependencies": {
+    "pretty-data": "^0.40.0",
     "request": "^2.69.0",
     "tmp": "^0.0.28",
     "yargs": "^4.7.1"

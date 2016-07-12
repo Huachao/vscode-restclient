@@ -4,6 +4,8 @@ import { TextDocumentContentProvider, EventEmitter, Event, Uri } from 'vscode';
 import { HttpResponse } from '../models/httpResponse'
 import { MimeUtility } from '../mimeUtility'
 
+var pd = require('pretty-data').pd;
+
 export class HttpResponseTextDocumentContentProvider implements TextDocumentContentProvider  {
     private static _tagsToReplace = {
         '&': '&amp;',
@@ -61,7 +63,9 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
         if (contentType) {
             let type = MimeUtility.parse(contentType).type;
             if (type === 'application/json') {
-                return JSON.stringify(JSON.parse(body), null, 4);
+                body = JSON.stringify(JSON.parse(body), null, 4);
+            } else if (type === 'application/xml') {
+                body = pd.xml(body);
             }
         }
 
