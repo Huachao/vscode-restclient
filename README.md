@@ -27,7 +27,7 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, use shortcut `Ctrl+Alt+R`, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in seperate panel of Visual Studio Code.
+Once you prepared a request, use shortcut `Ctrl+Alt+R`, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in seperate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/cloud-upload-icon.png) will be disalyed in the status bar, when receiving the response, the icon will be changed to the duration.
 
 ![Snippet](images/snippet.gif)
 
@@ -105,6 +105,10 @@ Currently we will auto complete for three cases:
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.5.3
+* Format response of `application/xml` type
+* Bug fix for escapse `<` and `>` in response headers
+
 ### 0.5.2
 * Add autocompletition of MIME type for specific headers like `Content-Type` and `Accept`
 
