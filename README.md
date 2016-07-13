@@ -105,6 +105,9 @@ Currently we will auto complete for three cases:
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.5.4
+* Bug fix for escape string header values
+
 ### 0.5.3
 * Format response of `application/xml` type
 * Bug fix for escapse `<` and `>` in response headers
