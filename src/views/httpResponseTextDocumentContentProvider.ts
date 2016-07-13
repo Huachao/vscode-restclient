@@ -52,7 +52,10 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
         let headerString = '';
         for (var header in headers) {
             if (headers.hasOwnProperty(header)) {
-                var value = HttpResponseTextDocumentContentProvider.escase(headers[header]);
+                let value = headers[header];
+                if (typeof headers[header] === 'string') {
+                    value = HttpResponseTextDocumentContentProvider.escape(<string>headers[header]);
+                }
                 headerString += `${header}: ${value}\n`;
             }
         }
@@ -69,10 +72,10 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             }
         }
 
-        return HttpResponseTextDocumentContentProvider.escase(body);
+        return HttpResponseTextDocumentContentProvider.escape(body);
     }
 
-    private static escase(data: string): string {
+    private static escape(data: string): string {
         return data.replace(/[&<>]/g, function(tag) {
             return HttpResponseTextDocumentContentProvider._tagsToReplace[tag] || tag;
     });
