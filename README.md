@@ -105,6 +105,10 @@ Currently we will auto complete for three cases:
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.5.5
+* Bug fix [Allow host header in request headers](https://github.com/Huachao/vscode-restclient/issues/10)
+* Bug fix [Display raw response if not real json](https://github.com/Huachao/vscode-restclient/issues/14)
+
 ### 0.5.4
 * Bug fix for escape string header values
 
