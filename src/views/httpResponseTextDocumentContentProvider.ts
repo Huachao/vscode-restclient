@@ -1,6 +1,6 @@
 "use strict";
 
-import { TextDocumentContentProvider, EventEmitter, Event, Uri } from 'vscode';
+import { TextDocumentContentProvider, EventEmitter, Event, Uri, window } from 'vscode';
 import { HttpResponse } from '../models/httpResponse'
 import { MimeUtility } from '../mimeUtility'
 
@@ -66,7 +66,11 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
         if (contentType) {
             let type = MimeUtility.parse(contentType).type;
             if (type === 'application/json') {
-                body = JSON.stringify(JSON.parse(body), null, 4);
+                if (HttpResponseTextDocumentContentProvider.isJsonString(body)) {
+                    body = JSON.stringify(JSON.parse(body), null, 4);
+                 } else {
+                    window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
+                 }
             } else if (type === 'application/xml') {
                 body = pd.xml(body);
             }
@@ -79,5 +83,14 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
         return data.replace(/[&<>]/g, function (tag) {
             return HttpResponseTextDocumentContentProvider._tagsToReplace[tag] || tag;
         });
+    }
+
+    private static isJsonString(data: string) {
+        try {
+            JSON.parse(data);
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 }
