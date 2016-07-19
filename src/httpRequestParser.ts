@@ -4,7 +4,6 @@ import { HttpRequest } from './models/httpRequest'
 import { IRequestParser } from './models/IRequestParser'
 import { RequestParserUtil } from './requestParserUtil'
 import { EOL } from 'os';
-import * as url from 'url';
 
 export class HttpRequestParser implements IRequestParser {
     private static defaultMethod = 'GET';
