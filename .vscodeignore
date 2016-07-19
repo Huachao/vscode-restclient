@@ -1,3 +1,4 @@
+.github/**
 .vscode/**
 typings/**
 out/test/**

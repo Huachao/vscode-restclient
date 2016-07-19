@@ -13,10 +13,10 @@ export class HttpCompletionItemProvider implements CompletionItemProvider {
             let item = new CompletionItem(e.name);
             item.detail = `HTTP ${ElementType[e.type]}`;
             item.insertText = e.type === ElementType.Header
-                                            ? `${e.name}: `
-                                            : (e.type === ElementType.Method
-                                                ? `${e.name} `
-                                                : `${e.name}`);
+                ? `${e.name}: `
+                : (e.type === ElementType.Method
+                    ? `${e.name} `
+                    : `${e.name}`);
             item.kind = CompletionItemKind.Text;
             completionItems.push(item);
         });

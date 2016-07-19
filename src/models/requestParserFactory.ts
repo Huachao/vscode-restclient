@@ -9,7 +9,7 @@ export interface IRequestParserFactory {
 }
 
 export class RequestParserFactory implements IRequestParserFactory {
-    public createRequestParser(rawHttpRequest: string) : IRequestParser {
+    public createRequestParser(rawHttpRequest: string): IRequestParser {
         if (rawHttpRequest.trim().toLowerCase().startsWith('curl'.toLowerCase())) {
             return new CurlRequestParser();
         } else {

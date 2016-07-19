@@ -6,7 +6,7 @@ import { MimeUtility } from '../mimeUtility'
 
 var pd = require('pretty-data').pd;
 
-export class HttpResponseTextDocumentContentProvider implements TextDocumentContentProvider  {
+export class HttpResponseTextDocumentContentProvider implements TextDocumentContentProvider {
     private static _tagsToReplace = {
         '&': '&amp;',
         '<': '&lt;',
@@ -76,8 +76,8 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
     }
 
     private static escape(data: string): string {
-        return data.replace(/[&<>]/g, function(tag) {
+        return data.replace(/[&<>]/g, function (tag) {
             return HttpResponseTextDocumentContentProvider._tagsToReplace[tag] || tag;
-    });
+        });
     }
 }

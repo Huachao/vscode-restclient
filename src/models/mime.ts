@@ -6,7 +6,7 @@ export class MIME {
     raw: string;
 
     constructor(type: string, suffix: string, raw: string) {
-        this.type =type;
+        this.type = type;
         this.suffix = suffix;
         this.raw = raw;
     }

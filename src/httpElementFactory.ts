@@ -3,7 +3,7 @@
 import { HttpElement, ElementType } from './models/httpElement';
 
 export class HttpElementFactory {
-    static getHttpElements(line: string) : HttpElement[] {
+    static getHttpElements(line: string): HttpElement[] {
         let originalElements: HttpElement[] = [];
 
         // add http methods

@@ -62,19 +62,19 @@ export class RequestController {
                 this._responseTextProvider.update(this._previewUri);
 
                 commands.executeCommand('vscode.previewHtml', this._previewUri, ViewColumn.Two).then((success) => {
-                    }, (reason) => {
-                        window.showErrorMessage(reason);
-                    });
+                }, (reason) => {
+                    window.showErrorMessage(reason);
+                });
 
                 // persist to history json file
                 PersistUtility.save(httpRequest);
             })
             .catch(error => {
                 if (error.code === 'ETIMEDOUT') {
-                    error = `Error: Timed out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
+                    error = `Error: ${error}. Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
                 }
                 this._statusBarItem.text = '';
-                window.showErrorMessage(error.message);
+                window.showErrorMessage(error);
             });
     }
 

@@ -15,7 +15,7 @@ export class PersistUtility {
             requests.unshift(httpRequest);
             requests = requests.slice(0, Constants.HistoryItemsMaxCount);
             PersistUtility.serializeToHistoryFile(requests);
-        }).catch(error => {});
+        }).catch(error => { });
     }
 
     static load(): Promise<HttpRequest[]> {

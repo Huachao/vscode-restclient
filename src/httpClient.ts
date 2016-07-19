@@ -36,7 +36,7 @@ export class HttpClient {
         }
 
         return new Promise<HttpResponse>((resolve, reject) => {
-            request(options, function(error, response, body) {
+            request(options, function (error, response, body) {
                 if (error) {
                     reject(error);
                     return;
