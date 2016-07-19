@@ -71,10 +71,10 @@ export class RequestController {
             })
             .catch(error => {
                 if (error.code === 'ETIMEDOUT') {
-                    error = `Error: ${error}. Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
+                    error.message = `Error: ${error}. Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
                 }
                 this._statusBarItem.text = '';
-                window.showErrorMessage(error);
+                window.showErrorMessage(error.message);
             });
     }
 

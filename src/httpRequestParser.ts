@@ -43,7 +43,7 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // if Host header provided and url is relative path, change to absolute url
-        if (headers['host'] && requestLine.url[0] === '/') {
+        if (headers && headers['host'] && requestLine.url[0] === '/') {
             requestLine.url = `http://${headers['host']}${requestLine.url}`;
         }
 
