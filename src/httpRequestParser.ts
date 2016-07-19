@@ -4,6 +4,7 @@ import { HttpRequest } from './models/httpRequest'
 import { IRequestParser } from './models/IRequestParser'
 import { RequestParserUtil } from './requestParserUtil'
 import { EOL } from 'os';
+import * as url from 'url';
 
 export class HttpRequestParser implements IRequestParser {
     private static defaultMethod = 'GET';
@@ -40,6 +41,11 @@ export class HttpRequestParser implements IRequestParser {
                 let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                 body = lines.slice(bodyStartLine, bodyEndLine).join(EOL);
             }
+        }
+
+        // if Host header provided and url is relative path, change to absolute url
+        if (headers['host'] && requestLine.url[0] === '/') {
+            requestLine.url = `http://${headers['host']}${requestLine.url}`;
         }
 
         return new HttpRequest(requestLine.method, requestLine.url, headers, body);
