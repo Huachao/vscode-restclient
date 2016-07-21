@@ -29,13 +29,11 @@ content-type: application/json
 ```
 Once you prepared a request, use shortcut `Ctrl+Alt+R`, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in seperate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/cloud-upload-icon.png) will be disalyed in the status bar, when receiving the response, the icon will be changed to the duration.
 
-![Snippet](images/snippet.gif)
-
 ## Install
 Press `F1`, type `ext install rest-client`.
 
 ## Making Request
-![rest-client](images/rest-client.png)
+![rest-client](images/demo.gif)
 ### Request Line
 The first non-empty line of the selection (or document if nothing is selected) is the _Request Line_.
 Below are some examples of _Request Line_:
