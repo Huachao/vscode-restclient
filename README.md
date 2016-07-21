@@ -103,6 +103,9 @@ Currently we will auto complete for three cases:
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.6.1
+* Update README to reflect latest changes
+
 ### 0.6.0
 * Preview response with css file which takes theme style into consideration. Fix the issue [avoid the white background](https://github.com/Huachao/vscode-restclient/issues/12) 
 
