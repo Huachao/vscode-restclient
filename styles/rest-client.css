@@ -1,0 +1,98 @@
+body.vscode-light {
+  background-color: inherit;
+}
+
+body.vscode-dark {
+  background-color: inherit
+}
+
+body.vscode-high-contrast {
+  background-color: inherit
+}
+
+.vscode-light pre .hljs-attribute {
+  color: #c82829;
+}
+
+.vscode-dark pre .hljs-attribute {
+  color: #cc6666;
+}
+
+.vscode-high-contrast pre .hljs-attribute {
+  color: #ff9da4;
+}
+
+.vscode-light pre .hljs-attr {
+  color: #eab700;
+}
+
+.vscode-dark pre .hljs-attr {
+  color: #f0c674;
+}
+
+.vscode-high-contrast pre .hljs-attr {
+  color: #ffeead;
+}
+
+.vscode-light pre .hljs-number, .vscode-light pre .literal {
+  color: #f5871f;
+}
+
+.vscode-dark pre .hljs-number, .vscode-dark pre .literal {
+  color: #de935f;
+}
+
+.vscode-high-contrast pre .hljs-number, .vscode-high-contrast pre .literal {
+  color: #ffc58f;
+}
+
+.vscode-light pre .hljs-hljs-string {
+  color: #718c00;
+}
+
+.vscode-dark pre .hljs-string {
+  color: #b5bd68;
+}
+
+.vscode-high-contrast pre .hljs-string {
+  color: #d1f1a9;
+}
+
+.vscode-light pre .hljs-keyword {
+  color: #8959a8;
+}
+
+.vscode-dark pre .hljs-keyword {
+  color: #b294bb;
+}
+
+.vscode-high-contrast pre .hljs-keyword {
+  color: #ebbbff;
+}
+
+.vscode-light pre code {
+  display: block;
+  background: inherit;
+  color: #4d4d4c;
+  font-family: Menlo, Monaco, Consolas, monospace;
+  line-height: 1.5;
+  padding: 10px;
+}
+
+.vscode-dark pre code {
+  display: block;
+  background: inherit;
+  color: #c5c8c6;
+  font-family: Menlo, Monaco, Consolas, monospace;
+  line-height: 1.5;
+  padding: 10px;
+}
+
+.vscode-high-contrast pre code {
+  display: block;
+  background: inherit;
+  color: white;
+  font-family: Menlo, Monaco, Consolas, monospace;
+  line-height: 1.5;
+  padding: 10px;
+}

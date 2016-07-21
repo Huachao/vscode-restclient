@@ -1,8 +1,10 @@
 "use strict";
 
-import { TextDocumentContentProvider, EventEmitter, Event, Uri, window } from 'vscode';
+import { TextDocumentContentProvider, EventEmitter, Event, Uri, window, extensions } from 'vscode';
 import { HttpResponse } from '../models/httpResponse'
 import { MimeUtility } from '../mimeUtility'
+import * as Constants from '../constants'
+import * as path from 'path'
 
 var pd = require('pretty-data').pd;
 
@@ -12,6 +14,8 @@ export class HttpResponseTextDocumentContentProvider implements TextDocumentCont
         '<': '&lt;',
         '>': '&gt;',
     };
+
+    private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
 
     private _onDidChange = new EventEmitter<Uri>();
     response: HttpResponse;
@@ -24,13 +28,13 @@ export class HttpResponseTextDocumentContentProvider implements TextDocumentCont
         if (this.response) {
             return `
             <head>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/styles/github.min.css">
+                <link rel="stylesheet" href="${HttpResponseTextDocumentContentProvider.cssFilePath}">
                 <script src="https://cdn.jsdelivr.net/highlight.js/9.4.0/highlight.min.js"></script>
             </head>
             <body>
                 <script>hljs.initHighlightingOnLoad();</script>
                 <div>
-                <pre><code class="http" style="background-color: white">
+                <pre><code class="http">
 HTTP/${this.response.httpVersion} <b>${this.response.statusCode} ${this.response.statusMessage}</b> <i>${this.response.elapsedMillionSeconds}ms</i>
 ${HttpResponseTextDocumentContentProvider.formatHeaders(this.response.headers)}
 ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.response.headers['content-type'])}
