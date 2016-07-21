@@ -105,6 +105,9 @@ Currently we will auto complete for three cases:
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.6.0
+* Preview response with css file which takes theme style into consideration. Fix the issue [avoid the white background](https://github.com/Huachao/vscode-restclient/issues/12) 
+
 ### 0.5.5
 * Bug fix [Allow host header in request headers](https://github.com/Huachao/vscode-restclient/issues/10)
 * Bug fix [Display raw response if not real json](https://github.com/Huachao/vscode-restclient/issues/14)
