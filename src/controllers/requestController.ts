@@ -61,7 +61,7 @@ export class RequestController {
                 this._responseTextProvider.response = response;
                 this._responseTextProvider.update(this._previewUri);
 
-                commands.executeCommand('vscode.previewHtml', this._previewUri, ViewColumn.Two).then((success) => {
+                commands.executeCommand('vscode.previewHtml', this._previewUri, ViewColumn.Two, `${response.statusMessage}(${response.statusCode}) - ${response.elapsedMillionSeconds}ms`).then((success) => {
                 }, (reason) => {
                     window.showErrorMessage(reason);
                 });
