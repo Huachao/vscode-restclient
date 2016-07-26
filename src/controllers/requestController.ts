@@ -6,6 +6,7 @@ import { HttpClient } from '../httpClient'
 import { RestClientSettings } from '../models/configurationSettings'
 import { PersistUtility } from '../persistUtility'
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
+import { EOL } from 'os';
 
 export class RequestController {
     private _statusBarItem: StatusBarItem;
@@ -14,6 +15,8 @@ export class RequestController {
     private _responseTextProvider: HttpResponseTextDocumentContentProvider;
     private _registration: Disposable;
     private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
+
+    private static commentIdentifiersRegex = new RegExp('^\s*(\#|\/\/)');
 
     constructor() {
         this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
@@ -38,6 +41,9 @@ export class RequestController {
             selectedText = editor.document.getText(editor.selection);
         }
 
+        // remove comment lines
+        let lines: string[] = selectedText.split(EOL);
+        selectedText = lines.filter(l => !RequestController.commentIdentifiersRegex.test(l)).join(EOL);
         if (selectedText === '') {
             return;
         }
@@ -61,7 +67,7 @@ export class RequestController {
                 this._responseTextProvider.response = response;
                 this._responseTextProvider.update(this._previewUri);
 
-                commands.executeCommand('vscode.previewHtml', this._previewUri, ViewColumn.Two, `${response.statusMessage}(${response.statusCode}) - ${response.elapsedMillionSeconds}ms`).then((success) => {
+                commands.executeCommand('vscode.previewHtml', this._previewUri, ViewColumn.Two, 'Response').then((success) => {
                 }, (reason) => {
                     window.showErrorMessage(reason);
                 });

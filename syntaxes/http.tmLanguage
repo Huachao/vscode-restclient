@@ -16,6 +16,18 @@
         <key>patterns</key>
         <array>
             <dict>
+                <key>match</key>
+                <string>^\s*#.*$\n?</string>
+                <key>name</key>
+                <string>comment.source.sharp.http</string>
+            </dict>
+            <dict>
+                <key>match</key>
+                <string>^\s*//.*$\n?</string>
+                <key>name</key>
+                <string>comment.source.double-slash.http</string>
+            </dict>
+            <dict>
                 <key>captures</key>
                 <dict>
                     <key>2</key>
