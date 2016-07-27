@@ -104,7 +104,7 @@ Currently we will auto complete for three cases:
 [MIT License](LICENSE)
 
 ## Change Log
-## 0.6.2
+### 0.6.2
 * Support comments in `.http` and `.rest` files
 
 ### 0.6.1
