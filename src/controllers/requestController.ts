@@ -67,7 +67,8 @@ export class RequestController {
                 this._responseTextProvider.response = response;
                 this._responseTextProvider.update(this._previewUri);
 
-                commands.executeCommand('vscode.previewHtml', this._previewUri, ViewColumn.Two, 'Response').then((success) => {
+                let previewUri = this.generatePreviewUri();
+                commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, 'Response').then((success) => {
                 }, (reason) => {
                     window.showErrorMessage(reason);
                 });
@@ -87,5 +88,13 @@ export class RequestController {
     dispose() {
         this._statusBarItem.dispose();
         this._registration.dispose();
+    }
+
+    private generatePreviewUri() : Uri {
+        let uriString = 'rest-response://authority/response-preview'
+        if (this._restClientSettings.showResponseInDifferentTab) {
+            uriString += `/${Date.now()}`;  // just make every uri different
+        }
+        return Uri.parse(uriString);
     }
 }

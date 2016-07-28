@@ -112,6 +112,11 @@
           "type": "integer",
           "default": 0,
           "description": "Timeout in milliseconds. 0 for infinity"
+        },
+        "rest-client.showResponseInDifferentTab": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show response in different tab"
         }
       }
     }
