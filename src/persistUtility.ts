@@ -1,13 +1,13 @@
 'use strict';
 
-import { extensions } from 'vscode';
 import { HttpRequest } from './models/httpRequest'
 import * as Constants from './constants'
 import * as fs from 'fs'
 import * as path from 'path'
+import * as os from 'os'
 
 export class PersistUtility {
-    private static historyFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.HistoryFileName);
+    private static historyFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.HistoryFileName);
     private static emptyHttpRequestItems: HttpRequest[] = [];
 
     static save(httpRequest: HttpRequest) {
@@ -26,6 +26,7 @@ export class PersistUtility {
         try {
             fs.statSync(PersistUtility.historyFilePath);
         } catch (error) {
+            PersistUtility.ensureDirectoryExistence(PersistUtility.historyFilePath);
             fs.writeFileSync(PersistUtility.historyFilePath, '');
         }
     }
@@ -39,12 +40,6 @@ export class PersistUtility {
             fs.readFile(PersistUtility.historyFilePath, (error, data) => {
                 if (error) {
                     PersistUtility.createHistoryFileIfNotExist();
-                    let previousRequests = PersistUtility.retrieveRequestsFromPreviousVersions();
-                    if (previousRequests && previousRequests.length > 0) {
-                        PersistUtility.serializeToHistoryFile(previousRequests);
-                        resolve(previousRequests);
-                        return;
-                    }
                 } else {
                     let fileContent = data.toString();
                     if (fileContent) {
@@ -57,34 +52,20 @@ export class PersistUtility {
         });
     }
 
-    private static retrieveRequestsFromPreviousVersions(): HttpRequest[] {
-        let extensionsFolderPath = path.dirname(path.dirname(PersistUtility.historyFilePath));
-        let folders = fs.readdirSync(extensionsFolderPath).filter(function (file) {
-            let filePath = path.join(extensionsFolderPath, file);
-            return fs.statSync(filePath).isDirectory() && file.startsWith('humao.rest-client-');
-        }).sort().reverse();
-
-        let previousRequests: HttpRequest[] = [];
-        for (var i in folders) {
-            let historyFile = path.join(extensionsFolderPath, folders[i], Constants.HistoryFileName);
-            try {
-                fs.statSync(historyFile);
-                let fileContent = fs.readFileSync(historyFile).toString();
-                if (fileContent) {
-                    let requests = <HttpRequest[]>JSON.parse(fileContent)
-                    if (requests) {
-                        previousRequests.push(...requests);
-                        if (previousRequests.length >= Constants.HistoryItemsMaxCount) {
-                            previousRequests = previousRequests.slice(0, Constants.HistoryItemsMaxCount);
-                            break;
-                        }
-                    }
-                }
-            } catch (error) {
-                continue;
-            }
+    private static ensureDirectoryExistence(filePath: string) {
+        let dirname = path.dirname(filePath);
+        if (PersistUtility.directoryExists(dirname)) {
+            return true;
         }
+        PersistUtility.ensureDirectoryExistence(dirname);
+        fs.mkdirSync(dirname);
+    }
 
-        return previousRequests;
+    private static directoryExists(path) {
+        try {
+            return fs.statSync(path).isDirectory();
+        } catch (err) {
+            return false;
+        }
     }
 }
