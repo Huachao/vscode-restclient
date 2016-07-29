@@ -1,4 +1,4 @@
-"use strict";
+/// <reference path="../../typings/vscode-typings.d.ts" />
 
 import { workspace } from 'vscode';
 
@@ -7,6 +7,8 @@ export interface IRestClientSettings {
     defaultUserAgent: string;
     timeoutInMilliseconds: number;
     showResponseInDifferentTab: boolean;
+    proxy: string;
+    proxyStrictSSL: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -14,6 +16,8 @@ export class RestClientSettings implements IRestClientSettings {
     defaultUserAgent: string;
     timeoutInMilliseconds: number;
     showResponseInDifferentTab: boolean;
+    proxy: string;
+    proxyStrictSSL: boolean;
 
     constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -32,5 +36,9 @@ export class RestClientSettings implements IRestClientSettings {
         if (this.timeoutInMilliseconds < 0) {
             this.timeoutInMilliseconds = 0;
         }
+
+        let httpSettings = workspace.getConfiguration('http');
+        this.proxy = httpSettings.get<string>('proxy', undefined);
+        this.proxyStrictSSL = httpSettings.get<boolean>('proxyStrictSSL', false);
     }
 }
