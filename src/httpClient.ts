@@ -21,7 +21,8 @@ export class HttpClient {
             body: httpRequest.body,
             time: true,
             timeout: this._settings.timeoutInMilliseconds,
-            strictSSL: false,
+            proxy: this._settings.proxy,
+            strictSSL: this._settings.proxyStrictSSL,
             gzip: true,
             followRedirect: this._settings.followRedirect
         };

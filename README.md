@@ -101,6 +101,8 @@ Currently we will auto complete for three cases:
 * `rest-client.timeoutinmilliseconds`: Timeout in milliseconds. 0 for infinity. (Default is __0__)
 * `rest-client.showResponseInDifferentTab`: Show response in different tab. (Default is __false__)
 
+Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
+
 ## License
 [MIT License](LICENSE)
 
