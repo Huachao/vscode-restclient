@@ -22,7 +22,7 @@ export class HttpClient {
             time: true,
             timeout: this._settings.timeoutInMilliseconds,
             proxy: this._settings.proxy,
-            strictSSL: this._settings.proxyStrictSSL,
+            strictSSL: this._settings.proxy && this._settings.proxy.length > 0 ? this._settings.proxyStrictSSL : false,
             gzip: true,
             followRedirect: this._settings.followRedirect
         };
