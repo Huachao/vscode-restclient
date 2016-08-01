@@ -26,6 +26,11 @@ export class CurlRequestParser implements IRequestParser {
             headers = RequestParserUtil.parseRequestHeaders(parsedArguments.H);
         }
 
+        let user = parsedArguments.u || parsedArguments.user;
+        if (user) {
+            headers['Authorization'] = `Basic ${new Buffer(user).toString('base64')}`;
+        }
+
         // parse body
         let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-binary'];
 
