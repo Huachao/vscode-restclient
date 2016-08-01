@@ -99,11 +99,16 @@ Currently we will auto complete for three cases:
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
 * `rest-client.defaultuseragent`: If User-Agent header is omitted in request header, this value will be added as user agent for each request. (Default is __vscode-restclient__)
 * `rest-client.timeoutinmilliseconds`: Timeout in milliseconds. 0 for infinity. (Default is __0__)
+* `rest-client.showResponseInDifferentTab`: Show response in different tab. (Default is __false__)
 
 ## License
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.6.3
+* Bug fix [Add option to show response in seperate tabs](https://github.com/Huachao/vscode-restclient/issues/23)
+* Bug fix [Allow -u option in curl request](https://github.com/Huachao/vscode-restclient/issues/26)
+
 ### 0.6.2
 * Support comments in `.http` and `.rest` files
 
