@@ -1,5 +1,3 @@
-/// <reference path="../../typings/vscode-typings.d.ts" />
-
 import { workspace } from 'vscode';
 
 export interface IRestClientSettings {
