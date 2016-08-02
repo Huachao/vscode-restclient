@@ -7,7 +7,8 @@ import * as path from 'path'
 import * as os from 'os'
 
 export class PersistUtility {
-    private static historyFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.HistoryFileName);
+    static historyFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.HistoryFileName);
+    static cookieFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.CookieFileName);
     private static emptyHttpRequestItems: HttpRequest[] = [];
 
     static save(httpRequest: HttpRequest) {
@@ -22,12 +23,21 @@ export class PersistUtility {
         return PersistUtility.deserializeFromHistoryFile();
     }
 
-    private static createHistoryFileIfNotExist() {
+    static createHistoryFileIfNotExist() {
         try {
             fs.statSync(PersistUtility.historyFilePath);
         } catch (error) {
             PersistUtility.ensureDirectoryExistence(PersistUtility.historyFilePath);
             fs.writeFileSync(PersistUtility.historyFilePath, '');
+        }
+    }
+
+    static createCookieFileIfNotExist() {
+        try {
+            fs.statSync(PersistUtility.cookieFilePath);
+        } catch (error) {
+            PersistUtility.ensureDirectoryExistence(PersistUtility.cookieFilePath);
+            fs.writeFileSync(PersistUtility.cookieFilePath, '');
         }
     }
 

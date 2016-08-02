@@ -117,6 +117,11 @@
           "type": "boolean",
           "default": false,
           "description": "Show response in different tab"
+        },
+        "rest-client.rememberCookiesForSubsequentRequests": {
+          "type": "boolean",
+          "default": true,
+          "description": "Remember cookies for subsequent requests"
         }
       }
     }
@@ -136,6 +141,7 @@
     "pretty-data": "^0.40.0",
     "request": "^2.69.0",
     "tmp": "^0.0.28",
+    "tough-cookie-filestore": "0.0.1",
     "yargs": "^4.7.1"
   }
 }

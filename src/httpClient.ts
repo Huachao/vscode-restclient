@@ -3,14 +3,17 @@
 import { RestClientSettings } from './models/configurationSettings'
 import { HttpRequest } from './models/httpRequest'
 import { HttpResponse } from './models/httpResponse'
+import { PersistUtility } from './persistUtility'
 
 var request = require('request')
+var fileCookieStore = require('tough-cookie-filestore');
 
 export class HttpClient {
     private _settings: RestClientSettings;
 
     constructor(settings: RestClientSettings) {
         this._settings = settings;
+        PersistUtility.createCookieFileIfNotExist();
     }
 
     send(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -24,7 +27,8 @@ export class HttpClient {
             proxy: this._settings.proxy,
             strictSSL: this._settings.proxy && this._settings.proxy.length > 0 ? this._settings.proxyStrictSSL : false,
             gzip: true,
-            followRedirect: this._settings.followRedirect
+            followRedirect: this._settings.followRedirect,
+            jar: this._settings.rememberCookiesForSubsequentRequests ? request.jar(new fileCookieStore(PersistUtility.cookieFilePath)) : false
         };
 
         if (!options.headers) {

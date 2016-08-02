@@ -7,6 +7,7 @@ export interface IRestClientSettings {
     showResponseInDifferentTab: boolean;
     proxy: string;
     proxyStrictSSL: boolean;
+    rememberCookiesForSubsequentRequests: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -16,6 +17,7 @@ export class RestClientSettings implements IRestClientSettings {
     showResponseInDifferentTab: boolean;
     proxy: string;
     proxyStrictSSL: boolean;
+    rememberCookiesForSubsequentRequests: boolean;
 
     constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -30,6 +32,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultUserAgent = restClientSettings.get<string>("defaultuseragent", "vscode-restclient");
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
+        this.rememberCookiesForSubsequentRequests = restClientSettings.get<boolean>("rememberCookiesForSubsequentRequests", true);
         this.timeoutInMilliseconds = restClientSettings.get<number>("timeoutinmilliseconds", 0);
         if (this.timeoutInMilliseconds < 0) {
             this.timeoutInMilliseconds = 0;
