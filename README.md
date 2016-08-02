@@ -4,10 +4,12 @@
 
 REST Client allows you to send HTTP request and view the response in Visual Studio Code directly.
 
-## Features
+## Main Features
 * Send __HTTP request__ in editor and view response in a separate pane with syntax highlight
 * Send __CURL command__ in editor
 * Auto save and view request history
+* Remeber Cookies for subsequent requests
+* Proxy support
 * Code snippets for operations like `GET` and `POST`
 * Add HTTP language support with _syntax highlight_
 * Add HTTP language _auto completition_ for method, header, and mime types
@@ -100,6 +102,7 @@ Currently we will auto complete for three cases:
 * `rest-client.defaultuseragent`: If User-Agent header is omitted in request header, this value will be added as user agent for each request. (Default is __vscode-restclient__)
 * `rest-client.timeoutinmilliseconds`: Timeout in milliseconds. 0 for infinity. (Default is __0__)
 * `rest-client.showResponseInDifferentTab`: Show response in different tab. (Default is __false__)
+* `rest-client.rememberCookiesForSubsequentRequests`: Remember cookies for subsequent requests. (Default is __true__)
 
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 
@@ -107,6 +110,11 @@ Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.7.0
+* Feature: [Support Cookies](https://github.com/Huachao/vscode-restclient/issues/8)
+* Feature: [Proxy Support](https://github.com/Huachao/vscode-restclient/issues/25) [(@mad-mike)](https://github.com/mad-mike/)
+* Improvement: [Wrap long strings in preview tab](https://github.com/Huachao/vscode-restclient/issues/24)
+
 ### 0.6.3
 * Bug fix [Add option to show response in seperate tabs](https://github.com/Huachao/vscode-restclient/issues/23)
 * Bug fix [Allow -u option in curl request](https://github.com/Huachao/vscode-restclient/issues/26)
