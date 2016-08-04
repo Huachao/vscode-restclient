@@ -14,7 +14,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * `HTTP` language support
     - `.http` and `.rest` file extensions support
     - Syntax highlight
-    - Auto completition for method, header, and mime types
+    - Auto completion for method, header, and mime types
     - Comments (line starts with `#` or `//`) support
 
 ## Usage
@@ -142,7 +142,7 @@ Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy
 * Bug fix for escapse `<` and `>` in response headers
 
 ### 0.5.2
-* Add autocompletition of MIME type for specific headers like `Content-Type` and `Accept`
+* Add autocompletion of MIME type for specific headers like `Content-Type` and `Accept`
 
 ### 0.5.1
 * Add autocomplete for HTTP language
