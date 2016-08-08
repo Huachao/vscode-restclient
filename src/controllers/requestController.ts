@@ -16,7 +16,7 @@ export class RequestController {
     private _registration: Disposable;
     private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
 
-    private static commentIdentifiersRegex = new RegExp('^\s*(\#|\/\/)');
+    private static commentIdentifiersRegex = new RegExp('^\\s*(\#|\/\/)');
 
     constructor() {
         this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
