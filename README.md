@@ -104,7 +104,7 @@ Currently we will auto complete for three cases:
 * `rest-client.defaultuseragent`: If User-Agent header is omitted in request header, this value will be added as user agent for each request. (Default is __vscode-restclient__)
 * `rest-client.timeoutinmilliseconds`: Timeout in milliseconds. 0 for infinity. (Default is __0__)
 * `rest-client.showResponseInDifferentTab`: Show response in different tab. (Default is __false__)
-* `rest-client.rememberCookiesForSubsequentRequests`: Remember cookies for subsequent requests. (Default is __true__)
+* `rest-client.rememberCookiesForSubsequentRequests`: Save cookies from `Set-Cookie` header in response and use for subsequent requests. (Default is __true__)
 
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 
