@@ -8,6 +8,9 @@ import { PersistUtility } from '../persistUtility'
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
 import { EOL } from 'os';
 
+const elegantSpinner = require('elegant-spinner');
+const spinner = elegantSpinner();
+
 export class RequestController {
     private _statusBarItem: StatusBarItem;
     private _restClientSettings: RestClientSettings;
@@ -15,6 +18,7 @@ export class RequestController {
     private _responseTextProvider: HttpResponseTextDocumentContentProvider;
     private _registration: Disposable;
     private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
+    private _interval: any;
 
     private static commentIdentifiersRegex = new RegExp('^\\s*(\#|\/\/)');
 
@@ -48,21 +52,21 @@ export class RequestController {
             return;
         }
 
-        // clear status bar
-        this._statusBarItem.text = `$(cloud-upload)`;
-        this._statusBarItem.show();
-
         // parse http request
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText);
         if (!httpRequest) {
             return;
         }
 
+        // clear status bar
+        this.setSendingProgressStatusText();
+
         // set http request
         try {
             let response = await this._httpClient.send(httpRequest);
+            this.clearSendProgressStatusText();
             this._statusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
-            this._statusBarItem.tooltip = 'duration';
+            this._statusBarItem.tooltip = 'Duration';
 
             this._responseTextProvider.response = response;
             this._responseTextProvider.update(this._previewUri);
@@ -80,6 +84,7 @@ export class RequestController {
             if (error.code === 'ETIMEDOUT') {
                 error.message = `Error: ${error}. Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
             }
+            this.clearSendProgressStatusText();
             this._statusBarItem.text = '';
             window.showErrorMessage(error.message);
         }
@@ -96,5 +101,18 @@ export class RequestController {
             uriString += `/${Date.now()}`;  // just make every uri different
         }
         return Uri.parse(uriString);
+    }
+
+    private setSendingProgressStatusText() {
+        this.clearSendProgressStatusText();
+        this._interval = setInterval(() => {
+            this._statusBarItem.text = `Waiting ${spinner()}`;
+        }, 50);
+        this._statusBarItem.tooltip = 'Waiting Response';
+        this._statusBarItem.show();
+    }
+
+    private clearSendProgressStatusText() {
+        clearInterval(this._interval);
     }
 }

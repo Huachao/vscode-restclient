@@ -139,6 +139,7 @@
     "vscode": "^0.11.0"
   },
   "dependencies": {
+    "elegant-spinner": "^1.0.1",
     "pretty-data": "^0.40.0",
     "request": "^2.74.0",
     "tmp": "^0.0.28",
