@@ -11,15 +11,17 @@ export class PersistUtility {
     static cookieFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.CookieFileName);
     private static emptyHttpRequestItems: HttpRequest[] = [];
 
-    static save(httpRequest: HttpRequest) {
-        PersistUtility.deserializeFromHistoryFile().then(requests => {
+    static async save(httpRequest: HttpRequest) {
+        try {
+            let requests = await PersistUtility.deserializeFromHistoryFile();
             requests.unshift(httpRequest);
             requests = requests.slice(0, Constants.HistoryItemsMaxCount);
-            PersistUtility.serializeToHistoryFile(requests);
-        }).catch(error => { });
+            await PersistUtility.serializeToHistoryFile(requests);
+        } catch (error) {
+        }
     }
 
-    static load(): Promise<HttpRequest[]> {
+    static async load(): Promise<HttpRequest[]> {
         return PersistUtility.deserializeFromHistoryFile();
     }
 
@@ -41,11 +43,20 @@ export class PersistUtility {
         }
     }
 
-    private static serializeToHistoryFile(requests: HttpRequest[]): void {
-        fs.writeFileSync(PersistUtility.historyFilePath, JSON.stringify(requests));
+    private static async serializeToHistoryFile(requests: HttpRequest[]) {
+        return new Promise<void>((resolve, reject) => {
+            fs.writeFile(PersistUtility.historyFilePath, JSON.stringify(requests), error => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                resolve();
+            })
+        });
     }
 
-    private static deserializeFromHistoryFile(): Promise<HttpRequest[]> {
+    private static async deserializeFromHistoryFile(): Promise<HttpRequest[]> {
         return new Promise<HttpRequest[]>((resolve, reject) => {
             fs.readFile(PersistUtility.historyFilePath, (error, data) => {
                 if (error) {

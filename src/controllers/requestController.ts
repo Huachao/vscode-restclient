@@ -27,7 +27,7 @@ export class RequestController {
         this._registration = workspace.registerTextDocumentContentProvider('rest-response', this._responseTextProvider);
     }
 
-    run() {
+    async run() {
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return;
@@ -59,30 +59,30 @@ export class RequestController {
         }
 
         // set http request
-        this._httpClient.send(httpRequest)
-            .then(response => {
-                this._statusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
-                this._statusBarItem.tooltip = 'duration';
+        try {
+            let response = await this._httpClient.send(httpRequest);
+            this._statusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
+            this._statusBarItem.tooltip = 'duration';
 
-                this._responseTextProvider.response = response;
-                this._responseTextProvider.update(this._previewUri);
+            this._responseTextProvider.response = response;
+            this._responseTextProvider.update(this._previewUri);
 
-                let previewUri = this.generatePreviewUri();
-                commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, 'Response').then((success) => {
-                }, (reason) => {
-                    window.showErrorMessage(reason);
-                });
+            let previewUri = this.generatePreviewUri();
+            try {
+                await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, 'Response')
+            } catch (reason) {
+                window.showErrorMessage(reason);
+            }
 
-                // persist to history json file
-                PersistUtility.save(httpRequest);
-            })
-            .catch(error => {
-                if (error.code === 'ETIMEDOUT') {
-                    error.message = `Error: ${error}. Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
-                }
-                this._statusBarItem.text = '';
-                window.showErrorMessage(error.message);
-            });
+            // persist to history json file
+            await PersistUtility.save(httpRequest);
+        } catch (error) {
+            if (error.code === 'ETIMEDOUT') {
+                error.message = `Error: ${error}. Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
+            }
+            this._statusBarItem.text = '';
+            window.showErrorMessage(error.message);
+        }
     }
 
     dispose() {
@@ -90,7 +90,7 @@ export class RequestController {
         this._registration.dispose();
     }
 
-    private generatePreviewUri() : Uri {
+    private generatePreviewUri(): Uri {
         let uriString = 'rest-response://authority/response-preview'
         if (this._restClientSettings.showResponseInDifferentTab) {
             uriString += `/${Date.now()}`;  // just make every uri different

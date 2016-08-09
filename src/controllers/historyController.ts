@@ -16,8 +16,9 @@ export class HistoryController {
         this._outputChannel = window.createOutputChannel('REST');
     }
 
-    run(): any {
-        PersistUtility.load().then(requests => {
+    async run() {
+        try {
+            let requests = await PersistUtility.load();
             if (!requests || requests.length <= 0) {
                 window.showInformationMessage("No request history items are found!");
                 return;
@@ -33,21 +34,20 @@ export class HistoryController {
                 return item;
             });
 
-            window.showQuickPick(itemPickList, { placeHolder: "" }).then(item => {
-                if (!item) {
-                    return;
-                }
-                this.createRequestInTempFile(item.rawRequest).then(path => {
-                    workspace.openTextDocument(path).then(d => {
-                        window.showTextDocument(d);
-                    });
-                });
-            })
-        }).catch(error => this.errorHandler(error));
+            let item = await window.showQuickPick(itemPickList, { placeHolder: "" });
+            if (!item) {
+                return;
+            }
+            let path = await this.createRequestInTempFile(item.rawRequest);
+            let document = await workspace.openTextDocument(path);
+            window.showTextDocument(document);
+        } catch (error) {
+            this.errorHandler(error)
+        }
     }
 
-    private createRequestInTempFile(request: HttpRequest): Promise<string> {
-        return new Promise((resolve, reject) => {
+    private async createRequestInTempFile(request: HttpRequest): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
             tmp.file({ prefix: 'vscode-restclient-', postfix: ".http" }, function _tempFileCreated(err, tmpFilePath, fd) {
                 if (err) {
                     reject(err);

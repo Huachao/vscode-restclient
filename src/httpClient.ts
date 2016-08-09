@@ -16,7 +16,7 @@ export class HttpClient {
         PersistUtility.createCookieFileIfNotExist();
     }
 
-    send(httpRequest: HttpRequest): Promise<HttpResponse> {
+    async send(httpRequest: HttpRequest): Promise<HttpResponse> {
         let options = {
             url: httpRequest.url,
             headers: httpRequest.headers,
