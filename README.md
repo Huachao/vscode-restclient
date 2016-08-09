@@ -112,6 +112,10 @@ Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.7.1
+* Bug Fix: [Filter comments start with white spaces](https://github.com/Huachao/vscode-restclient/issues/28)
+* Bug Fix: [Display request error for invalid header](https://github.com/Huachao/vscode-restclient/issues/12)
+
 ### 0.7.0
 * Feature: [Support Cookies](https://github.com/Huachao/vscode-restclient/issues/8)
 * Feature: [Proxy Support](https://github.com/Huachao/vscode-restclient/issues/25) [(@mad-mike)](https://github.com/mad-mike/)
