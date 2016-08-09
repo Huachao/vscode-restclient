@@ -43,6 +43,12 @@ export class HttpClient {
         return new Promise<HttpResponse>((resolve, reject) => {
             request(options, function (error, response, body) {
                 if (error) {
+                    if (error.message) {
+                        if (error.message.startsWith("Header name must be a valid HTTP Token")) {
+                            error.message = "Header must be in 'header name: header value' format, "
+                                            + "please also make sure there is a blank line between headers and body";
+                        }
+                    }
                     reject(error);
                     return;
                 }
