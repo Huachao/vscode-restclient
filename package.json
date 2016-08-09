@@ -54,7 +54,8 @@
           ".http",
           ".rest"
         ],
-        "firstLine": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+(.*?)HTTP/[0-9\\.]+$"
+        "firstLine": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+(.*?)HTTP/[0-9\\.]+$",
+        "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
