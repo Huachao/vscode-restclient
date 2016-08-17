@@ -16,6 +16,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Syntax highlight
     - Auto completion for method, header, and mime types
     - Comments (line starts with `#` or `//`) support
+    - Support `json` and `xml` body indentation, comment shortcut and auto closing brackets
 
 ## Usage
 In editor, type a HTTP request as simple as below:
@@ -32,7 +33,7 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, use shortcut `Ctrl+Alt+R`, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in seperate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/cloud-upload-icon.png) will be disalyed in the status bar, when receiving the response, the icon will be changed to the duration.
+Once you prepared a request, use shortcut `Ctrl+Alt+R`, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in seperate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/loading.gif) will be disalyed in the status bar, when receiving the response, the icon will be changed to the duration.
 
 ## Install
 Press `F1`, type `ext install rest-client`.
@@ -112,6 +113,10 @@ Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.7.2
+* Improvement: [Add loading icon in status bar](https://github.com/Huachao/vscode-restclient/issues/13)
+* Feature: Support comment shortcut, request body indentation and auto closing brackets
+
 ### 0.7.1
 * Bug Fix: [Filter comments start with white spaces](https://github.com/Huachao/vscode-restclient/issues/28)
 * Bug Fix: [Display request error for invalid header](https://github.com/Huachao/vscode-restclient/issues/12)
