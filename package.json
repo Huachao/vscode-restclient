@@ -144,6 +144,6 @@
     "request": "^2.74.0",
     "tmp": "^0.0.28",
     "tough-cookie-filestore": "0.0.1",
-    "yargs": "^4.7.1"
+    "yargs": "^5.0.0"
   }
 }
