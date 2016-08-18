@@ -34,8 +34,7 @@ export class HttpResponseTextDocumentContentProvider implements TextDocumentCont
             <body>
                 <script>hljs.initHighlightingOnLoad();</script>
                 <div>
-                <pre><code class="http">
-HTTP/${this.response.httpVersion} <b>${this.response.statusCode} ${this.response.statusMessage}</b> <i>${this.response.elapsedMillionSeconds}ms</i>
+                <pre><code class="http">HTTP/${this.response.httpVersion} <b>${this.response.statusCode} ${this.response.statusMessage}</b> <i>${this.response.elapsedMillionSeconds}ms</i>
 ${HttpResponseTextDocumentContentProvider.formatHeaders(this.response.headers)}
 ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.response.headers['content-type'])}
 </code></pre>
