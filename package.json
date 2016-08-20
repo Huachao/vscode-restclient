@@ -143,7 +143,7 @@
     "pretty-data": "^0.40.0",
     "request": "^2.74.0",
     "tmp": "^0.0.28",
-    "tough-cookie-filestore": "0.0.1",
+    "tough-cookie-file-store": "^1.1.1",
     "yargs": "^5.0.0"
   }
 }
