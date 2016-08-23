@@ -113,6 +113,10 @@ Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy
 [MIT License](LICENSE)
 
 ## Change Log
+### 0.7.3
+* Bug Fix: [Concurrent requests corrupted cookie file](https://github.com/Huachao/vscode-restclient/issues/31)
+* Bug Fix: [Allow request without headers](https://github.com/Huachao/vscode-restclient/issues/32)
+
 ### 0.7.2
 * Improvement: [Add loading icon in status bar](https://github.com/Huachao/vscode-restclient/issues/13)
 * Feature: Support comment shortcut, request body indentation and auto closing brackets
