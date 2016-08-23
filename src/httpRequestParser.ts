@@ -28,17 +28,24 @@ export class HttpRequestParser implements IRequestParser {
         let body: string;
         let headerStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', 1);
         if (headerStartLine !== -1) {
-            // parse request headers
-            let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
-            let headerEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
-            headers = RequestParserUtil.parseRequestHeaders(lines.slice(headerStartLine, headerEndLine));
+            if (headerStartLine === 1) {
+                // parse request headers
+                let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
+                let headerEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
+                headers = RequestParserUtil.parseRequestHeaders(lines.slice(headerStartLine, headerEndLine));
 
-            // get body range
-            let bodyStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
-            if (bodyStartLine !== -1) {
-                firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
+                // get body range
+                let bodyStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
+                if (bodyStartLine !== -1) {
+                    firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
+                    let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
+                    body = lines.slice(bodyStartLine, bodyEndLine).join(EOL);
+                }
+            } else {
+                // parse body, since no headers provided
+                let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
                 let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
-                body = lines.slice(bodyStartLine, bodyEndLine).join(EOL);
+                body = lines.slice(headerStartLine, bodyEndLine).join(EOL);
             }
         }
 
