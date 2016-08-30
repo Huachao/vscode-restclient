@@ -32,7 +32,23 @@ export class HttpRequestParser implements IRequestParser {
                 // parse request headers
                 let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
                 let headerEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
-                headers = RequestParserUtil.parseRequestHeaders(lines.slice(headerStartLine, headerEndLine));
+                let headerLines = lines.slice(headerStartLine, headerEndLine);
+                let index = 0;
+                let queryString = '';
+                for (; index < headerLines.length;) {
+                    let headerLine = (headerLines[index]).trim();
+                    if (headerLine[0] in {'?': '', '&': ''} && headerLine.split('=').length === 2) {
+                        queryString += headerLine;
+                        index++;
+                        continue;
+                    }
+                    break;
+                }
+
+                if (queryString !== '') {
+                    requestLine.url += queryString;
+                }
+                headers = RequestParserUtil.parseRequestHeaders(headerLines.slice(index));
 
                 // get body range
                 let bodyStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
