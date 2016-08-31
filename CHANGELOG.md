@@ -1,4 +1,4 @@
-## 0.7.3 (2016/8/31)
+## 0.7.4 (2016/8/31)
 * __Improvement__: [Allow query strings spread into multiple lines](https://github.com/Huachao/vscode-restclient/issues/16)
 
 ## 0.7.3 (2016/8/23)
