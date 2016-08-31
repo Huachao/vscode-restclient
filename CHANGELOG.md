@@ -1,3 +1,6 @@
+## 0.7.3 (2016/8/31)
+* __Improvement__: [Allow query strings spread into multiple lines](https://github.com/Huachao/vscode-restclient/issues/16)
+
 ## 0.7.3 (2016/8/23)
 * __Bug Fix__: [Concurrent requests corrupted cookie file](https://github.com/Huachao/vscode-restclient/issues/31)
 * __Bug Fix__: [Allow request without headers](https://github.com/Huachao/vscode-restclient/issues/32)

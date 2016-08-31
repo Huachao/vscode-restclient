@@ -54,6 +54,18 @@ https://example.com/comments/1
 ```
 If request method is omitted, request will be treated as __GET__, so above requests are the same after parsing.
 
+#### Query Strings
+You can always write query strings in the request line, like:
+```http
+GET https://example.com/comments?page=2&pageSize=10
+```
+However you may want to spread query parameters into mutiple lines(one line one query parameter), we will parse the lines in request headers starts with `?` and `&`, like
+```http
+GET https://example.com/comments
+    ?page=2
+    &pageSize=10
+```
+
 ### Request Headers
 The lines immediately after the request line to first empty line are parsed as _Request Headers_. Please provide headers with the standard `field-name: field-value` format, each line represents one header.
 Below are examples of _Request Headers_:
