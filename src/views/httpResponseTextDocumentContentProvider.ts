@@ -6,6 +6,8 @@ import { MimeUtility } from '../mimeUtility'
 import * as Constants from '../constants'
 import * as path from 'path'
 
+const hljs = require('highlight.js');
+
 var pd = require('pretty-data').pd;
 
 export class HttpResponseTextDocumentContentProvider implements TextDocumentContentProvider {
@@ -26,19 +28,17 @@ export class HttpResponseTextDocumentContentProvider implements TextDocumentCont
 
     public provideTextDocumentContent(uri: Uri): string {
         if (this.response) {
+            let code = `HTTP/${this.response.httpVersion} ${this.response.statusCode} ${this.response.statusMessage}
+${HttpResponseTextDocumentContentProvider.formatHeaders(this.response.headers)}
+${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.response.headers['content-type'])}`;
             return `
             <head>
                 <link rel="stylesheet" href="${HttpResponseTextDocumentContentProvider.cssFilePath}">
-                <script src="https://cdn.jsdelivr.net/highlight.js/9.4.0/highlight.min.js"></script>
             </head>
             <body>
-                <script>hljs.initHighlightingOnLoad();</script>
                 <div>
-                <pre><code class="http">HTTP/${this.response.httpVersion} <b>${this.response.statusCode} ${this.response.statusMessage}</b> <i>${this.response.elapsedMillionSeconds}ms</i>
-${HttpResponseTextDocumentContentProvider.formatHeaders(this.response.headers)}
-${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.response.headers['content-type'])}
-</code></pre>
-</div>
+                    <pre><code class="http">${hljs.highlight('http', code, true).value}</code></pre>
+                </div>
             </body>`;
         }
     }
