@@ -1,3 +1,7 @@
+## 0.7.5 (2016/9/6)
+* __Improvement__: Improve loading performance by fetching highlight.js from local instead of CDN
+* __Improvement__: Add application insights for extension to collect usage data
+
 ## 0.7.4 (2016/8/31)
 * __Improvement__: [Allow query strings spread into multiple lines](https://github.com/Huachao/vscode-restclient/issues/16)
 
