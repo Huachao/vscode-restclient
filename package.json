@@ -123,6 +123,11 @@
           "type": "boolean",
           "default": true,
           "description": "Remember cookies for subsequent requests"
+        },
+        "rest-client.enableTelemetry": {
+          "type": "boolean",
+          "default": true,
+          "description": "Send out anonymous usage data"
         }
       }
     }
@@ -139,6 +144,7 @@
     "vscode": "^0.11.0"
   },
   "dependencies": {
+    "applicationinsights": "^0.15.19",
     "elegant-spinner": "^1.0.1",
     "highlight.js": "^9.6.0",
     "pretty-data": "^0.40.0",

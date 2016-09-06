@@ -4,6 +4,7 @@ import { window, workspace, OutputChannel } from 'vscode';
 import { PersistUtility } from '../persistUtility'
 import { HttpRequest } from '../models/httpRequest'
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem'
+import { Telemetry } from '../telemetry';
 import { EOL } from 'os';
 import * as fs from 'fs'
 
@@ -17,6 +18,7 @@ export class HistoryController {
     }
 
     async run() {
+        Telemetry.sendEvent('History');
         try {
             let requests = await PersistUtility.load();
             if (!requests || requests.length <= 0) {

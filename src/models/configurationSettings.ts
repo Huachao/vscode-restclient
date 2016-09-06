@@ -8,6 +8,7 @@ export interface IRestClientSettings {
     proxy: string;
     proxyStrictSSL: boolean;
     rememberCookiesForSubsequentRequests: boolean;
+    enableTelemetry: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -18,6 +19,7 @@ export class RestClientSettings implements IRestClientSettings {
     proxy: string;
     proxyStrictSSL: boolean;
     rememberCookiesForSubsequentRequests: boolean;
+    enableTelemetry: boolean;
 
     constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -41,5 +43,6 @@ export class RestClientSettings implements IRestClientSettings {
         let httpSettings = workspace.getConfiguration('http');
         this.proxy = httpSettings.get<string>('proxy', undefined);
         this.proxyStrictSSL = httpSettings.get<boolean>('proxyStrictSSL', false);
+        this.enableTelemetry = httpSettings.get<boolean>('enableTelemetry', true);
     }
 }

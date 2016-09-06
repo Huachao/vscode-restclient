@@ -6,6 +6,7 @@ import { HttpClient } from '../httpClient'
 import { RestClientSettings } from '../models/configurationSettings'
 import { PersistUtility } from '../persistUtility'
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
+import { Telemetry } from '../telemetry';
 import { EOL } from 'os';
 
 const elegantSpinner = require('elegant-spinner');
@@ -32,6 +33,7 @@ export class RequestController {
     }
 
     async run() {
+        Telemetry.sendEvent('Request');
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return;
@@ -73,7 +75,7 @@ export class RequestController {
 
             let previewUri = this.generatePreviewUri();
             try {
-                await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, 'Response')
+                await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response-${Date.now()}`)
             } catch (reason) {
                 window.showErrorMessage(reason);
             }
