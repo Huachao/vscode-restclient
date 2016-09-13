@@ -75,7 +75,7 @@ export class RequestController {
 
             let previewUri = this.generatePreviewUri();
             try {
-                await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, 'Response')
+                await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`)
             } catch (reason) {
                 window.showErrorMessage(reason);
             }
