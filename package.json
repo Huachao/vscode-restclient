@@ -149,7 +149,7 @@
     "highlight.js": "^9.6.0",
     "pretty-data": "^0.40.0",
     "request": "^2.74.0",
-    "tmp": "^0.0.28",
+    "tmp": "^0.0.29",
     "tough-cookie-file-store": "^1.1.1",
     "yargs": "^5.0.0"
   }
