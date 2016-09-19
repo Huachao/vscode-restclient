@@ -48,7 +48,7 @@ export class RequestController {
         }
 
         // remove comment lines
-        let lines: string[] = selectedText.split(EOL);
+        let lines: string[] = selectedText.split(/\r?\n/g);
         selectedText = lines.filter(l => !RequestController.commentIdentifiersRegex.test(l)).join(EOL);
         if (selectedText === '') {
             return;
