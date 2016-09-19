@@ -12,15 +12,21 @@ export class HttpCompletionItemProvider implements CompletionItemProvider {
         elements.map(e => {
             let item = new CompletionItem(e.name);
             item.detail = `HTTP ${ElementType[e.type]}`;
-            item.insertText = e.type === ElementType.Header
+            item.documentation = e.description;
+            let insertText = e.type === ElementType.Header
                 ? `${e.name}: `
                 : (e.type === ElementType.Method
                     ? `${e.name} `
                     : `${e.name}`);
-            item.kind = CompletionItemKind.Text;
+            item.insertText = this.escapeCompletionItemInsertText(insertText);
+            item.kind = e.type === ElementType.GlobalVariable ? CompletionItemKind.Variable : CompletionItemKind.Text;
             completionItems.push(item);
         });
 
         return completionItems;
+    }
+
+    private escapeCompletionItemInsertText(str: string): string {
+        return str.replace(/[\{\}]/g, "\\$&");
     }
 }

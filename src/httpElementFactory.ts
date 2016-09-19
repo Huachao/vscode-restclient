@@ -1,6 +1,7 @@
 "use strict";
 
 import { HttpElement, ElementType } from './models/httpElement';
+import * as Constants from './Constants'
 
 export class HttpElementFactory {
     static getHttpElements(line: string): HttpElement[] {
@@ -71,6 +72,9 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement("text/plain", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
         originalElements.push(new HttpElement("text/xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
 
+        originalElements.push(new HttpElement(Constants.GuidVariableName, ElementType.GlobalVariable, null, Constants.GuidVariableDescription));
+        originalElements.push(new HttpElement(Constants.TimeStampVariableName, ElementType.GlobalVariable, null, Constants.TimeStampVariableDescription));
+
         let elements: HttpElement[] = [];
         if (line) {
             originalElements.forEach(element => {
@@ -83,7 +87,7 @@ export class HttpElementFactory {
         }
 
         if (elements.length === 0) {
-            elements = originalElements.filter(e => e.type === ElementType.Method || e.type === ElementType.Header);
+            elements = originalElements.filter(e => e.type !== ElementType.MIME);
         }
 
         return elements;

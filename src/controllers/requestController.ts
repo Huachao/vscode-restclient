@@ -7,6 +7,7 @@ import { RestClientSettings } from '../models/configurationSettings'
 import { PersistUtility } from '../persistUtility'
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
 import { Telemetry } from '../telemetry';
+import { VariableProcessor } from '../variableProcessor';
 import { EOL } from 'os';
 
 const elegantSpinner = require('elegant-spinner');
@@ -53,6 +54,9 @@ export class RequestController {
         if (selectedText === '') {
             return;
         }
+
+        // variables replacement
+        selectedText = VariableProcessor.processRawRequest(selectedText);
 
         // parse http request
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText);
