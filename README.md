@@ -8,13 +8,14 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Send __HTTP request__ in editor and view response in a separate pane with syntax highlight
 * Send __CURL command__ in editor
 * Auto save and view request history
+* Global variables support (Only support system dynamic variables `{{$guid}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
 * Proxy support
 * Code snippets for operations like `GET` and `POST`
 * `HTTP` language support
     - `.http` and `.rest` file extensions support
     - Syntax highlight
-    - Auto completion for method, header, and mime types
+    - Auto completion for method, header, global dynamic variables and mime types
     - Comments (line starts with `#` or `//`) support
     - Support `json` and `xml` body indentation, comment shortcut and auto closing brackets
 
@@ -106,11 +107,28 @@ Add language support for HTTP request, with __syntax highlight__, __autocomplete
 If you want to enable language association in other cases, just change the language mode to `HTTP`.
 
 ![HTTP Language](images/http.png)
-Currently we will auto complete for three cases:
+Currently we will auto complete for four cases:
 
 1. HTTP Method
 2. HTTP Header
-3. MIME Types for `Accept` and `Content-Type` headers
+3. Global dynamic variables
+4. MIME Types for `Accept` and `Content-Type` headers
+
+## Variables
+### Global Variables
+Global variables provide a set of variables that can be used in every part of the request(Url/Headers/Body) in the format `{{variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests.
+* `{{$guid}}`: Add a RFC 4122 v4 UUID
+* `{{$timestamp}}`: Add a number of milliseconds 1970/1/1 UTC Time and now
+
+```http
+POST https://example.com/comments HTTP/1.1
+Content-Type: application/xml
+X-Request-Id: {{$guid}}
+
+{
+    "time": "{{$timestamp}}"
+}
+```
 
 ## Settings
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
@@ -127,6 +145,10 @@ Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy
 
 ## Change Log
 See CHANGELOG [here](CHANGELOG.md)
+
+## TODO
+* Environment Support
+* Per-Environment Variables Support
 
 ## Feedback
 Please provide feedback through the [GitHub Issue](https://github.com/Huachao/vscode-restclient/issues) system, or fork the repository and submit PR.
