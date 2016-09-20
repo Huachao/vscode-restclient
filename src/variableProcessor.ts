@@ -8,13 +8,13 @@ export class VariableProcessor {
         let globalVariables = VariableProcessor.getGlobalVariables();
         let pattern = '';
         for (var key in globalVariables) {
-            if (pattern != '') pattern += '|';
+            if (pattern !== '') pattern += '|';
             pattern += VariableProcessor.escapeRegExp(key);
         }
 
         // regex replace
         return request.replace(new RegExp(pattern, 'g'), function(match) {
-            return globalVariables[match] != undefined ? globalVariables[match] : match;
+            return globalVariables[match] !== undefined ? globalVariables[match] : match;
         });
     }
 

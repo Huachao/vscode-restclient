@@ -118,7 +118,7 @@ Currently we will auto complete for four cases:
 ### Global Variables
 Global variables provide a set of variables that can be used in every part of the request(Url/Headers/Body) in the format `{{variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
-* `{{$timestamp}}`: Add a number of milliseconds 1970/1/1 UTC Time and now
+* `{{$timestamp}}`: Add a number of milliseconds between 1970/1/1 UTC Time and now
 
 ```http
 POST https://example.com/comments HTTP/1.1
