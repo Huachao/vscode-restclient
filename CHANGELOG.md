@@ -1,3 +1,7 @@
+## 0.8.0 (2016/9/20)
+* __Feature__: [Support global system dynamic variables](https://github.com/Huachao/vscode-restclient/issues/22)
+* __Bug Fix__: [Parse request correctly with LF line ending](https://github.com/Huachao/vscode-restclient/issues/37)
+
 ## 0.7.5 (2016/9/6)
 * __Improvement__: Improve loading performance by fetching highlight.js from local instead of CDN
 * __Improvement__: Add application insights for extension to collect usage data
