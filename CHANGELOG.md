@@ -1,3 +1,6 @@
+## 0.8.1 (2016/9/21)
+* __Bug Fix__: [Fix command 'rest-client.request' not found on Linux](https://github.com/Huachao/vscode-restclient/issues/38) [(@myakimov)](https://github.com/myakimov)
+
 ## 0.8.0 (2016/9/20)
 * __Feature__: [Support global system dynamic variables](https://github.com/Huachao/vscode-restclient/issues/22)
 * __Bug Fix__: [Parse request correctly with LF line ending](https://github.com/Huachao/vscode-restclient/issues/37)
