@@ -1,7 +1,7 @@
 "use strict";
 
 import { HttpElement, ElementType } from './models/httpElement';
-import * as Constants from './Constants'
+import * as Constants from './constants'
 
 export class HttpElementFactory {
     static getHttpElements(line: string): HttpElement[] {

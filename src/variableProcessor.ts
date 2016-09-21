@@ -1,6 +1,6 @@
 'use strict';
 
-import * as Constants from './Constants'
+import * as Constants from './constants'
 var uuid = require('node-uuid');
 
 export class VariableProcessor {
