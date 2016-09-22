@@ -8,13 +8,14 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Send __HTTP request__ in editor and view response in a separate pane with syntax highlight
 * Send __CURL command__ in editor
 * Auto save and view request history
+* Save raw response to local disk
 * Global variables support (Only support system dynamic variables `{{$guid}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
 * Proxy support
 * Code snippets for operations like `GET` and `POST`
 * `HTTP` language support
     - `.http` and `.rest` file extensions support
-    - Syntax highlight
+    - Syntax highlight (Request and Response)
     - Auto completion for method, header, global dynamic variables and mime types
     - Comments (line starts with `#` or `//`) support
     - Support `json` and `xml` body indentation, comment shortcut and auto closing brackets
@@ -97,6 +98,10 @@ We add the capability to directly run [curl request](https://curl.haxx.se/) in R
 ## Request History
 ![request-history](images/request-history.png)
 Each time we sent a http request, the request details(method, url, headers and body) would be persisted into file. By using shortcut `Ctrl+Alt+H`, or press `F1` and then select/type `Rest Client: Request History`, you can view the last __50__ request items in the time reversing order, you can select any request you wish to trigger again. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
+
+## Save Response
+![Save Response](images/response.gif)
+In the upper right corner of the response preview tab, we add a new icon to save the latest response to local file system. After you click the `Save Latest Response` icon, it will prompt the window with the saved response file path. You can click the `Open` button to open the saved response file in current workspace.
 
 ## HTTP Language
 Add language support for HTTP request, with __syntax highlight__, __autocomplete__ and __comment support__, when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:

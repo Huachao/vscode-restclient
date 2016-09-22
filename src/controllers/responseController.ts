@@ -15,6 +15,9 @@ export class ResponseController {
 
     static save(uri: Uri) {
         Telemetry.sendEvent('Response-Save');
+        if (!uri) {
+            return;
+        }
         let response = ResponseStore.get(uri.toString());
         if (response !== undefined) {
             let fullResponse = ResponseController.getFullResponseString(response);
