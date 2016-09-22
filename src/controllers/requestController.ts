@@ -1,13 +1,14 @@
 "use strict";
 
 import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable } from 'vscode';
-import { RequestParserFactory } from '../models/requestParserFactory'
-import { HttpClient } from '../httpClient'
-import { RestClientSettings } from '../models/configurationSettings'
-import { PersistUtility } from '../persistUtility'
+import { RequestParserFactory } from '../models/requestParserFactory';
+import { HttpClient } from '../httpClient';
+import { RestClientSettings } from '../models/configurationSettings';
+import { PersistUtility } from '../persistUtility';
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
 import { Telemetry } from '../telemetry';
 import { VariableProcessor } from '../variableProcessor';
+import { ResponseStore } from '../responseStore';
 import { EOL } from 'os';
 
 const elegantSpinner = require('elegant-spinner');
@@ -78,8 +79,9 @@ export class RequestController {
             this._responseTextProvider.update(this._previewUri);
 
             let previewUri = this.generatePreviewUri();
+            ResponseStore.add(previewUri.toString(), response);
             try {
-                await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`)
+                await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`);
             } catch (reason) {
                 window.showErrorMessage(reason);
             }

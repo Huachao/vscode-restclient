@@ -4,6 +4,7 @@
 import { ExtensionContext, commands, languages } from 'vscode';
 import { RequestController } from './controllers/requestController'
 import { HistoryController } from './controllers/historyController'
+import { ResponseController } from './controllers/responseController'
 import { HttpCompletionItemProvider } from './httpCompletionItemProvider'
 
 // this method is called when your extension is activated
@@ -20,6 +21,7 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(historyController);
     context.subscriptions.push(commands.registerCommand('rest-client.request', () => requestController.run()));
     context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.run()));
+    context.subscriptions.push(commands.registerCommand('rest-client.save-response', ResponseController.save));
     context.subscriptions.push(languages.registerCompletionItemProvider('http', new HttpCompletionItemProvider()));
 }
 

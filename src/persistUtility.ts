@@ -43,6 +43,15 @@ export class PersistUtility {
         }
     }
 
+    static createResponseFileIfNotExist(path: string) {
+        try {
+            fs.statSync(path);
+        } catch (error) {
+            PersistUtility.ensureDirectoryExistence(path);
+            fs.writeFileSync(path, '');
+        }
+    }
+
     private static async serializeToHistoryFile(requests: HttpRequest[]) {
         return new Promise<void>((resolve, reject) => {
             fs.writeFile(PersistUtility.historyFilePath, JSON.stringify(requests), error => {

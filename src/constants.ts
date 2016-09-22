@@ -7,6 +7,7 @@ export const CSSFolderName: string = 'styles';
 export const ExtensionFolderName: string = '.rest-client';
 export const HistoryFileName: string = 'history.json';
 export const CookieFileName: string = 'cookie.json';
+export const DefaultResponseDownloadFolderName: string = 'responses';
 export const HistoryItemsMaxCount: number = 50;
 
 export const TimeStampVariableName = "{{$timestamp}}";

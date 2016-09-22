@@ -75,6 +75,25 @@
                 <key>name</key>
                 <string>http.requestheaders</string>
             </dict>
+            <dict>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>constant.numeric.http</string>
+                    </dict>
+                    <key>2</key>
+                    <dict>
+                        <key>name</key>
+                        <string>keyword.other.http</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>^\s*HTTP\/.*\s([1-5][0-9][0-9])\s(.*)$</string>
+                <key>name</key>
+                <string>http.responseLine</string>
+            </dict>
         </array>
     </dict>
 </plist>

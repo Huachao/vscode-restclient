@@ -38,6 +38,7 @@
   "activationEvents": [
     "onCommand:rest-client.request",
     "onCommand:rest-client.history",
+    "onCommand:rest-client.save-response",
     "onLanguage:http"
   ],
   "main": "./out/src/extension",
@@ -78,13 +79,33 @@
     "commands": [
       {
         "command": "rest-client.request",
-        "title": "Rest Client: Send Request"
+        "title": "Send Request",
+        "category": "Rest Client"
       },
       {
         "command": "rest-client.history",
-        "title": "Rest Client: Request History"
+        "title": "Request History",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.save-response",
+        "title": "Save Latest Response",
+        "icon": {
+          "light": "./images/save.svg",
+          "dark": "./images/save-inverse.svg"
+        },
+        "category": "Rest Client"
       }
     ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceScheme == rest-response",
+          "command": "rest-client.save-response",
+          "group": "navigation"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "rest-client.request",
