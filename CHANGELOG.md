@@ -1,3 +1,7 @@
+## 0.8.2 (2016/9/22)
+* __Feature__: Add the capability to save latest response to local file system
+* __Bug Fix__: [Encode non-ASCII characters in URL](https://github.com/Huachao/vscode-restclient/issues/36)
+
 ## 0.8.1 (2016/9/21)
 * __Bug Fix__: [Fix command 'rest-client.request' not found on Linux](https://github.com/Huachao/vscode-restclient/issues/38) [(@myakimov)](https://github.com/myakimov)
 
