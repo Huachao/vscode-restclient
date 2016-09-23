@@ -109,11 +109,13 @@
     "keybindings": [
       {
         "command": "rest-client.request",
-        "key": "ctrl+alt+r"
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r"
       },
       {
         "command": "rest-client.history",
-        "key": "ctrl+alt+h"
+        "key": "ctrl+alt+h",
+        "mac": "cmd+alt+h"
       }
     ],
     "configuration": {
