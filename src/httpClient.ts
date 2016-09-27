@@ -18,7 +18,7 @@ export class HttpClient {
 
     async send(httpRequest: HttpRequest): Promise<HttpResponse> {
         let options = {
-            url: encodeURI(httpRequest.url),
+            url: encodeURI(decodeURI(httpRequest.url)),
             headers: httpRequest.headers,
             method: httpRequest.method,
             body: httpRequest.body,
