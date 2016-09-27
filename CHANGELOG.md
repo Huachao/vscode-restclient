@@ -1,5 +1,5 @@
 ## 0.8.3 (2016/9/27)
-* __Improvement__: Support keyboard shortcut for macOS (`Cmd+Alt+R` for requst and `Cmd+Alt+H` for history)
+* __Improvement__: Support keyboard shortcut for macOS (`Cmd+Alt+R` for request and `Cmd+Alt+H` for history)
 * __Bug Fix__: Fix encoding an already encoded URI
 
 ## 0.8.2 (2016/9/22)
