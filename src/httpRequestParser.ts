@@ -3,6 +3,7 @@
 import { HttpRequest } from './models/httpRequest'
 import { IRequestParser } from './models/IRequestParser'
 import { RequestParserUtil } from './requestParserUtil'
+import { HttpClient } from './httpClient'
 import { EOL } from 'os';
 
 export class HttpRequestParser implements IRequestParser {
@@ -66,8 +67,8 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // if Host header provided and url is relative path, change to absolute url
-        if (headers && headers['host'] && requestLine.url[0] === '/') {
-            requestLine.url = `http://${headers['host']}${requestLine.url}`;
+        if (HttpClient.getHeaderValue(headers, 'Host') && requestLine.url[0] === '/') {
+            requestLine.url = `http://${HttpClient.getHeaderValue(headers, 'Host')}${requestLine.url}`;
         }
 
         return new HttpRequest(requestLine.method, requestLine.url, headers, body);

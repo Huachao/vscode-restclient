@@ -36,8 +36,8 @@ export class HttpClient {
         }
 
         // add default user agent if not specified
-        if (!options.headers['user-agent']) {
-            options.headers['user-agent'] = this._settings.defaultUserAgent;
+        if (!HttpClient.getHeaderValue(options.headers, 'User-Agent')) {
+            options.headers['User-Agent'] = this._settings.defaultUserAgent;
         }
 
         return new Promise<HttpResponse>((resolve, reject) => {
@@ -56,5 +56,17 @@ export class HttpClient {
                 resolve(new HttpResponse(response.statusCode, response.statusMessage, response.httpVersion, response.headers, body, response.elapsedTime));
             });
         });
+    }
+
+    static getHeaderValue(headers: { [key: string]: string }, headerName: string): string {
+        if (headers) {
+            for (var key in headers) {
+                if (key.toLowerCase() === headerName.toLowerCase()) {
+                    return headers[key];
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -4,6 +4,7 @@ export class RequestParserUtil {
     public static parseRequestHeaders(headerLines: string[]): { [key: string]: string } {
         // message-header = field-name ":" [ field-value ]
         let headers: { [key: string]: string } = {};
+        let headerNames: { [key: string]: string } = {};
         headerLines.forEach(headerLine => {
             let headerParts = headerLine.split(':', 2).filter(Boolean);
             let fieldName: string;
@@ -18,10 +19,14 @@ export class RequestParserUtil {
 
             let normalizedfieldName = fieldName.trim().toLowerCase();
             let normalizedfieldValue = fieldValue.trim();
-            if (!headers[normalizedfieldName]) {
-                headers[normalizedfieldName] = normalizedfieldValue;
-            } else {
-                headers[normalizedfieldName] += `,${normalizedfieldValue}`;
+            if (!headerNames[normalizedfieldName])
+            {
+                headerNames[normalizedfieldName] = fieldName;
+                headers[fieldName] = normalizedfieldValue;
+            }
+            else
+            {
+                headers[headerNames[normalizedfieldName]] += `,${normalizedfieldValue}`;
             }
         });
 
