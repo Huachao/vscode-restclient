@@ -110,7 +110,14 @@
       {
         "command": "rest-client.request",
         "key": "ctrl+alt+r",
-        "mac": "cmd+alt+r"
+        "mac": "cmd+alt+r",
+        "when": "editorTextFocus && editorLangId == 'http'"
+      },
+      {
+        "command": "rest-client.request",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r",
+        "when": "editorTextFocus && editorLangId == 'plaintext'"
       },
       {
         "command": "rest-client.history",
