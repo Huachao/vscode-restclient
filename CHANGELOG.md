@@ -1,3 +1,7 @@
+## 0.8.4 (2016/9/28)
+* __Bug Fix__: [Lower case request header name](https://github.com/Huachao/vscode-restclient/issues/39)
+* __Bug Fix__: [Keyboard shortcut conflicts on macOS](https://github.com/Huachao/vscode-restclient/issues/40)
+
 ## 0.8.3 (2016/9/27)
 * __Improvement__: Support keyboard shortcut for macOS (`Cmd+Alt+R` for request and `Cmd+Alt+H` for history)
 * __Bug Fix__: Fix encoding an already encoded URI
