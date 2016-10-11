@@ -11,12 +11,6 @@ const hljs = require('highlight.js');
 var pd = require('pretty-data').pd;
 
 export class HttpResponseTextDocumentContentProvider implements TextDocumentContentProvider {
-    private static _tagsToReplace = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-    };
-
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
 
     private _onDidChange = new EventEmitter<Uri>();
@@ -57,7 +51,7 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             if (headers.hasOwnProperty(header)) {
                 let value = headers[header];
                 if (typeof headers[header] === 'string') {
-                    value = HttpResponseTextDocumentContentProvider.escape(<string>headers[header]);
+                    value = <string>headers[header];
                 }
                 headerString += `${header}: ${value}\n`;
             }
@@ -74,18 +68,12 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
                  } else {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                  }
-            } else if (type === 'application/xml') {
+            } else if (type === 'application/xml' || type === 'text/xml') {
                 body = pd.xml(body);
             }
         }
 
-        return HttpResponseTextDocumentContentProvider.escape(body);
-    }
-
-    private static escape(data: string): string {
-        return data.replace(/[&<>]/g, function (tag) {
-            return HttpResponseTextDocumentContentProvider._tagsToReplace[tag] || tag;
-        });
+        return body;
     }
 
     private static isJsonString(data: string) {
