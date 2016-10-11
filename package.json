@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -174,7 +174,7 @@
     "vscode": "^0.11.0"
   },
   "dependencies": {
-    "applicationinsights": "^0.15.19",
+    "applicationinsights": "^0.16.0",
     "elegant-spinner": "^1.0.1",
     "highlight.js": "^9.6.0",
     "node-uuid": "^1.4.7",
@@ -182,6 +182,6 @@
     "request": "^2.74.0",
     "tmp": "^0.0.29",
     "tough-cookie-file-store": "^1.1.1",
-    "yargs": "^5.0.0"
+    "yargs": "^6.0.0"
   }
 }

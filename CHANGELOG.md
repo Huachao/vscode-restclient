@@ -1,3 +1,7 @@
+## 0.8.5 (2016/10/11)
+* __Bug Fix__: [DO NOT escapse '<' and '>' in response](https://github.com/Huachao/vscode-restclient/issues/41)
+* __Improvement__: Show elapsed time in editor tab
+
 ## 0.8.4 (2016/9/28)
 * __Bug Fix__: [Lower case request header name](https://github.com/Huachao/vscode-restclient/issues/39)
 * __Bug Fix__: [Keyboard shortcut conflicts on macOS](https://github.com/Huachao/vscode-restclient/issues/40)
