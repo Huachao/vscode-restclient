@@ -124,7 +124,7 @@ Currently we will auto complete for four cases:
 Global variables provide a set of variables that can be used in every part of the request(Url/Headers/Body) in the format `{{variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
-* `{{$timestamp}}`: Add UTC current time. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{$timestamp 2 d}}`. Here the option string you can specify in timestamp are:
+* `{{$timestamp}}`: Add UTC current time. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`. The option string you can specify in timestamp are:
 ```
     +---------+--------------+
     | Options | Descriptions |
