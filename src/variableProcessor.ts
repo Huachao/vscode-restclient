@@ -23,16 +23,28 @@ export class VariableProcessor {
             [`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`]: match => {
                 let regex = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
                 let groups = regex.exec(match);
+                if (groups !== null && groups.length === 3) {
+                    return groups[1] && groups[2]
+                            ? moment.utc().add(groups[1], groups[2]).unix()
+                            : moment.utc().unix();
+                }
+                return match;
+            },
+            [`\\${Constants.GuidVariableName}`]: match => uuid.v4(),
+            [`\\${Constants.RandomInt}\\s(\\-?\\d+)\\s(\\-?\\d+)`]: match => {
+                let regex = new RegExp(`\\${Constants.RandomInt}\\s(\\-?\\d+)\\s(\\-?\\d+)`);
+                let groups = regex.exec(match);
                 if (groups !== null) {
-                    if (groups.length === 3) {
-                        if (groups[1] && groups[2]) {
-                            return moment.utc().add(groups[1], groups[2]).unix();
-                        }
+                    let min = Number(groups[1]);
+                    let max = Number(groups[2]);
+                    if (min < max) {
+                        min = Math.ceil(min);
+                        max = Math.floor(max);
+                        return Math.floor(Math.random() * (max - min)) + min;
                     }
                 }
-                return moment.utc().unix();
-            },
-            [`\\${Constants.GuidVariableName}`]: match => uuid.v4()
+                return match;
+            }
         }
     }
 }

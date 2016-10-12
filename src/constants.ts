@@ -15,3 +15,5 @@ export const TimeStampVariableDescription = "Add a number of milliseconds betwee
  You can also provide the offset with current time in the format {{$timestamp number string}}";
 export const GuidVariableName = "$guid";
 export const GuidVariableDescription = "Add a RFC 4122 v4 UUID";
+export const RandomInt = "$randomInt";
+export const RandomIntDescription = "Returns a random integer between min (included) and max (excluded)";

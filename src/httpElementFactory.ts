@@ -74,6 +74,7 @@ export class HttpElementFactory {
 
         originalElements.push(new HttpElement(`{{${Constants.GuidVariableName}}}`, ElementType.GlobalVariable, null, Constants.GuidVariableDescription));
         originalElements.push(new HttpElement(`{{${Constants.TimeStampVariableName}}}`, ElementType.GlobalVariable, null, Constants.TimeStampVariableDescription));
+        originalElements.push(new HttpElement(`{{${Constants.RandomInt}}}`, ElementType.GlobalVariable, null, Constants.RandomIntDescription));
 
         let elements: HttpElement[] = [];
         if (line) {

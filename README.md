@@ -9,7 +9,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Send __CURL command__ in editor
 * Auto save and view request history
 * Save raw response to local disk
-* Global variables support (Only support system dynamic variables `{{$guid}}` and `{{$timestamp}}` now)
+* Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
 * Proxy support
 * Code snippets for operations like `GET` and `POST`
@@ -121,17 +121,44 @@ Currently we will auto complete for four cases:
 
 ## Variables
 ### Global Variables
-Global variables provide a set of variables that can be used in every part of the request(Url/Headers/Body) in the format `{{variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests.
+Global variables provide a set of variables that can be used in every part of the request(Url/Headers/Body) in the format `{{variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
-* `{{$timestamp}}`: Add a number of milliseconds between 1970/1/1 UTC Time and now
+* `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
+* `{{$timestamp}}`: Add UTC current time. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{$timestamp 2 d}}`. Here the option string you can specify in timestamp are:
+    ```
+    +---------+--------------+
+    | Options | Descriptions |
+    +---------+--------------+
+    |    y    |    Years     |
+    +---------+--------------+
+    |    Q    |   Quarters   |
+    +---------+--------------+
+    |    M    |    Months    |
+    +---------+--------------+
+    |    w    |    Weeks     |
+    +---------+--------------+
+    |    d    |     Days     |
+    +---------+--------------+
+    |    h    |    Hours     |
+    +---------+--------------+
+    |    m    |   Minutes    |
+    +---------+--------------+
+    |    s    |   Seconds    |
+    +---------+--------------+
+    |    ms   | Milliseconds |
+    +---------+--------------+
+    ```
 
+### Variables Sample:
 ```http
 POST https://example.com/comments HTTP/1.1
 Content-Type: application/xml
 X-Request-Id: {{$guid}}
 
 {
-    "time": "{{$timestamp}}"
+    "updated_at": "{{$timestamp}}",
+    "created_at": "{{$timestamp -1 d}}",
+    "review_count": "{{$randomInt 5, 200}}"
 }
 ```
 
