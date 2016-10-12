@@ -72,8 +72,8 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement("text/plain", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
         originalElements.push(new HttpElement("text/xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
 
-        originalElements.push(new HttpElement(Constants.GuidVariableName, ElementType.GlobalVariable, null, Constants.GuidVariableDescription));
-        originalElements.push(new HttpElement(Constants.TimeStampVariableName, ElementType.GlobalVariable, null, Constants.TimeStampVariableDescription));
+        originalElements.push(new HttpElement(`{{${Constants.GuidVariableName}}}`, ElementType.GlobalVariable, null, Constants.GuidVariableDescription));
+        originalElements.push(new HttpElement(`{{${Constants.TimeStampVariableName}}}`, ElementType.GlobalVariable, null, Constants.TimeStampVariableDescription));
 
         let elements: HttpElement[] = [];
         if (line) {

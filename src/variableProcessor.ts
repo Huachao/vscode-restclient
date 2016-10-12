@@ -1,31 +1,38 @@
 'use strict';
 
 import * as Constants from './constants'
+import { Func } from './common/delegates';
 var uuid = require('node-uuid');
+var moment = require('moment');
 
 export class VariableProcessor {
     static processRawRequest(request: string) {
         let globalVariables = VariableProcessor.getGlobalVariables();
-        let pattern = '';
-        for (var key in globalVariables) {
-            if (pattern !== '') pattern += '|';
-            pattern += VariableProcessor.escapeRegExp(key);
+        for (var variablePattern in globalVariables) {
+            let regex = new RegExp(`\\{\\{${variablePattern}\\}\\}`, 'g');
+            if (regex.test(request)) {
+                request = request.replace(regex, globalVariables[variablePattern]);
+            }
         }
 
-        // regex replace
-        return request.replace(new RegExp(pattern, 'g'), function(match) {
-            return globalVariables[match] !== undefined ? globalVariables[match] : match;
-        });
+        return request;
     }
 
-    private static getGlobalVariables(): { [key: string]: any } {
+    private static getGlobalVariables(): { [key: string]: Func<string, string> } {
         return {
-            [Constants.TimeStampVariableName]: Date.now(),
-            [Constants.GuidVariableName]: uuid.v4()
+            [`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`]: match => {
+                let regex = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
+                let groups = regex.exec(match);
+                if (groups !== null) {
+                    if (groups.length === 3) {
+                        if (groups[1] && groups[2]) {
+                            return moment.utc().add(groups[1], groups[2]).unix();
+                        }
+                    }
+                }
+                return moment.utc().unix();
+            },
+            [`\\${Constants.GuidVariableName}`]: match => uuid.v4()
         }
-    }
-
-    private static escapeRegExp(str: string): string {
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     }
 }

@@ -10,7 +10,8 @@ export const CookieFileName: string = 'cookie.json';
 export const DefaultResponseDownloadFolderName: string = 'responses';
 export const HistoryItemsMaxCount: number = 50;
 
-export const TimeStampVariableName = "{{$timestamp}}";
-export const TimeStampVariableDescription = "Add a number of milliseconds between 1970/1/1 UTC Time and now";
-export const GuidVariableName = "{{$guid}}";
+export const TimeStampVariableName = "$timestamp";
+export const TimeStampVariableDescription = "Add a number of milliseconds between 1970/1/1 UTC Time and now. \
+ You can also provide the offset with current time in the format {{$timestamp number string}}";
+export const GuidVariableName = "$guid";
 export const GuidVariableDescription = "Add a RFC 4122 v4 UUID";
