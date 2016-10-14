@@ -5,7 +5,8 @@ import { HttpRequest } from './models/httpRequest'
 import { HttpResponse } from './models/httpResponse'
 import { PersistUtility } from './persistUtility'
 
-var request = require('request')
+var encodeUrl = require('encodeurl');
+var request = require('request');
 var cookieStore = require('tough-cookie-file-store');
 
 export class HttpClient {
@@ -18,7 +19,7 @@ export class HttpClient {
 
     async send(httpRequest: HttpRequest): Promise<HttpResponse> {
         let options = {
-            url: encodeURI(decodeURI(httpRequest.url)),
+            url: encodeUrl(httpRequest.url),
             headers: httpRequest.headers,
             method: httpRequest.method,
             body: httpRequest.body,

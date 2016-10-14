@@ -176,6 +176,7 @@
   "dependencies": {
     "applicationinsights": "^0.16.0",
     "elegant-spinner": "^1.0.1",
+    "encodeurl": "^1.0.1",
     "highlight.js": "^9.6.0",
     "moment": "^2.15.1",
     "node-uuid": "^1.4.7",
