@@ -35,17 +35,17 @@ body.vscode-high-contrast {
 }
 
 .vscode-light pre .hljs-number,
-.vscode-light pre .literal {
+.vscode-light pre .hljs-literal {
   color: #f5871f;
 }
 
 .vscode-dark pre .hljs-number,
-.vscode-dark pre .literal {
+.vscode-dark pre .hljs-literal {
   color: #de935f;
 }
 
 .vscode-high-contrast pre .hljs-number,
-.vscode-high-contrast pre .literal {
+.vscode-high-contrast pre .hljs-literal {
   color: #ffc58f;
 }
 
