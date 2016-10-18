@@ -1,3 +1,6 @@
+## 0.8.7 (2016/10/17)
+* __Improvement__: [Display line numbers in response](https://github.com/Huachao/vscode-restclient/issues/12)
+
 ## 0.8.6 (2016/10/14)
 * __Bug Fix__: [Handle urls with urlencoded query params](https://github.com/Huachao/vscode-restclient/issues/43)
 * __Improvement__: Support {{$randomInt}} gloabl system variables, add function to adjust time base on current time for {{$timestamp}} variable
