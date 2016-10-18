@@ -102,3 +102,30 @@ body.vscode-high-contrast {
   padding: 10px;
   white-space: pre-wrap;
 }
+
+code .line {
+  display: inline-block;
+  position: relative;
+  padding-left: calc(2ch + 18px );
+}
+
+code .line:after {
+  content: ' ';
+}
+
+code .line:before {
+  box-sizing: content-box;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  text-align: right;
+  width: 2ch;
+  content: attr(start);
+  padding-right: 9px;
+  padding-left: 9px;
+  margin-left: calc(-2ch + -27px );
+  margin-right: 9px;
+  color: #787878;
+  background-color: inherit;
+}

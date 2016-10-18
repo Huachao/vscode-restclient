@@ -7,6 +7,7 @@ import * as Constants from '../constants'
 import * as path from 'path'
 
 const hljs = require('highlight.js');
+const codeHighlightLinenums = require('code-highlight-linenums');
 
 var pd = require('pretty-data').pd;
 
@@ -31,7 +32,7 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             </head>
             <body>
                 <div>
-                    <pre><code class="http">${hljs.highlight('http', code, true).value}</code></pre>
+                    <pre><code class="http">${codeHighlightLinenums(code, { hljs: hljs, lang: 'http', start: 1 })}</code></pre>
                 </div>
             </body>`;
         }
