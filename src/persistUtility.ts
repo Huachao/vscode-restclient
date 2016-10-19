@@ -52,7 +52,7 @@ export class PersistUtility {
         }
     }
 
-    private static async serializeToHistoryFile(requests: HttpRequest[]) {
+    static async serializeToHistoryFile(requests: HttpRequest[]) {
         return new Promise<void>((resolve, reject) => {
             fs.writeFile(PersistUtility.historyFilePath, JSON.stringify(requests), error => {
                 if (error) {

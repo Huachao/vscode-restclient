@@ -20,7 +20,8 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(requestController);
     context.subscriptions.push(historyController);
     context.subscriptions.push(commands.registerCommand('rest-client.request', () => requestController.run()));
-    context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.run()));
+    context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.save()));
+    context.subscriptions.push(commands.registerCommand('rest-client.clear-history', () => historyController.clear()));
     context.subscriptions.push(commands.registerCommand('rest-client.save-response', ResponseController.save));
     context.subscriptions.push(languages.registerCompletionItemProvider('http', new HttpCompletionItemProvider()));
 }

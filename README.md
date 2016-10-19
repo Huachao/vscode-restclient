@@ -7,7 +7,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 ## Main Features
 * Send __HTTP request__ in editor and view response in a separate pane with syntax highlight
 * Send __CURL command__ in editor
-* Auto save and view request history
+* Auto save and view/clear request history
 * Save raw response to local disk
 * Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests

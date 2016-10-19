@@ -38,6 +38,7 @@
   "activationEvents": [
     "onCommand:rest-client.request",
     "onCommand:rest-client.history",
+    "onCommand:rest-client.clear-history",
     "onCommand:rest-client.save-response",
     "onLanguage:http"
   ],
@@ -84,12 +85,17 @@
       },
       {
         "command": "rest-client.history",
-        "title": "Request History",
+        "title": "View Request History",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.clear-history",
+        "title": "Clear Request History",
         "category": "Rest Client"
       },
       {
         "command": "rest-client.save-response",
-        "title": "Save Latest Response",
+        "title": "Save Response",
         "icon": {
           "light": "./images/save.svg",
           "dark": "./images/save-inverse.svg"

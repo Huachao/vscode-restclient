@@ -17,7 +17,7 @@ export class HistoryController {
         this._outputChannel = window.createOutputChannel('REST');
     }
 
-    async run() {
+    async save() {
         Telemetry.sendEvent('History');
         try {
             let requests = await PersistUtility.load();
@@ -43,6 +43,23 @@ export class HistoryController {
             let path = await this.createRequestInTempFile(item.rawRequest);
             let document = await workspace.openTextDocument(path);
             window.showTextDocument(document);
+        } catch (error) {
+            this.errorHandler(error)
+        }
+    }
+
+    async clear() {
+        Telemetry.sendEvent('Clear History');
+        try {
+            window.showInformationMessage(`Do you really want to clear request history?`, { title: 'Yes' }, { title: 'No' })
+                .then(async function (btn) {
+                    if (btn) {
+                        if (btn.title === 'Yes') {
+                            await PersistUtility.serializeToHistoryFile([]);
+                            window.showInformationMessage('Request history has been cleared');
+                        }
+                    }
+                });
         } catch (error) {
             this.errorHandler(error)
         }
