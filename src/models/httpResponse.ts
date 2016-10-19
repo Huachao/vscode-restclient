@@ -18,9 +18,11 @@ export class HttpResponse {
     }
 
     public getResponseHeaderValue(name: string) {
-        for (var header in this.headers) {
-            if (header.toLowerCase() === name.toLowerCase()) {
-                return this.headers[header];
+        if (this.headers) {
+            for (var header in this.headers) {
+                if (header.toLowerCase() === name.toLowerCase()) {
+                    return this.headers[header];
+                }
             }
         }
 
