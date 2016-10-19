@@ -54,7 +54,19 @@ export class HttpClient {
                     return;
                 }
 
-                resolve(new HttpResponse(response.statusCode, response.statusMessage, response.httpVersion, response.headers, body, response.elapsedTime));
+                // adjust response header case, due to the response headers in request package is in lowercase
+                var headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
+                let adjustedResponseHeaders: { [key: string]: string } = {};
+                for (var header in response.headers) {
+                    let adjustedHeaderName = header;
+                    if (headersDic[header]) {
+                        adjustedHeaderName = headersDic[header];
+                        adjustedResponseHeaders[headersDic[header]] = response.headers[header];
+                    }
+                    adjustedResponseHeaders[adjustedHeaderName] = response.headers[header];
+                }
+
+                resolve(new HttpResponse(response.statusCode, response.statusMessage, response.httpVersion, adjustedResponseHeaders, body, response.elapsedTime));
             });
         });
     }
@@ -69,5 +81,13 @@ export class HttpClient {
         }
 
         return null;
+    }
+
+    private static getResponseRawHeaderNames(rawHeaders: string[]): { [key: string]: string } {
+        let result: { [key: string]: string } = {};
+        rawHeaders.forEach(header => {
+            result[header.toLowerCase()] = header;
+        });
+        return result;
     }
 }

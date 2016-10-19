@@ -25,7 +25,7 @@ export class HttpResponseTextDocumentContentProvider implements TextDocumentCont
         if (this.response) {
             let code = `HTTP/${this.response.httpVersion} ${this.response.statusCode} ${this.response.statusMessage}
 ${HttpResponseTextDocumentContentProvider.formatHeaders(this.response.headers)}
-${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.response.headers['content-type'])}`;
+${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.response.getResponseHeaderValue("content-type"))}`;
             return `
             <head>
                 <link rel="stylesheet" href="${HttpResponseTextDocumentContentProvider.cssFilePath}">

@@ -16,4 +16,14 @@ export class HttpResponse {
         this.body = body;
         this.elapsedMillionSeconds = elapsedMillionSeconds;
     }
+
+    public getResponseHeaderValue(name: string) {
+        for (var header in this.headers) {
+            if (header.toLowerCase() === name.toLowerCase()) {
+                return this.headers[header];
+            }
+        }
+
+        return null;
+    }
 }
