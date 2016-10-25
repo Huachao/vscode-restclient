@@ -10,6 +10,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
 
+var cp = require('copy-paste');
+
 export class ResponseController {
     static responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
 
@@ -25,9 +27,13 @@ export class ResponseController {
             try {
                 PersistUtility.createResponseFileIfNotExist(filePath);
                 fs.writeFileSync(filePath, fullResponse);
-                window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open'}).then(function (btn) {
-                    if (btn && btn.title === 'Open') {
-                        workspace.openTextDocument(filePath).then(window.showTextDocument);
+                window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open'}, { title: 'Copy Path'}).then(function (btn) {
+                    if (btn) {
+                        if (btn.title === 'Open') {
+                            workspace.openTextDocument(filePath).then(window.showTextDocument);
+                        } else if (btn.title === 'Copy Path') {
+                            cp.copy(filePath);
+                        }
                     }
                 });
             } catch (error) {
