@@ -1,3 +1,7 @@
+## 0.9.0 (2016/10/25)
+* __Feature__: Add clear history command
+* __Improvement__: Display response header in original case
+
 ## 0.8.7 (2016/10/17)
 * __Improvement__: [Display line numbers in response](https://github.com/Huachao/vscode-restclient/issues/12)
 
