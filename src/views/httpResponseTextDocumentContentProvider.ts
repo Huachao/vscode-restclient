@@ -65,7 +65,7 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             let type = MimeUtility.parse(contentType).type;
             if (type === 'application/json') {
                 if (HttpResponseTextDocumentContentProvider.isJsonString(body)) {
-                    body = JSON.stringify(JSON.parse(body), null, 4);
+                    body = JSON.stringify(JSON.parse(body), null, 2);
                  } else {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                  }
