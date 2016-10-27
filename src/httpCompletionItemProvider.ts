@@ -19,7 +19,13 @@ export class HttpCompletionItemProvider implements CompletionItemProvider {
                     ? `${e.name} `
                     : `${e.name}`);
             item.insertText = this.escapeCompletionItemInsertText(insertText);
-            item.kind = e.type === ElementType.GlobalVariable ? CompletionItemKind.Variable : CompletionItemKind.Text;
+            item.kind = e.type === ElementType.GlobalVariable
+                ? CompletionItemKind.Variable
+                : e.type === ElementType.Method
+                    ? CompletionItemKind.Method
+                    : e.type === ElementType.Header
+                        ? CompletionItemKind.Property
+                        : CompletionItemKind.Field;
             completionItems.push(item);
         });
 
