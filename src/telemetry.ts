@@ -6,7 +6,7 @@ import * as Constants from './constants'
 const appInsights = require("applicationinsights");
 
 export class Telemetry {
-    private static restClientSettings: RestClientSettings = new RestClientSettings();
+    private static readonly restClientSettings: RestClientSettings = new RestClientSettings();
 
     static sendEvent(eventName: string, properties?: {[key: string]: string }) {
         try {

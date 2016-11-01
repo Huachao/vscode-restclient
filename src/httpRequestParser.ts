@@ -7,7 +7,7 @@ import { HttpClient } from './httpClient'
 import { EOL } from 'os';
 
 export class HttpRequestParser implements IRequestParser {
-    private static defaultMethod = 'GET';
+    private static readonly defaultMethod = 'GET';
 
     parseHttpRequest(requestRawText: string): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html

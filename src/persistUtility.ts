@@ -7,8 +7,8 @@ import * as path from 'path'
 import * as os from 'os'
 
 export class PersistUtility {
-    static historyFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.HistoryFileName);
-    static cookieFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.CookieFileName);
+    static readonly historyFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.HistoryFileName);
+    static readonly cookieFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.CookieFileName);
     private static emptyHttpRequestItems: HttpRequest[] = [];
 
     static async save(httpRequest: HttpRequest) {
