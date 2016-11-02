@@ -26,7 +26,8 @@ export class RequestParserUtil {
             }
             else
             {
-                headers[headerNames[normalizedfieldName]] += `,${normalizedfieldValue}`;
+                let splitter = normalizedfieldName === 'cookie' ? ';' : ',';
+                headers[headerNames[normalizedfieldName]] += `${splitter}${normalizedfieldValue}`;
             }
         });
 
