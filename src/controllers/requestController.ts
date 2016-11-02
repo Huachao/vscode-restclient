@@ -9,6 +9,7 @@ import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTe
 import { Telemetry } from '../telemetry';
 import { VariableProcessor } from '../variableProcessor';
 import { ResponseStore } from '../responseStore';
+import * as Constants from '../constants';
 import { EOL } from 'os';
 
 const elegantSpinner = require('elegant-spinner');
@@ -22,8 +23,6 @@ export class RequestController {
     private _registration: Disposable;
     private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
     private _interval: any;
-
-    private static commentIdentifiersRegex = new RegExp('^\\s*(\#|\/\/)');
 
     constructor() {
         this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
@@ -51,7 +50,7 @@ export class RequestController {
 
         // remove comment lines
         let lines: string[] = selectedText.split(/\r?\n/g);
-        selectedText = lines.filter(l => !RequestController.commentIdentifiersRegex.test(l)).join(EOL);
+        selectedText = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
         if (selectedText === '') {
             return;
         }

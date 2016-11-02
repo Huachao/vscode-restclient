@@ -101,6 +101,20 @@
           "dark": "./images/save-inverse.svg"
         },
         "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.generate-codesnippet",
+        "title": "Generate Code Snippet",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.copy-codesnippet",
+        "title": "Copy Code Snippet",
+        "icon": {
+          "light": "./images/copy.svg",
+          "dark": "./images/copy-inverse.svg"
+        },
+        "category": "Rest Client"
       }
     ],
     "menus": {
@@ -108,6 +122,11 @@
         {
           "when": "resourceScheme == rest-response",
           "command": "rest-client.save-response",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceScheme == rest-code-snippet",
+          "command": "rest-client.copy-codesnippet",
           "group": "navigation"
         }
       ]
@@ -129,6 +148,18 @@
         "command": "rest-client.history",
         "key": "ctrl+alt+h",
         "mac": "cmd+alt+h"
+      },
+      {
+        "command": "rest-client.generate-codesnippet",
+        "key": "ctrl+alt+c",
+        "mac": "cmd+alt+c",
+        "when": "editorTextFocus && editorLangId == 'http'"
+      },
+      {
+        "command": "rest-client.generate-codesnippet",
+        "key": "ctrl+alt+c",
+        "mac": "cmd+alt+c",
+        "when": "editorTextFocus && editorLangId == 'plaintext'"
       }
     ],
     "configuration": {
@@ -189,6 +220,7 @@
     "elegant-spinner": "^1.0.1",
     "encodeurl": "^1.0.1",
     "highlight.js": "^9.6.0",
+    "httpsnippet": "^1.16.5",
     "moment": "^2.15.1",
     "node-uuid": "^1.4.7",
     "pretty-data": "^0.40.0",
