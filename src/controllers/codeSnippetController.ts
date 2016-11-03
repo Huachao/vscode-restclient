@@ -10,6 +10,7 @@ import { CodeSnippetTarget } from '../models/codeSnippetTarget';
 import { CodeSnippetClientQuickPickItem } from '../models/codeSnippetClientPickItem';
 import { CodeSnippetClient } from '../models/codeSnippetClient';
 import { CodeSnippetTextDocumentContentProvider } from '../views/codeSnippetTextDocumentContentProvider';
+import { Telemetry } from '../telemetry';
 import * as Constants from '../constants';
 import { EOL } from 'os';
 import * as url from 'url';
@@ -101,6 +102,7 @@ export class CodeSnippetController {
 
                 let client = await window.showQuickPick(clientsPickList, { placeHolder: "" });
                 if (client) {
+                    Telemetry.sendEvent('Generate Code Snippet', { 'target' : item.rawTarget.key, 'client': client.rawClient.key });
                     let result = snippet.convert(item.rawTarget.key, client.rawClient.key);
                     this._convertedResult = result;
                     this._codeSnippetTextProvider.convertResult = result;

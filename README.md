@@ -9,16 +9,17 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Send __CURL command__ in editor
 * Auto save and view/clear request history
 * Save raw response to local disk
+* Generate code snippets for __HTTP request__ in languages like `Python`, `Javascript`, etc.
 * Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
 * Proxy support
-* Code snippets for operations like `GET` and `POST`
 * `HTTP` language support
     - `.http` and `.rest` file extensions support
     - Syntax highlight (Request and Response)
     - Auto completion for method, header, global dynamic variables and mime types
     - Comments (line starts with `#` or `//`) support
     - Support `json` and `xml` body indentation, comment shortcut and auto closing brackets
+    - Code snippets for operations like `GET` and `POST`
 
 ## Usage
 In editor, type a HTTP request as simple as below:
@@ -102,6 +103,10 @@ Each time we sent a http request, the request details(method, url, headers and b
 ## Save Response
 ![Save Response](images/response.gif)
 In the upper right corner of the response preview tab, we add a new icon to save the latest response to local file system. After you click the `Save Latest Response` icon, it will prompt the window with the saved response file path. You can click the `Open` button to open the saved response file in current workspace.
+
+## Generate Code Snippet
+![Generate Code Snippet](images/code-snippet.gif)
+Once you’ve finalized your request in REST Client extension, you might want to make the same request from your own source code. REST Client lets you generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as you do in sending a request, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, and as well as library list. After that, the generated code snippet will be previewed in a seperate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
 
 ## HTTP Language
 Add language support for HTTP request, with __syntax highlight__, __autocomplete__ and __comment support__, when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:
