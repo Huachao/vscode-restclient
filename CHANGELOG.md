@@ -1,3 +1,9 @@
+## 0.10.0 (2016/11/3)
+* __Feature__: Support generate code snippets for various languages and libraries
+* __Improvement__: Allow copy saved response path
+* __Improvement__: Allow description for HTTP headers in autocompletion
+* __Bug Fix__: Use comma to concat multiple cookies 
+
 ## 0.9.0 (2016/10/25)
 * __Feature__: Add clear history command
 * __Improvement__: Display response header in original case
