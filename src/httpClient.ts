@@ -66,7 +66,14 @@ export class HttpClient {
                     adjustedResponseHeaders[adjustedHeaderName] = response.headers[header];
                 }
 
-                resolve(new HttpResponse(response.statusCode, response.statusMessage, response.httpVersion, adjustedResponseHeaders, body, response.elapsedTime));
+                resolve(new HttpResponse(
+                            response.statusCode,
+                            response.statusMessage,
+                            response.httpVersion,
+                            adjustedResponseHeaders,
+                            body,
+                            response.elapsedTime,
+                            httpRequest.url));
             });
         });
     }

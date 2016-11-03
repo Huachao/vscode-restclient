@@ -23,16 +23,22 @@ export class HttpResponseTextDocumentContentProvider implements TextDocumentCont
 
     public provideTextDocumentContent(uri: Uri): string {
         if (this.response) {
-            let code = `HTTP/${this.response.httpVersion} ${this.response.statusCode} ${this.response.statusMessage}
+            let innerHtml: string;
+            if (MimeUtility.isBrowerSupportedImageFormat(this.response.headers['Content-Type'].trim())) {
+                innerHtml = `<img src="${this.response.requestUrl}">`;
+            } else {
+                let code = `HTTP/${this.response.httpVersion} ${this.response.statusCode} ${this.response.statusMessage}
 ${HttpResponseTextDocumentContentProvider.formatHeaders(this.response.headers)}
 ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.response.getResponseHeaderValue("content-type"))}`;
+                innerHtml = `<pre><code class="http">${codeHighlightLinenums(code, { hljs: hljs, lang: 'http', start: 1 })}</code></pre>`;
+            }
             return `
             <head>
                 <link rel="stylesheet" href="${HttpResponseTextDocumentContentProvider.cssFilePath}">
             </head>
             <body>
                 <div>
-                    <pre><code class="http">${codeHighlightLinenums(code, { hljs: hljs, lang: 'http', start: 1 })}</code></pre>
+                    ${innerHtml}
                 </div>
             </body>`;
         }
