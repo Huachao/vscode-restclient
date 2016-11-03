@@ -13,3 +13,7 @@ export class HttpRequest {
         this.body = body;
     }
 }
+
+export class SerializedHttpRequest extends HttpRequest {
+    startTime: number;
+}

@@ -3,6 +3,7 @@
 import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable } from 'vscode';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
+import { SerializedHttpRequest } from '../models/httpRequest';
 import { RestClientSettings } from '../models/configurationSettings';
 import { PersistUtility } from '../persistUtility';
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
@@ -86,7 +87,9 @@ export class RequestController {
             }
 
             // persist to history json file
-            await PersistUtility.save(httpRequest);
+            let serializedRequest = <SerializedHttpRequest>httpRequest;
+            serializedRequest.startTime = Date.now();
+            await PersistUtility.save(serializedRequest);
         } catch (error) {
             if (error.code === 'ETIMEDOUT') {
                 error.message = `Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'. Details: ${error}. `;

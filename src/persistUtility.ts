@@ -1,6 +1,6 @@
 'use strict';
 
-import { HttpRequest } from './models/httpRequest'
+import { SerializedHttpRequest } from './models/httpRequest'
 import * as Constants from './constants'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -9,9 +9,9 @@ import * as os from 'os'
 export class PersistUtility {
     static readonly historyFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.HistoryFileName);
     static readonly cookieFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.CookieFileName);
-    private static emptyHttpRequestItems: HttpRequest[] = [];
+    private static emptyHttpRequestItems: SerializedHttpRequest[] = [];
 
-    static async save(httpRequest: HttpRequest) {
+    static async save(httpRequest: SerializedHttpRequest) {
         try {
             let requests = await PersistUtility.deserializeFromHistoryFile();
             requests.unshift(httpRequest);
@@ -21,7 +21,7 @@ export class PersistUtility {
         }
     }
 
-    static async load(): Promise<HttpRequest[]> {
+    static async load(): Promise<SerializedHttpRequest[]> {
         return PersistUtility.deserializeFromHistoryFile();
     }
 
@@ -52,7 +52,7 @@ export class PersistUtility {
         }
     }
 
-    static async serializeToHistoryFile(requests: HttpRequest[]) {
+    static async serializeToHistoryFile(requests: SerializedHttpRequest[]) {
         return new Promise<void>((resolve, reject) => {
             fs.writeFile(PersistUtility.historyFilePath, JSON.stringify(requests), error => {
                 if (error) {
@@ -65,8 +65,8 @@ export class PersistUtility {
         });
     }
 
-    private static async deserializeFromHistoryFile(): Promise<HttpRequest[]> {
-        return new Promise<HttpRequest[]>((resolve, reject) => {
+    private static async deserializeFromHistoryFile(): Promise<SerializedHttpRequest[]> {
+        return new Promise<SerializedHttpRequest[]>((resolve, reject) => {
             fs.readFile(PersistUtility.historyFilePath, (error, data) => {
                 if (error) {
                     PersistUtility.createHistoryFileIfNotExist();

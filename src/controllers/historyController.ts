@@ -9,6 +9,7 @@ import { EOL } from 'os';
 import * as fs from 'fs'
 
 var tmp = require('tmp')
+var moment = require('moment');
 
 export class HistoryController {
     private _outputChannel: OutputChannel;
@@ -31,6 +32,9 @@ export class HistoryController {
                 item.label = `${request.method.toUpperCase()} ${request.url}`;
                 if (request.body && request.body.length > 0) {
                     item.description = `${request.body.length} body bytes`;
+                }
+                if (request.startTime) {
+                    item.detail = `${moment().to(request.startTime)}`;
                 }
                 item.rawRequest = request;
                 return item;
