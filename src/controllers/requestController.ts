@@ -89,7 +89,11 @@ export class RequestController {
             await PersistUtility.save(httpRequest);
         } catch (error) {
             if (error.code === 'ETIMEDOUT') {
-                error.message = `Error: ${error}. Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'.`;
+                error.message = `Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'. Details: ${error}. `;
+            } else if (error.code === 'ECONNREFUSED') {
+                error.message = `Connection is being rejected. The service isn’t running on the server, or a firewall is blocking requests. Details: ${error}.`;
+            } else if (error.code === 'ENETUNREACH') {
+                error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
             this.clearSendProgressStatusText();
             this._statusBarItem.text = '';
