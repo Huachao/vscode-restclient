@@ -13,7 +13,6 @@ import { CodeSnippetTextDocumentContentProvider } from '../views/codeSnippetText
 import { Telemetry } from '../telemetry';
 import * as Constants from '../constants';
 import { EOL } from 'os';
-import * as url from 'url';
 
 const cp = require('copy-paste');
 const HTTPSnippet = require('httpsnippet');
@@ -147,7 +146,7 @@ export class CodeSnippetController {
                 {
                     cookies.push(new HARCookie(cookieParts[0].trim(), ''))
                 }
-            }); 
+            });
         }
 
         // convert body

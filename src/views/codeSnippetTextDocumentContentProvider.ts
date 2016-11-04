@@ -1,6 +1,6 @@
 "use strict";
 
-import { TextDocumentContentProvider, EventEmitter, Event, Uri, window, extensions } from 'vscode';
+import { TextDocumentContentProvider, EventEmitter, Event, Uri, extensions } from 'vscode';
 import * as Constants from '../constants';
 import * as path from 'path';
 
