@@ -10,6 +10,7 @@ import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTe
 import { Telemetry } from '../telemetry';
 import { VariableProcessor } from '../variableProcessor';
 import { ResponseStore } from '../responseStore';
+import { Selector } from '../selector';
 import * as Constants from '../constants';
 import { EOL } from 'os';
 
@@ -42,11 +43,9 @@ export class RequestController {
         }
 
         // Get selected text of selected lines or full document
-        let selectedText: string;
-        if (editor.selection.isEmpty) {
-            selectedText = editor.document.getText();
-        } else {
-            selectedText = editor.document.getText(editor.selection);
+        let selectedText = new Selector().getSelectedText(editor);
+        if (!selectedText) {
+            return;
         }
 
         // remove comment lines
