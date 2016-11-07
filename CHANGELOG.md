@@ -1,3 +1,9 @@
+## 0.10.1 (2016/11/7)
+* __Feature__: [Support saving multiple requests in the same file and use three consecutive '#' as delimiter](https://github.com/Huachao/vscode-restclient/issues/21)
+* __Feature__: [Allow send request between the delimiters based on the cursor location](https://github.com/Huachao/vscode-restclient/issues/12)
+* __Feature__: Support display image response directly in response view
+* __Improvement__: Display request triggered time in history view
+
 ## 0.10.0 (2016/11/3)
 * __Feature__: Support generate code snippets for various languages and libraries
 * __Improvement__: Allow copy saved response path
