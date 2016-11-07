@@ -8,6 +8,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Send __HTTP request__ in editor and view response in a separate pane with syntax highlight
 * Send __CURL command__ in editor
 * Auto save and view/clear request history
+* Support _MULTIPLE_ requests in the same file
 * Save raw response to local disk
 * Generate code snippets for __HTTP request__ in languages like `Python`, `Javascript`, etc.
 * Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
@@ -38,11 +39,32 @@ content-type: application/json
 ```
 Once you prepared a request, use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in seperate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/loading.gif) will be disalyed in the status bar, when receiving the response, the icon will be changed to the duration.
 
+### Mutiple Requests In The Same File
+You may even want to save numerous requests in the same file and execute any of them easily. REST Client extension could recognize any line contains three or more `#` (and no other characters) as a delimiter between requests. Place the cursor anywhere between the delimiters, triggering sending the request, and it will first parse the text between the delimiters as request and then send it out.
+```http
+GET https://example.com/comments/1 HTTP/1.1
+
+###
+
+GET https://example.com/topics/1 HTTP/1.1
+
+###
+
+POST https://example.com/comments HTTP/1.1
+content-type: application/json
+
+{
+    "name": "sample",
+    "time": "Wed, 21 Oct 2015 18:27:50 GMT"
+}
+```
+You may even use mouse to highlight the text as you wish in file, REST Client will parse the selected text as request.
+
 ## Install
 Press `F1`, type `ext install rest-client`.
 
 ## Making Request
-![rest-client](images/demo.gif)
+![rest-client](images/usage.gif)
 ### Request Line
 The first non-empty line of the selection (or document if nothing is selected) is the _Request Line_.
 Below are some examples of _Request Line_:
