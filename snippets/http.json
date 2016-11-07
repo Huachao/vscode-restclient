@@ -5,10 +5,25 @@
            "GET ${url} HTTP/1.1"
         ]
     },
+    "Delete request block": {
+        "prefix": "delete",
+        "body": [
+           "DELETE ${url} HTTP/1.1"
+        ]
+    },
     "Post request block": {
         "prefix": "post",
         "body": [
             "POST ${url} HTTP/1.1",
+            "${header name}: ${header value}",
+            "",
+            "${content}"
+        ]
+    },
+    "Put request block": {
+        "prefix": "put",
+        "body": [
+            "PUT ${url} HTTP/1.1",
             "${header name}: ${header value}",
             "",
             "${content}"
