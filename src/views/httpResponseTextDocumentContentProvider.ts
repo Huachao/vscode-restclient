@@ -24,7 +24,7 @@ export class HttpResponseTextDocumentContentProvider implements TextDocumentCont
     public provideTextDocumentContent(uri: Uri): string {
         if (this.response) {
             let innerHtml: string;
-            let contentType = this.response.headers['Content-Type'];
+            let contentType = this.response.getResponseHeaderValue("content-type");
             if (contentType) {
                 contentType = contentType.trim();
             }
