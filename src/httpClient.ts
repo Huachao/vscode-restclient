@@ -4,6 +4,7 @@ import { RestClientSettings } from './models/configurationSettings'
 import { HttpRequest } from './models/httpRequest'
 import { HttpResponse } from './models/httpResponse'
 import { PersistUtility } from './persistUtility'
+import * as url from 'url'
 
 var encodeUrl = require('encodeurl');
 var request = require('request');
@@ -18,19 +19,24 @@ export class HttpClient {
     }
 
     async send(httpRequest: HttpRequest): Promise<HttpResponse> {
-        let options = {
+        let options: any = {
             url: encodeUrl(httpRequest.url),
             headers: httpRequest.headers,
             method: httpRequest.method,
             body: httpRequest.body,
             time: true,
             timeout: this._settings.timeoutInMilliseconds,
-            proxy: this._settings.proxy,
-            strictSSL: this._settings.proxy && this._settings.proxy.length > 0 ? this._settings.proxyStrictSSL : false,
             gzip: true,
             followRedirect: this._settings.followRedirect,
             jar: this._settings.rememberCookiesForSubsequentRequests ? request.jar(new cookieStore(PersistUtility.cookieFilePath)) : false
         };
+
+        // set proxy
+        let host = url.parse(httpRequest.url).host;
+        options.proxy = this._settings.excludeHostsForProxy.findIndex(eh => host && eh.toLowerCase() === host.toLowerCase()) > -1
+                                ? null
+                                : this._settings.proxy;
+        options.strictSSL = options.proxy && options.proxy.length > 0 ? this._settings.proxyStrictSSL : false;
 
         if (!options.headers) {
             options.headers = httpRequest.headers = {};

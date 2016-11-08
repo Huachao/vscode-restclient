@@ -196,6 +196,7 @@ X-Request-Id: {{$guid}}
 * `rest-client.showResponseInDifferentTab`: Show response in different tab. (Default is __false__)
 * `rest-client.rememberCookiesForSubsequentRequests`: Save cookies from `Set-Cookie` header in response and use for subsequent requests. (Default is __true__)
 * `rest-client.enableTelemetry`: Send out anonymous usage data. (Default is __true__)
+* `rest-client.excludeHostsForProxy`: Excluded hosts when using using proxy settings. (Default is __[]__)
 
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 
