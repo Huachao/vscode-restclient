@@ -14,6 +14,10 @@ export class MimeUtility {
     static isBrowerSupportedImageFormat(contentTypeString: string): boolean {
         // https://en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
         // For chrome supports JPEG, GIF, WebP, PNG and BMP
+        if (!contentTypeString) {
+            return false;
+        }
+
         let type = MimeUtility.parse(contentTypeString).type;
         if (type === 'image/jpeg' || type === 'image/gif' || type === 'image/webp' || type === 'image/png' || type === 'image/bmp') {
             return true;

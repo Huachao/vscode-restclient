@@ -24,7 +24,11 @@ export class HttpResponseTextDocumentContentProvider implements TextDocumentCont
     public provideTextDocumentContent(uri: Uri): string {
         if (this.response) {
             let innerHtml: string;
-            if (MimeUtility.isBrowerSupportedImageFormat(this.response.headers['Content-Type'].trim())) {
+            let contentType = this.response.headers['Content-Type'];
+            if (contentType) {
+                contentType = contentType.trim();
+            }
+            if (contentType && MimeUtility.isBrowerSupportedImageFormat(contentType)) {
                 innerHtml = `<img src="${this.response.requestUrl}">`;
             } else {
                 let code = `HTTP/${this.response.httpVersion} ${this.response.statusCode} ${this.response.statusMessage}
