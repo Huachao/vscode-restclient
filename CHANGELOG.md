@@ -1,3 +1,7 @@
+## 0.10.2 (2016/11/8)
+* __Improvement__: [Add snippets for DELETE and PUT requests](https://github.com/Huachao/vscode-restclient/pull/45) [(@Meir017)](https://github.com/Meir017/)
+* __Bug Fix__: [Cannot read property 'trim' of undefined](https://github.com/Huachao/vscode-restclient/issues/46)
+
 ## 0.10.1 (2016/11/7)
 * __Feature__: [Support saving multiple requests in the same file and use three consecutive '#' as delimiter](https://github.com/Huachao/vscode-restclient/issues/21)
 * __Feature__: [Allow send request between the delimiters based on the cursor location](https://github.com/Huachao/vscode-restclient/issues/12)
