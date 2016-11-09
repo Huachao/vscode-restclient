@@ -1,23 +1,24 @@
 "use strict";
 
-import { TextDocumentContentProvider, EventEmitter, Event, Uri, window, extensions } from 'vscode';
-import { HttpResponse } from '../models/httpResponse'
-import { MimeUtility } from '../mimeUtility'
-import * as Constants from '../constants'
-import * as path from 'path'
+import { Uri, window, extensions } from 'vscode';
+import { BaseTextDocumentContentProvider } from './baseTextDocumentContentProvider';
+import { HttpResponse } from '../models/httpResponse';
+import { MimeUtility } from '../mimeUtility';
+import * as Constants from '../constants';
+import * as path from 'path';
 
 const hljs = require('highlight.js');
 const codeHighlightLinenums = require('code-highlight-linenums');
 
 var pd = require('pretty-data').pd;
 
-export class HttpResponseTextDocumentContentProvider implements TextDocumentContentProvider {
+export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentContentProvider {
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
 
-    private _onDidChange = new EventEmitter<Uri>();
     response: HttpResponse;
 
     constructor(response: HttpResponse) {
+        super();
         this.response = response;
     }
 
@@ -46,14 +47,6 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
                 </div>
             </body>`;
         }
-    }
-
-    get onDidChange(): Event<Uri> {
-        return this._onDidChange.event;
-    }
-
-    public update(uri: Uri) {
-        this._onDidChange.fire(uri);
     }
 
     private static formatHeaders(headers: { [key: string]: string }): string {

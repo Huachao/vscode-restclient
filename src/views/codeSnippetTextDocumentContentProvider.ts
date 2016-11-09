@@ -1,20 +1,21 @@
 "use strict";
 
-import { TextDocumentContentProvider, EventEmitter, Event, Uri, extensions } from 'vscode';
+import { Uri, extensions } from 'vscode';
+import { BaseTextDocumentContentProvider } from './baseTextDocumentContentProvider';
 import * as Constants from '../constants';
 import * as path from 'path';
 
 const hljs = require('highlight.js');
 const codeHighlightLinenums = require('code-highlight-linenums');
 
-export class CodeSnippetTextDocumentContentProvider implements TextDocumentContentProvider {
+export class CodeSnippetTextDocumentContentProvider extends BaseTextDocumentContentProvider {
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
 
-    private _onDidChange = new EventEmitter<Uri>();
     convertResult: string;
     lang: string;
 
     constructor(convertResult: string, lang: string) {
+        super();
         this.convertResult = convertResult;
         this.lang = lang;
     }
@@ -31,14 +32,6 @@ export class CodeSnippetTextDocumentContentProvider implements TextDocumentConte
                 </div>
             </body>`;
         }
-    }
-
-    get onDidChange(): Event<Uri> {
-        return this._onDidChange.event;
-    }
-
-    public update(uri: Uri) {
-        this._onDidChange.fire(uri);
     }
 
     private getHighlightJsLanguageAlias() {

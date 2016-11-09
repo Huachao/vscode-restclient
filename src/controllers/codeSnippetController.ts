@@ -10,6 +10,7 @@ import { CodeSnippetTarget } from '../models/codeSnippetTarget';
 import { CodeSnippetClientQuickPickItem } from '../models/codeSnippetClientPickItem';
 import { CodeSnippetClient } from '../models/codeSnippetClient';
 import { CodeSnippetTextDocumentContentProvider } from '../views/codeSnippetTextDocumentContentProvider';
+import { Selector } from '../selector';
 import { Telemetry } from '../telemetry';
 import * as Constants from '../constants';
 import { EOL } from 'os';
@@ -36,12 +37,10 @@ export class CodeSnippetController {
             return;
         }
 
-        // Get selected text of selected lines or previous selected code or full document
-        let selectedText: string;
-        if (editor.selection.isEmpty) {
-            selectedText = this._selectedText || editor.document.getText();
-        } else {
-            selectedText = editor.document.getText(editor.selection);
+        // Get selected text of selected lines or full document
+        let selectedText = new Selector().getSelectedText(editor);
+        if (!selectedText) {
+            return;
         }
 
         // remove comment lines
