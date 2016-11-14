@@ -115,6 +115,15 @@ authorization: token xxx
 </request>
 ```
 
+You may also allows you to specify file path to use as a body, which starts with `< `:
+```http
+POST https://example.com/comments HTTP/1.1
+content-type: application/xml
+authorization: token xxx
+
+< C:\Users\Default\Desktop\demo.http
+```
+
 ## Making CURL Request
 ![CURL Request](images/curl-request.png)
 We add the capability to directly run [curl request](https://curl.haxx.se/) in REST Client extension. The making request command is the same as previous one. REST Client will automatically parse the request with specified parser.

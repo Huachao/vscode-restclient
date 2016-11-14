@@ -1,3 +1,7 @@
+## 0.10.3 (2016/11/14)
+* __Feature__: Allow to specify file path to use as request body
+* __Bug Fix__: [Add setting to ignore some proxy hosts](https://github.com/Huachao/vscode-restclient/issues/47)
+
 ## 0.10.2 (2016/11/8)
 * __Improvement__: [Add snippets for DELETE and PUT requests](https://github.com/Huachao/vscode-restclient/pull/45) [(@Meir017)](https://github.com/Meir017/)
 * __Bug Fix__: [Cannot read property 'trim' of undefined](https://github.com/Huachao/vscode-restclient/issues/46)
