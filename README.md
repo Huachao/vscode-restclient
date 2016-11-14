@@ -11,7 +11,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Support _MULTIPLE_ requests in the same file
 * View image response directly in pane
 * Save raw response to local disk
-* Generate code snippets for __HTTP request__ in languages like `Python`, `Javascript`, etc.
+* Generate code snippets for __HTTP request__ in languages like `Python`, `Javascript` and more!.
 * Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
 * Proxy support
@@ -121,7 +121,7 @@ POST https://example.com/comments HTTP/1.1
 content-type: application/xml
 authorization: token xxx
 
-< C:\Users\Default\Desktop\demo.http
+< C:\Users\Default\Desktop\demo.xml
 ```
 
 ## Making CURL Request
