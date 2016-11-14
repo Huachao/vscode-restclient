@@ -5,9 +5,11 @@ import { IRequestParser } from './models/IRequestParser'
 import { RequestParserUtil } from './requestParserUtil'
 import { HttpClient } from './httpClient'
 import { EOL } from 'os';
+import * as fs from 'fs';
 
 export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
+    private static readonly uploadFromFildSyntax: RegExp = new RegExp('^\<[ \t]+([^ \t]*)[ \t]*$');
 
     parseHttpRequest(requestRawText: string): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
@@ -27,6 +29,7 @@ export class HttpRequestParser implements IRequestParser {
         // get headers range
         let headers: { [key: string]: string };
         let body: string;
+        let bodyLineCount: number = 0;
         let headerStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', 1);
         if (headerStartLine !== -1) {
             if (headerStartLine === 1) {
@@ -56,12 +59,14 @@ export class HttpRequestParser implements IRequestParser {
                 if (bodyStartLine !== -1) {
                     firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
                     let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
+                    bodyLineCount = bodyEndLine - bodyStartLine;
                     body = lines.slice(bodyStartLine, bodyEndLine).join(EOL);
                 }
             } else {
                 // parse body, since no headers provided
                 let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
                 let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
+                bodyLineCount = bodyEndLine - headerStartLine;
                 body = lines.slice(headerStartLine, bodyEndLine).join(EOL);
             }
         }
@@ -69,6 +74,17 @@ export class HttpRequestParser implements IRequestParser {
         // if Host header provided and url is relative path, change to absolute url
         if (HttpClient.getHeaderValue(headers, 'Host') && requestLine.url[0] === '/') {
             requestLine.url = `http://${HttpClient.getHeaderValue(headers, 'Host')}${requestLine.url}`;
+        }
+
+        // parse body
+        if (bodyLineCount === 1 && HttpRequestParser.uploadFromFildSyntax.test(body)) {
+            let groups = HttpRequestParser.uploadFromFildSyntax.exec(body);
+            if (groups !== null && groups.length === 2) {
+                let fileUploadPath = groups[1];
+                if (fs.existsSync(fileUploadPath)) {
+                    body = fs.readFileSync(fileUploadPath).toString();
+                }
+            }
         }
 
         return new HttpRequest(requestLine.method, requestLine.url, headers, body);
