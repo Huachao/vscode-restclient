@@ -32,10 +32,7 @@ export class HttpClient {
         };
 
         // set proxy
-        let host = url.parse(httpRequest.url).host;
-        options.proxy = this._settings.excludeHostsForProxy.findIndex(eh => host && eh.toLowerCase() === host.toLowerCase()) > -1
-                                ? null
-                                : this._settings.proxy;
+        options.proxy = HttpClient.ignoreProxy(httpRequest.url, this._settings.excludeHostsForProxy) ? null : this._settings.proxy;
         options.strictSSL = options.proxy && options.proxy.length > 0 ? this._settings.proxyStrictSSL : false;
 
         if (!options.headers) {
@@ -102,5 +99,36 @@ export class HttpClient {
             result[header.toLowerCase()] = header;
         });
         return result;
+    }
+
+    private static ignoreProxy(requestUrl: string, excludeHostsForProxy: string[]): Boolean {
+        if (!excludeHostsForProxy || excludeHostsForProxy.length === 0) {
+            return true;
+        }
+
+        let resolvedUrl = url.parse(requestUrl);
+        let hostName = resolvedUrl.hostname.toLowerCase();
+        let port = resolvedUrl.port;
+        let excludeHostsProxyList = Array.from(new Set(excludeHostsForProxy.map(eh => eh.toLowerCase())));
+
+        for (var index = 0; index < excludeHostsProxyList.length; index++) {
+            var eh = excludeHostsProxyList[index];
+            let urlParts = eh.split(":");
+            if (!port) {
+                // if no port specified in request url, host name must exactly match
+                if (urlParts.length === 1 && urlParts[0] === hostName) {
+                    return true
+                };
+            } else {
+                // if port specified, match host without port or hostname:port exactly match
+                if (urlParts.length === 1 && urlParts[0] === hostName) {
+                    return true;
+                } else if (urlParts.length === 2 && urlParts[0] === hostName && urlParts[1] === port) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
