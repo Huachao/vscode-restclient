@@ -16,6 +16,7 @@ export class HttpElement {
 
 export enum ElementType {
     Method,
+    URL,
     Header,
     MIME,
     GlobalVariable,

@@ -1,10 +1,12 @@
 "use strict";
 
 import { HttpElement, ElementType } from './models/httpElement';
-import * as Constants from './constants'
+import { PersistUtility } from './persistUtility';
+import * as Constants from './constants';
+import * as url from 'url';
 
 export class HttpElementFactory {
-    static getHttpElements(line: string): HttpElement[] {
+    static async getHttpElements(line: string): Promise<HttpElement[]> {
         let originalElements: HttpElement[] = [];
 
         // add http methods
@@ -72,9 +74,19 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement("text/plain", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
         originalElements.push(new HttpElement("text/xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
 
+        // add global variables
         originalElements.push(new HttpElement(`{{${Constants.GuidVariableName}}}`, ElementType.GlobalVariable, null, Constants.GuidVariableDescription));
         originalElements.push(new HttpElement(`{{${Constants.TimeStampVariableName}}}`, ElementType.GlobalVariable, null, Constants.TimeStampVariableDescription));
         originalElements.push(new HttpElement(`{{${Constants.RandomInt}}}`, ElementType.GlobalVariable, null, Constants.RandomIntDescription));
+
+        // add urls from history
+        let historyItems = await PersistUtility.load();
+        let distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));
+        distinctRequestUrls.forEach(requestUrl => {
+            let protocol = url.parse(requestUrl).protocol;
+            let prefixLength = protocol.length + 2; // https: + //
+            originalElements.push(new HttpElement(`${requestUrl.substr(prefixLength)}`, ElementType.URL, '^\\s*(?:(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+)https?\\:\\/{2}'));
+        });
 
         let elements: HttpElement[] = [];
         if (line) {
@@ -88,7 +100,7 @@ export class HttpElementFactory {
         }
 
         if (elements.length === 0) {
-            elements = originalElements.filter(e => e.type !== ElementType.MIME);
+            elements = originalElements.filter(e => e.type !== ElementType.MIME && e.type !== ElementType.URL);
         }
 
         return elements;
