@@ -1,3 +1,7 @@
+## 0.10.4 (2016/11/16)
+* __Improvement__: Get autocompletion items from request history too
+* __Improvement__: Improve resolving excluded hosts logic
+
 ## 0.10.3 (2016/11/14)
 * __Feature__: Allow to specify file path to use as request body
 * __Bug Fix__: [Add setting to ignore some proxy hosts](https://github.com/Huachao/vscode-restclient/issues/47)
