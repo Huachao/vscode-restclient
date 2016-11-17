@@ -7,7 +7,7 @@ import { RequestParserUtil } from './requestParserUtil'
 var yargs = require('yargs');
 
 export class CurlRequestParser implements IRequestParser {
-    parseHttpRequest(requestRawText: string): HttpRequest {
+    parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest {
         let yargObject = yargs(CurlRequestParser.mergeIntoSingleLine(requestRawText.trim()));
         let parsedArguments = yargObject.argv;
 

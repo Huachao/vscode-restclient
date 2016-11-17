@@ -6,12 +6,13 @@ import { RequestParserUtil } from './requestParserUtil'
 import { HttpClient } from './httpClient'
 import { EOL } from 'os';
 import * as fs from 'fs';
+import * as path from 'path';
 
 export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFildSyntax: RegExp = new RegExp('^\<[ \t]+([^ \t]*)[ \t]*$');
 
-    parseHttpRequest(requestRawText: string): HttpRequest {
+    parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
         // split the request raw text into lines
         let lines: string[] = requestRawText.split(EOL);
@@ -81,6 +82,9 @@ export class HttpRequestParser implements IRequestParser {
             let groups = HttpRequestParser.uploadFromFildSyntax.exec(body);
             if (groups !== null && groups.length === 2) {
                 let fileUploadPath = groups[1];
+                if (!path.isAbsolute(fileUploadPath) && requestAbsoluteFilePath) {
+                    fileUploadPath = path.join(requestAbsoluteFilePath, fileUploadPath);
+                }
                 if (fs.existsSync(fileUploadPath)) {
                     body = fs.readFileSync(fileUploadPath).toString();
                 }

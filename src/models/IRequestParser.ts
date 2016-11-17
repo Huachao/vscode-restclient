@@ -3,5 +3,5 @@
 import { HttpRequest } from '../models/httpRequest'
 
 export interface IRequestParser {
-    parseHttpRequest(requestRawText: string): HttpRequest
+    parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest
 }
