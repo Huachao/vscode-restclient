@@ -83,7 +83,8 @@ export class HttpRequestParser implements IRequestParser {
             if (groups !== null && groups.length === 2) {
                 let fileUploadPath = groups[1];
                 if (!path.isAbsolute(fileUploadPath) && requestAbsoluteFilePath) {
-                    fileUploadPath = path.join(requestAbsoluteFilePath, fileUploadPath);
+                    // get path relative to this http file
+                    fileUploadPath = path.join(path.dirname(requestAbsoluteFilePath), fileUploadPath);
                 }
                 if (fs.existsSync(fileUploadPath)) {
                     body = fs.readFileSync(fileUploadPath).toString();
