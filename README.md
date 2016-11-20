@@ -38,10 +38,10 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in seperate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/loading.gif) will be disalyed in the status bar, when receiving the response, the icon will be changed to the duration.
+Once you prepared a request, use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/loading.gif) will be disalyed in the status bar, when receiving the response, the icon will be changed to the duration.
 
-### Mutiple Requests In The Same File
-You may even want to save numerous requests in the same file and execute any of them easily. REST Client extension could recognize any line contains three or more `#` (and no other characters) as a delimiter between requests. Place the cursor anywhere between the delimiters, triggering sending the request, and it will first parse the text between the delimiters as request and then send it out.
+### Select Request Text
+You may even want to save numerous requests in the same file and execute any of them as you wish easily. REST Client extension could recognize any line begins with three or more consecutive `#` (and no other characters) as a delimiter between requests. Place the cursor anywhere between the delimiters, issuing the request as above, and it will first parse the text between the delimiters as request and then send it out.
 ```http
 GET https://example.com/comments/1 HTTP/1.1
 
@@ -59,7 +59,7 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-You may even use mouse to highlight the text as you wish in file, REST Client will parse the selected text as request.
+`REST Client Extesion` also provides another flexibility that you can use mouse to highlight the text in file as request text.
 
 ## Install
 Press `F1`, type `ext install rest-client`.
@@ -85,7 +85,7 @@ You can always write query strings in the request line, like:
 ```http
 GET https://example.com/comments?page=2&pageSize=10
 ```
-However you may want to spread query parameters into mutiple lines(one line one query parameter), we will parse the lines in request headers starts with `?` and `&`, like
+Sometimes there may be several query parameters in a single request, putting all the query parameters in _Request Line_ is diffcult to read and modify. So we allow you to spread query parameters into mutiple lines(one line one query parameter), we will parse the lines in immediately after the _Request Line_ which starts with `?` and `&`, like
 ```http
 GET https://example.com/comments
     ?page=2
@@ -93,7 +93,7 @@ GET https://example.com/comments
 ```
 
 ### Request Headers
-The lines immediately after the request line to first empty line are parsed as _Request Headers_. Please provide headers with the standard `field-name: field-value` format, each line represents one header.
+The lines immediately after the _request line_ to first empty line are parsed as _Request Headers_. Please provide headers with the standard `field-name: field-value` format, each line represents one header.
 Below are examples of _Request Headers_:
 ```http
 user-agent: rest-client
