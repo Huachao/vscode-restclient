@@ -59,7 +59,7 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-`REST Client Extesion` also provides another flexibility that you can use mouse to highlight the text in file as request text.
+`REST Client Extension` also provides another flexibility that you can use mouse to highlight the text in file as request text.
 
 ## Install
 Press `F1`, type `ext install rest-client`.
