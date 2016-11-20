@@ -85,7 +85,7 @@ You can always write query strings in the request line, like:
 ```http
 GET https://example.com/comments?page=2&pageSize=10
 ```
-Sometimes there may be several query parameters in a single request, putting all the query parameters in _Request Line_ is diffcult to read and modify. So we allow you to spread query parameters into mutiple lines(one line one query parameter), we will parse the lines in immediately after the _Request Line_ which starts with `?` and `&`, like
+Sometimes there may be several query parameters in a single request, putting all the query parameters in _Request Line_ is difficult to read and modify. So we allow you to spread query parameters into mutiple lines(one line one query parameter), we will parse the lines in immediately after the _Request Line_ which starts with `?` and `&`, like
 ```http
 GET https://example.com/comments
     ?page=2
@@ -96,8 +96,9 @@ GET https://example.com/comments
 The lines immediately after the _request line_ to first empty line are parsed as _Request Headers_. Please provide headers with the standard `field-name: field-value` format, each line represents one header.
 Below are examples of _Request Headers_:
 ```http
-user-agent: rest-client
-accept-language: en-GB,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4
+User-Agent: rest-client
+Accept-Language: en-GB,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4
+Content-Type: application/json
 ```
 
 ### Request Body
@@ -106,8 +107,8 @@ Below are examples of _Request Body_:
 
 ```http
 POST https://example.com/comments HTTP/1.1
-content-type: application/xml
-authorization: token xxx
+Content-Yype: application/xml
+Authorization: token xxx
 
 <request>
     <name>sample</name>
@@ -115,7 +116,7 @@ authorization: token xxx
 </request>
 ```
 
-You may also allows you to specify file path to use as a body, which starts with `< `:
+You can also specify file path to use as a body, which starts with `< `, the file path can be either in absolute and relative(relative to current http file) format:
 ```http
 POST https://example.com/comments HTTP/1.1
 content-type: application/xml
