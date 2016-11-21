@@ -1,3 +1,8 @@
+## 0.10.5 (2016/11/21)
+* __Bug Fix__: [Support send file with relative path](https://github.com/Huachao/vscode-restclient/issues/49)
+* __Improvement__: Display response body size in status bar
+* __Improvement__: Make three or more consecutive `#` at the line beginning as request block delimiter
+
 ## 0.10.4 (2016/11/16)
 * __Improvement__: Get autocompletion items from request history too
 * __Improvement__: Improve resolving excluded hosts logic

@@ -38,10 +38,10 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/loading.gif) will be disalyed in the status bar, when receiving the response, the icon will be changed to the duration.
+Once you prepared a request, use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/loading.gif) will be disalyed in the status bar, after receiving the response, the icon will be changed to the duration and response size.
 
 ### Select Request Text
-You may even want to save numerous requests in the same file and execute any of them as you wish easily. REST Client extension could recognize any line begins with three or more consecutive `#` (and no other characters) as a delimiter between requests. Place the cursor anywhere between the delimiters, issuing the request as above, and it will first parse the text between the delimiters as request and then send it out.
+You may even want to save numerous requests in the same file and execute any of them as you wish easily. REST Client extension could recognize any line begins with three or more consecutive `#` as a delimiter between requests. Place the cursor anywhere between the delimiters, issuing the request as above, and it will first parse the text between the delimiters as request and then send it out.
 ```http
 GET https://example.com/comments/1 HTTP/1.1
 
@@ -116,13 +116,20 @@ Authorization: token xxx
 </request>
 ```
 
-You can also specify file path to use as a body, which starts with `< `, the file path can be either in absolute and relative(relative to current http file) format:
+You can also specify file path to use as a body, which starts with `< `, the file path can be either in absolute or relative(relative to current http file) formats:
 ```http
 POST https://example.com/comments HTTP/1.1
 content-type: application/xml
 authorization: token xxx
 
 < C:\Users\Default\Desktop\demo.xml
+```
+```http
+POST https://example.com/comments HTTP/1.1
+content-type: application/xml
+authorization: token xxx
+
+< ./demo.xml
 ```
 
 ## Making CURL Request
