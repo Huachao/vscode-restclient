@@ -44,6 +44,8 @@ export class HttpClient {
             options.headers['User-Agent'] = this._settings.defaultUserAgent;
         }
 
+        let size = 0;
+
         return new Promise<HttpResponse>((resolve, reject) => {
             request(options, function (error, response, body) {
                 if (error) {
@@ -76,8 +78,12 @@ export class HttpClient {
                             adjustedResponseHeaders,
                             body,
                             response.elapsedTime,
-                            httpRequest.url));
-            });
+                            httpRequest.url,
+                            size));
+            })
+            .on('data', function(data) {
+                size += data.length;
+            })
         });
     }
 

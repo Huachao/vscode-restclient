@@ -17,8 +17,11 @@ import { EOL } from 'os';
 const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();
 
+const filesize = require('filesize');
+
 export class RequestController {
-    private _statusBarItem: StatusBarItem;
+    private _durationStatusBarItem: StatusBarItem;
+    private _sizeStatusBarItem: StatusBarItem;
     private _restClientSettings: RestClientSettings;
     private _httpClient: HttpClient;
     private _responseTextProvider: HttpResponseTextDocumentContentProvider;
@@ -27,7 +30,8 @@ export class RequestController {
     private _interval: any;
 
     constructor() {
-        this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
+        this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
+        this._sizeStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._restClientSettings = new RestClientSettings();
         this._httpClient = new HttpClient(this._restClientSettings);
 
@@ -71,8 +75,11 @@ export class RequestController {
         try {
             let response = await this._httpClient.send(httpRequest);
             this.clearSendProgressStatusText();
-            this._statusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
-            this._statusBarItem.tooltip = 'Duration';
+            this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
+            this._durationStatusBarItem.tooltip = 'Duration';
+
+            this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes)}`;
+            this._sizeStatusBarItem.tooltip = 'Body Size';
 
             this._responseTextProvider.response = response;
             this._responseTextProvider.update(this._previewUri);
@@ -98,13 +105,15 @@ export class RequestController {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
             this.clearSendProgressStatusText();
-            this._statusBarItem.text = '';
+            this._durationStatusBarItem.text = '';
+            this._sizeStatusBarItem.text = '';
             window.showErrorMessage(error.message);
         }
     }
 
     dispose() {
-        this._statusBarItem.dispose();
+        this._durationStatusBarItem.dispose();
+        this._sizeStatusBarItem.dispose();
         this._registration.dispose();
     }
 
@@ -119,10 +128,12 @@ export class RequestController {
     private setSendingProgressStatusText() {
         this.clearSendProgressStatusText();
         this._interval = setInterval(() => {
-            this._statusBarItem.text = `Waiting ${spinner()}`;
+            this._durationStatusBarItem.text = `Waiting ${spinner()}`;
+            this._sizeStatusBarItem.text = '';
         }, 50);
-        this._statusBarItem.tooltip = 'Waiting Response';
-        this._statusBarItem.show();
+        this._durationStatusBarItem.tooltip = 'Waiting Response';
+        this._durationStatusBarItem.show();
+        this._sizeStatusBarItem.show();
     }
 
     private clearSendProgressStatusText() {
