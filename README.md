@@ -127,30 +127,33 @@ authorization: token xxx
 
 ## Making CURL Request
 ![CURL Request](images/curl-request.png)
-We add the capability to directly run [curl request](https://curl.haxx.se/) in REST Client extension. The making request command is the same as previous one. REST Client will automatically parse the request with specified parser.
+We add the capability to directly run [curl request](https://curl.haxx.se/) in REST Client extension. The issuing request command is the same as raw HTTp one. REST Client will automatically parse the request with specified parser.
 
 ## Request History
 ![request-history](images/request-history.png)
-Each time we sent a http request, the request details(method, url, headers and body) would be persisted into file. By using shortcut `Ctrl+Alt+H`(`Cmd+Alt+H` for macOS), or press `F1` and then select/type `Rest Client: Request History`, you can view the last __50__ request items in the time reversing order, you can select any request you wish to trigger again. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
+Each time we sent a http request, the request details(method, url, headers and body) would be persisted into file. By using shortcut `Ctrl+Alt+H`(`Cmd+Alt+H` for macOS), or press `F1` and then select/type `Rest Client: Request History`, you can view the last __50__ request items(method, url and request time) in the time reversing order, you can select any request you wish to trigger again. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
+
+You can also clear request history by pressing `F1` and then selecting/typing `Rest Client: Clear Request History`.
 
 ## Save Response
 ![Save Response](images/response.gif)
-In the upper right corner of the response preview tab, we add a new icon to save the latest response to local file system. After you click the `Save Latest Response` icon, it will prompt the window with the saved response file path. You can click the `Open` button to open the saved response file in current workspace.
+In the upper right corner of the response preview tab, we add a new icon to save the latest response to local file system. After you click the `Save Response` icon, it will prompt the window with the saved response file path. You can click the `Open` button to open the saved response file in current workspace, or click `Copy Path` to copy the saved response path to clipboard.
 
 ## Generate Code Snippet
 ![Generate Code Snippet](images/code-snippet.gif)
-Once you’ve finalized your request in REST Client extension, you might want to make the same request from your own source code. REST Client lets you generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as you do in sending a request, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, and as well as library list. After that, the generated code snippet will be previewed in a seperate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
+Once you’ve finalized your request in REST Client extension, you might want to make the same request from your own source code. We allow you to generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as previously, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, as well as library list. After you selected the code snippet language/library you want, the generated code snippet will be previewed in a separate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
 
 ## HTTP Language
-Add language support for HTTP request, with __syntax highlight__, __autocomplete__ and __comment support__, when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:
+Add language support for HTTP request, with features like __syntax highlight__, __auto completion__ and __comment support__, when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:
 
-1. File with extension `.http` and `.rest`
+1. File with extension `.http` or `.rest`
 2. First line of file follows standard request line in [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html), with `Method SP Request-URI SP HTTP-Version` format
 
-If you want to enable language association in other cases, just change the language mode to `HTTP`.
+If you want to enable language association in other cases, just change the language mode in the right bottom of `Visual Studio Code` to `HTTP`.
 
 ![HTTP Language](images/http.png)
-Currently we will auto complete for four cases:
+### Auto Completion
+Currently auto completion will be enabled for following five categories:
 
 1. HTTP Method
 2. HTTP URL from request history
@@ -163,7 +166,7 @@ Currently we will auto complete for four cases:
 Global variables provide a set of variables that can be used in every part of the request(Url/Headers/Body) in the format `{{variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
-* `{{$timestamp}}`: Add UTC current time. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`. The option string you can specify in timestamp are:
+* `{{$timestamp}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`. The option string you can specify in timestamp are:
 ```
     +---------+--------------+
     | Options | Descriptions |
@@ -217,10 +220,6 @@ Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy
 
 ## Change Log
 See CHANGELOG [here](CHANGELOG.md)
-
-## TODO
-* Environment Support
-* Per-Environment Variables Support
 
 ## Feedback
 Please provide feedback through the [GitHub Issue](https://github.com/Huachao/vscode-restclient/issues) system, or fork the repository and submit PR.
