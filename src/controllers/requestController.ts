@@ -80,6 +80,7 @@ export class RequestController {
 
             this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes)}`;
             this._sizeStatusBarItem.tooltip = 'Body Size';
+            this._sizeStatusBarItem.show();
 
             this._responseTextProvider.response = response;
             this._responseTextProvider.update(this._previewUri);
@@ -106,7 +107,6 @@ export class RequestController {
             }
             this.clearSendProgressStatusText();
             this._durationStatusBarItem.text = '';
-            this._sizeStatusBarItem.text = '';
             window.showErrorMessage(error.message);
         }
     }
@@ -129,14 +129,13 @@ export class RequestController {
         this.clearSendProgressStatusText();
         this._interval = setInterval(() => {
             this._durationStatusBarItem.text = `Waiting ${spinner()}`;
-            this._sizeStatusBarItem.text = '';
         }, 50);
         this._durationStatusBarItem.tooltip = 'Waiting Response';
         this._durationStatusBarItem.show();
-        this._sizeStatusBarItem.show();
     }
 
     private clearSendProgressStatusText() {
         clearInterval(this._interval);
+        this._sizeStatusBarItem.hide();
     }
 }
