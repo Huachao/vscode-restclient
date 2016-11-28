@@ -109,7 +109,7 @@ export class HttpClient {
 
     private static ignoreProxy(requestUrl: string, excludeHostsForProxy: string[]): Boolean {
         if (!excludeHostsForProxy || excludeHostsForProxy.length === 0) {
-            return true;
+            return false;
         }
 
         let resolvedUrl = url.parse(requestUrl);
