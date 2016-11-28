@@ -84,6 +84,11 @@
         "category": "Rest Client"
       },
       {
+        "command": "rest-client.rerun-last-request",
+        "title": "Rerun Last Request",
+        "category": "Rest Client"
+      },
+      {
         "command": "rest-client.history",
         "title": "View Request History",
         "category": "Rest Client"
@@ -143,6 +148,24 @@
         "key": "ctrl+alt+r",
         "mac": "cmd+alt+r",
         "when": "editorTextFocus && editorLangId == 'plaintext'"
+      },
+      {
+        "command": "rest-client.rerun-last-request",
+        "key": "ctrl+alt+l",
+        "mac": "cmd+alt+l",
+        "when": "editorTextFocus && editorLangId == 'http'"
+      },
+      {
+        "command": "rest-client.rerun-last-request",
+        "key": "ctrl+alt+l",
+        "mac": "cmd+alt+l",
+        "when": "editorTextFocus && editorLangId == 'plaintext'"
+      },
+      {
+        "command": "rest-client.rerun-last-request",
+        "key": "ctrl+alt+l",
+        "mac": "cmd+alt+l",
+        "when": "resourceScheme == rest-response"
       },
       {
         "command": "rest-client.history",

@@ -3,12 +3,14 @@
 import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable } from 'vscode';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
+import { HttpRequest } from '../models/httpRequest';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { RestClientSettings } from '../models/configurationSettings';
 import { PersistUtility } from '../persistUtility';
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
 import { Telemetry } from '../telemetry';
 import { VariableProcessor } from '../variableProcessor';
+import { RequestStore } from '../requestStore';
 import { ResponseStore } from '../responseStore';
 import { Selector } from '../selector';
 import * as Constants from '../constants';
@@ -68,6 +70,23 @@ export class RequestController {
             return;
         }
 
+        RequestStore.add(httpRequest);
+
+        await this.runCore(httpRequest);
+    }
+
+    async rerun() {
+        Telemetry.sendEvent('Rerun Request');
+
+        let httpRequest = RequestStore.getLatest();
+        if (!httpRequest) {
+            return;
+        }
+
+        await this.runCore(httpRequest);
+    }
+
+    async runCore(httpRequest: HttpRequest) {
         // clear status bar
         this.setSendingProgressStatusText();
 
