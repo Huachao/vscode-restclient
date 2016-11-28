@@ -1,3 +1,6 @@
+## 0.10.6 (2016/11/28)
+* __Bug Fix__: Fix regression bug to respect proxy setting
+
 ## 0.10.5 (2016/11/21)
 * __Bug Fix__: [Support send file with relative path](https://github.com/Huachao/vscode-restclient/issues/49)
 * __Improvement__: Display response body size in status bar
