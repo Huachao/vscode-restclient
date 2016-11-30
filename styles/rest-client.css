@@ -81,6 +81,7 @@ body.vscode-high-contrast {
   line-height: 1.5;
   padding: 10px;
   white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .vscode-dark pre code {
@@ -91,6 +92,7 @@ body.vscode-high-contrast {
   line-height: 1.5;
   padding: 10px;
   white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .vscode-high-contrast pre code {
@@ -101,6 +103,7 @@ body.vscode-high-contrast {
   line-height: 1.5;
   padding: 10px;
   white-space: pre-wrap;
+  word-break: break-all;
 }
 
 code .line {
