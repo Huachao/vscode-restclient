@@ -21,6 +21,8 @@ const spinner = elegantSpinner();
 
 const filesize = require('filesize');
 
+const uuid = require('node-uuid');
+
 export class RequestController {
     private _durationStatusBarItem: StatusBarItem;
     private _sizeStatusBarItem: StatusBarItem;
@@ -70,8 +72,6 @@ export class RequestController {
             return;
         }
 
-        RequestStore.add(httpRequest);
-
         await this.runCore(httpRequest);
     }
 
@@ -86,14 +86,37 @@ export class RequestController {
         await this.runCore(httpRequest);
     }
 
-    async runCore(httpRequest: HttpRequest) {
+    async cancel() {
+        Telemetry.sendEvent('Cancel Request');
+
+        this.clearSendProgressStatusText();
+
+        // cancel current request
+        RequestStore.cancel();
+
+        this._durationStatusBarItem.command = null;
+        this._durationStatusBarItem.text = 'Cancelled $(circle-slash)';
+        this._durationStatusBarItem.tooltip = null;
+    }
+
+    private async runCore(httpRequest: HttpRequest) {
+        let requestId = uuid.v4();
+        RequestStore.add(<string>requestId, httpRequest);
+
         // clear status bar
         this.setSendingProgressStatusText();
 
         // set http request
         try {
             let response = await this._httpClient.send(httpRequest);
+
+            // check cancel
+            if (RequestStore.isCancelled(<string>requestId)) {
+                return;
+            }
+
             this.clearSendProgressStatusText();
+            this._durationStatusBarItem.command = null;
             this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
             this._durationStatusBarItem.tooltip = 'Duration';
 
@@ -117,6 +140,11 @@ export class RequestController {
             serializedRequest.startTime = Date.now();
             await PersistUtility.save(serializedRequest);
         } catch (error) {
+            // check cancel
+            if (RequestStore.isCancelled(<string>requestId)) {
+                return;
+            }
+
             if (error.code === 'ETIMEDOUT') {
                 error.message = `Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'. Details: ${error}. `;
             } else if (error.code === 'ECONNREFUSED') {
@@ -125,6 +153,7 @@ export class RequestController {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
             this.clearSendProgressStatusText();
+            this._durationStatusBarItem.command = null;
             this._durationStatusBarItem.text = '';
             window.showErrorMessage(error.message);
         }

@@ -89,6 +89,11 @@
         "category": "Rest Client"
       },
       {
+        "command": "rest-client.cancel-request",
+        "title": "Cancel Request",
+        "category": "Rest Client"
+      },
+      {
         "command": "rest-client.history",
         "title": "View Request History",
         "category": "Rest Client"
@@ -166,6 +171,18 @@
         "key": "ctrl+alt+l",
         "mac": "cmd+alt+l",
         "when": "resourceScheme == rest-response"
+      },
+      {
+        "command": "rest-client.cancel-request",
+        "key": "ctrl+alt+q",
+        "mac": "cmd+alt+q",
+        "when": "editorTextFocus && editorLangId == 'http'"
+      },
+      {
+        "command": "rest-client.cancel-request",
+        "key": "ctrl+alt+q",
+        "mac": "cmd+alt+q",
+        "when": "editorTextFocus && editorLangId == 'plaintext'"
       },
       {
         "command": "rest-client.history",

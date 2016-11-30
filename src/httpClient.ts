@@ -62,7 +62,7 @@ export class HttpClient {
                     return;
                 }
 
-                let contentType = response.headers['content-type'];
+                let contentType = HttpClient.getHeaderValue(response.headers, 'Content-Type');
                 let encoding: string;
                 if (contentType) {
                     encoding = MimeUtility.parse(contentType).charset;
