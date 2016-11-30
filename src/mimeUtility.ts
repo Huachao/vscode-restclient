@@ -8,7 +8,16 @@ export class MimeUtility {
         // application/vnd.github.chitauri-preview+sha
         let params = contentTypeString.split(';');
         let types = params[0].trim().split('+');
-        return new MIME(types[0], types[1] ? `+${types[1]}` : '', contentTypeString);
+        let charset = null;
+        if (params.length > 1) {
+            for (var i = 1; i < params.length; i++) {
+                let attributes = params[i].trim().split('=', 2);
+                if (attributes.length === 2 && attributes[0].toLowerCase() === 'charset') {
+                    charset = attributes[1].trim();
+                } 
+            }
+        }
+        return new MIME(types[0], types[1] ? `+${types[1]}` : '', contentTypeString, charset);
     }
 
     static isBrowerSupportedImageFormat(contentTypeString: string): boolean {

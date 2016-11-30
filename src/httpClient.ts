@@ -4,11 +4,13 @@ import { RestClientSettings } from './models/configurationSettings'
 import { HttpRequest } from './models/httpRequest'
 import { HttpResponse } from './models/httpResponse'
 import { PersistUtility } from './persistUtility'
+import { MimeUtility } from './mimeUtility'
 import * as url from 'url'
 
 var encodeUrl = require('encodeurl');
 var request = require('request');
 var cookieStore = require('tough-cookie-file-store');
+var iconv = require('iconv-lite');
 
 export class HttpClient {
     private _settings: RestClientSettings;
@@ -24,6 +26,7 @@ export class HttpClient {
             headers: httpRequest.headers,
             method: httpRequest.method,
             body: httpRequest.body,
+            encoding: null,
             time: true,
             timeout: this._settings.timeoutInMilliseconds,
             gzip: true,
@@ -57,6 +60,25 @@ export class HttpClient {
                     }
                     reject(error);
                     return;
+                }
+
+                let contentType = response.headers['content-type'];
+                let encoding: string;
+                if (contentType) {
+                    encoding = MimeUtility.parse(contentType).charset;
+                }
+
+                if (!encoding) {
+                    encoding = "utf8";
+                }
+
+                let buffer = new Buffer(body);
+                try {
+                    body = iconv.decode(buffer, encoding);
+                } catch (e) {
+                    if (encoding !== 'utf8') {
+                        body = iconv.decode(buffer, 'utf8');
+                    }
                 }
 
                 // adjust response header case, due to the response headers in request package is in lowercase
