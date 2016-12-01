@@ -89,6 +89,10 @@ export class RequestController {
     async cancel() {
         Telemetry.sendEvent('Cancel Request');
 
+        if (RequestStore.isCompleted()) {
+            return;
+        }
+
         this.clearSendProgressStatusText();
 
         // cancel current request
@@ -156,6 +160,8 @@ export class RequestController {
             this._durationStatusBarItem.command = null;
             this._durationStatusBarItem.text = '';
             window.showErrorMessage(error.message);
+        } finally {
+            RequestStore.complete(<string>requestId);
         }
     }
 
