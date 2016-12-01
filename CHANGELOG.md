@@ -1,3 +1,9 @@
+## 0.11.0 (2016/12/1)
+* __Bug Fix__: [Wrap long strings in preview panel](https://github.com/Huachao/vscode-restclient/issues/24)
+* __Bug Fix__: [Cancel processing reqeust](https://github.com/Huachao/vscode-restclient/issues/48)
+* __Bug Fix__: [Allow refresh from results view](https://github.com/Huachao/vscode-restclient/issues/50)
+* __Bug Fix__: [Messy code in the response view when access the unicode website](https://github.com/Huachao/vscode-restclient/issues/51)
+
 ## 0.10.6 (2016/11/28)
 * __Bug Fix__: Fix regression bug to respect proxy setting
 

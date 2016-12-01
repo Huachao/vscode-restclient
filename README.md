@@ -5,7 +5,7 @@
 REST Client allows you to send HTTP request and view the response in Visual Studio Code directly.
 
 ## Main Features
-* Send __HTTP request__ in editor and view response in a separate pane with syntax highlight
+* Send/Cancel/Rerun __HTTP request__ in editor and view response in a separate pane with syntax highlight
 * Send __CURL command__ in editor
 * Auto save and view/clear request history
 * Support _MULTIPLE_ requests in the same file
@@ -131,6 +131,12 @@ authorization: token xxx
 
 < ./demo.xml
 ```
+
+### Cancel Request
+Once you want to cancel a processing request, use shortcut `Ctrl+Alt+Q`(`Cmd+Alt+Q` for macOS), or press `F1` and then select/type `Rest Client: Cancel Request`.
+
+### Rerun Last Request
+Sometimes you may want to refresh the API response, now you could do it simply using shortcut `Ctrl+Alt+L`(`Cmd+Alt+L` for macOS), or press `F1` and then select/type `Rest Client: Rerun Last Request` to rerun last request.
 
 ## Making CURL Request
 ![CURL Request](images/curl-request.png)
