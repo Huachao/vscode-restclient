@@ -17,17 +17,14 @@ export class RequestParserUtil {
                 fieldValue = '';
             }
 
-            let normalizedfieldName = fieldName.trim().toLowerCase();
-            let normalizedfieldValue = fieldValue.trim();
-            if (!headerNames[normalizedfieldName])
-            {
-                headerNames[normalizedfieldName] = fieldName;
-                headers[fieldName] = normalizedfieldValue;
-            }
-            else
-            {
-                let splitter = normalizedfieldName === 'cookie' ? ';' : ',';
-                headers[headerNames[normalizedfieldName]] += `${splitter}${normalizedfieldValue}`;
+            let normalizedFieldName = fieldName.trim().toLowerCase();
+            let normalizedFieldValue = fieldValue.trim();
+            if (!headerNames[normalizedFieldName]) {
+                headerNames[normalizedFieldName] = fieldName;
+                headers[fieldName] = normalizedFieldValue;
+            } else {
+                let splitter = normalizedFieldName === 'cookie' ? ';' : ',';
+                headers[headerNames[normalizedFieldName]] += `${splitter}${normalizedFieldValue}`;
             }
         });
 

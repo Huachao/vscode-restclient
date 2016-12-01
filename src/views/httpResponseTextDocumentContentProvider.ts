@@ -29,7 +29,7 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
             if (contentType) {
                 contentType = contentType.trim();
             }
-            if (contentType && MimeUtility.isBrowerSupportedImageFormat(contentType)) {
+            if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType)) {
                 innerHtml = `<img src="${this.response.requestUrl}">`;
             } else {
                 let code = `HTTP/${this.response.httpVersion} ${this.response.statusCode} ${this.response.statusMessage}
@@ -69,9 +69,9 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             if (type === 'application/json') {
                 if (HttpResponseTextDocumentContentProvider.isJsonString(body)) {
                     body = JSON.stringify(JSON.parse(body), null, 2);
-                 } else {
+                } else {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
-                 }
+                }
             } else if (type === 'application/xml' || type === 'text/xml') {
                 body = pd.xml(body);
             }

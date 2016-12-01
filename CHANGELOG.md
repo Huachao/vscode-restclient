@@ -1,6 +1,6 @@
 ## 0.11.0 (2016/12/1)
 * __Bug Fix__: [Wrap long strings in preview panel](https://github.com/Huachao/vscode-restclient/issues/24)
-* __Bug Fix__: [Cancel processing reqeust](https://github.com/Huachao/vscode-restclient/issues/48)
+* __Bug Fix__: [Cancel processing request](https://github.com/Huachao/vscode-restclient/issues/48)
 * __Bug Fix__: [Allow refresh from results view](https://github.com/Huachao/vscode-restclient/issues/50)
 * __Bug Fix__: [Messy code in the response view when access the unicode website](https://github.com/Huachao/vscode-restclient/issues/51)
 
@@ -45,10 +45,10 @@
 
 ## 0.8.6 (2016/10/14)
 * __Bug Fix__: [Handle urls with urlencoded query params](https://github.com/Huachao/vscode-restclient/issues/43)
-* __Improvement__: Support {{$randomInt}} gloabl system variables, add function to adjust time base on current time for {{$timestamp}} variable
+* __Improvement__: Support {{$randomInt}} global system variables, add function to adjust time base on current time for {{$timestamp}} variable
 
 ## 0.8.5 (2016/10/11)
-* __Bug Fix__: [DO NOT escapse '<' and '>' in response](https://github.com/Huachao/vscode-restclient/issues/41)
+* __Bug Fix__: [DO NOT escape '<' and '>' in response](https://github.com/Huachao/vscode-restclient/issues/41)
 * __Improvement__: Show elapsed time in editor tab
 
 ## 0.8.4 (2016/9/28)
@@ -95,7 +95,7 @@
 * __Improvement__: [Wrap long strings in preview tab](https://github.com/Huachao/vscode-restclient/issues/24)
 
 ## 0.6.3 (2016/8/1)
-* __Bug Fix__: [Add option to show response in seperate tabs](https://github.com/Huachao/vscode-restclient/issues/23)
+* __Bug Fix__: [Add option to show response in separate tabs](https://github.com/Huachao/vscode-restclient/issues/23)
 * __Bug Fix__: [Allow -u option in curl request](https://github.com/Huachao/vscode-restclient/issues/26)
 
 ## 0.6.2 (2016/7/26)
@@ -116,7 +116,7 @@
 
 ## 0.5.3 (2016/7/13)
 * __Improvement__: Format response of `application/xml` type
-* __Bug Fix__: Escapse `<` and `>` in response headers
+* __Bug Fix__: Escape `<` and `>` in response headers
 
 ## 0.5.2 (2016/6/23)
 * __Feature__: Add autocompletion of MIME type for specific headers like `Content-Type` and `Accept`

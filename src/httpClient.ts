@@ -55,7 +55,7 @@ export class HttpClient {
                     if (error.message) {
                         if (error.message.startsWith("Header name must be a valid HTTP Token")) {
                             error.message = "Header must be in 'header name: header value' format, "
-                                            + "please also make sure there is a blank line between headers and body";
+                                + "please also make sure there is a blank line between headers and body";
                         }
                     }
                     reject(error);
@@ -94,18 +94,18 @@ export class HttpClient {
                 }
 
                 resolve(new HttpResponse(
-                            response.statusCode,
-                            response.statusMessage,
-                            response.httpVersion,
-                            adjustedResponseHeaders,
-                            body,
-                            response.elapsedTime,
-                            httpRequest.url,
-                            size));
+                    response.statusCode,
+                    response.statusMessage,
+                    response.httpVersion,
+                    adjustedResponseHeaders,
+                    body,
+                    response.elapsedTime,
+                    httpRequest.url,
+                    size));
             })
-            .on('data', function(data) {
-                size += data.length;
-            })
+                .on('data', function (data) {
+                    size += data.length;
+                })
         });
     }
 

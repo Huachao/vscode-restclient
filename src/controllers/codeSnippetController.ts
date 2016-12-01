@@ -100,7 +100,7 @@ export class CodeSnippetController {
 
                 let client = await window.showQuickPick(clientsPickList, { placeHolder: "" });
                 if (client) {
-                    Telemetry.sendEvent('Generate Code Snippet', { 'target' : item.rawTarget.key, 'client': client.rawClient.key });
+                    Telemetry.sendEvent('Generate Code Snippet', { 'target': item.rawTarget.key, 'client': client.rawClient.key });
                     let result = snippet.convert(item.rawTarget.key, client.rawClient.key);
                     this._convertedResult = result;
                     this._codeSnippetTextProvider.convertResult = result;
@@ -141,8 +141,7 @@ export class CodeSnippetController {
                 if (cookieParts.length === 2) {
                     cookies.push(new HARCookie(cookieParts[0].trim(), cookieParts[1].trim()));
                 }
-                else
-                {
+                else {
                     cookies.push(new HARCookie(cookieParts[0].trim(), ''))
                 }
             });

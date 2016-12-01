@@ -20,7 +20,7 @@ export class MimeUtility {
         return new MIME(types[0], types[1] ? `+${types[1]}` : '', contentTypeString, charset);
     }
 
-    static isBrowerSupportedImageFormat(contentTypeString: string): boolean {
+    static isBrowserSupportedImageFormat(contentTypeString: string): boolean {
         // https://en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
         // For chrome supports JPEG, GIF, WebP, PNG and BMP
         if (!contentTypeString) {

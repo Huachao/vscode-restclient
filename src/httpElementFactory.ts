@@ -30,7 +30,7 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement('Cache-Control', ElementType.Header, null, 'Specify directives that MUST be obeyed by all caching mechanisms along the request/response chain'));
         originalElements.push(new HttpElement('Connection', ElementType.Header, null, 'Specify options that are desired for that particular connection and MUST NOT be communicated by proxies over further connections'));
         originalElements.push(new HttpElement('Content-Length', ElementType.Header, null, 'Indicate the size of the entity-body'));
-        originalElements.push(new HttpElement('Content-MD5', ElementType.Header, null, 'Providie an end-to-end message integrity check of the entity-body'));
+        originalElements.push(new HttpElement('Content-MD5', ElementType.Header, null, 'Provide an end-to-end message integrity check of the entity-body'));
         originalElements.push(new HttpElement('Content-Type', ElementType.Header, null, 'Indicate the media type of the entity-body sent to the recipient or, in the case of the HEAD method, the media type that would have been sent had the request been a GET'));
         originalElements.push(new HttpElement('Cookie', ElementType.Header, null, 'An HTTP cookie previously sent by the server with Set-Cookie'));
         originalElements.push(new HttpElement('Date', ElementType.Header, null, 'Represent the date and time at which the message was originated'));

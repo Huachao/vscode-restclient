@@ -27,7 +27,7 @@ export class ResponseController {
             try {
                 PersistUtility.createResponseFileIfNotExist(filePath);
                 fs.writeFileSync(filePath, fullResponse);
-                window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open'}, { title: 'Copy Path'}).then(function (btn) {
+                window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
                     if (btn) {
                         if (btn.title === 'Open') {
                             workspace.openTextDocument(filePath).then(window.showTextDocument);

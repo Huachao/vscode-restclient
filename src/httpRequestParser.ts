@@ -10,7 +10,7 @@ import * as path from 'path';
 
 export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
-    private static readonly uploadFromFildSyntax: RegExp = new RegExp('^\<[ \t]+([^ \t]*)[ \t]*$');
+    private static readonly uploadFromFileSyntax: RegExp = new RegExp('^\<[ \t]+([^ \t]*)[ \t]*$');
 
     parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
@@ -42,7 +42,7 @@ export class HttpRequestParser implements IRequestParser {
                 let queryString = '';
                 for (; index < headerLines.length;) {
                     let headerLine = (headerLines[index]).trim();
-                    if (headerLine[0] in {'?': '', '&': ''} && headerLine.split('=').length === 2) {
+                    if (headerLine[0] in { '?': '', '&': '' } && headerLine.split('=').length === 2) {
                         queryString += headerLine;
                         index++;
                         continue;
@@ -78,8 +78,8 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // parse body
-        if (bodyLineCount === 1 && HttpRequestParser.uploadFromFildSyntax.test(body)) {
-            let groups = HttpRequestParser.uploadFromFildSyntax.exec(body);
+        if (bodyLineCount === 1 && HttpRequestParser.uploadFromFileSyntax.test(body)) {
+            let groups = HttpRequestParser.uploadFromFileSyntax.exec(body);
             if (groups !== null && groups.length === 2) {
                 let fileUploadPath = groups[1];
                 if (!path.isAbsolute(fileUploadPath) && requestAbsoluteFilePath) {

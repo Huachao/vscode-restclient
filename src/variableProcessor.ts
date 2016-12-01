@@ -25,8 +25,8 @@ export class VariableProcessor {
                 let groups = regex.exec(match);
                 if (groups !== null && groups.length === 3) {
                     return groups[1] && groups[2]
-                            ? moment.utc().add(groups[1], groups[2]).unix()
-                            : moment.utc().unix();
+                        ? moment.utc().add(groups[1], groups[2]).unix()
+                        : moment.utc().unix();
                 }
                 return match;
             },

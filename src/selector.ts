@@ -26,7 +26,7 @@ export class Selector {
             return fullText;
         }
 
-        // return null if cursor is in delimter line
+        // return null if cursor is in delimiter line
         if (delimiterLineNumbers.indexOf(currentLine) > -1) {
             return null;
         }
