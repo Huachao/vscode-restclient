@@ -1,10 +1,10 @@
 'use strict';
 
-import { SerializedHttpRequest } from './models/httpRequest'
-import * as Constants from './constants'
-import * as fs from 'fs'
-import * as path from 'path'
-import * as os from 'os'
+import { SerializedHttpRequest } from './models/httpRequest';
+import * as Constants from './constants';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 
 export class PersistUtility {
     static readonly historyFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.HistoryFileName);

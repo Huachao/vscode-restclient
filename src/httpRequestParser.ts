@@ -1,9 +1,9 @@
 "use strict";
 
-import { HttpRequest } from './models/httpRequest'
-import { IRequestParser } from './models/IRequestParser'
-import { RequestParserUtil } from './requestParserUtil'
-import { HttpClient } from './httpClient'
+import { HttpRequest } from './models/httpRequest';
+import { IRequestParser } from './models/IRequestParser';
+import { RequestParserUtil } from './requestParserUtil';
+import { HttpClient } from './httpClient';
 import { EOL } from 'os';
 import * as fs from 'fs';
 import * as path from 'path';

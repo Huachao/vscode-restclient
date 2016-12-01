@@ -1,6 +1,6 @@
 "use strict";
 
-import { MIME } from './models/mime'
+import { MIME } from './models/mime';
 
 export class MimeUtility {
     static parse(contentTypeString: string) {
@@ -14,7 +14,7 @@ export class MimeUtility {
                 let attributes = params[i].trim().split('=', 2);
                 if (attributes.length === 2 && attributes[0].toLowerCase() === 'charset') {
                     charset = attributes[1].trim();
-                } 
+                }
             }
         }
         return new MIME(types[0], types[1] ? `+${types[1]}` : '', contentTypeString, charset);
@@ -28,10 +28,6 @@ export class MimeUtility {
         }
 
         let type = MimeUtility.parse(contentTypeString).type;
-        if (type === 'image/jpeg' || type === 'image/gif' || type === 'image/webp' || type === 'image/png' || type === 'image/bmp') {
-            return true;
-        } else {
-            return false;
-        }
+        return type === 'image/jpeg' || type === 'image/gif' || type === 'image/webp' || type === 'image/png' || type === 'image/bmp';
     }
 }

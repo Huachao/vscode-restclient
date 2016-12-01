@@ -2,11 +2,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import { ExtensionContext, commands, languages } from 'vscode';
-import { RequestController } from './controllers/requestController'
-import { HistoryController } from './controllers/historyController'
-import { ResponseController } from './controllers/responseController'
-import { CodeSnippetController } from './controllers/codeSnippetController'
-import { HttpCompletionItemProvider } from './httpCompletionItemProvider'
+import { RequestController } from './controllers/requestController';
+import { HistoryController } from './controllers/historyController';
+import { ResponseController } from './controllers/responseController';
+import { CodeSnippetController } from './controllers/codeSnippetController';
+import { HttpCompletionItemProvider } from './httpCompletionItemProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

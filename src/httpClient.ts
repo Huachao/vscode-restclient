@@ -1,11 +1,11 @@
 "use strict";
 
-import { RestClientSettings } from './models/configurationSettings'
-import { HttpRequest } from './models/httpRequest'
-import { HttpResponse } from './models/httpResponse'
-import { PersistUtility } from './persistUtility'
-import { MimeUtility } from './mimeUtility'
-import * as url from 'url'
+import { RestClientSettings } from './models/configurationSettings';
+import { HttpRequest } from './models/httpRequest';
+import { HttpResponse } from './models/httpResponse';
+import { PersistUtility } from './persistUtility';
+import { MimeUtility } from './mimeUtility';
+import * as url from 'url';
 
 var encodeUrl = require('encodeurl');
 var request = require('request');

@@ -1,6 +1,6 @@
 "use strict";
 
-import { CodeSnippetClient } from './codeSnippetClient'
+import { CodeSnippetClient } from './codeSnippetClient';
 
 export class CodeSnippetTarget {
     key: string;

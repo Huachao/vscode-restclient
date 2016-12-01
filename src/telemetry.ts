@@ -1,7 +1,7 @@
 'use strict';
 
-import { RestClientSettings } from './models/configurationSettings'
-import * as Constants from './constants'
+import { RestClientSettings } from './models/configurationSettings';
+import * as Constants from './constants';
 
 const appInsights = require("applicationinsights");
 

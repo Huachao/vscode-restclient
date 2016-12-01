@@ -24,9 +24,7 @@ export class RequestStore {
     }
 
     static cancel(requestId: string = null) {
-        if (!requestId) {
-            requestId = RequestStore.currentRequestId;
-        } 
+        requestId = requestId || RequestStore.currentRequestId;
         if (!RequestStore.cancelledRequestIds.has(requestId)) {
             RequestStore.cancelledRequestIds.add(requestId);
         }
@@ -43,10 +41,7 @@ export class RequestStore {
     }
 
     static isCompleted(requestId: string = null) {
-        if (!requestId) {
-            requestId = RequestStore.currentRequestId;
-        }
-
+        requestId = requestId || RequestStore.currentRequestId;
         return RequestStore.completedRequestIds.has(requestId);
     }
 }

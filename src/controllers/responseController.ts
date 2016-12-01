@@ -3,12 +3,12 @@
 import { window, Uri, workspace } from 'vscode';
 import { ResponseStore } from '../responseStore';
 import { HttpResponse } from '../models/httpResponse';
-import { PersistUtility } from '../persistUtility'
+import { PersistUtility } from '../persistUtility';
 import { Telemetry } from '../telemetry';
-import * as Constants from '../constants'
-import * as fs from 'fs'
-import * as path from 'path'
-import * as os from 'os'
+import * as Constants from '../constants';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 
 var cp = require('copy-paste');
 

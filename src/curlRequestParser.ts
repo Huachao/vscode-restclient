@@ -1,8 +1,8 @@
 "use strict";
 
-import { HttpRequest } from './models/httpRequest'
-import { IRequestParser } from './models/IRequestParser'
-import { RequestParserUtil } from './requestParserUtil'
+import { HttpRequest } from './models/httpRequest';
+import { IRequestParser } from './models/IRequestParser';
+import { RequestParserUtil } from './requestParserUtil';
 
 var yargs = require('yargs');
 

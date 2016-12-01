@@ -1,6 +1,6 @@
 "use strict";
 
-import { HttpResponse } from './models/httpResponse'
+import { HttpResponse } from './models/httpResponse';
 
 export class ResponseStore {
     private static cache: { [key: string]: HttpResponse } = {};

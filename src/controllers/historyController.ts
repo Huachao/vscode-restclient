@@ -1,14 +1,14 @@
 "use strict";
 
 import { window, workspace, OutputChannel } from 'vscode';
-import { PersistUtility } from '../persistUtility'
-import { HttpRequest } from '../models/httpRequest'
-import { HistoryQuickPickItem } from '../models/historyQuickPickItem'
+import { PersistUtility } from '../persistUtility';
+import { HttpRequest } from '../models/httpRequest';
+import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { Telemetry } from '../telemetry';
 import { EOL } from 'os';
-import * as fs from 'fs'
+import * as fs from 'fs';
 
-var tmp = require('tmp')
+var tmp = require('tmp');
 var moment = require('moment');
 
 export class HistoryController {

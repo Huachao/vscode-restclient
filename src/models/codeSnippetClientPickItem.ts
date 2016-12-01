@@ -1,7 +1,7 @@
 "use strict";
 
 import { QuickPickItem } from 'vscode';
-import { CodeSnippetClient } from './codeSnippetClient'
+import { CodeSnippetClient } from './codeSnippetClient';
 
 export class CodeSnippetClientQuickPickItem implements QuickPickItem {
     label: string;

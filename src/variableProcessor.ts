@@ -1,6 +1,6 @@
 'use strict';
 
-import * as Constants from './constants'
+import * as Constants from './constants';
 import { Func } from './common/delegates';
 var uuid = require('node-uuid');
 var moment = require('moment');
