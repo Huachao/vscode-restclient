@@ -3,11 +3,11 @@ body.vscode-light {
 }
 
 body.vscode-dark {
-  background-color: inherit
+  background-color: inherit;
 }
 
 body.vscode-high-contrast {
-  background-color: inherit
+  background-color: inherit;
 }
 
 .vscode-light pre .hljs-attribute {
@@ -73,37 +73,27 @@ body.vscode-high-contrast {
   color: #ebbbff;
 }
 
-.vscode-light pre code {
+code {
   display: block;
   background: inherit;
-  color: #4d4d4c;
-  font-family: Menlo, Monaco, Consolas, monospace;
+  font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+  font-size: 13px;
   line-height: 1.5;
   padding: 10px;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+.vscode-light pre code {
+  color: #4d4d4c;
 }
 
 .vscode-dark pre code {
-  display: block;
-  background: inherit;
   color: #c5c8c6;
-  font-family: Menlo, Monaco, Consolas, monospace;
-  line-height: 1.5;
-  padding: 10px;
-  white-space: pre-wrap;
-  word-break: break-all;
 }
 
 .vscode-high-contrast pre code {
-  display: block;
-  background: inherit;
   color: white;
-  font-family: Menlo, Monaco, Consolas, monospace;
-  line-height: 1.5;
-  padding: 10px;
-  white-space: pre-wrap;
-  word-break: break-all;
 }
 
 code .line {

@@ -2,6 +2,7 @@
 
 import { Uri, window, extensions } from 'vscode';
 import { BaseTextDocumentContentProvider } from './baseTextDocumentContentProvider';
+import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { MimeUtility } from '../mimeUtility';
 import * as Constants from '../constants';
@@ -16,10 +17,12 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
 
     response: HttpResponse;
+    settings: RestClientSettings;
 
-    constructor(response: HttpResponse) {
+    constructor(response: HttpResponse, settings: RestClientSettings) {
         super();
         this.response = response;
+        this.settings = settings;
     }
 
     public provideTextDocumentContent(uri: Uri): string {
@@ -40,6 +43,7 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             return `
             <head>
                 <link rel="stylesheet" href="${HttpResponseTextDocumentContentProvider.cssFilePath}">
+                ${this.getSettingsOverrideStyles()}
             </head>
             <body>
                 <div>
@@ -47,6 +51,17 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
                 </div>
             </body>`;
         }
+    }
+
+    private getSettingsOverrideStyles(): string {
+        return [
+            '<style>',
+            'code {',
+            this.settings.fontFamily ? `font-family: ${this.settings.fontFamily}` : '',
+            this.settings.fontSize ? `font-size: ${this.settings.fontSize}px;` : '',
+            this.settings.fontWeight ? `font-weight: ${this.settings.fontWeight}` : '',
+            '}',
+            '</style>'].join('\n');
     }
 
     private static formatHeaders(headers: { [key: string]: string }): string {

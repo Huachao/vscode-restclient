@@ -10,6 +10,9 @@ export interface IRestClientSettings {
     rememberCookiesForSubsequentRequests: boolean;
     enableTelemetry: boolean;
     excludeHostsForProxy: string[];
+    fontSize?: number;
+    fontFamily: string;
+    fontWeight: string;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -22,6 +25,9 @@ export class RestClientSettings implements IRestClientSettings {
     rememberCookiesForSubsequentRequests: boolean;
     enableTelemetry: boolean;
     excludeHostsForProxy: string[];
+    fontSize?: number;
+    fontFamily: string;
+    fontWeight: string;
 
     constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -42,6 +48,9 @@ export class RestClientSettings implements IRestClientSettings {
             this.timeoutInMilliseconds = 0;
         }
         this.excludeHostsForProxy = restClientSettings.get<string[]>("excludeHostsForProxy", []);
+        this.fontSize = restClientSettings.get<number>("fontSize", null);
+        this.fontFamily = restClientSettings.get<string>("fontFamily", null);
+        this.fontWeight = restClientSettings.get<string>("fontWeight", null);
 
         let httpSettings = workspace.getConfiguration('http');
         this.proxy = httpSettings.get<string>('proxy', undefined);

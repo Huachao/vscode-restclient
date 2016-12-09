@@ -39,7 +39,7 @@ export class RequestController {
         this._restClientSettings = new RestClientSettings();
         this._httpClient = new HttpClient(this._restClientSettings);
 
-        this._responseTextProvider = new HttpResponseTextDocumentContentProvider(null);
+        this._responseTextProvider = new HttpResponseTextDocumentContentProvider(null, this._restClientSettings);
         this._registration = workspace.registerTextDocumentContentProvider('rest-response', this._responseTextProvider);
     }
 

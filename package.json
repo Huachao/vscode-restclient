@@ -240,6 +240,35 @@
           "type": "array",
           "default": [],
           "description": "Excluded hosts when using using proxy settings"
+        },
+        "rest-client.fontSize": {
+          "type": "number",
+          "default": null,
+          "description": "Controls the font size in pixels used in the response preview"
+        },
+        "rest-client.fontFamily": {
+          "type": "string",
+          "default": null,
+          "description": "Controls the font family used in the response preview"
+        },
+        "rest-client.fontWeight": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "bold",
+            "bolder",
+            "lighter",
+            "100",
+            "200",
+            "300",
+            "400",
+            "500",
+            "600",
+            "700",
+            "800",
+            "900"
+          ],
+          "description": "Controls the font weight used in the response preview"
         }
       }
     }
