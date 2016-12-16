@@ -89,6 +89,8 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
                 }
             } else if (type === 'application/xml' || type === 'text/xml') {
                 body = pd.xml(body);
+            } else if (type === 'text/css') {
+                body = pd.css(body);
             }
         }
 
