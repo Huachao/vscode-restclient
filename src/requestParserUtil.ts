@@ -6,15 +6,15 @@ export class RequestParserUtil {
         let headers: { [key: string]: string } = {};
         let headerNames: { [key: string]: string } = {};
         headerLines.forEach(headerLine => {
-            let headerParts = headerLine.split(':', 2).filter(Boolean);
             let fieldName: string;
             let fieldValue: string;
-            if (headerParts.length === 2) {
-                fieldName = headerParts[0];
-                fieldValue = headerParts[1];
-            } else if (headerParts.length === 1) {
-                fieldName = headerParts[0];
+            let separatorIndex = headerLine.indexOf(':');
+            if (separatorIndex === -1) {
+                fieldName = headerLine;
                 fieldValue = '';
+            } else {
+                fieldName = headerLine.substring(0, separatorIndex);
+                fieldValue = headerLine.substring(separatorIndex + 1);
             }
 
             let normalizedFieldName = fieldName.trim().toLowerCase();
