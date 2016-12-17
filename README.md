@@ -11,6 +11,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Support _MULTIPLE_ requests in the same file
 * View image response directly in pane
 * Save raw response to local disk
+* Customize font(size/family/weight) in response preview
 * Generate code snippets for __HTTP request__ in languages like `Python`, `Javascript` and more!.
 * Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
@@ -219,6 +220,9 @@ X-Request-Id: {{$guid}}
 }
 ```
 
+## Customize Response Preview
+REST Client Extension adds the ability to control the font family, size and weight used in the response preview.
+
 ## Settings
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
 * `rest-client.defaultuseragent`: If User-Agent header is omitted in request header, this value will be added as user agent for each request. (Default is __vscode-restclient__)
@@ -227,6 +231,9 @@ X-Request-Id: {{$guid}}
 * `rest-client.rememberCookiesForSubsequentRequests`: Save cookies from `Set-Cookie` header in response and use for subsequent requests. (Default is __true__)
 * `rest-client.enableTelemetry`: Send out anonymous usage data. (Default is __true__)
 * `rest-client.excludeHostsForProxy`: Excluded hosts when using proxy settings. (Default is __[]__)
+* `rest-client.fontSize`: Controls the font size in pixels used in the response preview. (Default is __13__)
+* `rest-client.fontFamily`: Controls the font family used in the response preview. (Default is __Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback"__)
+* `rest-client.fontWeight`: Controls the font weight used in the response preview. (Default is __normal__)
 
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 

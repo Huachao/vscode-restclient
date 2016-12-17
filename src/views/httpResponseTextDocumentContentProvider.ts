@@ -57,9 +57,9 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
         return [
             '<style>',
             'code {',
-            this.settings.fontFamily ? `font-family: ${this.settings.fontFamily}` : '',
+            this.settings.fontFamily ? `font-family: ${this.settings.fontFamily};` : '',
             this.settings.fontSize ? `font-size: ${this.settings.fontSize}px;` : '',
-            this.settings.fontWeight ? `font-weight: ${this.settings.fontWeight}` : '',
+            this.settings.fontWeight ? `font-weight: ${this.settings.fontWeight};` : '',
             '}',
             '</style>'].join('\n');
     }
