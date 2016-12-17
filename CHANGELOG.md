@@ -1,3 +1,6 @@
+## 0.11.2 (2016/12/17)
+* __Bug Fix__: Fix extension publish issue
+
 ## 0.11.1 (2016/12/17)
 * __Feature__: [Improve legibility of the text in Response tab](https://github.com/Huachao/vscode-restclient/issues/54)
 * __Bug Fix__: [Parse colon(:) in request header correctly](https://github.com/Huachao/vscode-restclient/issues/55)
