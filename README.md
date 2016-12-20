@@ -12,7 +12,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * View image response directly in pane
 * Save raw response to local disk
 * Customize font(size/family/weight) in response preview
-* Generate code snippets for __HTTP request__ in languages like `Python`, `Javascript` and more!.
+* Generate code snippets for __HTTP request__ in languages like `Python`, `Javascript` and more!
 * Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
 * Proxy support
@@ -143,7 +143,7 @@ Sometimes you may want to refresh the API response, now you could do it simply u
 
 ## Making CURL Request
 ![CURL Request](images/curl-request.png)
-We add the capability to directly run [curl request](https://curl.haxx.se/) in REST Client extension. The issuing request command is the same as raw HTTp one. REST Client will automatically parse the request with specified parser.
+We add the capability to directly run [curl request](https://curl.haxx.se/) in REST Client extension. The issuing request command is the same as raw HTTP one. REST Client will automatically parse the request with specified parser.
 
 ## Request History
 ![request-history](images/request-history.png)
