@@ -282,8 +282,8 @@
   "devDependencies": {
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
-    "mocha": "^2.3.3",
-    "tslint": "^3.15.0",
+    "mocha": "^3.2.0",
+    "tslint": "^4.2.0",
     "typescript": "^2.0.3",
     "vscode": "^1.0.0"
   },
