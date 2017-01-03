@@ -31,7 +31,7 @@ export class RequestController {
     private _responseTextProvider: HttpResponseTextDocumentContentProvider;
     private _registration: Disposable;
     private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
-    private _interval: any;
+    private _interval: NodeJS.Timer;
 
     constructor() {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);

@@ -95,7 +95,7 @@ export class HttpRequestParser implements IRequestParser {
         return new HttpRequest(requestLine.method, requestLine.url, headers, body);
     }
 
-    private static parseRequestLine(line: string): any {
+    private static parseRequestLine(line: string): { method: string, url: string } {
         // Request-Line = Method SP Request-URI SP HTTP-Version CRLF
         let words = line.split(' ').filter(Boolean);
 
@@ -111,14 +111,13 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         return {
-            "method": method,
-            "url": url
+            method: method,
+            url: url
         };
     }
 
     private static skipWhile<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean): T[] {
-        let index = 0;
-        for (; index < items.length; index++) {
+        for (var index = 0; index < items.length; index++) {
             if (!callbackfn(items[index], index, items)) {
                 break;
             }
