@@ -107,8 +107,7 @@ export class HttpRequestParser implements IRequestParser {
             url = words[0];
         } else {
             // Provides both request method and url
-            method = words[0];
-            url = words[1];
+            [method, url] = words;
         }
 
         return {

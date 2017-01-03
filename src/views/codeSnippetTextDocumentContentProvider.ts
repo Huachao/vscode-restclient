@@ -11,13 +11,8 @@ const codeHighlightLinenums = require('code-highlight-linenums');
 export class CodeSnippetTextDocumentContentProvider extends BaseTextDocumentContentProvider {
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
 
-    convertResult: string;
-    lang: string;
-
-    constructor(convertResult: string, lang: string) {
+    constructor(public convertResult: string, public lang: string) {
         super();
-        this.convertResult = convertResult;
-        this.lang = lang;
     }
 
     public provideTextDocumentContent(uri: Uri): string {

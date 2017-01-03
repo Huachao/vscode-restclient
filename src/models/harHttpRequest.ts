@@ -6,47 +6,21 @@ export interface IHARNameValue {
 }
 
 export class HARHeader implements IHARNameValue {
-    name: string;
-    value: string;
-
-    constructor(name, value) {
-        this.name = name;
-        this.value = value;
+    constructor(public name: string, public value: string) {
     }
 }
 
 export class HARCookie implements IHARNameValue {
-    name: string;
-    value: string;
-
-    constructor(name, value) {
-        this.name = name;
-        this.value = value;
+    constructor(public name: string, public value: string) {
     }
 }
 
 export class HARPostData {
-    mimeType: string;
-    text: string;
-
-    constructor(mimeType, text) {
-        this.mimeType = mimeType;
-        this.text = text;
+    constructor(public mimeType: string, public text: string) {
     }
 }
 
 export class HARHttpRequest {
-    method: string;
-    url: string;
-    headers: HARHeader[];
-    cookies: HARCookie[];
-    postData: HARPostData;
-
-    constructor(method: string, url: string, headers: HARHeader[], cookies: HARCookie[], body: HARPostData) {
-        this.method = method;
-        this.url = url;
-        this.headers = headers;
-        this.cookies = cookies;
-        this.postData = body;
+    constructor(public method: string, public url: string, public headers: HARHeader[], public cookies: HARCookie[], public body: HARPostData) {
     }
 }

@@ -28,5 +28,21 @@
             "",
             "${content}"
         ]
+    },
+    "SOAP request block": {
+        "prefix": "soap",
+        "body": [
+            "POST ${url} HTTP/1.1",
+            "Content-Type: application/soap+xml",
+            "${header name}: ${header value}",
+            "",
+            "<soap:Envelope",
+            "\txmlns:soap=\"http://www.w3.org/2001/12/soap-envelope\"",
+            "\tsoap:encodingStyle=\"http://www.w3.org/2001/12/soap-encoding\">",
+            "\t<soap:Body>",
+            "\t\t${content}",
+            "\t</soap:Body>",
+            "</soap:Envelope>"
+        ]
     }
 }

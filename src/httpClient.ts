@@ -103,9 +103,9 @@ export class HttpClient {
                     httpRequest.url,
                     size));
             })
-                .on('data', function (data) {
-                    size += data.length;
-                })
+            .on('data', function (data) {
+                size += data.length;
+            })
         });
     }
 

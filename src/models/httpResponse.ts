@@ -1,24 +1,7 @@
 "use strict";
 
 export class HttpResponse {
-    elapsedMillionSeconds: number;
-    headers: { [key: string]: string };
-    body: string;
-    bodySizeInBytes: number;
-    httpVersion: string;
-    statusCode: number;
-    statusMessage: string;
-    requestUrl: string;
-
-    constructor(statusCode: number, statusMessage: string, httpVersion: string, headers: { [key: string]: string }, body: string, elapsedMillionSeconds: number, requestUrl: string, bodySizeInBytes: number) {
-        this.statusCode = statusCode;
-        this.statusMessage = statusMessage;
-        this.httpVersion = httpVersion;
-        this.headers = headers;
-        this.body = body;
-        this.elapsedMillionSeconds = elapsedMillionSeconds;
-        this.requestUrl = requestUrl;
-        this.bodySizeInBytes = bodySizeInBytes;
+    constructor(public statusCode: number, public statusMessage: string, public httpVersion: string, public headers: { [key: string]: string }, public body: string, public elapsedMillionSeconds: number, public requestUrl: string, public bodySizeInBytes: number) {
     }
 
     public getResponseHeaderValue(name: string) {

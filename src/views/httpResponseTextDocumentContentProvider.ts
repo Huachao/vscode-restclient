@@ -16,13 +16,8 @@ var pd = require('pretty-data').pd;
 export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentContentProvider {
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
 
-    response: HttpResponse;
-    settings: RestClientSettings;
-
-    constructor(response: HttpResponse, settings: RestClientSettings) {
+    constructor(public response: HttpResponse, public settings: RestClientSettings) {
         super();
-        this.response = response;
-        this.settings = settings;
     }
 
     public provideTextDocumentContent(uri: Uri): string {
