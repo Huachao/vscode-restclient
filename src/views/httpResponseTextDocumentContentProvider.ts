@@ -64,7 +64,7 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
         for (var header in headers) {
             if (headers.hasOwnProperty(header)) {
                 let value = headers[header];
-                if (typeof headers[header] === 'string') {
+                if (typeof headers[header] !== 'string') {
                     value = <string>headers[header];
                 }
                 headerString += `${header}: ${value}\n`;

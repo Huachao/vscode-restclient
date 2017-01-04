@@ -16,6 +16,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
 * Proxy support
+* Send SOAP requests, as weel as snippet support to build SOAP envelope easily
 * `HTTP` language support
     - `.http` and `.rest` file extensions support
     - Syntax highlight (Request and Response)
@@ -39,7 +40,7 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/loading.gif) will be displayed in the status bar, after receiving the response, the icon will be changed to the duration and response size.
+Once you prepared a request, use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/loading.gif) will be displayed in the status bar, after receiving the response, the icon will be changed to the duration and response size.
 
 > All the shortcuts in REST Client Extension are __ONLY__ available for file language mode `http` and `plaintext`.
 
@@ -157,7 +158,7 @@ In the upper right corner of the response preview tab, we add a new icon to save
 
 ## Generate Code Snippet
 ![Generate Code Snippet](images/code-snippet.gif)
-Once you’ve finalized your request in REST Client extension, you might want to make the same request from your own source code. We allow you to generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as previously, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, as well as library list. After you selected the code snippet language/library you want, the generated code snippet will be previewed in a separate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
+Once you’ve finalized your request in REST Client extension, you might want to make the same request from your own source code. We allow you to generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as previously, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or right click in the editor and then select `Generate Code Snippet` in the menu, or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, as well as library list. After you selected the code snippet language/library you want, the generated code snippet will be previewed in a separate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
 
 ## HTTP Language
 Add language support for HTTP request, with features like __syntax highlight__, __auto completion__ and __comment support__, when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:
