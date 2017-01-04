@@ -1,4 +1,7 @@
-## 0.11.3 (2017/12/14)
+## 0.11.4 (2017/1/4)
+* __Bug Fix__: Fix extension publish issue
+
+## 0.11.3 (2017/1/4)
 * __Bug Fix__: Adds right click menu options to send request and generate code snippet
 * __Improvement__: Add SOAP request snippet to help to build SOAP envelope
 
