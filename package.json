@@ -139,6 +139,12 @@
           "command": "rest-client.copy-codesnippet",
           "group": "navigation"
         }
+      ],
+      "editor/context": [
+        {
+          "command": "rest-client.request",
+          "when": "editorTextFocus && editorLangId == http"
+        }
       ]
     },
     "keybindings": [
