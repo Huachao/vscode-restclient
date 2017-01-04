@@ -143,7 +143,13 @@
       "editor/context": [
         {
           "command": "rest-client.request",
-          "when": "editorTextFocus && editorLangId == http"
+          "when": "editorTextFocus && editorLangId == http",
+          "group": "rest-client@1"
+        },
+        {
+          "command": "rest-client.generate-codesnippet",
+          "when": "editorTextFocus && editorLangId == http",
+          "group": "rest-client@2"
         }
       ]
     },
