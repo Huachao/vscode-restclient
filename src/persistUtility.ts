@@ -25,31 +25,28 @@ export class PersistUtility {
         return PersistUtility.deserializeFromHistoryFile();
     }
 
-    static createHistoryFileIfNotExist() {
-        try {
-            fs.statSync(PersistUtility.historyFilePath);
-        } catch (error) {
-            PersistUtility.ensureDirectoryExistence(PersistUtility.historyFilePath);
-            fs.writeFileSync(PersistUtility.historyFilePath, '');
-        }
-    }
-
-    static createCookieFileIfNotExist() {
-        try {
-            fs.statSync(PersistUtility.cookieFilePath);
-        } catch (error) {
-            PersistUtility.ensureDirectoryExistence(PersistUtility.cookieFilePath);
-            fs.writeFileSync(PersistUtility.cookieFilePath, '');
-        }
-    }
-
-    static createResponseFileIfNotExist(path: string) {
+    static createFileIfNotExists(path: string) {
         try {
             fs.statSync(path);
         } catch (error) {
             PersistUtility.ensureDirectoryExistence(path);
             fs.writeFileSync(path, '');
         }
+    }
+
+    static async createFileIfNotExistsAsync(path: string) {
+        return new Promise<void>((resolve, reject) => {
+            fs.stat(path, err => {
+                if(err === null) {
+                    resolve();
+                }
+
+                new Promise<string>((resolve, reject) => {
+                    PersistUtility.ensureDirectoryExistence(path);
+                    fs.writeFile(path, '', err => err === null ? resolve(path) : reject(err))
+                }).then(_ => resolve());
+            });
+        });
     }
 
     static async serializeToHistoryFile(requests: SerializedHttpRequest[]) {
@@ -69,7 +66,7 @@ export class PersistUtility {
         return new Promise<SerializedHttpRequest[]>((resolve, reject) => {
             fs.readFile(PersistUtility.historyFilePath, (error, data) => {
                 if (error) {
-                    PersistUtility.createHistoryFileIfNotExist();
+                    PersistUtility.createFileIfNotExists(PersistUtility.historyFilePath);
                 } else {
                     let fileContent = data.toString();
                     if (fileContent) {

@@ -17,7 +17,7 @@ export class HttpClient {
 
     constructor(settings: RestClientSettings) {
         this._settings = settings;
-        PersistUtility.createCookieFileIfNotExist();
+        PersistUtility.createFileIfNotExists(PersistUtility.cookieFilePath);
     }
 
     async send(httpRequest: HttpRequest): Promise<HttpResponse> {

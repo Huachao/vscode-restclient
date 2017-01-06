@@ -15,7 +15,7 @@ var cp = require('copy-paste');
 export class ResponseController {
     static responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
 
-    static save(uri: Uri) {
+    static async save(uri: Uri) {
         Telemetry.sendEvent('Response-Save');
         if (!uri) {
             return;
@@ -25,7 +25,7 @@ export class ResponseController {
             let fullResponse = ResponseController.getFullResponseString(response);
             let filePath = path.join(ResponseController.responseSaveFolderPath, `Response-${Date.now()}.http`)
             try {
-                PersistUtility.createResponseFileIfNotExist(filePath);
+                await PersistUtility.createFileIfNotExists(filePath);
                 fs.writeFileSync(filePath, fullResponse);
                 window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
                     if (btn) {
