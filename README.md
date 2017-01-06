@@ -16,7 +16,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
 * Proxy support
-* Send SOAP requests, as weel as snippet support to build SOAP envelope easily
+* Send SOAP requests, as well as snippet support to build SOAP envelope easily
 * `HTTP` language support
     - `.http` and `.rest` file extensions support
     - Syntax highlight (Request and Response)
