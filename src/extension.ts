@@ -6,11 +6,13 @@ import { RequestController } from './controllers/requestController';
 import { HistoryController } from './controllers/historyController';
 import { ResponseController } from './controllers/responseController';
 import { CodeSnippetController } from './controllers/codeSnippetController';
+import { EnvironmentController } from './controllers/environmentController';
 import { HttpCompletionItemProvider } from './httpCompletionItemProvider';
+import { CustomVariableHoverProvider } from './customVariableHoverProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext) {
 
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
@@ -19,9 +21,11 @@ export function activate(context: ExtensionContext) {
     let requestController = new RequestController();
     let historyController = new HistoryController();
     let codeSnippetController = new CodeSnippetController();
+    let environmentController = new EnvironmentController(await EnvironmentController.getCurrentEnvironment());
     context.subscriptions.push(requestController);
     context.subscriptions.push(historyController);
     context.subscriptions.push(codeSnippetController);
+    context.subscriptions.push(environmentController);
     context.subscriptions.push(commands.registerCommand('rest-client.request', () => requestController.run()));
     context.subscriptions.push(commands.registerCommand('rest-client.rerun-last-request', () => requestController.rerun()));
     context.subscriptions.push(commands.registerCommand('rest-client.cancel-request', () => requestController.cancel()));
@@ -30,7 +34,9 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('rest-client.save-response', ResponseController.save));
     context.subscriptions.push(commands.registerCommand('rest-client.generate-codesnippet', () => codeSnippetController.run()));
     context.subscriptions.push(commands.registerCommand('rest-client.copy-codesnippet', () => codeSnippetController.copy()));
+    context.subscriptions.push(commands.registerCommand('rest-client.switch-environment', () => environmentController.switchEnvironment()));
     context.subscriptions.push(languages.registerCompletionItemProvider('http', new HttpCompletionItemProvider()));
+    context.subscriptions.push(languages.registerHoverProvider('http', new CustomVariableHoverProvider()))
 }
 
 // this method is called when your extension is deactivated

@@ -21,7 +21,7 @@ export class HistoryController {
     async save() {
         Telemetry.sendEvent('History');
         try {
-            let requests = await PersistUtility.load();
+            let requests = await PersistUtility.loadRequests();
             if (!requests || requests.length <= 0) {
                 window.showInformationMessage("No request history items are found!");
                 return;

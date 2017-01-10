@@ -1,5 +1,6 @@
 "use strict";
 
+import { EnvironmentController } from './controllers/environmentController';
 import { HttpElement, ElementType } from './models/httpElement';
 import { PersistUtility } from './persistUtility';
 import * as Constants from './constants';
@@ -81,8 +82,14 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement(`{{${Constants.TimeStampVariableName}}}`, ElementType.GlobalVariable, null, Constants.TimeStampVariableDescription));
         originalElements.push(new HttpElement(`{{${Constants.RandomInt}}}`, ElementType.GlobalVariable, null, Constants.RandomIntDescription));
 
+        // add custom variables
+        let customVariables = await EnvironmentController.getCustomVariables();
+        for (var variableName in customVariables) {
+            originalElements.push(new HttpElement(`{{${variableName}}}`, ElementType.CustomVariable, null, `Value: ${customVariables[variableName]}`));
+        }
+
         // add urls from history
-        let historyItems = await PersistUtility.load();
+        let historyItems = await PersistUtility.loadRequests();
         let distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));
         distinctRequestUrls.forEach(requestUrl => {
             let protocol = url.parse(requestUrl).protocol;
@@ -102,7 +109,12 @@ export class HttpElementFactory {
         }
 
         if (elements.length === 0) {
-            elements = originalElements.filter(e => e.type !== ElementType.MIME && e.type !== ElementType.URL);
+            elements = originalElements.filter(e => !e.prefix);
+        } else {
+            // add global/custom variables anyway
+            originalElements.filter(e => !e.prefix && (e.type === ElementType.GlobalVariable || e.type === ElementType.CustomVariable)).forEach(element => {
+                elements.push(element);
+            });
         }
 
         return elements;

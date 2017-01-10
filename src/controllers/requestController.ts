@@ -64,7 +64,7 @@ export class RequestController {
         }
 
         // variables replacement
-        selectedText = VariableProcessor.processRawRequest(selectedText);
+        selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         // parse http request
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
@@ -142,7 +142,7 @@ export class RequestController {
             // persist to history json file
             let serializedRequest = <SerializedHttpRequest>httpRequest;
             serializedRequest.startTime = Date.now();
-            await PersistUtility.save(serializedRequest);
+            await PersistUtility.saveRequest(serializedRequest);
         } catch (error) {
             // check cancel
             if (RequestStore.isCancelled(<string>requestId)) {

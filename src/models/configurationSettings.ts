@@ -13,6 +13,7 @@ export interface IRestClientSettings {
     fontSize?: number;
     fontFamily: string;
     fontWeight: string;
+    environmentVariables: Map<string, Map<string, string>>;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -28,6 +29,7 @@ export class RestClientSettings implements IRestClientSettings {
     fontSize?: number;
     fontFamily: string;
     fontWeight: string;
+    environmentVariables: Map<string, Map<string, string>>;
 
     constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -51,6 +53,8 @@ export class RestClientSettings implements IRestClientSettings {
         this.fontSize = restClientSettings.get<number>("fontSize", null);
         this.fontFamily = restClientSettings.get<string>("fontFamily", null);
         this.fontWeight = restClientSettings.get<string>("fontWeight", null);
+
+        this.environmentVariables = restClientSettings.get<Map<string, Map<string, string>>>("environmentVariables", new Map<string, Map<string, string>>());
 
         let httpSettings = workspace.getConfiguration('http');
         this.proxy = httpSettings.get<string>('proxy', undefined);

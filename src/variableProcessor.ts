@@ -1,17 +1,26 @@
 'use strict';
 
+import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from './constants';
 import { Func } from './common/delegates';
 var uuid = require('node-uuid');
 var moment = require('moment');
 
 export class VariableProcessor {
-    static processRawRequest(request: string) {
+    static async processRawRequest(request: string) {
         let globalVariables = VariableProcessor.getGlobalVariables();
         for (var variablePattern in globalVariables) {
             let regex = new RegExp(`\\{\\{${variablePattern}\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, globalVariables[variablePattern]);
+            }
+        }
+
+        let customVariables = await EnvironmentController.getCustomVariables();
+        for (var variableName in customVariables) {
+            let regex = new RegExp(`\\{\\{${variableName}\\}\\}`, 'g');
+            if (regex.test(request)) {
+                request = request.replace(regex, customVariables[variableName]);
             }
         }
 

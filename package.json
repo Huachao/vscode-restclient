@@ -94,6 +94,11 @@
                 "category": "Rest Client"
             },
             {
+                "command": "rest-client.switch-environment",
+                "title": "Switch Environment",
+                "category": "Rest Client"
+            },
+            {
                 "command": "rest-client.history",
                 "title": "View Request History",
                 "category": "Rest Client"
@@ -202,6 +207,11 @@
                 "mac": "cmd+alt+h"
             },
             {
+                "command": "rest-client.switch-environment",
+                "key": "ctrl+alt+s",
+                "mac": "cmd+alt+s"
+            },
+            {
                 "command": "rest-client.generate-codesnippet",
                 "key": "ctrl+alt+c",
                 "mac": "cmd+alt+c",
@@ -281,6 +291,28 @@
                         "900"
                     ],
                     "description": "Controls the font weight used in the response preview"
+                },
+                "rest-client.environmentVariables": {
+                    "type": "object",
+                    "default": {},
+                    "description": "Sets the environments and custom variables belongs to it (e.g., {\"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
+                    "additionalProperties": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "default": {},
+                                "description": "Sets the custom variables belong to this environment",
+                                "additionalProperties": {
+                                    "anyOf": [
+                                        {
+                                            "type": "string",
+                                            "description": "Value of the custom variable"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
                 }
             }
         }

@@ -11,4 +11,5 @@ export enum ElementType {
     Header,
     MIME,
     GlobalVariable,
+    CustomVariable,
 }

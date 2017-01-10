@@ -51,7 +51,7 @@ export class CodeSnippetController {
         }
 
         // variables replacement
-        selectedText = VariableProcessor.processRawRequest(selectedText);
+        selectedText = await VariableProcessor.processRawRequest(selectedText);
         this._selectedText = selectedText;
 
         // parse http request
