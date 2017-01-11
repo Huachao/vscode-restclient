@@ -40,6 +40,7 @@
         "onCommand:rest-client.history",
         "onCommand:rest-client.clear-history",
         "onCommand:rest-client.save-response",
+        "onCommand:rest-client.switch-environment",
         "onLanguage:http"
     ],
     "main": "./out/src/extension",

@@ -12,15 +12,20 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * View image response directly in pane
 * Save raw response to local disk
 * Customize font(size/family/weight) in response preview
+* Environments and custom/global system variables support
+    - Use custom/global variables in any place of request(_URL_, _Headers_, _Body_)
+    - Auto completion and hover support for custom variables
+    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` 
+    - Easily create/update/delete environments and custom variables in setting file
+    - Support environment switch
 * Generate code snippets for __HTTP request__ in languages like `Python`, `Javascript` and more!
-* Global variables support (Already support system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` now)
 * Remember Cookies for subsequent requests
 * Proxy support
 * Send SOAP requests, as well as snippet support to build SOAP envelope easily
 * `HTTP` language support
     - `.http` and `.rest` file extensions support
     - Syntax highlight (Request and Response)
-    - Auto completion for method, url, header, global dynamic variables and mime types
+    - Auto completion for method, url, header, custom/global variables and mime types
     - Comments (line starts with `#` or `//`) support
     - Support `json` and `xml` body indentation, comment shortcut and auto closing brackets
     - Code snippets for operations like `GET` and `POST`
@@ -176,11 +181,36 @@ Currently auto completion will be enabled for following five categories:
 2. HTTP URL from request history
 3. HTTP Header
 4. Global dynamic variables
-5. MIME Types for `Accept` and `Content-Type` headers
+5. Custom variables in current environment
+6. MIME Types for `Accept` and `Content-Type` headers
 
-## Variables
+## Environments and Variables
+Environments give you the ability to customize requests using variables, and you can easily switch environment without chaning requests in `http` file. A common usage is having different configurations for different product environments, like devbox, sandbox and production.
+
+Environments and variables of `REST Client Extension` are defined in setting file of `Visual Studio Code`, so you can create/update/delete environments and variables at any time you wish. The changes will take effect right away. We also support two types of variables: __Global System Variables__ and __Environment Custom Variables__. You can use them in the same way: `{{VariableName}}`. Below is a sample piece of setting file for custom environments and variables:
+```json
+"rest-client.environmentVariables": {
+        "local": {
+            "host": "localhost",
+            "token": "test token"
+        },
+        "production":
+            "host": "example.com",
+            "token": "product token"
+        }
+    }
+```
+A sample usage in `http` for above custom variables is listed below:
+```http
+GET https://{{host}}/api/comments/1 HTTP/1.1
+Authorization: {{token}}
+```
+
+### Custom Variables
+Custom variables belong to the environment scope. Each environment is a set of key value pairs defined in setting file, key is the variable name, while value is variable value. Only custom variables in selected environment are available to you. Current active environment name is displayed in the right bottom of `Visual Studio Code`, when you click it, you can switch environment. And you can also switch environment using shortcut `Ctrl+Alt+S`(`Cmd+Alt+S` for macOS), or press `F1` and then select/type `Rest Client: Switch Environment`. When you write custom variables in `http` file, auto completion will be available to you, so when you have a variable named `host`, you don't need to type the full word `{{host}}` by yourself, simply type `host` or even less characters, it will prompt you the `host` variable as well as its actual value. After you select it, the value will be autocompleted with `{{host}}`. And if you hover on it, its value will also be displayed.
+
 ### Global Variables
-Global variables provide a set of variables that can be used in every part of the request(Url/Headers/Body) in the format `{{variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
+Global variables provide a pre-defined set of variables that can be used in every part of the request(Url/Headers/Body) in the format `{{variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
 * `{{$timestamp}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`. The option string you can specify in timestamp are:
@@ -210,11 +240,12 @@ Global variables provide a set of variables that can be used in every part of th
 
 ### Variables Sample:
 ```http
-POST https://example.com/comments HTTP/1.1
+POST https://{{host}}/comments HTTP/1.1
 Content-Type: application/xml
-X-Request-Id: {{$guid}}
+X-Request-Id: {{token}}
 
 {
+    "request_id" "{{$guid}}"
     "updated_at": "{{$timestamp}}",
     "created_at": "{{$timestamp -1 d}}",
     "review_count": "{{$randomInt 5, 200}}"
