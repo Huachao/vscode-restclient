@@ -209,8 +209,8 @@
             },
             {
                 "command": "rest-client.switch-environment",
-                "key": "ctrl+alt+s",
-                "mac": "cmd+alt+s"
+                "key": "ctrl+alt+e",
+                "mac": "cmd+alt+e"
             },
             {
                 "command": "rest-client.generate-codesnippet",
