@@ -8,13 +8,13 @@ import * as Constants from '../constants';
 import { Telemetry } from '../telemetry';
 
 export class EnvironmentController {
-    static noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
+    public static noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
         'No Environment', Constants.NoEnvironmentSelectedName, 'DO NOT Use Any Environment');
 
     private _environmentStatusBarItem: StatusBarItem;
     private _restClientSettings: RestClientSettings;
 
-    constructor(initEnvironment: EnvironmentPickItem) {
+    public constructor(initEnvironment: EnvironmentPickItem) {
         this._environmentStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
         this._environmentStatusBarItem.command = 'rest-client.switch-environment';
         this._environmentStatusBarItem.text = initEnvironment.label;
@@ -23,7 +23,7 @@ export class EnvironmentController {
         this._restClientSettings = new RestClientSettings();
     }
 
-    async switchEnvironment() {
+    public async switchEnvironment() {
         Telemetry.sendEvent('Switch Environment');
         let currentEnvironment = await EnvironmentController.getCurrentEnvironment();
         let itemPickList: EnvironmentPickItem[] = [];
@@ -46,7 +46,7 @@ export class EnvironmentController {
         await PersistUtility.saveEnvironment(item);
     }
 
-    static async getCurrentEnvironment(): Promise<EnvironmentPickItem> {
+    public static async getCurrentEnvironment(): Promise<EnvironmentPickItem> {
         let currentEnvironment = await PersistUtility.loadEnvironment();
         if (!currentEnvironment) {
             currentEnvironment = EnvironmentController.noEnvironmentPickItem;
@@ -55,7 +55,7 @@ export class EnvironmentController {
         return currentEnvironment;
     }
 
-    static async getCustomVariables(environment: EnvironmentPickItem = null): Promise<Map<string, string>> {
+    public static async getCustomVariables(environment: EnvironmentPickItem = null): Promise<Map<string, string>> {
         if (!environment) {
             environment = await EnvironmentController.getCurrentEnvironment();
         }
@@ -70,6 +70,6 @@ export class EnvironmentController {
         return new Map<string, string>();
     }
 
-    dispose() {
+    public dispose() {
     }
 }

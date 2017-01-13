@@ -5,7 +5,7 @@ import { TextDocumentContentProvider, EventEmitter, Event, Uri } from 'vscode';
 export abstract class BaseTextDocumentContentProvider implements TextDocumentContentProvider {
     private _onDidChange = new EventEmitter<Uri>();
 
-    get onDidChange(): Event<Uri> {
+    public get onDidChange(): Event<Uri> {
         return this._onDidChange.event;
     }
 

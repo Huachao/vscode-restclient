@@ -13,9 +13,9 @@ import * as os from 'os';
 var cp = require('copy-paste');
 
 export class ResponseController {
-    static responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
+    public static responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
 
-    static async save(uri: Uri) {
+    public static async save(uri: Uri) {
         Telemetry.sendEvent('Response-Save');
         if (!uri) {
             return;
@@ -42,7 +42,7 @@ export class ResponseController {
         }
     }
 
-    dispose() {
+    public dispose() {
     }
 
     private static getFullResponseString(response: HttpResponse): string {

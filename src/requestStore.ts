@@ -8,14 +8,14 @@ export class RequestStore {
     private static completedRequestIds: Set<string> = new Set<string>();
     private static currentRequestId: string;
 
-    static add(requestId: string, request: HttpRequest) {
+    public static add(requestId: string, request: HttpRequest) {
         if (request && requestId) {
             RequestStore.cache.set(requestId, request);
             RequestStore.currentRequestId = requestId;
         }
     }
 
-    static getLatest(): HttpRequest {
+    public static getLatest(): HttpRequest {
         if (RequestStore.cache.has(RequestStore.currentRequestId)) {
             return RequestStore.cache.get(RequestStore.currentRequestId);
         } else {
@@ -23,24 +23,24 @@ export class RequestStore {
         }
     }
 
-    static cancel(requestId: string = null) {
+    public static cancel(requestId: string = null) {
         requestId = requestId || RequestStore.currentRequestId;
         if (!RequestStore.cancelledRequestIds.has(requestId)) {
             RequestStore.cancelledRequestIds.add(requestId);
         }
     }
 
-    static isCancelled(requestId: string) {
+    public static isCancelled(requestId: string) {
         return requestId && RequestStore.cancelledRequestIds.has(requestId);
     }
 
-    static complete(requestId: string) {
+    public static complete(requestId: string) {
         if (requestId) {
             RequestStore.completedRequestIds.add(requestId);
         }
     }
 
-    static isCompleted(requestId: string = null) {
+    public static isCompleted(requestId: string = null) {
         requestId = requestId || RequestStore.currentRequestId;
         return RequestStore.completedRequestIds.has(requestId);
     }

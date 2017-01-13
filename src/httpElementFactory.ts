@@ -7,7 +7,7 @@ import * as Constants from './constants';
 import * as url from 'url';
 
 export class HttpElementFactory {
-    static async getHttpElements(line: string): Promise<HttpElement[]> {
+    public static async getHttpElements(line: string): Promise<HttpElement[]> {
         let originalElements: HttpElement[] = [];
 
         // add http methods

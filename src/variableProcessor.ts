@@ -7,7 +7,7 @@ var uuid = require('node-uuid');
 var moment = require('moment');
 
 export class VariableProcessor {
-    static async processRawRequest(request: string) {
+    public static async processRawRequest(request: string) {
         let globalVariables = VariableProcessor.getGlobalVariables();
         for (var variablePattern in globalVariables) {
             let regex = new RegExp(`\\{\\{${variablePattern}\\}\\}`, 'g');

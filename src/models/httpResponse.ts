@@ -1,7 +1,7 @@
 "use strict";
 
 export class HttpResponse {
-    constructor(public statusCode: number, public statusMessage: string, public httpVersion: string, public headers: { [key: string]: string }, public body: string, public elapsedMillionSeconds: number, public requestUrl: string, public bodySizeInBytes: number) {
+    public constructor(public statusCode: number, public statusMessage: string, public httpVersion: string, public headers: { [key: string]: string }, public body: string, public elapsedMillionSeconds: number, public requestUrl: string, public bodySizeInBytes: number) {
     }
 
     public getResponseHeaderValue(name: string) {

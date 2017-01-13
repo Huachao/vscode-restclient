@@ -1,8 +1,8 @@
 "use strict";
 
 export class CodeSnippetClient {
-    key: string;
-    title: string;
-    link: string;
-    description: string;
+    public key: string;
+    public title: string;
+    public link: string;
+    public description: string;
 }

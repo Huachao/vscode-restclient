@@ -4,7 +4,7 @@ import { TextEditor } from 'vscode';
 import { EOL } from 'os';
 
 export class Selector {
-    getSelectedText(editor: TextEditor): string {
+    public getSelectedText(editor: TextEditor): string {
         if (!editor || !editor.document) {
             return null;
         }

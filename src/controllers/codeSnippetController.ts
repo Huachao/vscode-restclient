@@ -31,7 +31,7 @@ export class CodeSnippetController {
         this._registration = workspace.registerTextDocumentContentProvider('rest-code-snippet', this._codeSnippetTextProvider);
     }
 
-    async run() {
+    public async run() {
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return;
@@ -119,7 +119,7 @@ export class CodeSnippetController {
         }
     }
 
-    async copy() {
+    public async copy() {
         if (this._convertedResult) {
             cp.copy(this._convertedResult);
         }
@@ -161,6 +161,6 @@ export class CodeSnippetController {
         return new HARHttpRequest(request.method, request.url, headers, cookies, body);
     }
 
-    dispose() {
+    public dispose() {
     }
 }

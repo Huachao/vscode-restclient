@@ -17,21 +17,21 @@ export interface IRestClientSettings {
 }
 
 export class RestClientSettings implements IRestClientSettings {
-    followRedirect: boolean;
-    defaultUserAgent: string;
-    timeoutInMilliseconds: number;
-    showResponseInDifferentTab: boolean;
-    proxy: string;
-    proxyStrictSSL: boolean;
-    rememberCookiesForSubsequentRequests: boolean;
-    enableTelemetry: boolean;
-    excludeHostsForProxy: string[];
-    fontSize?: number;
-    fontFamily: string;
-    fontWeight: string;
-    environmentVariables: Map<string, Map<string, string>>;
+    public followRedirect: boolean;
+    public defaultUserAgent: string;
+    public timeoutInMilliseconds: number;
+    public showResponseInDifferentTab: boolean;
+    public proxy: string;
+    public proxyStrictSSL: boolean;
+    public rememberCookiesForSubsequentRequests: boolean;
+    public enableTelemetry: boolean;
+    public excludeHostsForProxy: string[];
+    public fontSize?: number;
+    public fontFamily: string;
+    public fontWeight: string;
+    public environmentVariables: Map<string, Map<string, string>>;
 
-    constructor() {
+    public constructor() {
         workspace.onDidChangeConfiguration(() => {
             this.initializeSettings();
         });

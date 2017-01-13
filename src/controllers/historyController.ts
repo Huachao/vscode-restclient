@@ -14,11 +14,11 @@ var moment = require('moment');
 export class HistoryController {
     private _outputChannel: OutputChannel;
 
-    constructor() {
+    public constructor() {
         this._outputChannel = window.createOutputChannel('REST');
     }
 
-    async save() {
+    public async save() {
         Telemetry.sendEvent('History');
         try {
             let requests = await PersistUtility.loadRequests();
@@ -52,7 +52,7 @@ export class HistoryController {
         }
     }
 
-    async clear() {
+    public async clear() {
         Telemetry.sendEvent('Clear History');
         try {
             window.showInformationMessage(`Do you really want to clear request history?`, { title: 'Yes' }, { title: 'No' })
@@ -103,7 +103,7 @@ export class HistoryController {
         window.showErrorMessage("There was an error, please view details in output log");
     }
 
-    dispose() {
+    public dispose() {
         this._outputChannel.dispose();
     }
 }

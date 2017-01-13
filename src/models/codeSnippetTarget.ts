@@ -3,9 +3,9 @@
 import { CodeSnippetClient } from './codeSnippetClient';
 
 export class CodeSnippetTarget {
-    key: string;
-    title: string;
-    extname: string;
-    default: string;
-    clients: CodeSnippetClient[];
+    public key: string;
+    public title: string;
+    public extname: string;
+    public default: string;
+    public clients: CodeSnippetClient[];
 }
