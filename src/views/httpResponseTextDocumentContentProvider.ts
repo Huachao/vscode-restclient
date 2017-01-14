@@ -45,6 +45,7 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             <body>
                 <div>
                     ${innerHtml}
+                    <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="scroll(0,0)"><span class="icon"></span></a>
                 </div>
             </body>`;
         }

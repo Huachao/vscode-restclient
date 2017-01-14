@@ -24,6 +24,7 @@ export class CodeSnippetTextDocumentContentProvider extends BaseTextDocumentCont
             <body>
                 <div>
                     <pre><code>${codeHighlightLinenums(this.convertResult, { hljs: hljs, lang: this.getHighlightJsLanguageAlias(), start: 1 })}</code></pre>
+                    <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="scroll(0,0)"><span class="icon"></span></a>
                 </div>
             </body>`;
         }
