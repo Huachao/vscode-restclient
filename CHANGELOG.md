@@ -1,3 +1,8 @@
+## 0.12.0 (2016/1/15)
+* __Feature__: [Support custom environments and variables](https://github.com/Huachao/vscode-restclient/issues/56)
+* __Bug Fix__: [Fix line numbers overlap when response length > 99 lines long](https://github.com/Huachao/vscode-restclient/issues/58)
+* __Improvement__: Add scroll to top icon in response and code generation view
+
 ## 0.11.4 (2017/1/4)
 * __Bug Fix__: Fix extension publish issue
 

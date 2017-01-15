@@ -200,14 +200,14 @@ Environments and variables of `REST Client Extension` are defined in setting fil
         }
     }
 ```
-A sample usage in `http` for above custom variables is listed below:
+A sample usage in `http` file for above custom variables is listed below:
 ```http
 GET https://{{host}}/api/comments/1 HTTP/1.1
 Authorization: {{token}}
 ```
 
 ### Custom Variables
-Custom variables belong to the environment scope. Each environment is a set of key value pairs defined in setting file, key is the variable name, while value is variable value. Only custom variables in selected environment are available to you. Current active environment name is displayed in the right bottom of `Visual Studio Code`, when you click it, you can switch environment, current active environment's name will be marked with a check sign in the end. And you can also switch environment using shortcut `Ctrl+Alt+E`(`Cmd+Alt+E` for macOS), or press `F1` and then select/type `Rest Client: Switch Environment`. When you write custom variables in `http` file, auto completion will be available to you, so when you have a variable named `host`, you don't need to type the full word `{{host}}` by yourself, simply type `host` or even less characters, it will prompt you the `host` variable as well as its actual value. After you select it, the value will be autocompleted with `{{host}}`. And if you hover on it, its value will also be displayed.
+Custom variables belong to the environment scope. Each environment is a set of key value pairs defined in setting file, key is the variable name, while value is variable value. Only custom variables in selected environment are available to you. Current active environment name is displayed in the right bottom of `Visual Studio Code`, when you click it, you can switch environment, current active environment's name will be marked with a check sign in the end. And you can also switch environment using shortcut `Ctrl+Alt+E`(`Cmd+Alt+E` for macOS), or press `F1` and then select/type `Rest Client: Switch Environment`. When you write custom variables in `http` file, auto completion will be available to you, so if you have a variable named `host`, you don't need to type the full word `{{host}}` by yourself, simply type `host` or even less characters, it will prompt you the `host` variable as well as its actual value. After you select it, the value will be autocompleted with `{{host}}`. And if you hover on it, its value will also be displayed.
 
 ### Global Variables
 Global variables provide a pre-defined set of variables that can be used in every part of the request(Url/Headers/Body) in the format `{{variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
