@@ -194,7 +194,7 @@ Environments and variables of `REST Client Extension` are defined in setting fil
             "host": "localhost",
             "token": "test token"
         },
-        "production":
+        "production": {
             "host": "example.com",
             "token": "product token"
         }
