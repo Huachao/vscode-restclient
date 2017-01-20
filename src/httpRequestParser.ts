@@ -107,7 +107,12 @@ export class HttpRequestParser implements IRequestParser {
             url = words[0];
         } else {
             // Provides both request method and url
-            [method, url] = words;
+            method = words.shift();
+            if (words[words.length - 1].match(/HTTP\/.*/gi)) {
+                words.pop();
+            }
+
+            url = words.join(' ');
         }
 
         return {
