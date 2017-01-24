@@ -21,6 +21,6 @@ export class HARPostData {
 }
 
 export class HARHttpRequest {
-    public constructor(public method: string, public url: string, public headers: HARHeader[], public cookies: HARCookie[], public body: HARPostData) {
+    public constructor(public method: string, public url: string, public headers: HARHeader[], public cookies: HARCookie[], public postData: HARPostData) {
     }
 }
