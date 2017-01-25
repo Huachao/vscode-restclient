@@ -1,3 +1,7 @@
+## 0.12.1 (2017/1/25)
+* __Bug Fix__: [Parse url incorrectly when contains space](https://github.com/Huachao/vscode-restclient/issues/63)
+* __Bug Fix__: [Post and Put data not added to the request in code generation](https://github.com/Huachao/vscode-restclient/issues/64)
+
 ## 0.12.0 (2017/1/15)
 * __Feature__: [Support custom environments and variables](https://github.com/Huachao/vscode-restclient/issues/56)
 * __Bug Fix__: [Fix line numbers overlap when response length > 99 lines long](https://github.com/Huachao/vscode-restclient/issues/58)
