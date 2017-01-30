@@ -4,6 +4,7 @@ import { HttpRequest } from './models/httpRequest';
 import { IRequestParser } from './models/IRequestParser';
 import { RequestParserUtil } from './requestParserUtil';
 import { HttpClient } from './httpClient';
+import { MimeUtility } from './mimeUtility';
 import { EOL } from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -58,8 +59,9 @@ export class HttpRequestParser implements IRequestParser {
                 // get body range
                 let bodyStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
                 if (bodyStartLine !== -1) {
+                    let contentTypeHeader = HttpRequestParser.getContentTypeHeader(headers);
                     firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
-                    let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
+                    let bodyEndLine = MimeUtility.isMultiPartFormData(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                     bodyLineCount = bodyEndLine - bodyStartLine;
                     body = lines.slice(bodyStartLine, bodyEndLine).join(EOL);
                 }
@@ -119,6 +121,18 @@ export class HttpRequestParser implements IRequestParser {
             method: method,
             url: url
         };
+    }
+
+    private static getContentTypeHeader(headers: { [key: string]: string }) {
+        if (headers) {
+            for (var header in headers) {
+                if (header.toLowerCase() === 'content-type') {
+                    return headers[header];
+                }
+            }
+        }
+
+        return null;
     }
 
     private static skipWhile<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean): T[] {

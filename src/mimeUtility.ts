@@ -30,4 +30,13 @@ export class MimeUtility {
         let type = MimeUtility.parse(contentTypeString).type;
         return type === 'image/jpeg' || type === 'image/gif' || type === 'image/webp' || type === 'image/png' || type === 'image/bmp';
     }
+
+    public static isMultiPartFormData(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        let type = MimeUtility.parse(contentTypeString).type;
+        return type.toLowerCase() === 'multipart/form-data';
+    }
 }
