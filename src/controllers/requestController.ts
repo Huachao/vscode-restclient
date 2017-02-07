@@ -196,9 +196,8 @@ export class RequestController {
     }
 
     private onDidCloseTextDocument(doc: TextDocument): void {
-        // Remove the status bar associated with the document
+        // Remove the status bar associated with the response preview uri
         ResponseStore.remove(doc.uri.toString());
-        console.log(doc.uri.toString());
         if (ResponseStore.size === 0) {
             this._durationStatusBarItem.hide();
             this._sizeStatusBarItem.hide();
