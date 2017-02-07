@@ -1,6 +1,6 @@
 "use strict";
 
-import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable } from 'vscode';
+import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument } from 'vscode';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
 import { HttpRequest } from '../models/httpRequest';
@@ -41,6 +41,8 @@ export class RequestController {
 
         this._responseTextProvider = new HttpResponseTextDocumentContentProvider(null, this._restClientSettings);
         this._registration = workspace.registerTextDocumentContentProvider('rest-response', this._responseTextProvider);
+
+        workspace.onDidCloseTextDocument((params) => this.onDidCloseTextDocument(params));
     }
 
     public async run() {
@@ -191,5 +193,15 @@ export class RequestController {
     private clearSendProgressStatusText() {
         clearInterval(this._interval);
         this._sizeStatusBarItem.hide();
+    }
+
+    private onDidCloseTextDocument(doc: TextDocument): void {
+        // Remove the status bar associated with the document
+        ResponseStore.remove(doc.uri.toString());
+        console.log(doc.uri.toString());
+        if (ResponseStore.size === 0) {
+            this._durationStatusBarItem.hide();
+            this._sizeStatusBarItem.hide();
+        }
     }
 }
