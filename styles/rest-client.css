@@ -123,6 +123,16 @@ code .line:before {
   background-color: inherit;
 }
 
+a {
+  color: #4080D0;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #4080D0;
+  text-decoration: underline;
+}
+
 /* Copy from https://github.com/Microsoft/vscode-docs/blob/master/release-notes/css/inproduct_releasenotes.css */
 #scroll-to-top {
   position: fixed;

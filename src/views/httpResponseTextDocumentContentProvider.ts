@@ -12,6 +12,7 @@ const hljs = require('highlight.js');
 const codeHighlightLinenums = require('code-highlight-linenums');
 
 var pd = require('pretty-data').pd;
+var autoLinker = require('autolinker');
 
 export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentContentProvider {
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
@@ -44,7 +45,7 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             </head>
             <body>
                 <div>
-                    ${innerHtml}
+                    ${this.addUrlLinks(innerHtml)}
                     <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="scroll(0,0)"><span class="icon"></span></a>
                 </div>
             </body>`;
@@ -67,6 +68,20 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             `margin-left: calc(-${width}ch + -27px );`,
             '}',
             '</style>'].join('\n');
+    }
+
+    private addUrlLinks(innerHtml: string) {
+        return innerHtml = autoLinker.link(innerHtml, {
+                urls: {
+                    schemeMatches: true,
+                    wwwMatches: true,
+                    tldMatches: false
+                },
+                email: false,
+                phone: false,
+                stripPrefix: false,
+                stripTrailingSlash: false
+            });
     }
 
     private static formatHeaders(headers: { [key: string]: string }): string {
