@@ -1,3 +1,8 @@
+## 0.12.2 (2017/2/14)
+* __Feature__: Make link clickable in response body
+* __Bug Fix__: [Unable to send multipart/form-data](https://github.com/Huachao/vscode-restclient/issues/66)
+* __Bug Fix__: [Remove info in status bar when response views are closed](https://github.com/Huachao/vscode-restclient/issues/52)
+
 ## 0.12.1 (2017/1/25)
 * __Bug Fix__: [Parse url incorrectly when contains space](https://github.com/Huachao/vscode-restclient/issues/63)
 * __Bug Fix__: [Post and Put data not added to the request in code generation](https://github.com/Huachao/vscode-restclient/issues/64)
