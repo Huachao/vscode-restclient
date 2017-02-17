@@ -1,6 +1,6 @@
 "use strict";
 
-import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument } from 'vscode';
+import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument, Range } from 'vscode';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
 import { HttpRequest } from '../models/httpRequest';
@@ -45,7 +45,7 @@ export class RequestController {
         workspace.onDidCloseTextDocument((params) => this.onDidCloseTextDocument(params));
     }
 
-    public async run() {
+    public async run(range: Range) {
         Telemetry.sendEvent('Request');
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
@@ -53,7 +53,7 @@ export class RequestController {
         }
 
         // Get selected text of selected lines or full document
-        let selectedText = new Selector().getSelectedText(editor);
+        let selectedText = new Selector().getSelectedText(editor, range);
         if (!selectedText) {
             return;
         }
