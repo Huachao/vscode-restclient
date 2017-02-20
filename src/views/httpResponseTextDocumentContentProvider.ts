@@ -100,14 +100,18 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
 
     private static formatBody(body: string, contentType: string): string {
         if (contentType) {
-            let type = MimeUtility.parse(contentType).type;
+            let mime = MimeUtility.parse(contentType);
+            let type = mime.type;
+            let suffix = mime.suffix;
             if (type === 'application/json') {
                 if (HttpResponseTextDocumentContentProvider.isJsonString(body)) {
                     body = JSON.stringify(JSON.parse(body), null, 2);
                 } else {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                 }
-            } else if (type === 'application/xml' || type === 'text/xml') {
+            } else if (type === 'application/xml' ||
+                       type === 'text/xml' ||
+                       (type === 'application/atom' && suffix === '+xml')) {
                 body = pd.xml(body);
             } else if (type === 'text/css') {
                 body = pd.css(body);
