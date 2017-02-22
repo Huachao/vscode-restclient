@@ -19,7 +19,10 @@ export class HttpRequestParser implements IRequestParser {
         let lines: string[] = requestRawText.split(EOL);
 
         // skip leading empty lines
-        lines = HttpRequestParser.skipWhile(lines, value => value.trim() === '')
+        lines = HttpRequestParser.skipWhile(lines, value => value.trim() === '');
+
+        // skip trailing empty lines
+        lines = HttpRequestParser.skipWhile(lines.reverse(), value => value.trim() === '').reverse();
 
         if (lines.length === 0) {
             return null;
