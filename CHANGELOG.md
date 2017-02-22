@@ -1,3 +1,8 @@
+## 0.12.2 (2017/2/22)
+* __Improvement__: [Add link above the request to send request](https://github.com/Huachao/vscode-restclient/issues/44)
+* __Bug Fix__: [Fix regression bug of sending file with relative path](https://github.com/Huachao/vscode-restclient/issues/49)
+* __Bug Fix__: [Atom XML not formatted in response preview](https://github.com/Huachao/vscode-restclient/issues/71)
+
 ## 0.12.2 (2017/2/14)
 * __Feature__: Make link clickable in response body
 * __Bug Fix__: [Unable to send multipart/form-data](https://github.com/Huachao/vscode-restclient/issues/66)
