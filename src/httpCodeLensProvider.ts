@@ -38,7 +38,7 @@ export class HttpCodeLensProvider implements CodeLensProvider {
                 const range = new Range(blockStart, 0, blockEnd, 0);
                 const cmd: Command = {
                     arguments: [document, range],
-                    title: 'Run Request',
+                    title: 'Send Request',
                     command: 'rest-client.request'
                 };
                 blocks.push(new CodeLens(range, cmd));
