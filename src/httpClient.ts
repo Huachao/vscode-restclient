@@ -72,6 +72,7 @@ export class HttpClient {
                     encoding = "utf8";
                 }
 
+                let bodyStream = body;
                 let buffer = new Buffer(body);
                 try {
                     body = iconv.decode(buffer, encoding);
@@ -101,7 +102,8 @@ export class HttpClient {
                     body,
                     response.elapsedTime,
                     httpRequest.url,
-                    size));
+                    size,
+                    bodyStream));
             })
             .on('data', function (data) {
                 size += data.length;

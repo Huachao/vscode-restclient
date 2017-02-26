@@ -40,6 +40,7 @@
     "onCommand:rest-client.history",
     "onCommand:rest-client.clear-history",
     "onCommand:rest-client.save-response",
+    "onCommand:rest-client.save-response-body",
     "onCommand:rest-client.switch-environment",
     "onLanguage:http"
   ],
@@ -119,6 +120,15 @@
         "category": "Rest Client"
       },
       {
+        "command": "rest-client.save-response-body",
+        "title": "Save Response Body",
+        "icon": {
+          "light": "./images/save-body.svg",
+          "dark": "./images/save-body-inverse.svg"
+        },
+        "category": "Rest Client"
+      },
+      {
         "command": "rest-client.generate-codesnippet",
         "title": "Generate Code Snippet",
         "category": "Rest Client"
@@ -138,6 +148,11 @@
         {
           "when": "resourceScheme == rest-response",
           "command": "rest-client.save-response",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceScheme == rest-response",
+          "command": "rest-client.save-response-body",
           "group": "navigation"
         },
         {
@@ -314,6 +329,11 @@
               }
             ]
           }
+        },
+        "rest-client.mimeAndFileExtensionMapping": {
+          "type": "object",
+          "default": {},
+          "description": "Sets the custom mapping of mime type and file extension of saved response body (e.g., {\"application/atom+xml\": \"xml\"})"
         }
       }
     }
@@ -343,6 +363,7 @@
     "highlight.js": "^9.6.0",
     "httpsnippet": "^1.16.5",
     "iconv-lite": "^0.4.15",
+    "mime-types": "^2.1.14",
     "moment": "^2.15.1",
     "node-uuid": "^1.4.7",
     "pretty-data": "^0.40.0",

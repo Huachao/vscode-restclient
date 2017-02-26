@@ -8,7 +8,8 @@ export const ExtensionFolderName: string = '.rest-client';
 export const HistoryFileName: string = 'history.json';
 export const CookieFileName: string = 'cookie.json';
 export const EnvironmentFileName: string = 'environment.json';
-export const DefaultResponseDownloadFolderName: string = 'responses';
+export const DefaultResponseDownloadFolderName: string = 'responses/raw';
+export const DefaultResponseBodyDownloadFolerName: string = 'response/body';
 export const HistoryItemsMaxCount: number = 50;
 
 export const NoEnvironmentSelectedName: string = 'c0cfe680-4fcd-4b71-a4ba-8cfaee57680a';
