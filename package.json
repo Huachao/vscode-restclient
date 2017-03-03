@@ -24,7 +24,7 @@
     "url": "https://github.com/Huachao/vscode-restclient.git"
   },
   "engines": {
-    "vscode": "^0.10.10"
+    "vscode": "^1.8.0"
   },
   "categories": [
     "Other",

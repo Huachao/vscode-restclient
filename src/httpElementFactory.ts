@@ -1,5 +1,6 @@
 "use strict";
 
+import { SnippetString } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import { HttpElement, ElementType } from './models/httpElement';
 import { PersistUtility } from './persistUtility';
@@ -78,9 +79,14 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement("text/xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
 
         // add global variables
-        originalElements.push(new HttpElement(`{{${Constants.GuidVariableName}}}`, ElementType.GlobalVariable, null, Constants.GuidVariableDescription));
-        originalElements.push(new HttpElement(`{{${Constants.TimeStampVariableName}}}`, ElementType.GlobalVariable, null, Constants.TimeStampVariableDescription));
-        originalElements.push(new HttpElement(`{{${Constants.RandomInt}}}`, ElementType.GlobalVariable, null, Constants.RandomIntDescription));
+        originalElements.push(new HttpElement(Constants.GuidVariableName, ElementType.GlobalVariable, null, Constants.GuidVariableDescription, HttpElementFactory.escapeCompletionItemInsertText(`{{${Constants.GuidVariableName}}}`)));
+        originalElements.push(new HttpElement(Constants.TimeStampVariableName, ElementType.GlobalVariable, null, Constants.TimeStampVariableDescription, HttpElementFactory.escapeCompletionItemInsertText(`{{${Constants.TimeStampVariableName}}}`)));
+        originalElements.push(new HttpElement(
+            Constants.RandomInt,
+            ElementType.GlobalVariable,
+            null,
+            Constants.RandomIntDescription,
+            new SnippetString(`{{${Constants.RandomInt} \${1:min} \${2:max}}}`)));
 
         // add custom variables
         let customVariables = await EnvironmentController.getCustomVariables();
@@ -118,5 +124,9 @@ export class HttpElementFactory {
         }
 
         return elements;
+    }
+
+    private static escapeCompletionItemInsertText(str: string): string {
+        return str.replace(/[\{\}]/g, "\\$&");
     }
 }
