@@ -1,6 +1,5 @@
 'use strict';
 
-import { SnippetString } from 'vscode';
 import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind } from 'vscode';
 import { HttpElementFactory } from './httpElementFactory';
 import { ElementType } from './models/httpElement';

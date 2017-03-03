@@ -79,8 +79,8 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement("text/xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
 
         // add global variables
-        originalElements.push(new HttpElement(Constants.GuidVariableName, ElementType.SystemVariable, null, Constants.GuidVariableDescription, HttpElementFactory.escapeCompletionItemInsertText(`{{${Constants.GuidVariableName}}}`)));
-        originalElements.push(new HttpElement(Constants.TimeStampVariableName, ElementType.SystemVariable, null, Constants.TimeStampVariableDescription, HttpElementFactory.escapeCompletionItemInsertText(`{{${Constants.TimeStampVariableName}}}`)));
+        originalElements.push(new HttpElement(Constants.GuidVariableName, ElementType.SystemVariable, null, Constants.GuidVariableDescription, `{{${Constants.GuidVariableName}}}`));
+        originalElements.push(new HttpElement(Constants.TimeStampVariableName, ElementType.SystemVariable, null, Constants.TimeStampVariableDescription, `{{${Constants.TimeStampVariableName}}}`));
         originalElements.push(new HttpElement(
             Constants.RandomInt,
             ElementType.SystemVariable,
@@ -91,7 +91,7 @@ export class HttpElementFactory {
         // add custom variables
         let customVariables = await EnvironmentController.getCustomVariables();
         for (var variableName in customVariables) {
-            originalElements.push(new HttpElement(`{{${variableName}}}`, ElementType.CustomVariable, null, `Value: ${customVariables[variableName]}`));
+            originalElements.push(new HttpElement(variableName, ElementType.CustomVariable, null, `Value: ${customVariables[variableName]}`, `{{${variableName}}}`));
         }
 
         // add urls from history
@@ -124,9 +124,5 @@ export class HttpElementFactory {
         }
 
         return elements;
-    }
-
-    private static escapeCompletionItemInsertText(str: string): string {
-        return str.replace(/[\{\}]/g, "\\$&");
     }
 }
