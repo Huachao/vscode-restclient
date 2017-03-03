@@ -111,8 +111,11 @@ export class PersistUtility {
                 } else {
                     let fileContent = data.toString();
                     if (fileContent) {
-                        resolve(JSON.parse(fileContent));
-                        return;
+                        try {
+                            resolve(JSON.parse(fileContent));
+                            return;
+                        } catch (error) {
+                        }
                     }
                 }
                 resolve(PersistUtility.emptyHttpRequestItems);
