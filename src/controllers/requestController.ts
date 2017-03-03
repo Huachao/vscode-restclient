@@ -126,8 +126,8 @@ export class RequestController {
             this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
             this._durationStatusBarItem.tooltip = 'Duration';
 
-            this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes)}`;
-            this._sizeStatusBarItem.tooltip = 'Body Size';
+            this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
+            this._sizeStatusBarItem.tooltip = `Response Size:${EOL}Headers: ${filesize(response.headersSizeInBytes)}${EOL}Body: ${filesize(response.bodySizeInBytes)}`;
             this._sizeStatusBarItem.show();
 
             this._responseTextProvider.response = response;

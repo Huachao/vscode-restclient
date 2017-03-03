@@ -10,6 +10,7 @@ export class HttpResponse {
         public elapsedMillionSeconds: number,
         public requestUrl: string,
         public bodySizeInBytes: number,
+        public headersSizeInBytes: number,
         public bodyStream: Buffer) {
     }
 

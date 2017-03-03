@@ -48,7 +48,7 @@ export class HttpClient {
         }
 
         let size = 0;
-
+        let headersSize = 0;
         return new Promise<HttpResponse>((resolve, reject) => {
             request(options, function (error, response, body) {
                 if (error) {
@@ -103,10 +103,20 @@ export class HttpClient {
                     response.elapsedTime,
                     httpRequest.url,
                     size,
+                    headersSize,
                     bodyStream));
             })
             .on('data', function (data) {
                 size += data.length;
+            })
+            .on('response', function (response) {
+                if (response.rawHeaders) {
+                    headersSize += response.rawHeaders.map(h => h.length).reduce((a, b) => a + b, 0);
+                }
+
+                if (response.headers) {
+                    headersSize += Object.keys(response.headers).length;
+                }
             })
         });
     }
