@@ -79,11 +79,11 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement("text/xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
 
         // add global variables
-        originalElements.push(new HttpElement(Constants.GuidVariableName, ElementType.GlobalVariable, null, Constants.GuidVariableDescription, HttpElementFactory.escapeCompletionItemInsertText(`{{${Constants.GuidVariableName}}}`)));
-        originalElements.push(new HttpElement(Constants.TimeStampVariableName, ElementType.GlobalVariable, null, Constants.TimeStampVariableDescription, HttpElementFactory.escapeCompletionItemInsertText(`{{${Constants.TimeStampVariableName}}}`)));
+        originalElements.push(new HttpElement(Constants.GuidVariableName, ElementType.SystemVariable, null, Constants.GuidVariableDescription, HttpElementFactory.escapeCompletionItemInsertText(`{{${Constants.GuidVariableName}}}`)));
+        originalElements.push(new HttpElement(Constants.TimeStampVariableName, ElementType.SystemVariable, null, Constants.TimeStampVariableDescription, HttpElementFactory.escapeCompletionItemInsertText(`{{${Constants.TimeStampVariableName}}}`)));
         originalElements.push(new HttpElement(
             Constants.RandomInt,
-            ElementType.GlobalVariable,
+            ElementType.SystemVariable,
             null,
             Constants.RandomIntDescription,
             new SnippetString(`{{${Constants.RandomInt} \${1:min} \${2:max}}}`)));
@@ -118,7 +118,7 @@ export class HttpElementFactory {
             elements = originalElements.filter(e => !e.prefix);
         } else {
             // add global/custom variables anyway
-            originalElements.filter(e => !e.prefix && (e.type === ElementType.GlobalVariable || e.type === ElementType.CustomVariable)).forEach(element => {
+            originalElements.filter(e => !e.prefix && (e.type === ElementType.SystemVariable || e.type === ElementType.CustomVariable)).forEach(element => {
                 elements.push(element);
             });
         }

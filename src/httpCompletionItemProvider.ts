@@ -23,7 +23,7 @@ export class HttpCompletionItemProvider implements CompletionItemProvider {
                         : `${e.name}`);
             }
             item.insertText = insertText;
-            item.kind = e.type === ElementType.GlobalVariable
+            item.kind = e.type === ElementType.SystemVariable
                 ? CompletionItemKind.Variable
                 : e.type === ElementType.Method
                     ? CompletionItemKind.Method
