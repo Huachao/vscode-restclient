@@ -116,7 +116,7 @@ export class HttpClient {
                 }
 
                 if (response.headers) {
-                    headersSize += Object.keys(response.headers).length;
+                    headersSize += (response.rawHeaders.length) / 2;
                 }
             })
         });
