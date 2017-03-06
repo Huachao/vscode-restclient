@@ -113,9 +113,6 @@ export class HttpClient {
             .on('response', function (response) {
                 if (response.rawHeaders) {
                     headersSize += response.rawHeaders.map(h => h.length).reduce((a, b) => a + b, 0);
-                }
-
-                if (response.headers) {
                     headersSize += (response.rawHeaders.length) / 2;
                 }
             })
