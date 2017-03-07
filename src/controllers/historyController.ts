@@ -2,7 +2,7 @@
 
 import { window, workspace, OutputChannel } from 'vscode';
 import { PersistUtility } from '../persistUtility';
-import { HttpRequest } from '../models/httpRequest';
+import { SerializedHttpRequest } from '../models/httpRequest';
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { Telemetry } from '../telemetry';
 import { EOL } from 'os';
@@ -30,7 +30,7 @@ export class HistoryController {
                 // TODO: add headers and body in pick item?
                 let item = new HistoryQuickPickItem();
                 item.label = `${request.method.toUpperCase()} ${request.url}`;
-                if (request.body && request.body.length > 0) {
+                if (request.body && typeof request.body === 'string' && request.body.length > 0) {
                     item.description = `${request.body.length} body bytes`;
                 }
                 if (request.startTime) {
@@ -69,7 +69,7 @@ export class HistoryController {
         }
     }
 
-    private async createRequestInTempFile(request: HttpRequest): Promise<string> {
+    private async createRequestInTempFile(request: SerializedHttpRequest): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             tmp.file({ prefix: 'vscode-restclient-', postfix: ".http" }, function _tempFileCreated(err, tmpFilePath, fd) {
                 if (err) {

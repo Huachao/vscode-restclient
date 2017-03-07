@@ -63,6 +63,7 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement("application/xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
         originalElements.push(new HttpElement("application/javascript", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
         originalElements.push(new HttpElement("application/xhtml+xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
+        originalElements.push(new HttpElement("application/octet-stream", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
         originalElements.push(new HttpElement("application/soap+xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
         originalElements.push(new HttpElement("application/zip", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
         originalElements.push(new HttpElement("application/gzip", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));

@@ -1,5 +1,6 @@
 "use strict";
 
+import { workspace } from 'vscode';
 import { HttpRequest } from './models/httpRequest';
 import { IRequestParser } from './models/IRequestParser';
 import { RequestParserUtil } from './requestParserUtil';
@@ -8,6 +9,9 @@ import { MimeUtility } from './mimeUtility';
 import { EOL } from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Stream } from 'stream';
+
+var CombinedStream = require('combined-stream');
 
 export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
@@ -33,8 +37,8 @@ export class HttpRequestParser implements IRequestParser {
 
         // get headers range
         let headers: { [key: string]: string };
-        let body: string;
-        let bodyLineCount: number = 0;
+        let body: string | Stream;
+        let bodyLines: string[] = [];
         let headerStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', 1);
         if (headerStartLine !== -1) {
             if (headerStartLine === 1) {
@@ -65,15 +69,13 @@ export class HttpRequestParser implements IRequestParser {
                     let contentTypeHeader = HttpRequestParser.getContentTypeHeader(headers);
                     firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
                     let bodyEndLine = MimeUtility.isMultiPartFormData(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
-                    bodyLineCount = bodyEndLine - bodyStartLine;
-                    body = lines.slice(bodyStartLine, bodyEndLine).join(EOL);
+                    bodyLines = lines.slice(bodyStartLine, bodyEndLine);
                 }
             } else {
                 // parse body, since no headers provided
                 let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
                 let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
-                bodyLineCount = bodyEndLine - headerStartLine;
-                body = lines.slice(headerStartLine, bodyEndLine).join(EOL);
+                bodyLines = lines.slice(headerStartLine, bodyEndLine);
             }
         }
 
@@ -83,21 +85,10 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // parse body
-        if (bodyLineCount === 1 && HttpRequestParser.uploadFromFileSyntax.test(body)) {
-            let groups = HttpRequestParser.uploadFromFileSyntax.exec(body);
-            if (groups !== null && groups.length === 2) {
-                let fileUploadPath = groups[1];
-                if (!path.isAbsolute(fileUploadPath) && requestAbsoluteFilePath) {
-                    // get path relative to this http file
-                    fileUploadPath = path.join(path.dirname(requestAbsoluteFilePath), fileUploadPath);
-                }
-                if (fs.existsSync(fileUploadPath)) {
-                    body = fs.readFileSync(fileUploadPath).toString();
-                }
-            }
-        }
+        let contentTypeHeader = HttpRequestParser.getContentTypeHeader(headers);
+        body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
 
-        return new HttpRequest(requestLine.method, requestLine.url, headers, body);
+        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL));
     }
 
     private static parseRequestLine(line: string): { method: string, url: string } {
@@ -124,6 +115,64 @@ export class HttpRequestParser implements IRequestParser {
             method: method,
             url: url
         };
+    }
+
+    private static parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string): string | Stream {
+        if (!lines || lines.length === 0) {
+            return <string>null;
+        }
+
+        // Check if needed to upload file
+        if (lines.every(line => !HttpRequestParser.uploadFromFileSyntax.test(line))) {
+            return lines.join(EOL);
+        } else {
+            var combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
+            lines.forEach(line => {
+                if (HttpRequestParser.uploadFromFileSyntax.test(line)) {
+                    let groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
+                    if (groups !== null && groups.length === 2) {
+                        let fileUploadPath = groups[1];
+                        var fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
+                        if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
+                            combinedStream.append(fs.createReadStream(fileAbsolutePath));
+                        } else {
+                            combinedStream.append(line);
+                        }
+                    }
+                } else {
+                    combinedStream.append(line);
+                }
+
+                combinedStream.append(HttpRequestParser.getLineEnding(contentTypeHeader));
+            });
+
+            return combinedStream;
+        }
+    }
+
+    private static getLineEnding(contentTypeHeader: string) {
+        return MimeUtility.isMultiPartFormData(contentTypeHeader) ? '\r\n' : EOL;
+    }
+
+    private static resolveFilePath(refPath: string, httpFilePath: string): string {
+        if (path.isAbsolute(refPath)) {
+            return fs.existsSync(refPath) ? refPath : null;
+        }
+
+        var rootPath = workspace.rootPath;
+        if (rootPath) {
+            var absolutePath = path.join(rootPath, refPath);
+            if (fs.existsSync(absolutePath)) {
+                return absolutePath;
+            }
+        }
+
+        absolutePath = path.join(path.dirname(httpFilePath), refPath);
+        if (fs.existsSync(absolutePath)) {
+            return absolutePath;
+        }
+
+        return null;
     }
 
     private static getContentTypeHeader(headers: { [key: string]: string }) {

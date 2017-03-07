@@ -40,7 +40,7 @@ export class CurlRequestParser implements IRequestParser {
             method = body ? "POST" : "GET";
         }
 
-        return new HttpRequest(method, url, headers, body);
+        return new HttpRequest(method, url, headers, body, body);
     }
 
     private static mergeIntoSingleLine(text: string): string {

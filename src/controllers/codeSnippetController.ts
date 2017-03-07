@@ -155,7 +155,11 @@ export class CodeSnippetController {
             if (contentTypeHeader) {
                 mimeType = contentTypeHeader.value;
             }
-            body = new HARPostData(mimeType, request.body);
+            if (typeof request.body === 'string') {
+                body = new HARPostData(mimeType, request.body);
+            } else {
+                body = new HARPostData(mimeType, request.rawBody);
+            }
         }
 
         return new HARHttpRequest(request.method, request.url, headers, cookies, body);

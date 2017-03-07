@@ -142,8 +142,7 @@ export class RequestController {
             }
 
             // persist to history json file
-            let serializedRequest = <SerializedHttpRequest>httpRequest;
-            serializedRequest.startTime = Date.now();
+            let serializedRequest = SerializedHttpRequest.convertFromHttpRequest(httpRequest);
             await PersistUtility.saveRequest(serializedRequest);
         } catch (error) {
             // check cancel
