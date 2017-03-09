@@ -15,6 +15,7 @@ export interface IRestClientSettings {
     fontWeight: string;
     environmentVariables: Map<string, Map<string, string>>;
     mimeAndFileExtensionMapping: Map<string, string>;
+    previewResponseInUntitledDocument: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -32,6 +33,7 @@ export class RestClientSettings implements IRestClientSettings {
     public fontWeight: string;
     public environmentVariables: Map<string, Map<string, string>>;
     public mimeAndFileExtensionMapping: Map<string, string>;
+    public previewResponseInUntitledDocument: boolean;
 
     public constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -58,6 +60,8 @@ export class RestClientSettings implements IRestClientSettings {
 
         this.environmentVariables = restClientSettings.get<Map<string, Map<string, string>>>("environmentVariables", new Map<string, Map<string, string>>());
         this.mimeAndFileExtensionMapping = restClientSettings.get<Map<string, string>>("mimeAndFileExtensionMapping", new Map<string, string>());
+
+        this.previewResponseInUntitledDocument = restClientSettings.get<boolean>("previewResponseInUntitledDocument", false);
 
         let httpSettings = workspace.getConfiguration('http');
         this.proxy = httpSettings.get<string>('proxy', undefined);

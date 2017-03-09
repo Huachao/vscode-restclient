@@ -5,6 +5,8 @@ import { Selector } from './selector';
 import * as Constants from './constants';
 
 export class HttpCodeLensProvider implements CodeLensProvider {
+    public static responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
+
     public provideCodeLenses(document: TextDocument, token: CancellationToken): Thenable<CodeLens[]> {
         let blocks: CodeLens[] = [];
         let lines: string[] = document.getText().split(/\r?\n/g);
@@ -34,6 +36,10 @@ export class HttpCodeLensProvider implements CodeLensProvider {
                 }
             }
 
+            if (this.isResponseStatusLine(lines[blockStart])) {
+                continue;
+            }
+
             if (blockStart <= blockEnd) {
                 const range = new Range(blockStart, 0, blockEnd, 0);
                 const cmd: Command = {
@@ -54,5 +60,9 @@ export class HttpCodeLensProvider implements CodeLensProvider {
 
     private isEmptyLine(line: string): boolean {
         return line.trim() === '';
+    }
+
+    private isResponseStatusLine(line: string): boolean {
+        return HttpCodeLensProvider.responseStatusLineRegex.test(line);
     }
 }

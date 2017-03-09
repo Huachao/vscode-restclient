@@ -24,7 +24,7 @@
     "url": "https://github.com/Huachao/vscode-restclient.git"
   },
   "engines": {
-    "vscode": "^1.8.0"
+    "vscode": "^1.9.0"
   },
   "categories": [
     "Other",
@@ -334,6 +334,11 @@
           "type": "object",
           "default": {},
           "description": "Sets the custom mapping of mime type and file extension of saved response body (e.g., {\"application/atom+xml\": \"xml\"})"
+        },
+        "rest-client.previewResponseInUntitledDocument": {
+          "type": "boolean",
+          "default": false,
+          "description": "Preview response in untitle document if set to true, otherwise displayed in html view"
         }
       }
     }

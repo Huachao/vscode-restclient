@@ -1,6 +1,6 @@
 "use strict";
 
-import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument, Range } from 'vscode';
+import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument, Range, Position } from 'vscode';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
 import { HttpRequest } from '../models/httpRequest';
@@ -8,6 +8,7 @@ import { SerializedHttpRequest } from '../models/httpRequest';
 import { RestClientSettings } from '../models/configurationSettings';
 import { PersistUtility } from '../persistUtility';
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
+import { UntitledFileContentProvider } from '../views/responseUntitledFileContentProvider';
 import { Telemetry } from '../telemetry';
 import { VariableProcessor } from '../variableProcessor';
 import { RequestStore } from '../requestStore';
@@ -136,7 +137,14 @@ export class RequestController {
             let previewUri = this.generatePreviewUri();
             ResponseStore.add(previewUri.toString(), response);
             try {
-                await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`);
+                if (this._restClientSettings.previewResponseInUntitledDocument) {
+                    UntitledFileContentProvider.createHttpResponseUntitledFile(
+                        response,
+                        this._restClientSettings.showResponseInDifferentTab
+                    );
+                } else {
+                    await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`);
+                }
             } catch (reason) {
                 window.showErrorMessage(reason);
             }

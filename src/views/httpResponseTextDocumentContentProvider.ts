@@ -1,17 +1,17 @@
 "use strict";
 
-import { Uri, window, extensions } from 'vscode';
+import { Uri, extensions } from 'vscode';
 import { BaseTextDocumentContentProvider } from './baseTextDocumentContentProvider';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { MimeUtility } from '../mimeUtility';
+import { ResponseFormatUtility } from '../responseFormatUtility';
 import * as Constants from '../constants';
 import * as path from 'path';
 
 const hljs = require('highlight.js');
 const codeHighlightLinenums = require('code-highlight-linenums');
 
-var pd = require('pretty-data').pd;
 var autoLinker = require('autolinker');
 
 export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentContentProvider {
@@ -34,7 +34,7 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
             } else {
                 let code = `HTTP/${this.response.httpVersion} ${this.response.statusCode} ${this.response.statusMessage}
 ${HttpResponseTextDocumentContentProvider.formatHeaders(this.response.headers)}
-${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.response.getResponseHeaderValue("content-type"))}`;
+${ResponseFormatUtility.FormatBody(this.response.body, this.response.getResponseHeaderValue("content-type"))}`;
                 width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
                 innerHtml = `<pre><code class="http">${codeHighlightLinenums(code, { hljs: hljs, lang: 'http', start: 1 })}</code></pre>`;
             }
@@ -96,37 +96,5 @@ ${HttpResponseTextDocumentContentProvider.formatBody(this.response.body, this.re
             }
         }
         return headerString;
-    }
-
-    private static formatBody(body: string, contentType: string): string {
-        if (contentType) {
-            let mime = MimeUtility.parse(contentType);
-            let type = mime.type;
-            let suffix = mime.suffix;
-            if (type === 'application/json') {
-                if (HttpResponseTextDocumentContentProvider.isJsonString(body)) {
-                    body = JSON.stringify(JSON.parse(body), null, 2);
-                } else {
-                    window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
-                }
-            } else if (type === 'application/xml' ||
-                       type === 'text/xml' ||
-                       (type === 'application/atom' && suffix === '+xml')) {
-                body = pd.xml(body);
-            } else if (type === 'text/css') {
-                body = pd.css(body);
-            }
-        }
-
-        return body;
-    }
-
-    private static isJsonString(data: string) {
-        try {
-            JSON.parse(data);
-            return true;
-        } catch (e) {
-            return false;
-        }
     }
 }
