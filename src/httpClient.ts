@@ -3,6 +3,7 @@
 import { RestClientSettings } from './models/configurationSettings';
 import { HttpRequest } from './models/httpRequest';
 import { HttpResponse } from './models/httpResponse';
+import { HttpResponseTimingPhases } from './models/httpResponseTimingPhases';
 import { PersistUtility } from './persistUtility';
 import { MimeUtility } from './mimeUtility';
 import * as url from 'url';
@@ -105,7 +106,15 @@ export class HttpClient {
                     httpRequest.url,
                     size,
                     headersSize,
-                    bodyStream));
+                    bodyStream,
+                    new HttpResponseTimingPhases(
+                        response.timingPhases.total,
+                        response.timingPhases.wait,
+                        response.timingPhases.dns,
+                        response.timingPhases.tcp,
+                        response.timingPhases.firstByte,
+                        response.timingPhases.download
+                    )));
             })
             .on('data', function (data) {
                 size += data.length;

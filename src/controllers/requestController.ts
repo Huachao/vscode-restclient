@@ -4,6 +4,7 @@ import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, Vi
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
 import { HttpRequest } from '../models/httpRequest';
+import { HttpResponse } from '../models/httpResponse';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { RestClientSettings } from '../models/configurationSettings';
 import { PersistUtility } from '../persistUtility';
@@ -123,12 +124,9 @@ export class RequestController {
             }
 
             this.clearSendProgressStatusText();
-            this._durationStatusBarItem.command = null;
-            this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
-            this._durationStatusBarItem.tooltip = 'Duration';
+            this.formatDurationStatusBar(response);
 
-            this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
-            this._sizeStatusBarItem.tooltip = `Response Size:${EOL}Headers: ${filesize(response.headersSizeInBytes)}${EOL}Body: ${filesize(response.bodySizeInBytes)}`;
+            this.formatSizeStatusBar(response);
             this._sizeStatusBarItem.show();
 
             this._responseTextProvider.response = response;
@@ -209,5 +207,24 @@ export class RequestController {
             this._durationStatusBarItem.hide();
             this._sizeStatusBarItem.hide();
         }
+    }
+
+    private formatDurationStatusBar(response: HttpResponse) {
+        this._durationStatusBarItem.command = null;
+        this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
+        // this._durationStatusBarItem.tooltip = `Duration:${EOL}Total: ${response`;
+        this._durationStatusBarItem.tooltip = [
+            'Duration:',
+            `Socket: ${response.timingPhases.wait.toFixed(1)}ms`,
+            `DNS: ${response.timingPhases.dns.toFixed(1)}ms`,
+            `TCP: ${response.timingPhases.tcp.toFixed(1)}ms`,
+            `FirstByte: ${response.timingPhases.firstByte.toFixed(1)}ms`,
+            `Download: ${response.timingPhases.download.toFixed(1)}ms`
+        ].join(EOL);
+    }
+
+    private formatSizeStatusBar(response: HttpResponse) {
+        this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
+        this._sizeStatusBarItem.tooltip = `Response Size:${EOL}Headers: ${filesize(response.headersSizeInBytes)}${EOL}Body: ${filesize(response.bodySizeInBytes)}`;
     }
 }

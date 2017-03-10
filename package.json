@@ -373,7 +373,7 @@
     "moment": "^2.15.1",
     "node-uuid": "^1.4.7",
     "pretty-data": "^0.40.0",
-    "request": "^2.74.0",
+    "request": "^2.81.0",
     "tmp": "^0.0.31",
     "tough-cookie-file-store": "^1.1.1",
     "yargs": "^6.0.0"

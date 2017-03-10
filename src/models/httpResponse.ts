@@ -1,5 +1,7 @@
 "use strict";
 
+import { HttpResponseTimingPhases } from './httpResponseTimingPhases';
+
 export class HttpResponse {
     public constructor(
         public statusCode: number,
@@ -11,7 +13,8 @@ export class HttpResponse {
         public requestUrl: string,
         public bodySizeInBytes: number,
         public headersSizeInBytes: number,
-        public bodyStream: Buffer) {
+        public bodyStream: Buffer,
+        public timingPhases: HttpResponseTimingPhases) {
     }
 
     public getResponseHeaderValue(name: string) {
