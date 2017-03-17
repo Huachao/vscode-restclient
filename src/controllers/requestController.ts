@@ -202,6 +202,10 @@ export class RequestController {
 
     private onDidCloseTextDocument(doc: TextDocument): void {
         // Remove the status bar associated with the response preview uri
+        if (this._restClientSettings.showResponseInDifferentTab) {
+            return;
+        }
+
         ResponseStore.remove(doc.uri.toString());
         if (ResponseStore.size === 0) {
             this._durationStatusBarItem.hide();
