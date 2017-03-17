@@ -30,7 +30,7 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
                 contentType = contentType.trim();
             }
             if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType)) {
-                innerHtml = `<img src="${this.response.requestUrl}">`;
+                innerHtml = `<img src="data:${contentType};base64,${new Buffer(this.response.bodyStream).toString('base64')}">`;
             } else {
                 let code = `HTTP/${this.response.httpVersion} ${this.response.statusCode} ${this.response.statusMessage}
 ${HttpResponseTextDocumentContentProvider.formatHeaders(this.response.headers)}
