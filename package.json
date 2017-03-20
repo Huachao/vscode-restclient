@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.12.3",
+  "version": "0.13.0",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -338,7 +338,7 @@
         "rest-client.previewResponseInUntitledDocument": {
           "type": "boolean",
           "default": false,
-          "description": "Preview response in untitle document if set to true, otherwise displayed in html view"
+          "description": "Preview response in untitled document if set to true, otherwise displayed in html view"
         }
       }
     }

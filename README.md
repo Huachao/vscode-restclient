@@ -10,7 +10,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Auto save and view/clear request history
 * Support _MULTIPLE_ requests in the same file
 * View image response directly in pane
-* Save raw response to local disk
+* Save raw response and response body only to local disk
 * Customize font(size/family/weight) in response preview
 * Environments and custom/global system variables support
     - Use custom/global variables in any place of request(_URL_, _Headers_, _Body_)
@@ -45,7 +45,7 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, click the `Send Request` link above the request, or use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate panel of Visual Studio Code. When a request is issued, ![cloud upload](images/loading.gif) will be displayed in the status bar, after receiving the response, the icon will be changed to the duration and response size.
+Once you prepared a request, click the `Send Request` link above the request, or use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate __webview__ panel of Visual Studio Code. If you'd like to use the full power of searching, selecting or manipulating in Visual Studio Code, you can also preview response in __an untitled document__ by setting `rest-client.previewResponseInUntitledDocument` to `true`, by default the value is `false`. When a request is issued, ![cloud upload](images/loading.gif) will be displayed in the status bar, after receiving the response, the icon will be changed to the duration and response size. When hovering over the duration status bar, you could view the breakdown duration details of _Socket_, _DNS_, _TCP_, _First Byte_ and _Download_. When hovering over the response size status bar, you could view the breakdown response size details of _headers_ and _body_.
 
 > All the shortcuts in REST Client Extension are __ONLY__ available for file language mode `http` and `plaintext`.
 
@@ -125,20 +125,37 @@ Authorization: token xxx
 </request>
 ```
 
-You can also specify file path to use as a body, which starts with `< `, the file path can be either in absolute or relative(relative to current http file) formats:
+You can also specify file path to use as a body, which starts with `< `, the file path can be either in absolute or relative(relative to workspace root or current http file) formats:
 ```http
 POST https://example.com/comments HTTP/1.1
-content-type: application/xml
-authorization: token xxx
+Content-Type: application/xml
+Authorization: token xxx
 
 < C:\Users\Default\Desktop\demo.xml
 ```
 ```http
 POST https://example.com/comments HTTP/1.1
-content-type: application/xml
-authorization: token xxx
+Content-Type: application/xml
+Authorization: token xxx
 
 < ./demo.xml
+```
+
+When content type of request body is `multipart/form-data`, you may have the mixed format of the request body like following:
+```http
+POST https://api.example.com/user/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="text"
+
+title
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="1.png"
+Content-Type: image/png
+
+< ./1.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
 ```
 
 ### Cancel Request
@@ -160,6 +177,13 @@ You can also clear request history by pressing `F1` and then selecting/typing `R
 ## Save Response
 ![Save Response](images/response.gif)
 In the upper right corner of the response preview tab, we add a new icon to save the latest response to local file system. After you click the `Save Response` icon, it will prompt the window with the saved response file path. You can click the `Open` button to open the saved response file in current workspace, or click `Copy Path` to copy the saved response path to clipboard.
+
+Another icon in the upper right corner of the response preview tab is the `Save Response Body` button, it will only save the response body __ONLY__ to local file system. The saved file extension is set according to the response MIME type, like if the `Content-Type` value in response header is `application/json`, the saved file will be with extension `.json`. You can also overwrite the MIME type and extension mapping to your requirement with the `rest-client.mimeAndFileExtensionMapping` setting.
+```json
+"rest-client.mimeAndFileExtensionMapping": {
+    "application/atom+xml": "xml"
+}
+```
 
 ## Generate Code Snippet
 ![Generate Code Snippet](images/code-snippet.gif)
@@ -185,7 +209,7 @@ Currently auto completion will be enabled for following five categories:
 6. MIME Types for `Accept` and `Content-Type` headers
 
 ## Environments and Variables
-Environments give you the ability to customize requests using variables, and you can easily switch environment without chaning requests in `http` file. A common usage is having different configurations for different product environments, like devbox, sandbox and production.
+Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different product environments, like devbox, sandbox and production.
 
 Environments and variables of `REST Client Extension` are defined in setting file of `Visual Studio Code`, so you can create/update/delete environments and variables at any time you wish. The changes will take effect right away. If you __DO NOT__ want to use any environment, you can choose `No Environment` in the environments list. We also support two types of variables: __Global System Variables__ and __Environment Custom Variables__. You can use them in the same way: `{{VariableName}}`. Below is a sample piece of setting file for custom environments and variables:
 ```json
@@ -267,6 +291,8 @@ REST Client Extension adds the ability to control the font family, size and weig
 * `rest-client.fontFamily`: Controls the font family used in the response preview. (Default is __Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback"__)
 * `rest-client.fontWeight`: Controls the font weight used in the response preview. (Default is __normal__)
 * `rest-client.environmentVariables`: Sets the environments and custom variables belongs to it (e.g., `{"production": {"host": "api.example.com"}, "sandbox":{"host":"sandbox.api.example.com"}}`). (Default is __{}__)
+* `rest-client.mimeAndFileExtensionMapping`: Sets the custom mapping of mime type and file extension of saved response body. (Default is __{}__)
+* `rest-client.previewResponseInUntitledDocument`: Preview response in untitled document if set to true, otherwise displayed in html view. (Default is __false__)
 
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 

@@ -1,4 +1,15 @@
-## 0.12.2 (2017/2/22)
+## 0.13.0 (2017/3/20)
+* __Feature__: Allow preview response in untitled document directly to use the full power of VS Code to search, select or manipulate the response
+* __Feature__: Support saving response body to corresponding file according to response MIME type, and also provide setting `rest-client.mimeAndFileExtensionMapping` to overwrite the saved file extension
+* __Feature__: Display break down response timing details(_Socket_, _DNS_, _TCP_, _First Byte_ and _Download_) in tooltip of duration status bar
+* __Feature__: Display breakdown response size(_headers_ and _body_) in tooltip of size status bar
+* __Bug Fix__: [Fix auto completion not working sometimes](https://github.com/Huachao/vscode-restclient/issues/76)
+* __Bug Fix__: [Image display issue](https://github.com/Huachao/vscode-restclient/issues/80)
+* __Improvement__: [Full support multipart/form-data request](https://github.com/Huachao/vscode-restclient/issues/77)
+* __Improvement__: Update `Run Request` to `Send Request` in code lense text
+* __Improvement__: Make global variable `randomInt` as a snippet string when inserting
+
+## 0.12.3 (2017/2/22)
 * __Improvement__: [Add link above the request to send request](https://github.com/Huachao/vscode-restclient/issues/44)
 * __Bug Fix__: [Fix regression bug of sending file with relative path](https://github.com/Huachao/vscode-restclient/issues/49)
 * __Bug Fix__: [Atom XML not formatted in response preview](https://github.com/Huachao/vscode-restclient/issues/71)
