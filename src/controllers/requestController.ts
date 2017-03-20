@@ -138,7 +138,9 @@ export class RequestController {
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
                     UntitledFileContentProvider.createHttpResponseUntitledFile(
                         response,
-                        this._restClientSettings.showResponseInDifferentTab
+                        this._restClientSettings.showResponseInDifferentTab,
+                        this._restClientSettings.previewResponseSetUntitledDocumentLanguageByContentType,
+                        this._restClientSettings.includeAdditionalInfoInResponse
                     );
                 } else {
                     await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`);
