@@ -3,7 +3,6 @@
 import { Uri, extensions } from 'vscode';
 import { BaseTextDocumentContentProvider } from './baseTextDocumentContentProvider';
 import { RestClientSettings } from '../models/configurationSettings';
-import { HttpResponse } from '../models/httpResponse';
 import { MimeUtility } from '../mimeUtility';
 import { ResponseFormatUtility } from '../responseFormatUtility';
 import { ResponseStore } from '../responseStore';
