@@ -338,7 +338,17 @@
         "rest-client.previewResponseInUntitledDocument": {
           "type": "boolean",
           "default": false,
-          "description": "Preview response in untitled document if set to true, otherwise displayed in html view"
+          "description": "Preview response in untitle document if set to true, otherwise displayed in html view"
+        },
+        "rest-client.previewResponseSetUntitledDocumentLanguageByContentType": {
+          "type": "boolean",
+          "default": false,
+          "description": "Attempt to automatically set document language based on Content-Type header when showing each response in new tab"
+        },
+        "rest-client.includeAdditionalInfoInResponse": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include additional information such as request URL and response time when preview is set to use untitled document"
         }
       }
     }

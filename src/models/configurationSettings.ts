@@ -16,6 +16,9 @@ export interface IRestClientSettings {
     environmentVariables: Map<string, Map<string, string>>;
     mimeAndFileExtensionMapping: Map<string, string>;
     previewResponseInUntitledDocument: boolean;
+    previewResponseSetUntitledDocumentLanguageByContentType: boolean;
+    includeAdditionalInfoInResponse: boolean;
+
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -34,6 +37,8 @@ export class RestClientSettings implements IRestClientSettings {
     public environmentVariables: Map<string, Map<string, string>>;
     public mimeAndFileExtensionMapping: Map<string, string>;
     public previewResponseInUntitledDocument: boolean;
+    public previewResponseSetUntitledDocumentLanguageByContentType: boolean;
+    public includeAdditionalInfoInResponse: boolean;
 
     public constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -62,6 +67,8 @@ export class RestClientSettings implements IRestClientSettings {
         this.mimeAndFileExtensionMapping = restClientSettings.get<Map<string, string>>("mimeAndFileExtensionMapping", new Map<string, string>());
 
         this.previewResponseInUntitledDocument = restClientSettings.get<boolean>("previewResponseInUntitledDocument", false);
+        this.previewResponseSetUntitledDocumentLanguageByContentType = restClientSettings.get<boolean>("previewResponseSetUntitledDocumentLanguageByContentType", false);
+        this.includeAdditionalInfoInResponse = restClientSettings.get<boolean>("includeAdditionalInfoInResponse", false);
 
         let httpSettings = workspace.getConfiguration('http');
         this.proxy = httpSettings.get<string>('proxy', undefined);
