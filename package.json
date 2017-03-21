@@ -348,7 +348,7 @@
         "rest-client.includeAdditionalInfoInResponse": {
           "type": "boolean",
           "default": false,
-          "description": "Include additional information such as request URL and response time"
+          "description": "Include additional information such as request URL and response time when preview is set to use untitled document"
         }
       }
     }

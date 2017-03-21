@@ -106,7 +106,7 @@ export class UntitledFileContentProvider {
             html: '<!-- ',
             css: '/* '
         }
-        return commentStyle[language] ? commentStyle[language] + REST_RESPONSE: '';
+        return commentStyle[language] ? commentStyle[language] + REST_RESPONSE : '';
     }
 
     private static commentEnd(language: string) {
