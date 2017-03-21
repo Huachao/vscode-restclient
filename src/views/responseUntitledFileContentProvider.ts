@@ -23,7 +23,7 @@ export class UntitledFileContentProvider {
                     textEditor.edit(edit => {
                         // get previous response file Range
                         var startPosition = new Position(0, 0);
-                        var endPosition =  updateDocument.lineAt(updateDocument.lineCount - 1).range.end;
+                        var endPosition = updateDocument.lineAt(updateDocument.lineCount - 1).range.end;
                         edit.replace(new Range(startPosition, endPosition), UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage));
                     });
                 });
@@ -54,31 +54,31 @@ export class UntitledFileContentProvider {
     }
 
     private static formatResponse(response: HttpResponse, language: string, additionalInfo: boolean, autoSetLanguage: boolean) {
-        const {responseStatusLine, headers, body} = UntitledFileContentProvider.extractStandardResponseInformation(response);
+        const { responseStatusLine, headers, body } = UntitledFileContentProvider.extractStandardResponseInformation(response);
         let responseInformation;
-        if(additionalInfo) {
+        if (additionalInfo) {
             const formattedAdditionalInfo = UntitledFileContentProvider.formatAdditionalResponseInformation(response);
             responseInformation = `${responseStatusLine}${formattedAdditionalInfo}${headers}`;
         } else {
             responseInformation = `${responseStatusLine}${headers}`;
-        } 
+        }
 
-        return autoSetLanguage ? UntitledFileContentProvider.formatResponseForLanguage(responseInformation, body, language) : 
-                                 UntitledFileContentProvider.formatResponseDefault(responseInformation, body);
+        return autoSetLanguage ? UntitledFileContentProvider.formatResponseForLanguage(responseInformation, body, language) :
+            UntitledFileContentProvider.formatResponseDefault(responseInformation, body);
     }
 
-    private static formatResponseDefault(responseInformation:string, responseBody: string) {
+    private static formatResponseDefault(responseInformation: string, responseBody: string) {
         return `${responseInformation}${EOL}${responseBody}`;
     }
 
-    private static formatResponseForLanguage(responseInformation:string, responseBody: string, language: string) {
+    private static formatResponseForLanguage(responseInformation: string, responseBody: string, language: string) {
         let commentBegin = UntitledFileContentProvider.commentBegin(language);
-        let commentEnd   = UntitledFileContentProvider.commentEnd(language);
+        let commentEnd = UntitledFileContentProvider.commentEnd(language);
         return `${commentBegin}${EOL}${responseInformation}${commentEnd}${EOL}${responseBody}`;
     }
     private static formatAdditionalResponseInformation(response: HttpResponse) {
-        let requestURL   = `Request: ${response.requestUrl}${EOL}`;
-        let elapsedTime  = `Elapsed time: ${response.elapsedMillionSeconds}ms${EOL}`;
+        let requestURL = `Request: ${response.requestUrl}${EOL}`;
+        let elapsedTime = `Elapsed time: ${response.elapsedMillionSeconds}ms${EOL}`;
         return `${requestURL}${elapsedTime}`;
     }
 
@@ -95,7 +95,7 @@ export class UntitledFileContentProvider {
             }
         }
         let body = ResponseFormatUtility.FormatBody(response.body, response.getResponseHeaderValue("content-type"));
-        return {responseStatusLine, headers, body};
+        return { responseStatusLine, headers, body };
     }
 
     private static commentBegin(language: string) {

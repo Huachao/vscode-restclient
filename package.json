@@ -338,7 +338,7 @@
         "rest-client.previewResponseInUntitledDocument": {
           "type": "boolean",
           "default": false,
-          "description": "Preview response in untitle document if set to true, otherwise displayed in html view"
+          "description": "Preview response in untitled document if set to true, otherwise displayed in html view"
         },
         "rest-client.previewResponseSetUntitledDocumentLanguageByContentType": {
           "type": "boolean",
