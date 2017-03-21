@@ -41,7 +41,7 @@ export class RequestController {
         this._restClientSettings = new RestClientSettings();
         this._httpClient = new HttpClient(this._restClientSettings);
 
-        this._responseTextProvider = new HttpResponseTextDocumentContentProvider(null, this._restClientSettings);
+        this._responseTextProvider = new HttpResponseTextDocumentContentProvider(this._restClientSettings);
         this._registration = workspace.registerTextDocumentContentProvider('rest-response', this._responseTextProvider);
 
         workspace.onDidCloseTextDocument((params) => this.onDidCloseTextDocument(params));
@@ -129,11 +129,11 @@ export class RequestController {
             this.formatSizeStatusBar(response);
             this._sizeStatusBarItem.show();
 
-            this._responseTextProvider.response = response;
-            this._responseTextProvider.update(this._previewUri);
-
             let previewUri = this.generatePreviewUri();
             ResponseStore.add(previewUri.toString(), response);
+
+            this._responseTextProvider.update(this._previewUri);
+
             try {
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
                     UntitledFileContentProvider.createHttpResponseUntitledFile(

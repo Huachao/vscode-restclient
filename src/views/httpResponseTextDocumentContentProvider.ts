@@ -6,6 +6,7 @@ import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { MimeUtility } from '../mimeUtility';
 import { ResponseFormatUtility } from '../responseFormatUtility';
+import { ResponseStore } from '../responseStore';
 import * as Constants from '../constants';
 import * as path from 'path';
 
@@ -17,28 +18,30 @@ var autoLinker = require('autolinker');
 export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentContentProvider {
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
 
-    public constructor(public response: HttpResponse, public settings: RestClientSettings) {
+    public constructor(public settings: RestClientSettings) {
         super();
     }
 
     public provideTextDocumentContent(uri: Uri): string {
-        if (this.response) {
-            let innerHtml: string;
-            let width = 2;
-            let contentType = this.response.getResponseHeaderValue("content-type");
-            if (contentType) {
-                contentType = contentType.trim();
-            }
-            if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType)) {
-                innerHtml = `<img src="data:${contentType};base64,${new Buffer(this.response.bodyStream).toString('base64')}">`;
-            } else {
-                let code = `HTTP/${this.response.httpVersion} ${this.response.statusCode} ${this.response.statusMessage}
-${HttpResponseTextDocumentContentProvider.formatHeaders(this.response.headers)}
-${ResponseFormatUtility.FormatBody(this.response.body, this.response.getResponseHeaderValue("content-type"))}`;
-                width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
-                innerHtml = `<pre><code class="http">${codeHighlightLinenums(code, { hljs: hljs, lang: 'http', start: 1 })}</code></pre>`;
-            }
-            return `
+        if (uri) {
+            let response = ResponseStore.get(uri.toString());
+            if (response) {
+                let innerHtml: string;
+                let width = 2;
+                let contentType = response.getResponseHeaderValue("content-type");
+                if (contentType) {
+                    contentType = contentType.trim();
+                }
+                if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType)) {
+                    innerHtml = `<img src="data:${contentType};base64,${new Buffer(response.bodyStream).toString('base64')}">`;
+                } else {
+                    let code = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
+${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}
+${ResponseFormatUtility.FormatBody(response.body, response.getResponseHeaderValue("content-type"))}`;
+                    width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
+                    innerHtml = `<pre><code class="http">${codeHighlightLinenums(code, { hljs: hljs, lang: 'http', start: 1 })}</code></pre>`;
+                }
+                return `
             <head>
                 <link rel="stylesheet" href="${HttpResponseTextDocumentContentProvider.cssFilePath}">
                 ${this.getSettingsOverrideStyles(width)}
@@ -49,6 +52,7 @@ ${ResponseFormatUtility.FormatBody(this.response.body, this.response.getResponse
                     <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="scroll(0,0)"><span class="icon"></span></a>
                 </div>
             </body>`;
+            }
         }
     }
 
@@ -72,16 +76,16 @@ ${ResponseFormatUtility.FormatBody(this.response.body, this.response.getResponse
 
     private addUrlLinks(innerHtml: string) {
         return innerHtml = autoLinker.link(innerHtml, {
-                urls: {
-                    schemeMatches: true,
-                    wwwMatches: true,
-                    tldMatches: false
-                },
-                email: false,
-                phone: false,
-                stripPrefix: false,
-                stripTrailingSlash: false
-            });
+            urls: {
+                schemeMatches: true,
+                wwwMatches: true,
+                tldMatches: false
+            },
+            email: false,
+            phone: false,
+            stripPrefix: false,
+            stripTrailingSlash: false
+        });
     }
 
     private static formatHeaders(headers: { [key: string]: string }): string {
