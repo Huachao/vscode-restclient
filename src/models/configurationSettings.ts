@@ -1,4 +1,5 @@
 import { workspace } from 'vscode';
+import { HostCertificate } from '../models/hostCertificate';
 
 export interface IRestClientSettings {
     followRedirect: boolean;
@@ -18,6 +19,7 @@ export interface IRestClientSettings {
     previewResponseInUntitledDocument: boolean;
     previewResponseSetUntitledDocumentLanguageByContentType: boolean;
     includeAdditionalInfoInResponse: boolean;
+    hostCertificates: Map<string, HostCertificate>;
 
 }
 
@@ -39,6 +41,7 @@ export class RestClientSettings implements IRestClientSettings {
     public previewResponseInUntitledDocument: boolean;
     public previewResponseSetUntitledDocumentLanguageByContentType: boolean;
     public includeAdditionalInfoInResponse: boolean;
+    public hostCertificates: Map<string, HostCertificate>;
 
     public constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -69,6 +72,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.previewResponseInUntitledDocument = restClientSettings.get<boolean>("previewResponseInUntitledDocument", false);
         this.previewResponseSetUntitledDocumentLanguageByContentType = restClientSettings.get<boolean>("previewResponseSetUntitledDocumentLanguageByContentType", false);
         this.includeAdditionalInfoInResponse = restClientSettings.get<boolean>("includeAdditionalInfoInResponse", false);
+        this.hostCertificates = restClientSettings.get<Map<string, HostCertificate>>("certificates", new Map<string, HostCertificate>());
 
         let httpSettings = workspace.getConfiguration('http');
         this.proxy = httpSettings.get<string>('proxy', undefined);
