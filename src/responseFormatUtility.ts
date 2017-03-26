@@ -10,7 +10,8 @@ export class ResponseFormatUtility {
             let mime = MimeUtility.parse(contentType);
             let type = mime.type;
             let suffix = mime.suffix;
-            if (type === 'application/json') {
+            if (type === 'application/json' ||
+                suffix === '+json') {
                 if (ResponseFormatUtility.IsJsonString(body)) {
                     body = JSON.stringify(JSON.parse(body), null, 2);
                 } else {
