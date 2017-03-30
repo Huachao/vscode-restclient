@@ -55,7 +55,7 @@ export class CodeSnippetController {
         this._selectedText = selectedText;
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName, true);
         if (!httpRequest) {
             return;
         }

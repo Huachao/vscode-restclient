@@ -386,6 +386,11 @@
               } 
             ] 
           }
+        },
+        "rest-client.useTrunkedTransferEncodingForSendingFileContent": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use trunked transfer encoding for sending file content as request body"
         }
       }
     }

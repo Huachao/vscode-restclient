@@ -17,7 +17,7 @@ export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax: RegExp = new RegExp('^\<[ \t]+([^ \t]*)[ \t]*$');
 
-    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest {
+    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string, parseFileContentAsStream: boolean): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
         // split the request raw text into lines
         let lines: string[] = requestRawText.split(EOL);
@@ -86,7 +86,7 @@ export class HttpRequestParser implements IRequestParser {
 
         // parse body
         let contentTypeHeader = HttpRequestParser.getContentTypeHeader(headers);
-        body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
+        body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader, parseFileContentAsStream);
 
         return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL));
     }
@@ -117,7 +117,7 @@ export class HttpRequestParser implements IRequestParser {
         };
     }
 
-    private static parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string): string | Stream {
+    private static parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string, parseFileContentAsStream: boolean): string | Stream {
         if (!lines || lines.length === 0) {
             return <string>null;
         }
@@ -126,27 +126,49 @@ export class HttpRequestParser implements IRequestParser {
         if (lines.every(line => !HttpRequestParser.uploadFromFileSyntax.test(line))) {
             return lines.join(EOL);
         } else {
-            var combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
-            lines.forEach(line => {
-                if (HttpRequestParser.uploadFromFileSyntax.test(line)) {
-                    let groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
-                    if (groups !== null && groups.length === 2) {
-                        let fileUploadPath = groups[1];
-                        var fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
-                        if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
-                            combinedStream.append(fs.createReadStream(fileAbsolutePath));
-                        } else {
-                            combinedStream.append(line);
+            if (parseFileContentAsStream) {
+                var combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
+                lines.forEach(line => {
+                    if (HttpRequestParser.uploadFromFileSyntax.test(line)) {
+                        let groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
+                        if (groups !== null && groups.length === 2) {
+                            let fileUploadPath = groups[1];
+                            var fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
+                            if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
+                                combinedStream.append(fs.createReadStream(fileAbsolutePath));
+                            } else {
+                                combinedStream.append(line);
+                            }
                         }
+                    } else {
+                        combinedStream.append(line);
                     }
-                } else {
-                    combinedStream.append(line);
-                }
 
-                combinedStream.append(HttpRequestParser.getLineEnding(contentTypeHeader));
-            });
+                    combinedStream.append(HttpRequestParser.getLineEnding(contentTypeHeader));
+                });
 
-            return combinedStream;
+                return combinedStream;
+            } else {
+                let contents = [];
+                lines.forEach(line => {
+                    if (HttpRequestParser.uploadFromFileSyntax.test(line)) {
+                        let groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
+                        if (groups !== null && groups.length === 2) {
+                            let fileUploadPath = groups[1];
+                            var fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
+                            if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
+                                contents.push(fs.readFileSync(fileAbsolutePath));
+                            } else {
+                                contents.push(line);
+                            }
+                        }
+                    } else {
+                        contents.push(line);
+                    }
+                });
+
+                return contents.join(EOL);
+            }
         }
     }
 
