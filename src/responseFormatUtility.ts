@@ -18,8 +18,8 @@ export class ResponseFormatUtility {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                 }
             } else if (type === 'application/xml' ||
-                       type === 'text/xml' ||
-                       (type === 'application/atom' && suffix === '+xml')) {
+                type === 'text/xml' ||
+                (type === 'application/atom' && suffix === '+xml')) {
                 body = pd.xml(body);
             } else if (type === 'text/css') {
                 body = pd.css(body);

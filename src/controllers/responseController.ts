@@ -98,14 +98,14 @@ export class ResponseController {
         return `${statusLine}${headerString}${body}`;
     }
 
-    private getExtension(contentType: string): string|boolean {
+    private getExtension(contentType: string): string | boolean {
         let mimeType = MimeUtility.parse(contentType);
         let contentTypeWithoutCharsets = `${mimeType.type}${mimeType.suffix}`;
 
         // Check if user has custom mapping for this content type first
         if (contentTypeWithoutCharsets in this._restClientSettings.mimeAndFileExtensionMapping) {
             let ext = this._restClientSettings.mimeAndFileExtensionMapping[contentTypeWithoutCharsets];
-            ext = ext.replace(/^(\.)+/,"");
+            ext = ext.replace(/^(\.)+/, "");
             if (ext) {
                 return ext;
             }
