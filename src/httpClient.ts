@@ -45,12 +45,14 @@ export class HttpClient {
         if (authorization) {
             let start = authorization.indexOf(' ');
             let scheme = authorization.substr(0, start);
-            if (scheme === 'Digest') {
+            if (scheme === 'Digest' || scheme === 'Basic') {
                 let params = authorization.substr(start).trim().split(' ');
-                options.auth = {
-                    user: params[0],
-                    pass: params[1],
-                    sendImmediately: false
+                if (params.length === 2) {
+                    options.auth = {
+                        user: params[0],
+                        pass: params[1],
+                        sendImmediately: scheme === 'Basic'
+                    }
                 }
             }
         }
