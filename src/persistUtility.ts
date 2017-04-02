@@ -45,10 +45,10 @@ export class PersistUtility {
         }
     }
 
-    public static async createFileIfNotExistsAsync(path: string) {
+    public static createFileIfNotExistsAsync(path: string) {
         return new Promise<void>((resolve, reject) => {
             fs.stat(path, err => {
-                if(err === null) {
+                if (err === null) {
                     resolve();
                 }
 
@@ -60,7 +60,7 @@ export class PersistUtility {
         });
     }
 
-    public static async serializeToEnvironmentFile(environment: EnvironmentPickItem) {
+    public static serializeToEnvironmentFile(environment: EnvironmentPickItem) {
         return new Promise<void>((resolve, reject) => {
             fs.writeFile(PersistUtility.environmentFilePath, JSON.stringify(environment), error => {
                 if (error) {
@@ -73,24 +73,25 @@ export class PersistUtility {
         });
     }
 
-    private static async deserializeFromEnvironmentFile(): Promise<EnvironmentPickItem> {
+    private static deserializeFromEnvironmentFile(): Promise<EnvironmentPickItem> {
         return new Promise<EnvironmentPickItem>((resolve, reject) => {
             fs.readFile(PersistUtility.environmentFilePath, (error, data) => {
                 if (error) {
-                    PersistUtility.createFileIfNotExists(PersistUtility.environmentFilePath);
+                    PersistUtility.createFileIfNotExistsAsync(PersistUtility.environmentFilePath).then(_ => resolve(null));
+                    return;
                 } else {
                     let fileContent = data.toString();
                     if (fileContent) {
                         resolve(JSON.parse(fileContent));
                         return;
                     }
+                    resolve(null);
                 }
-                resolve(null);
             })
         });
     }
 
-    public static async serializeToHistoryFile(requests: SerializedHttpRequest[]) {
+    public static serializeToHistoryFile(requests: SerializedHttpRequest[]) {
         return new Promise<void>((resolve, reject) => {
             fs.writeFile(PersistUtility.historyFilePath, JSON.stringify(requests), error => {
                 if (error) {
@@ -103,11 +104,11 @@ export class PersistUtility {
         });
     }
 
-    private static async deserializeFromHistoryFile(): Promise<SerializedHttpRequest[]> {
+    private static deserializeFromHistoryFile(): Promise<SerializedHttpRequest[]> {
         return new Promise<SerializedHttpRequest[]>((resolve, reject) => {
             fs.readFile(PersistUtility.historyFilePath, (error, data) => {
                 if (error) {
-                    PersistUtility.createFileIfNotExists(PersistUtility.historyFilePath);
+                    PersistUtility.createFileIfNotExistsAsync(PersistUtility.historyFilePath).then(_ => resolve(PersistUtility.emptyHttpRequestItems));
                 } else {
                     let fileContent = data.toString();
                     if (fileContent) {
@@ -117,8 +118,8 @@ export class PersistUtility {
                         } catch (error) {
                         }
                     }
+                    resolve(PersistUtility.emptyHttpRequestItems);
                 }
-                resolve(PersistUtility.emptyHttpRequestItems);
             })
         });
     }

@@ -7,7 +7,7 @@ import * as Constants from './constants';
 export class HttpCodeLensProvider implements CodeLensProvider {
     public static responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public provideCodeLenses(document: TextDocument, token: CancellationToken): Thenable<CodeLens[]> {
+    public provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {
         let blocks: CodeLens[] = [];
         let lines: string[] = document.getText().split(/\r?\n/g);
         let delimitedLines: number[] = Selector.getDelimiterRows(lines);
