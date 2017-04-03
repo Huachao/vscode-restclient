@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -351,40 +351,44 @@
           "description": "Include additional information such as request URL and response time when preview is set to use untitled document"
         },
         "rest-client.certificates": {
-          "type": "object", 
-          "default": {}, 
-          "description": "Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file)", 
-          "pattern": "^(?!http(s?):\/\/)", 
-          "additionalProperties": { 
-            "anyOf": [ 
-              { 
-                "type": "object", 
-                "default": {}, 
-                "description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional", 
-                "properties": { 
-                  "cert": { 
-                    "type": "string", 
-                    "description": "Absolute or relative path of Public x509 certificate" 
-                  }, 
-                  "key": { 
-                    "type": "string", 
-                    "description": "Absolute or relative path of Private key" 
-                  }, 
-                  "pfx": { 
-                    "type": "string", 
-                    "description": "Absolute or relative path of PKCS #12 certificate" 
-                  }, 
-                  "passphrase": { 
-                    "type": "string", 
-                    "description": "[Optional] A string of passphrase for the private key or pfx" 
-                  } 
-                }, 
-                "dependencies": { 
-                  "cert": ["key"], 
-                  "key": ["cert"] 
-                } 
-              } 
-            ] 
+          "type": "object",
+          "default": {},
+          "description": "Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file)",
+          "pattern": "^(?!http(s?):\/\/)",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "object",
+                "default": {},
+                "description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
+                "properties": {
+                  "cert": {
+                    "type": "string",
+                    "description": "Absolute or relative path of Public x509 certificate"
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "Absolute or relative path of Private key"
+                  },
+                  "pfx": {
+                    "type": "string",
+                    "description": "Absolute or relative path of PKCS #12 certificate"
+                  },
+                  "passphrase": {
+                    "type": "string",
+                    "description": "[Optional] A string of passphrase for the private key or pfx"
+                  }
+                },
+                "dependencies": {
+                  "cert": [
+                    "key"
+                  ],
+                  "key": [
+                    "cert"
+                  ]
+                }
+              }
+            ]
           }
         },
         "rest-client.useTrunkedTransferEncodingForSendingFileContent": {

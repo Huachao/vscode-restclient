@@ -12,6 +12,10 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * View image response directly in pane
 * Save raw response and response body only to local disk
 * Customize font(size/family/weight) in response preview
+* Authentication support for:
+    - Basic Auth
+    - Digest Auth
+    - SSL Client Certificates
 * Environments and custom/global system variables support
     - Use custom/global variables in any place of request(_URL_, _Headers_, _Body_)
     - Auto completion and hover support for custom variables
@@ -185,6 +189,61 @@ Another icon in the upper right corner of the response preview tab is the `Save 
 }
 ```
 
+## Authentication
+We have supported some most common authenticatoin schemes like _Basic Auth_, _Digest Auth_ and _SSL Client Certificates_.
+
+### Basic Auth
+HTTP Basic Auth is a widely used protocol for simple username/password authentication. We support __two__ formats of Authorization header to use Basic Auth.
+1. Add the value of Authorization header in the base64 encoding of `username:password`.
+2. Add the value of Authorization header in the raw value of `username` and `password`, which is separated by space.
+
+The corresponding examples are as following:
+```http
+GET https://httpbin.org//basic-auth/user/passwd HTTP/1.1
+Authorization: Basic dXNlcjpwYXNzd2Q=
+```
+and
+```http
+GET https://httpbin.org//basic-auth/user/passwd HTTP/1.1
+Authorization: Basic user passwd
+```
+
+### Digest Auth
+HTTP Digest Auth is also a username/password authentication protocol that aims to be slightly safer than Basic Auth. The format of Authorization header for Digest Auth is similar to Basic Auth. You just need to set the scheme to `Digest`, as well as the raw user name and password.
+```http
+GET https://httpbin.org/digest-auth/auth/user/passwd
+Authorization: Digest user passwd
+```
+
+### SSL Client Certificates
+We support `PFX`, `PKCS12`, and `PEM` certificates. Before using your certificates, you need to set the certificates paths(absolute/relative to workspace/relative to current http file) in the setting file for expected host name(port is optional). For eachhost, you can specify the key `cert`, `key`, `pfx` and `passphrase`.
+- `cert`: Path of public x509 certificate
+- `key`: Path of private key
+- `pfx`: Path of PKCS #12 or PFX certificate
+- `passphrase`: Optional passphrase for the certificate if required
+You can add following piece of code in your setting file if your certificate is in `PEM` format:
+```json
+"rest-client.certificates": {
+    "localhost:8081": {
+        "cert": "/Users/demo/Certificates/client.crt",
+        "key": "/Users/demo/Keys/client.key"
+    },
+    "example.com": {
+        "cert": "/Users/demo/Certificates/client.crt",
+        "key": "/Users/demo/Keys/client.key"
+    }
+}
+```
+Or if you have certifcate in `PFX` or `PKCS12` format, setting code can be like this:
+```json
+"rest-client.certificates": {
+    "localhost:8081": {
+        "pfx": "/Users/demo/Certificates/clientcert.p12",
+        "passphrase": "123456"
+    }
+}
+```
+
 ## Generate Code Snippet
 ![Generate Code Snippet](images/code-snippet.gif)
 Once you’ve finalized your request in REST Client extension, you might want to make the same request from your own source code. We allow you to generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as previously, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or right click in the editor and then select `Generate Code Snippet` in the menu, or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, as well as library list. After you selected the code snippet language/library you want, the generated code snippet will be previewed in a separate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
@@ -293,6 +352,10 @@ REST Client Extension adds the ability to control the font family, size and weig
 * `rest-client.environmentVariables`: Sets the environments and custom variables belongs to it (e.g., `{"production": {"host": "api.example.com"}, "sandbox":{"host":"sandbox.api.example.com"}}`). (Default is __{}__)
 * `rest-client.mimeAndFileExtensionMapping`: Sets the custom mapping of mime type and file extension of saved response body. (Default is __{}__)
 * `rest-client.previewResponseInUntitledDocument`: Preview response in untitled document if set to true, otherwise displayed in html view. (Default is __false__)
+* `rest-client.previewResponseSetUntitledDocumentLanguageByContentType`: Attempt to automatically set document language based on Content-Type header when showing each response in new tab. (Default is __false__)
+* `rest-client.includeAdditionalInfoInResponse`: Include additional information such as request URL and response time when preview is set to use untitled document. (Default is __false__)
+* `rest-client.certificates`: Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file). (Default is __{}__)
+* `rest-client.useTrunkedTransferEncodingForSendingFileContent`: Use trunked transfer encoding for sending file content as request body. (Default is __true__)
 
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 
