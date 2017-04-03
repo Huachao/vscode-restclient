@@ -10,8 +10,8 @@
   },
   "icon": "images/rest_icon.svg",
   "galleryBanner": {
-    "color": "#4dffff",
-    "theme": "light"
+    "color": "#000000",
+    "theme": "dark"
   },
   "license": "MIT",
   "bugs": {
