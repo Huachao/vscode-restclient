@@ -31,13 +31,10 @@ export class UntitledFileContentProvider {
             }
         }
 
-        workspace.openTextDocument({ 'language': language }).then(document => {
+        const content = UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage);
+        workspace.openTextDocument({ 'language': language, 'content': content }).then(document => {
             UntitledFileContentProvider.createdFiles.push(document);
-            window.showTextDocument(document, ViewColumn.Two, false).then(textEditor => {
-                textEditor.edit(edit => {
-                    edit.insert(new Position(0, 0), UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage));
-                });
-            });
+            window.showTextDocument(document, ViewColumn.Two, false);
         });
     }
 
