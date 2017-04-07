@@ -1,3 +1,8 @@
+## 0.14.1 (2017/4/7)
+* __Bug Fix__: [Could not resolve any model with provided uri](https://github.com/Huachao/vscode-restclient/issues/90)
+* __Improvement__: [Icon redesign](https://github.com/Huachao/vscode-restclient/pull/87) [(@pluwen)](https://github.com/pluwen)
+* __Improvement__: [Switch to new API for opening editor](https://github.com/Huachao/vscode-restclient/pull/89) [(@dakaraphi)](https://github.com/dakaraphi/)
+
 ## 0.14.0 (2017/4/3)
 * __Feature__: [Support Digest Authentication](https://github.com/Huachao/vscode-restclient/issues/61)
 * __Feature__: [Support client side certificate authentication](https://github.com/Huachao/vscode-restclient/issues/35)
