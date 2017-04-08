@@ -190,7 +190,7 @@ Another icon in the upper right corner of the response preview tab is the `Save 
 ```
 
 ## Authentication
-We have supported some most common authenticatoin schemes like _Basic Auth_, _Digest Auth_ and _SSL Client Certificates_.
+We have supported some most common authentication schemes like _Basic Auth_, _Digest Auth_ and _SSL Client Certificates_.
 
 ### Basic Auth
 HTTP Basic Auth is a widely used protocol for simple username/password authentication. We support __two__ formats of Authorization header to use Basic Auth.
@@ -234,7 +234,7 @@ You can add following piece of code in your setting file if your certificate is 
     }
 }
 ```
-Or if you have certifcate in `PFX` or `PKCS12` format, setting code can be like this:
+Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like this:
 ```json
 "rest-client.certificates": {
     "localhost:8081": {
