@@ -216,7 +216,7 @@ Authorization: Digest user passwd
 ```
 
 ### SSL Client Certificates
-We support `PFX`, `PKCS12`, and `PEM` certificates. Before using your certificates, you need to set the certificates paths(absolute/relative to workspace/relative to current http file) in the setting file for expected host name(port is optional). For eachhost, you can specify the key `cert`, `key`, `pfx` and `passphrase`.
+We support `PFX`, `PKCS12`, and `PEM` certificates. Before using your certificates, you need to set the certificates paths(absolute/relative to workspace/relative to current http file) in the setting file for expected host name(port is optional). For each host, you can specify the key `cert`, `key`, `pfx` and `passphrase`.
 - `cert`: Path of public x509 certificate
 - `key`: Path of private key
 - `pfx`: Path of PKCS #12 or PFX certificate

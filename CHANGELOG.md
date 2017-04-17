@@ -7,7 +7,7 @@
 * __Feature__: [Support Digest Authentication](https://github.com/Huachao/vscode-restclient/issues/61)
 * __Feature__: [Support client side certificate authentication](https://github.com/Huachao/vscode-restclient/issues/35)
 * __Bug Fix__: [Fix showResponseInDifferentTab doesn't work](https://github.com/Huachao/vscode-restclient/issues/81)
-* __Improvement__: Add setting to tse trunked transfer encoding for sending file content as request body
+* __Improvement__: Add setting to the trunked transfer encoding for sending file content as request body
 * __Improvement__: [Allow to preview response body only in untitled document](https://github.com/Huachao/vscode-restclient/pull/82) [(@dakaraphi)](https://github.com/dakaraphi/)
 * __Improvement__: Format response body whose suffix of content type header is json
 
