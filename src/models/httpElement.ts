@@ -20,6 +20,10 @@ export class HttpElement {
             }
             this.text = this.text.replace(/[\{\}]/g, "\\$&");;
         }
+
+        if (type === ElementType.SystemVariable) {
+            this.name = name.substr(1);
+        }
     }
 }
 
