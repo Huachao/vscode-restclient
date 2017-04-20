@@ -32,6 +32,7 @@ export enum ElementType {
     URL,
     Header,
     MIME,
+    Authentication,
     SystemVariable,
     CustomVariable,
 }

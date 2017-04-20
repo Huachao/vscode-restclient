@@ -79,6 +79,11 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement("text/plain", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
         originalElements.push(new HttpElement("text/xml", ElementType.MIME, '^\\s*(Content-Type|Accept)\\s*\\:\\s*'));
 
+        // add Basic, Digest Authentication snippet
+        originalElements.push(new HttpElement("Basic Base64", ElementType.Authentication, '^\\s*Authorization\\s*\\:\\s*', "Base64 encoded username and password", new SnippetString(`Basic \${1:base64-user-password}`)));
+        originalElements.push(new HttpElement("Basic Raw Credential", ElementType.Authentication, '^\\s*Authorization\\s*\\:\\s*', "Raw username and password", new SnippetString(`Basic \${1:username} \${2:password}`)));
+        originalElements.push(new HttpElement("Digest", ElementType.Authentication, '^\\s*Authorization\\s*\\:\\s*', "Raw username and password", new SnippetString(`Digest \${1:username} \${2:password}`)));
+
         // add global variables
         originalElements.push(new HttpElement(Constants.GuidVariableName, ElementType.SystemVariable, null, Constants.GuidVariableDescription, `{{${Constants.GuidVariableName}}}`));
         originalElements.push(new HttpElement(Constants.TimeStampVariableName, ElementType.SystemVariable, null, Constants.TimeStampVariableDescription, `{{${Constants.TimeStampVariableName}}}`));
