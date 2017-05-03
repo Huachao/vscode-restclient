@@ -45,7 +45,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerCompletionItemProvider('http', new HttpCompletionItemProvider()));
     context.subscriptions.push(languages.registerHoverProvider('http', new CustomVariableHoverProvider()));
     context.subscriptions.push(languages.registerCodeLensProvider('http', new HttpCodeLensProvider()));
-    context.subscriptions.push(languages.registerDocumentLinkProvider('http', new RequestBodyDocumentLinkProvider()))
+    context.subscriptions.push(languages.registerDocumentLinkProvider('http', new RequestBodyDocumentLinkProvider()));
 }
 
 // this method is called when your extension is deactivated

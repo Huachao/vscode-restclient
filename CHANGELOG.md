@@ -1,3 +1,8 @@
+## 0.14.2 (2017/5/3)
+* __Bug Fix__: Fix MIME types autocompletion bug
+* __Improvement__: Add autocompletion for Basic Auth and Digest Auth
+* __Improvement__: Add request body document link provider to allow user to click to referenced document
+
 ## 0.14.1 (2017/4/7)
 * __Bug Fix__: [Could not resolve any model with provided uri](https://github.com/Huachao/vscode-restclient/issues/90)
 * __Improvement__: [Icon redesign](https://github.com/Huachao/vscode-restclient/pull/87) [(@pluwen)](https://github.com/pluwen)
