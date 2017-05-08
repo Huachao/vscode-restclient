@@ -354,7 +354,7 @@
           "type": "object",
           "default": {},
           "description": "Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file)",
-          "pattern": "^(?!http(s?):\/\/)",
+          "pattern": "^(?!http(s?)://)",
           "additionalProperties": {
             "anyOf": [
               {
@@ -416,7 +416,6 @@
   "dependencies": {
     "applicationinsights": "^0.18.0",
     "autolinker": "^1.4.0",
-    "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
     "copy-paste": "^1.3.0",
     "elegant-spinner": "^1.0.1",
