@@ -8,33 +8,12 @@ import { EOL } from 'os';
 export class UntitledFileContentProvider {
     private static createdFiles: TextDocument[] = [];
     public static createHttpResponseUntitledFile(response: HttpResponse, createNewFile: boolean, autoSetLanguage: boolean, additionalInfo: boolean) {
-        // Currently unable to find a way to change language through API for already opened file.
-        // So when reusing same editor, default to 'http'
-        // This can be fixed when vscode issue #1800 is resolved
-        if (!createNewFile) autoSetLanguage = false; // override for now until vscode issue is resolved
 
-        const language = (createNewFile && autoSetLanguage) ? UntitledFileContentProvider.languageFromContentType(response) : 'http';
-        if (!createNewFile && UntitledFileContentProvider.createdFiles.length > 0) {
-            let updateDocument = UntitledFileContentProvider.createdFiles.slice(-1)[0];
-
-            // check if user already save this file
-            if (updateDocument.isUntitled && updateDocument.lineCount > 0) {
-                window.showTextDocument(updateDocument, ViewColumn.Two, false).then(textEditor => {
-                    textEditor.edit(edit => {
-                        // get previous response file Range
-                        var startPosition = new Position(0, 0);
-                        var endPosition = updateDocument.lineAt(updateDocument.lineCount - 1).range.end;
-                        edit.replace(new Range(startPosition, endPosition), UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage));
-                    });
-                });
-                return;
-            }
-        }
-
+        const language = autoSetLanguage ? UntitledFileContentProvider.languageFromContentType(response) : 'http';
         const content = UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage);
         workspace.openTextDocument({ 'language': language, 'content': content }).then(document => {
             UntitledFileContentProvider.createdFiles.push(document);
-            window.showTextDocument(document, ViewColumn.Two, false);
+            window.showTextDocument(document, {viewColumn: ViewColumn.Two, preserveFocus: false, preview: !createNewFile}) ;
         });
     }
 
