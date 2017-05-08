@@ -1,18 +1,16 @@
 'use strict';
 
-import { window, workspace, ViewColumn, TextDocument, Range, Position } from 'vscode';
+import { window, workspace, ViewColumn, TextDocument } from 'vscode';
 import { HttpResponse } from '../models/httpResponse';
 import { ResponseFormatUtility } from '../responseFormatUtility';
 import { EOL } from 'os';
 
 export class UntitledFileContentProvider {
-    private static createdFiles: TextDocument[] = [];
     public static createHttpResponseUntitledFile(response: HttpResponse, createNewFile: boolean, autoSetLanguage: boolean, additionalInfo: boolean) {
 
         const language = autoSetLanguage ? UntitledFileContentProvider.languageFromContentType(response) : 'http';
         const content = UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage);
         workspace.openTextDocument({ 'language': language, 'content': content }).then(document => {
-            UntitledFileContentProvider.createdFiles.push(document);
             window.showTextDocument(document, {viewColumn: ViewColumn.Two, preserveFocus: false, preview: !createNewFile}) ;
         });
     }
