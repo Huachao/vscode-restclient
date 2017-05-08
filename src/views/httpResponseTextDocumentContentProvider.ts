@@ -60,7 +60,7 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
         code += hljs.highlight('http', nonBodyPart + '\r\n').value;
         let contentType = response.getResponseHeaderValue("content-type");
         let bodyPart = `${ResponseFormatUtility.FormatBody(response.body, contentType)}`;
-        let bodyLanguageAlias = HttpResponseTextDocumentContentProvider.getHightLanguageAlias(contentType);
+        let bodyLanguageAlias = HttpResponseTextDocumentContentProvider.getHighlightLanguageAlias(contentType);
         if (bodyLanguageAlias) {
             code += hljs.highlight(bodyLanguageAlias, bodyPart).value;
         } else {
@@ -154,7 +154,7 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
         return headerString;
     }
 
-    private static getHightLanguageAlias(contentType: string): string {
+    private static getHighlightLanguageAlias(contentType: string): string {
         contentType = contentType.toLowerCase();
         let mime = MimeUtility.parse(contentType);
         let type = mime.type;
