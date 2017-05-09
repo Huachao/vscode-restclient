@@ -29,7 +29,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * `HTTP` language support
     - `.http` and `.rest` file extensions support
     - Syntax highlight (Request and Response)
-    - Auto completion for method, url, header, custom/global variables and mime types
+    - Auto completion for method, url, header, custom/global variables, mime types and so on
     - Comments (line starts with `#` or `//`) support
     - Support `json` and `xml` body indentation, comment shortcut and auto closing brackets
     - Code snippets for operations like `GET` and `POST`
@@ -258,7 +258,7 @@ If you want to enable language association in other cases, just change the langu
 
 ![HTTP Language](images/http.png)
 ### Auto Completion
-Currently auto completion will be enabled for following five categories:
+Currently auto completion will be enabled for following seven categories:
 
 1. HTTP Method
 2. HTTP URL from request history
@@ -266,6 +266,7 @@ Currently auto completion will be enabled for following five categories:
 4. Global dynamic variables
 5. Custom variables in current environment
 6. MIME Types for `Accept` and `Content-Type` headers
+7. Authentication scheme for `Basic` and `Digest`
 
 ## Environments and Variables
 Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different product environments, like devbox, sandbox and production.
