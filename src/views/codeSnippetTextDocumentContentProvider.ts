@@ -31,7 +31,7 @@ export class CodeSnippetTextDocumentContentProvider extends BaseTextDocumentCont
     }
 
     private getHighlightJsLanguageAlias() {
-        if (!this.lang || this.lang === 'bash') {
+        if (!this.lang || this.lang === 'shell') {
             return 'bash';
         }
 
