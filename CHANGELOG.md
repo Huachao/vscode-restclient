@@ -1,3 +1,6 @@
+## 0.14.4 (2017/5/16)
+* __Bug Fix__: [getting error "Unable to open'Response(xxxms)': Cannot read property 'toLowerCase' of null"](https://github.com/Huachao/vscode-restclient/issues/96)
+
 ## 0.14.3 (2017/5/12)
 * __Bug Fix__: [Performance issue when rendering large response](https://github.com/Huachao/vscode-restclient/issues/59), [cannot show raw big-data](https://github.com/Huachao/vscode-restclient/issues/94)
 * __Bug Fix__: Fix bug to allow generate code snippet for `cURL`, `httpie` and `wget`
