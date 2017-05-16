@@ -155,6 +155,9 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
     }
 
     private static getHighlightLanguageAlias(contentType: string): string {
+        if (!contentType) {
+            return null;
+        }
         contentType = contentType.toLowerCase();
         let mime = MimeUtility.parse(contentType);
         let type = mime.type;
