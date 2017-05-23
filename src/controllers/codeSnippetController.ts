@@ -129,7 +129,11 @@ export class CodeSnippetController {
         // convert headers
         let headers: HARHeader[] = [];
         for (var key in request.headers) {
-            headers.push(new HARHeader(key, request.headers[key]));
+            let headerValue = request.headers[key];
+            if (key.toLowerCase() === 'authorization') {
+                headerValue = CodeSnippetController.normalizeAuthHeader(headerValue);
+            }
+            headers.push(new HARHeader(key, headerValue));
         }
 
         // convert cookie headers
@@ -166,5 +170,20 @@ export class CodeSnippetController {
     }
 
     public dispose() {
+    }
+
+    private static normalizeAuthHeader(authHeader) {
+        if (authHeader) {
+            let start = authHeader.indexOf(' ');
+            let scheme = authHeader.substr(0, start);
+            if (scheme && scheme.toLowerCase() === 'basic') {
+                let params = authHeader.substr(start).trim().split(' ');
+                if (params.length === 2) {
+                    return 'Basic ' + new Buffer(`${params[0]}:${params[1]}`).toString('base64');
+                }
+            }
+        }
+
+        return authHeader;
     }
 }
