@@ -125,6 +125,41 @@ export class CodeSnippetController {
         }
     }
 
+    public async copyAsCurl() {
+        let editor = window.activeTextEditor;
+        if (!editor || !editor.document) {
+            return;
+        }
+
+        // Get selected text of selected lines or full document
+        let selectedText = new Selector().getSelectedText(editor);
+        if (!selectedText) {
+            return;
+        }
+
+        // remove comment lines
+        let lines: string[] = selectedText.split(/\r?\n/g);
+        selectedText = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
+        if (selectedText === '') {
+            return;
+        }
+
+        // variables replacement
+        selectedText = await VariableProcessor.processRawRequest(selectedText);
+        this._selectedText = selectedText;
+
+        // parse http request
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName, true);
+        if (!httpRequest) {
+            return;
+        }
+
+        let harHttpRequest = this.convertToHARHttpRequest(httpRequest);
+        let snippet = new HTTPSnippet(harHttpRequest);
+        let result = snippet.convert('shell', 'curl');
+        cp.copy(result);
+    }
+
     private convertToHARHttpRequest(request: HttpRequest): HARHttpRequest {
         // convert headers
         let headers: HARHeader[] = [];

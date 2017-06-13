@@ -38,6 +38,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', uri => responseController.saveBody(uri)));
     context.subscriptions.push(commands.registerCommand('rest-client.generate-codesnippet', () => codeSnippetController.run()));
     context.subscriptions.push(commands.registerCommand('rest-client.copy-codesnippet', () => codeSnippetController.copy()));
+    context.subscriptions.push(commands.registerCommand('rest-client.copy-request-as-curl', () => codeSnippetController.copyAsCurl()));
     context.subscriptions.push(commands.registerCommand('rest-client.switch-environment', () => environmentController.switchEnvironment()));
     context.subscriptions.push(commands.registerCommand('rest-client._openDocumentLink', args => {
         workspace.openTextDocument(Uri.file(args.path)).then(window.showTextDocument, window.showErrorMessage);

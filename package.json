@@ -141,6 +141,11 @@
           "dark": "./images/copy-inverse.svg"
         },
         "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.copy-request-as-curl",
+        "title": "Copy Request As cURL",
+        "category": "Rest Client"
       }
     ],
     "menus": {
@@ -171,6 +176,11 @@
           "command": "rest-client.generate-codesnippet",
           "when": "editorTextFocus && editorLangId == http",
           "group": "rest-client@2"
+        },
+        {
+          "command": "rest-client.copy-request-as-curl",
+          "when": "editorTextFocus && editorLangId == http",
+          "group": "rest-client@3"
         }
       ]
     },
