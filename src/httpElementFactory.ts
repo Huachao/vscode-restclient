@@ -85,19 +85,29 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement("Digest", ElementType.Authentication, '^\\s*Authorization\\s*\\:\\s*', "Raw username and password", new SnippetString(`Digest \${1:username} \${2:password}`)));
 
         // add global variables
-        originalElements.push(new HttpElement(Constants.GuidVariableName, ElementType.SystemVariable, null, Constants.GuidVariableDescription, `{{${Constants.GuidVariableName}}}`));
-        originalElements.push(new HttpElement(Constants.TimeStampVariableName, ElementType.SystemVariable, null, Constants.TimeStampVariableDescription, `{{${Constants.TimeStampVariableName}}}`));
+        originalElements.push(new HttpElement(
+            Constants.GuidVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.GuidVariableDescription,
+            new SnippetString(`{{$\${name:${Constants.GuidVariableName.slice(1)}}}}`)));
+        originalElements.push(new HttpElement(
+            Constants.TimeStampVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.TimeStampVariableDescription,
+            new SnippetString(`{{$\${name:${Constants.TimeStampVariableName.slice(1)}}}}`)));
         originalElements.push(new HttpElement(
             Constants.RandomInt,
             ElementType.SystemVariable,
             null,
             Constants.RandomIntDescription,
-            new SnippetString(`{{${Constants.RandomInt} \${1:min} \${2:max}}}`)));
+            new SnippetString(`{{$\${name:${Constants.RandomInt.slice(1)}} \${1:min} \${2:max}}}`)));
 
         // add custom variables
         let customVariables = await EnvironmentController.getCustomVariables();
         for (var variableName in customVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.CustomVariable, null, `Value: ${customVariables[variableName]}`, `{{${variableName}}}`));
+            originalElements.push(new HttpElement(variableName, ElementType.CustomVariable, null, `Value: ${customVariables[variableName]}`, new SnippetString(`{{${variableName}}}`)));
         }
 
         // add urls from history
