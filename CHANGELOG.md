@@ -1,3 +1,9 @@
+## 0.14.5 (2017/6/15)
+* __Feature__: [Save cURL into clipboard](https://github.com/Huachao/vscode-restclient/issues/100)
+* __Bug Fix__: ["Generate code snippet" does not encode basic authorization](https://github.com/Huachao/vscode-restclient/issues/98)
+* __Bug Fix__: [Variable autocompletion adds escaped brackets instead of brackets](https://github.com/Huachao/vscode-restclient/issues/103)
+* __Improvement__: [Variable substitution fails when there is spaces after/before the brackets](https://github.com/Huachao/vscode-restclient/issues/104)
+
 ## 0.14.4 (2017/5/16)
 * __Bug Fix__: [getting error "Unable to open'Response(xxxms)': Cannot read property 'toLowerCase' of null"](https://github.com/Huachao/vscode-restclient/issues/96)
 
