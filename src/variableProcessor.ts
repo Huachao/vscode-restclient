@@ -10,7 +10,7 @@ export class VariableProcessor {
     public static async processRawRequest(request: string) {
         let globalVariables = VariableProcessor.getGlobalVariables();
         for (var variablePattern in globalVariables) {
-            let regex = new RegExp(`\\{\\{${variablePattern}\\}\\}`, 'g');
+            let regex = new RegExp(`\\{\\{\\s*${variablePattern}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, globalVariables[variablePattern]);
             }
@@ -18,7 +18,7 @@ export class VariableProcessor {
 
         let customVariables = await EnvironmentController.getCustomVariables();
         for (var variableName in customVariables) {
-            let regex = new RegExp(`\\{\\{${variableName}\\}\\}`, 'g');
+            let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, customVariables[variableName]);
             }
