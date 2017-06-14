@@ -6,7 +6,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 
 ## Main Features
 * Send/Cancel/Rerun __HTTP request__ in editor and view response in a separate pane with syntax highlight
-* Send __CURL command__ in editor
+* Send __CURL command__ in editor and copy HTTP request as `CURL command`
 * Auto save and view/clear request history
 * Support _MULTIPLE_ requests in the same file
 * View image response directly in pane
@@ -171,6 +171,8 @@ Sometimes you may want to refresh the API response, now you could do it simply u
 ## Making CURL Request
 ![CURL Request](images/curl-request.png)
 We add the capability to directly run [curl request](https://curl.haxx.se/) in REST Client extension. The issuing request command is the same as raw HTTP one. REST Client will automatically parse the request with specified parser.
+
+Sometimes you may want to get the curl format of a http request quickly and save it to clipboard, just pressing `F1` and then selecting/typing `Rest Client: Copy Request As cURL` or simply right click in the editor, and select `Copy Request As cURL`.
 
 ## Request History
 ![request-history](images/request-history.png)
