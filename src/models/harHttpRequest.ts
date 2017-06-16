@@ -16,7 +16,19 @@ export class HARCookie implements IHARNameValue {
 }
 
 export class HARPostData {
+    public params: {name: string, value: string}[];
     public constructor(public mimeType: string, public text: string) {
+        if (mimeType === 'application/x-www-form-urlencoded') {
+            if (text) {
+                this.params = [];
+                let pairs = text.split('&');
+                pairs.forEach(pair => {
+                    let key: string, value: string;
+                    [key, value] = pair.split('=');
+                    this.params.push({name: key, value: value});
+                });
+            }
+        }
     }
 }
 
