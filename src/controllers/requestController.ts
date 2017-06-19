@@ -181,7 +181,7 @@ export class RequestController {
     }
 
     private generatePreviewUri(): Uri {
-        let uriString = 'rest-response://authority/response-preview'
+        let uriString = 'rest-response://authority/response-preview';
         if (this._restClientSettings.showResponseInDifferentTab) {
             uriString += `/${Date.now()}`;  // just make every uri different
         }

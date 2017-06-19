@@ -48,7 +48,7 @@ export class HistoryController {
             let document = await workspace.openTextDocument(path);
             window.showTextDocument(document);
         } catch (error) {
-            this.errorHandler(error)
+            this.errorHandler(error);
         }
     }
 
@@ -65,7 +65,7 @@ export class HistoryController {
                     }
                 });
         } catch (error) {
-            this.errorHandler(error)
+            this.errorHandler(error);
         }
     }
 

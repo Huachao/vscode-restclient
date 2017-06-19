@@ -36,7 +36,7 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
                 } else {
                     let code = this.highlightResponse(response);
                     width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
-                    innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`
+                    innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
                 }
                 return `
             <head>
@@ -112,7 +112,7 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
         return code.replace(matcher, function(match) {
             if(newline.test(match)) {
                 if(openSpans.length) {
-                    return openSpans.map(function() { return '</span>' }).join('') + match + openSpans.join('');
+                    return openSpans.map(() => '</span>').join('') + match + openSpans.join('');
                 } else {
                     return match;
                 }

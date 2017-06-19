@@ -13,7 +13,7 @@ import * as path from 'path';
 import * as os from 'os';
 
 var cp = require('copy-paste');
-var mime = require('mime-types')
+var mime = require('mime-types');
 
 export class ResponseController {
     private _restClientSettings: RestClientSettings;
@@ -32,7 +32,7 @@ export class ResponseController {
         let response = ResponseStore.get(uri.toString());
         if (response !== undefined) {
             let fullResponse = this.getFullResponseString(response);
-            let filePath = path.join(ResponseController.responseSaveFolderPath, `Response-${Date.now()}.http`)
+            let filePath = path.join(ResponseController.responseSaveFolderPath, `Response-${Date.now()}.http`);
             try {
                 await PersistUtility.createFileIfNotExistsAsync(filePath);
                 fs.writeFileSync(filePath, fullResponse);

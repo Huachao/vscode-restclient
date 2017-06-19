@@ -83,7 +83,7 @@ export class CodeSnippetController {
                 });
 
                 return item;
-            })
+            });
 
             let item = await window.showQuickPick(targetsPickList, { placeHolder: "" });
             if (!item) {
@@ -96,7 +96,7 @@ export class CodeSnippetController {
                     item.detail = client.link;
                     item.rawClient = client;
                     return item;
-                })
+                });
 
                 let client = await window.showQuickPick(clientsPickList, { placeHolder: "" });
                 if (client) {
@@ -115,7 +115,7 @@ export class CodeSnippetController {
                 }
             }
         } else {
-            window.showInformationMessage('No available code snippet convert targets')
+            window.showInformationMessage('No available code snippet convert targets');
         }
     }
 
@@ -181,7 +181,7 @@ export class CodeSnippetController {
                     cookies.push(new HARCookie(cookieParts[0].trim(), cookieParts[1].trim()));
                 }
                 else {
-                    cookies.push(new HARCookie(cookieParts[0].trim(), ''))
+                    cookies.push(new HARCookie(cookieParts[0].trim(), ''));
                 }
             });
         }

@@ -27,7 +27,7 @@ export class EnvironmentController {
         Telemetry.sendEvent('Switch Environment');
         let currentEnvironment = await EnvironmentController.getCurrentEnvironment();
         let itemPickList: EnvironmentPickItem[] = [];
-        itemPickList.push(EnvironmentController.noEnvironmentPickItem)
+        itemPickList.push(EnvironmentController.noEnvironmentPickItem);
         for (var name in this._restClientSettings.environmentVariables) {
             let item = new EnvironmentPickItem(name, name);
             if (item.name === currentEnvironment.name) {

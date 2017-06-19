@@ -1,6 +1,6 @@
 'use strict';
 
-import { window, workspace, ViewColumn, TextDocument } from 'vscode';
+import { window, workspace, ViewColumn } from 'vscode';
 import { HttpResponse } from '../models/httpResponse';
 import { ResponseFormatUtility } from '../responseFormatUtility';
 import { EOL } from 'os';
@@ -17,11 +17,15 @@ export class UntitledFileContentProvider {
 
     private static languageFromContentType(response: HttpResponse): string {
         let contentType = response.getResponseHeaderValue("Content-Type");
-        if (!contentType) return 'http';
+        if (!contentType) {
+            return 'http';
+        };
 
         let types = ['xml', 'json', 'html', 'css'];
         for (let type of types) {
-            if (contentType.includes(type)) return type;
+            if (contentType.includes(type)) {
+                return type;
+            }
         };
 
         return 'http';
@@ -79,7 +83,7 @@ export class UntitledFileContentProvider {
             json: '/* ',
             html: '<!-- ',
             css: '/* '
-        }
+        };
         return commentStyle[language] ? commentStyle[language] + REST_RESPONSE : '';
     }
 
@@ -89,7 +93,7 @@ export class UntitledFileContentProvider {
             json: '*/',
             html: '-->',
             css: '*/'
-        }
+        };
         return commentStyle[language] ? commentStyle[language] : '';
     }
 }
