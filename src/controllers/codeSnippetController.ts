@@ -195,7 +195,8 @@ export class CodeSnippetController {
                 mimeType = contentTypeHeader.value;
             }
             if (typeof request.body === 'string') {
-                body = new HARPostData(mimeType, request.body);
+                var normalizedBody = request.body.split(EOL).reduce((prev, cur) => prev.concat(cur.trim()), '');
+                body = new HARPostData(mimeType, normalizedBody);
             } else {
                 body = new HARPostData(mimeType, request.rawBody);
             }
