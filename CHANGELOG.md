@@ -1,3 +1,7 @@
+## 0.14.6 (2017/6/28)
+* __Bug Fix__: ["Generate code snippet" does not include the POST body when Content-Type: application/x-www-form-urlencoded](https://github.com/Huachao/vscode-restclient/issues/105)
+* __Bug Fix__: [Save cURL into clipboard](https://github.com/Huachao/vscode-restclient/issues/100)
+
 ## 0.14.5 (2017/6/15)
 * __Feature__: [Save cURL into clipboard](https://github.com/Huachao/vscode-restclient/issues/100)
 * __Bug Fix__: ["Generate code snippet" does not encode basic authorization](https://github.com/Huachao/vscode-restclient/issues/98)
