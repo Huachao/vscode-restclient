@@ -12,6 +12,7 @@ import * as path from 'path';
 import { Stream } from 'stream';
 
 var CombinedStream = require('combined-stream');
+var encodeurl = require('encodeurl');
 
 export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
@@ -87,6 +88,9 @@ export class HttpRequestParser implements IRequestParser {
         // parse body
         let contentTypeHeader = HttpRequestParser.getContentTypeHeader(headers);
         body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader, parseFileContentAsStream);
+        if (body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(HttpRequestParser.getContentTypeHeader(headers))) {
+            body = encodeurl(body);
+        }
 
         return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL));
     }

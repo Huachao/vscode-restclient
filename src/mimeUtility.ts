@@ -39,4 +39,13 @@ export class MimeUtility {
         let type = MimeUtility.parse(contentTypeString).type;
         return type.toLowerCase() === 'multipart/form-data';
     }
+
+    public static isFormUrlEncoded(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        let type = MimeUtility.parse(contentTypeString).type;
+        return type.toLowerCase() === 'application/x-www-form-urlencoded';
+    }
 }
