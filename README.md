@@ -181,11 +181,12 @@ Each time we sent a http request, the request details(method, url, headers and b
 
 You can also clear request history by pressing `F1` and then selecting/typing `Rest Client: Clear Request History`.
 
-## Save Response
+## Save Full Response
 ![Save Response](images/response.gif)
 In the upper right corner of the response preview tab, we add a new icon to save the latest response to local file system. After you click the `Save Response` icon, it will prompt the window with the saved response file path. You can click the `Open` button to open the saved response file in current workspace, or click `Copy Path` to copy the saved response path to clipboard.
 
-Another icon in the upper right corner of the response preview tab is the `Save Response Body` button, it will only save the response body __ONLY__ to local file system. The saved file extension is set according to the response MIME type, like if the `Content-Type` value in response header is `application/json`, the saved file will be with extension `.json`. You can also overwrite the MIME type and extension mapping to your requirement with the `rest-client.mimeAndFileExtensionMapping` setting.
+## Save Response Body
+Another icon in the upper right corner of the response preview tab is the `Save Response Body` button, it will only save the response body __ONLY__ to local file system. The extension of saved file is set according to the response `MIME` type, like if the `Content-Type` value in response header is `application/json`, the saved file will have extension `.json`. You can also overwrite the `MIME` type and extension mapping according to your requirement with the `rest-client.mimeAndFileExtensionMapping` setting.
 ```json
 "rest-client.mimeAndFileExtensionMapping": {
     "application/atom+xml": "xml"
