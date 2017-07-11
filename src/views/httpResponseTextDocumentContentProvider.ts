@@ -110,13 +110,13 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
             closingTag = /^<\//;
 
         return code.replace(matcher, function(match) {
-            if(newline.test(match)) {
-                if(openSpans.length) {
+            if (newline.test(match)) {
+                if (openSpans.length) {
                     return openSpans.map(() => '</span>').join('') + match + openSpans.join('');
                 } else {
                     return match;
                 }
-            } else if(closingTag.test(match)) {
+            } else if (closingTag.test(match)) {
                 openSpans.pop();
                 return match;
             } else {

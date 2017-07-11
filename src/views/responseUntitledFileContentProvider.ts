@@ -11,7 +11,7 @@ export class UntitledFileContentProvider {
         const language = autoSetLanguage ? UntitledFileContentProvider.languageFromContentType(response) : 'http';
         const content = UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage);
         workspace.openTextDocument({ 'language': language, 'content': content }).then(document => {
-            window.showTextDocument(document, {viewColumn: ViewColumn.Two, preserveFocus: false, preview: !createNewFile}) ;
+            window.showTextDocument(document, { viewColumn: ViewColumn.Two, preserveFocus: false, preview: !createNewFile });
         });
     }
 
