@@ -52,7 +52,7 @@ export class HttpClient {
                         user: params[0],
                         pass: params[1],
                         sendImmediately: scheme === 'Basic'
-                    }
+                    };
                 }
             }
         }
@@ -152,7 +152,7 @@ export class HttpClient {
                         headersSize += response.rawHeaders.map(h => h.length).reduce((a, b) => a + b, 0);
                         headersSize += (response.rawHeaders.length) / 2;
                     }
-                })
+                });
         });
     }
 
@@ -226,7 +226,7 @@ export class HttpClient {
             if (!port) {
                 // if no port specified in request url, host name must exactly match
                 if (urlParts.length === 1 && urlParts[0] === hostName) {
-                    return true
+                    return true;
                 };
             } else {
                 // if port specified, match host without port or hostname:port exactly match
