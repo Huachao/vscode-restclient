@@ -54,6 +54,6 @@ export class VariableProcessor {
                 }
                 return match;
             }
-        }
+        };
     }
 }

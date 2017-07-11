@@ -51,7 +51,7 @@ export class HttpCodeLensProvider implements CodeLensProvider {
             }
         }
 
-        return Promise.resolve(blocks)
+        return Promise.resolve(blocks);
     }
 
     private isCommentLine(line: string): boolean {

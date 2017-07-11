@@ -54,7 +54,7 @@ export class PersistUtility {
 
                 new Promise<string>((resolve, reject) => {
                     PersistUtility.ensureDirectoryExistence(path);
-                    fs.writeFile(path, '', err => err === null ? resolve(path) : reject(err))
+                    fs.writeFile(path, '', err => err === null ? resolve(path) : reject(err));
                 }).then(_ => resolve());
             });
         });
@@ -69,7 +69,7 @@ export class PersistUtility {
                 }
 
                 resolve();
-            })
+            });
         });
     }
 
@@ -87,7 +87,7 @@ export class PersistUtility {
                     }
                     resolve(null);
                 }
-            })
+            });
         });
     }
 
@@ -100,7 +100,7 @@ export class PersistUtility {
                 }
 
                 resolve();
-            })
+            });
         });
     }
 
@@ -120,7 +120,7 @@ export class PersistUtility {
                     }
                     resolve(PersistUtility.emptyHttpRequestItems);
                 }
-            })
+            });
         });
     }
 
