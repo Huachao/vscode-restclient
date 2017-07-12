@@ -333,7 +333,7 @@ Content-Type: application/xml
 X-Request-Id: {{token}}
 
 {
-    "request_id" "{{$guid}}",
+    "request_id": "{{$guid}}",
     "updated_at": "{{$timestamp}}",
     "created_at": "{{$timestamp -1 d}}",
     "review_count": "{{$randomInt 5, 200}}"
