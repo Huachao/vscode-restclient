@@ -1,6 +1,7 @@
 "use strict";
 
 import { window, Uri, Disposable, workspace, commands, ViewColumn } from 'vscode';
+import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { VariableProcessor } from '../variableProcessor';
 import { HttpRequest } from '../models/httpRequest';
@@ -49,6 +50,10 @@ export class CodeSnippetController {
         if (selectedText === '') {
             return;
         }
+
+        // remove file variables definition lines
+        lines = selectedText.split(/\r?\n/g);
+        selectedText = ArrayUtility.skipWhile(lines, l => Constants.VariableDefinitionRegex.test(l)).join(EOL);
 
         // variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
@@ -144,7 +149,11 @@ export class CodeSnippetController {
             return;
         }
 
-        // variables replacement
+        // remove file variables definition lines
+        lines = selectedText.split(/\r?\n/g);
+        selectedText = ArrayUtility.skipWhile(lines, l => Constants.VariableDefinitionRegex.test(l)).join(EOL);
+
+        // environment variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
         this._selectedText = selectedText;
 

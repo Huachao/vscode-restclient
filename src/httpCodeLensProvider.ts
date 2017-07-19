@@ -29,7 +29,9 @@ export class HttpCodeLensProvider implements CodeLensProvider {
 
             // get real start for current requestRange
             while (blockStart <= blockEnd) {
-                if (this.isEmptyLine(lines[blockStart]) || this.isCommentLine(lines[blockStart])) {
+                if (this.isEmptyLine(lines[blockStart]) ||
+                    this.isCommentLine(lines[blockStart]) ||
+                    this.isVariableDefinitionLine(lines[blockStart])) {
                     blockStart++;
                 } else {
                     break;
@@ -60,6 +62,10 @@ export class HttpCodeLensProvider implements CodeLensProvider {
 
     private isEmptyLine(line: string): boolean {
         return line.trim() === '';
+    }
+
+    private isVariableDefinitionLine(line: string): boolean {
+        return Constants.VariableDefinitionRegex.test(line);
     }
 
     private isResponseStatusLine(line: string): boolean {

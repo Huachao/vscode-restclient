@@ -1,5 +1,6 @@
 'use strict';
 
+import { window } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from './constants';
 import { Func } from './common/delegates';
@@ -16,18 +17,26 @@ export class VariableProcessor {
             }
         }
 
-        let customVariables = await EnvironmentController.getCustomVariables();
-        for (var variableName in customVariables) {
+        let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
+        for (var [variableName, variableValue] of fileVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
-                request = request.replace(regex, customVariables[variableName]);
+                request = request.replace(regex, variableValue);
+            }
+        }
+
+        let environmentVariables = await EnvironmentController.getCustomVariables();
+        for (var variableName in environmentVariables) {
+            let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
+            if (regex.test(request)) {
+                request = request.replace(regex, environmentVariables[variableName]);
             }
         }
 
         return request;
     }
 
-    private static getGlobalVariables(): { [key: string]: Func<string, string> } {
+    public static getGlobalVariables(): { [key: string]: Func<string, string> } {
         return {
             [`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`]: match => {
                 let regex = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
@@ -55,5 +64,29 @@ export class VariableProcessor {
                 return match;
             }
         };
+    }
+
+    public static getCustomVariablesInCurrentFile(): Map<string, string> {
+        var variables = new Map<string, string>();
+        let editor = window.activeTextEditor;
+        if (!editor || !editor.document) {
+            return variables;
+        }
+
+        let document = editor.document.getText();
+        let lines: string[] = document.split(/\r?\n/g);
+        lines = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        if (lines.length === 0) {
+            return variables;
+        }
+
+        lines.forEach(line => {
+            let match: RegExpExecArray;
+            if ((match = Constants.VariableDefinitionRegex.exec(line)) && typeof match !== null) {
+                variables.set(match[1], match[2]);
+            }
+        });
+
+        return variables;
     }
 }

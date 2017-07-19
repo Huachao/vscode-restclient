@@ -1,6 +1,7 @@
 "use strict";
 
 import { workspace } from 'vscode';
+import { ArrayUtility } from './common/arrayUtility';
 import { HttpRequest } from './models/httpRequest';
 import { IRequestParser } from './models/IRequestParser';
 import { RequestParserUtil } from './requestParserUtil';
@@ -24,10 +25,10 @@ export class HttpRequestParser implements IRequestParser {
         let lines: string[] = requestRawText.split(EOL);
 
         // skip leading empty lines
-        lines = HttpRequestParser.skipWhile(lines, value => value.trim() === '');
+        lines = ArrayUtility.skipWhile(lines, value => value.trim() === '');
 
         // skip trailing empty lines
-        lines = HttpRequestParser.skipWhile(lines.reverse(), value => value.trim() === '').reverse();
+        lines = ArrayUtility.skipWhile(lines.reverse(), value => value.trim() === '').reverse();
 
         if (lines.length === 0) {
             return null;
@@ -40,11 +41,11 @@ export class HttpRequestParser implements IRequestParser {
         let headers: { [key: string]: string };
         let body: string | Stream;
         let bodyLines: string[] = [];
-        let headerStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', 1);
+        let headerStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', 1);
         if (headerStartLine !== -1) {
             if (headerStartLine === 1) {
                 // parse request headers
-                let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
+                let firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
                 let headerEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                 let headerLines = lines.slice(headerStartLine, headerEndLine);
                 let index = 0;
@@ -65,16 +66,16 @@ export class HttpRequestParser implements IRequestParser {
                 headers = RequestParserUtil.parseRequestHeaders(headerLines.slice(index));
 
                 // get body range
-                let bodyStartLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
+                let bodyStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
                 if (bodyStartLine !== -1) {
                     let contentTypeHeader = HttpRequestParser.getContentTypeHeader(headers);
-                    firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
+                    firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
                     let bodyEndLine = MimeUtility.isMultiPartFormData(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                     bodyLines = lines.slice(bodyStartLine, bodyEndLine);
                 }
             } else {
                 // parse body, since no headers provided
-                let firstEmptyLine = HttpRequestParser.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
+                let firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
                 let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                 bodyLines = lines.slice(headerStartLine, bodyEndLine);
             }
@@ -211,30 +212,5 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         return null;
-    }
-
-    private static skipWhile<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean): T[] {
-        for (var index = 0; index < items.length; index++) {
-            if (!callbackfn(items[index], index, items)) {
-                break;
-            }
-        }
-
-        return items.slice(index);
-    };
-
-    private static firstIndexOf<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean, start?: number): number {
-        if (!start) {
-            start = 0;
-        }
-
-        let index = start;
-        for (; index < items.length; index++) {
-            if (callbackfn(items[index], index, items)) {
-                break;
-            }
-        }
-
-        return index >= items.length ? -1 : index;
     }
 }

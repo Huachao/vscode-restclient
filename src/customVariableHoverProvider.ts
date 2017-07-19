@@ -2,6 +2,7 @@
 
 import {HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Position} from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
+import { VariableProcessor } from './variableProcessor';
 
 export class CustomVariableHoverProvider implements HoverProvider {
 
@@ -21,10 +22,18 @@ export class CustomVariableHoverProvider implements HoverProvider {
 
         let selectedVariableName = document.getText(wordRange);
 
-        let customVariables = await EnvironmentController.getCustomVariables();
-        for (var variableName in customVariables) {
+        let fileCustomVariables = VariableProcessor.getCustomVariablesInCurrentFile();
+        for (var [variableName, variableValue] of fileCustomVariables) {
             if (variableName === selectedVariableName) {
-                let contents: MarkedString[] = [customVariables[variableName], { language: 'http', value: `Custom Variable ${variableName}` }];
+                let contents: MarkedString[] = [variableValue, { language: 'http', value: `File Variable ${variableName}` }];
+                return new Hover(contents, wordRange);
+            }
+        }
+
+        let environmentCustomVariables = await EnvironmentController.getCustomVariables();
+        for (var variableName in environmentCustomVariables) {
+            if (variableName === selectedVariableName) {
+                let contents: MarkedString[] = [environmentCustomVariables[variableName], { language: 'http', value: `Environment Variable ${variableName}` }];
                 return new Hover(contents, wordRange);
             }
         }

@@ -1,6 +1,7 @@
 "use strict";
 
 import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument, Range } from 'vscode';
+import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
 import { HttpRequest } from '../models/httpRequest';
@@ -66,6 +67,10 @@ export class RequestController {
         if (selectedText === '') {
             return;
         }
+
+        // remove file variables definition lines
+        lines = selectedText.split(/\r?\n/g);
+        selectedText = ArrayUtility.skipWhile(lines, l => Constants.VariableDefinitionRegex.test(l)).join(EOL);
 
         // variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
