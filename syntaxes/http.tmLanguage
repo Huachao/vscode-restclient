@@ -124,7 +124,7 @@
                     </dict>
                 </dict>
                 <key>match</key>
-                <string>^(@)([^\s=]+)\s*=\s*(.+)\s*$</string>
+                <string>^\s*(@)([^\s=]+)\s*=\s*(.+)\s*$</string>
                 <key>name</key>
                 <string>http.filevariable</string>
             </dict>

@@ -44,5 +44,11 @@
             "\t</soap:Body>",
             "</soap:Envelope>"
         ]
+    },
+    "File level custom variable": {
+        "prefix": "variable",
+        "body": [
+            "@${name} = ${value}"
+        ]
     }
 }

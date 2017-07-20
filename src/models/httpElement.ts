@@ -34,5 +34,6 @@ export enum ElementType {
     MIME,
     Authentication,
     SystemVariable,
-    CustomVariable,
+    EnvironmentCustomVariable,
+    FileCustomVariable
 }
