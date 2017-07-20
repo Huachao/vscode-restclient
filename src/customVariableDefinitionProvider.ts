@@ -10,13 +10,13 @@ export class CustomVariableDefinitionProvider implements DefinitionProvider {
         let wordRange = document.getWordRangeAtPosition(position);
         let selectedVariableName = document.getText(wordRange);
 
-        let locations = this.getDefinitions(documentLines, selectedVariableName);
+        let locations = this.getDefinitionRanges(documentLines, selectedVariableName);
         return Promise.resolve(locations.map(location => {
             return new Location(document.uri, location);
         }));
     }
 
-    private getDefinitions(lines: string[], variable: string): Range[] {
+    private getDefinitionRanges(lines: string[], variable: string): Range[] {
         let locations: Range[] = [];
         for (var index = 0; index < lines.length; index++) {
             var line = lines[index];
