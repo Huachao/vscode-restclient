@@ -9,6 +9,7 @@ import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
 import { HttpCompletionItemProvider } from './httpCompletionItemProvider';
 import { CustomVariableHoverProvider } from './customVariableHoverProvider';
+import { CustomVariableDefinitionProvider } from './customVariableDefinitionProvider';
 import { HttpCodeLensProvider } from './httpCodeLensProvider';
 import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
 
@@ -47,6 +48,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerHoverProvider('http', new CustomVariableHoverProvider()));
     context.subscriptions.push(languages.registerCodeLensProvider('http', new HttpCodeLensProvider()));
     context.subscriptions.push(languages.registerDocumentLinkProvider('http', new RequestBodyDocumentLinkProvider()));
+    context.subscriptions.push(languages.registerDefinitionProvider('http', new CustomVariableDefinitionProvider()));
 }
 
 // this method is called when your extension is deactivated

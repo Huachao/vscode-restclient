@@ -75,11 +75,6 @@ export class VariableProcessor {
 
         let document = editor.document.getText();
         let lines: string[] = document.split(/\r?\n/g);
-        lines = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l));
-        if (lines.length === 0) {
-            return variables;
-        }
-
         lines.forEach(line => {
             let match: RegExpExecArray;
             if ((match = Constants.VariableDefinitionRegex.exec(line)) && typeof match !== null) {

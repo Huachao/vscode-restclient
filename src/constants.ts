@@ -24,4 +24,4 @@ export const RandomIntDescription = "Returns a random integer between min (inclu
 
 export const CommentIdentifiersRegex: RegExp = new RegExp('^\\s*(\#|\/\/)');
 
-export const VariableDefinitionRegex: RegExp = new RegExp('^@([^\\s=]+)\\s*=\\s*(.+)\\s*$');
+export const VariableDefinitionRegex: RegExp = new RegExp('^\\s*@([^\\s=]+)\\s*=\\s*(.+)\\s*$');
