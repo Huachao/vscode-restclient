@@ -1,10 +1,15 @@
 'use strict';
 
-import {DefinitionProvider, Definition, TextDocument, CancellationToken, Position, Location, Range} from 'vscode';
+import { DefinitionProvider, Definition, TextDocument, CancellationToken, Position, Location, Range } from 'vscode';
+import { VariableUtility } from './variableUtility';
 import * as Constants from './constants';
 
 export class CustomVariableDefinitionProvider implements DefinitionProvider {
     public provideDefinition(document: TextDocument, position: Position, token: CancellationToken): Promise<Definition> {
+        if (!VariableUtility.isVariableReference(document, position)) {
+            return Promise.resolve(null);
+        }
+
         let documentLines = document.getText().split(/\r?\n/g);
 
         let wordRange = document.getWordRangeAtPosition(position);
