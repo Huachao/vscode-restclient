@@ -27,7 +27,7 @@ export class CustomVariableReferenceProvider implements ReferenceProvider {
     private getDefinitionRanges(lines: string[], variable: string): Range[] {
         let locations: Range[] = [];
         for (var index = 0; index < lines.length; index++) {
-            var line = lines[index];
+            let line = lines[index];
             let match: RegExpExecArray;
             if ((match = Constants.VariableDefinitionRegex.exec(line)) &&
                 match[1] === variable) {
@@ -42,7 +42,11 @@ export class CustomVariableReferenceProvider implements ReferenceProvider {
     private getReferenceRanges(lines: string[], variable: string): Range[] {
         let locations: Range[] = [];
         for (var index = 0; index < lines.length; index++) {
-            var line = lines[index];
+            let line = lines[index];
+            if (Constants.CommentIdentifiersRegex.test(line)) {
+                continue;
+            }
+
             let regex = new RegExp(`\{\{${variable}\}\}`, 'g');
             let match: RegExpExecArray;
             while (match = regex.exec(line)) {

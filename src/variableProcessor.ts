@@ -67,7 +67,7 @@ export class VariableProcessor {
     }
 
     public static getCustomVariablesInCurrentFile(): Map<string, string> {
-        var variables = new Map<string, string>();
+        let variables = new Map<string, string>();
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return variables;

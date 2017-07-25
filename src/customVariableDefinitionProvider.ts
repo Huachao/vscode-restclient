@@ -24,7 +24,7 @@ export class CustomVariableDefinitionProvider implements DefinitionProvider {
     private getDefinitionRanges(lines: string[], variable: string): Range[] {
         let locations: Range[] = [];
         for (var index = 0; index < lines.length; index++) {
-            var line = lines[index];
+            let line = lines[index];
             let match: RegExpExecArray;
             if ((match = Constants.VariableDefinitionRegex.exec(line)) &&
                 typeof match !== null &&

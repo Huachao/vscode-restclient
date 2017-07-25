@@ -138,7 +138,7 @@ export class HttpRequestParser implements IRequestParser {
                         let groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
                         if (groups !== null && groups.length === 2) {
                             let fileUploadPath = groups[1];
-                            var fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
+                            let fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
                             if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
                                 combinedStream.append(fs.createReadStream(fileAbsolutePath));
                             } else {
@@ -186,9 +186,10 @@ export class HttpRequestParser implements IRequestParser {
             return fs.existsSync(refPath) ? refPath : null;
         }
 
-        var rootPath = workspace.rootPath;
+        let rootPath = workspace.rootPath;
+        let absolutePath;
         if (rootPath) {
-            var absolutePath = path.join(rootPath, refPath);
+            absolutePath = path.join(rootPath, refPath);
             if (fs.existsSync(absolutePath)) {
                 return absolutePath;
             }

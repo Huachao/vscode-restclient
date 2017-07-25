@@ -26,7 +26,7 @@ export class HistoryController {
                 window.showInformationMessage("No request history items are found!");
                 return;
             }
-            var itemPickList: HistoryQuickPickItem[] = requests.map(request => {
+            let itemPickList: HistoryQuickPickItem[] = requests.map(request => {
                 // TODO: add headers and body in pick item?
                 let item = new HistoryQuickPickItem();
                 item.label = `${request.method.toUpperCase()} ${request.url}`;
@@ -80,7 +80,7 @@ export class HistoryController {
                 if (request.headers) {
                     for (var header in request.headers) {
                         if (request.headers.hasOwnProperty(header)) {
-                            var value = request.headers[header];
+                            let value = request.headers[header];
                             output += `${header}: ${value}${EOL}`;
                         }
                     }

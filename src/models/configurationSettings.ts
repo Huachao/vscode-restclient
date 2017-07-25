@@ -53,7 +53,7 @@ export class RestClientSettings implements IRestClientSettings {
     }
 
     private initializeSettings() {
-        var restClientSettings = workspace.getConfiguration("rest-client");
+        let restClientSettings = workspace.getConfiguration("rest-client");
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultUserAgent = restClientSettings.get<string>("defaultuseragent", "vscode-restclient");
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
