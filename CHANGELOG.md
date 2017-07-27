@@ -1,3 +1,7 @@
+## 0.15.0 (2017/7/28)
+* __Feature__: [Define variables inside of HTTP file](https://github.com/Huachao/vscode-restclient/issues/84)
+* __Bug Fix__: ["Generate code snippet" does not include the POST body when Content-Type: application/x-www-form-urlencoded](https://github.com/Huachao/vscode-restclient/issues/105)
+
 ## 0.14.6 (2017/6/28)
 * __Bug Fix__: ["Generate code snippet" does not include the POST body when Content-Type: application/x-www-form-urlencoded](https://github.com/Huachao/vscode-restclient/issues/105)
 * __Bug Fix__: [Save cURL into clipboard](https://github.com/Huachao/vscode-restclient/issues/100)
