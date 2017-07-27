@@ -18,7 +18,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - SSL Client Certificates
 * Environments and custom/global system variables support
     - Use custom/global variables in any place of request(_URL_, _Headers_, _Body_)
-    - Support both __environment__ and __document__ custom variables
+    - Support both __environment__ and __file__ custom variables
     - Auto completion and hover support for both environment and file custom variables
     - Go to definition and find all references support _ONLY_ for file custom variables
     - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}` 
