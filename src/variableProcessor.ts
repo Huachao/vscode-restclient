@@ -8,6 +8,14 @@ var uuid = require('node-uuid');
 var moment = require('moment');
 
 export class VariableProcessor {
+
+    private static readonly escapee: Map<string, string> = new Map<string, string>([
+        ['n', '\n'],
+        ['r', '\r'],
+        ['t', '\t'],
+        ['\\', '\\']
+    ]);
+
     public static async processRawRequest(request: string) {
         let globalVariables = VariableProcessor.getGlobalVariables();
         for (var variablePattern in globalVariables) {
@@ -78,7 +86,24 @@ export class VariableProcessor {
         lines.forEach(line => {
             let match: RegExpExecArray;
             if ((match = Constants.VariableDefinitionRegex.exec(line)) && typeof match !== null) {
-                variables.set(match[1], match[2]);
+                let key = match[1];
+                let originalValue = match[2];
+                let value = '';
+                let isPrevCharEscape = false;
+                for (var index = 0; index < originalValue.length; index++) {
+                    let currentChar = originalValue[index];
+                    if (isPrevCharEscape) {
+                        isPrevCharEscape = false;
+                        value += this.escapee.get(currentChar) || currentChar;
+                    } else {
+                        if (currentChar === '\\') {
+                            isPrevCharEscape = true;
+                            continue;
+                        }
+                        value += currentChar;
+                    }
+                }
+                variables.set(key, value);
             }
         });
 
