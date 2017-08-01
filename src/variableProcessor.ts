@@ -12,8 +12,7 @@ export class VariableProcessor {
     private static readonly escapee: Map<string, string> = new Map<string, string>([
         ['n', '\n'],
         ['r', '\r'],
-        ['t', '\t'],
-        ['\\', '\\']
+        ['t', '\t']
     ]);
 
     public static async processRawRequest(request: string) {
