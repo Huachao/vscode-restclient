@@ -337,29 +337,18 @@ Global variables provide a pre-defined set of variables that can be used in any 
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
 * `{{$timestamp}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`. The option string you can specify in timestamp are:
-```
-    +---------+--------------+
-    | Options | Descriptions |
-    +---------+--------------+
-    |    y    |    Years     |
-    +---------+--------------+
-    |    Q    |   Quarters   |
-    +---------+--------------+
-    |    M    |    Months    |
-    +---------+--------------+
-    |    w    |    Weeks     |
-    +---------+--------------+
-    |    d    |     Days     |
-    +---------+--------------+
-    |    h    |    Hours     |
-    +---------+--------------+
-    |    m    |   Minutes    |
-    +---------+--------------+
-    |    s    |   Seconds    |
-    +---------+--------------+
-    |    ms   | Milliseconds |
-    +---------+--------------+
-```
+
+Option | Description
+------ | -----------
+y | Year
+Q | Quarter
+M | Month
+w | Week
+d | Day
+h | Hour
+m | Minute
+s | Second
+ms | Millisecond
 
 ### Variables Sample:
 ```http
