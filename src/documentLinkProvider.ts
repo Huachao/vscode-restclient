@@ -15,7 +15,7 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
         let lines: string[] = text.split(/\r?\n/g);
         for (var index = 0; index < lines.length; index++) {
             var line = lines[index];
-            let match: RegExpMatchArray | null;
+            let match: RegExpMatchArray;
             if (match = this._linkPattern.exec(line)) {
                 let filePath = match[2];
                 const offset = match[1].length;
@@ -41,8 +41,10 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
         let resourcePath;
         if (!uri.path) {
             resourcePath = document.uri.path;
-        } else if (uri.path[0] === '/') {
-            resourcePath = path.join(workspace.rootPath || '', uri.path);
+        } else if (path.isAbsolute(uri.path)) {
+            resourcePath = uri.path;
+        } else if (workspace.rootPath) {
+            resourcePath = path.join(workspace.rootPath, uri.path);
         } else {
             resourcePath = path.join(base, uri.path);
         }

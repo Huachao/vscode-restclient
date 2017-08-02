@@ -43,7 +43,9 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('rest-client.copy-request-as-curl', () => codeSnippetController.copyAsCurl()));
     context.subscriptions.push(commands.registerCommand('rest-client.switch-environment', () => environmentController.switchEnvironment()));
     context.subscriptions.push(commands.registerCommand('rest-client._openDocumentLink', args => {
-        workspace.openTextDocument(Uri.file(args.path)).then(window.showTextDocument, window.showErrorMessage);
+        workspace.openTextDocument(Uri.file(args.path)).then(window.showTextDocument, error => {
+            window.showErrorMessage(error.message);
+        });
     }));
     context.subscriptions.push(languages.registerCompletionItemProvider('http', new HttpCompletionItemProvider()));
     context.subscriptions.push(languages.registerHoverProvider('http', new CustomVariableHoverProvider()));
