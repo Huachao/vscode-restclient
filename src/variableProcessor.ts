@@ -84,7 +84,7 @@ export class VariableProcessor {
         let lines: string[] = document.split(/\r?\n/g);
         lines.forEach(line => {
             let match: RegExpExecArray;
-            if ((match = Constants.VariableDefinitionRegex.exec(line)) && typeof match !== null) {
+            if (match = Constants.VariableDefinitionRegex.exec(line)) {
                 let key = match[1];
                 let originalValue = match[2];
                 let value = '';

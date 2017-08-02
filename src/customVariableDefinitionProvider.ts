@@ -27,7 +27,6 @@ export class CustomVariableDefinitionProvider implements DefinitionProvider {
             let line = lines[index];
             let match: RegExpExecArray;
             if ((match = Constants.VariableDefinitionRegex.exec(line)) &&
-                typeof match !== null &&
                 match[1] === variable) {
                 let startPos = line.indexOf(`@${variable}`);
                 let endPos = startPos + variable.length + 1;
