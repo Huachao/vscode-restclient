@@ -114,7 +114,7 @@ export class HttpElementFactory {
         // add file custom variables
         let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
         for (var [variableName, variableValue] of fileVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.FileCustomVariable, '^\\s*[^@]', `Value: ${variableValue}`, new SnippetString(`{{${variableName}}}`)));
+            originalElements.push(new HttpElement(variableName, ElementType.FileCustomVariable, '^\\s*[^@]+=', `Value: ${variableValue}`, new SnippetString(`{{${variableName}}}`)));
         }
 
         // add urls from history
