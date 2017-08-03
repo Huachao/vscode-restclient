@@ -114,7 +114,7 @@ export class HttpElementFactory {
         // add file custom variables
         let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
         for (var [variableName, variableValue] of fileVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.FileCustomVariable, '^\\s*[^@]+=', `Value: ${variableValue}`, new SnippetString(`{{${variableName}}}`)));
+            originalElements.push(new HttpElement(variableName, ElementType.FileCustomVariable, '^\\s*[^@]', `Value: ${variableValue}`, new SnippetString(`{{${variableName}}}`)));
         }
 
         // add urls from history
@@ -139,9 +139,11 @@ export class HttpElementFactory {
 
         if (elements.length === 0) {
             elements = originalElements.filter(e => !e.prefix);
+        } else if (elements.every(e => e.type === ElementType.FileCustomVariable)) {
+            elements = elements.concat(originalElements.filter(e => !e.prefix));
         } else {
             // add global/custom variables anyway
-            originalElements.filter(e => !e.prefix && (e.type === ElementType.SystemVariable || e.type === ElementType.EnvironmentCustomVariable)).forEach(element => {
+            originalElements.filter(e => !e.prefix && (e.type === ElementType.SystemVariable || e.type === ElementType.EnvironmentCustomVariable || e.type === ElementType.FileCustomVariable)).forEach(element => {
                 elements.push(element);
             });
         }

@@ -1,3 +1,7 @@
+## 0.15.1 (2017/8/3)
+* __Bug Fix__: Fix autocompletion not working
+* __Improvement__: Add backslash to escape special character(`\n`, `\r` and `\t`)
+
 ## 0.15.0 (2017/7/28)
 * __Feature__: [Define variables inside of HTTP file](https://github.com/Huachao/vscode-restclient/issues/84)
 * __Bug Fix__: ["Generate code snippet" does not include the POST body when Content-Type: application/x-www-form-urlencoded](https://github.com/Huachao/vscode-restclient/issues/105)
