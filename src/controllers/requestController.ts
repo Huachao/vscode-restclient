@@ -224,7 +224,7 @@ export class RequestController {
         this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
         // this._durationStatusBarItem.tooltip = `Duration:${EOL}Total: ${response`;
         this._durationStatusBarItem.tooltip = [
-            'Duration:',
+            'Breakdown of Duration:',
             `Socket: ${response.timingPhases.wait.toFixed(1)}ms`,
             `DNS: ${response.timingPhases.dns.toFixed(1)}ms`,
             `TCP: ${response.timingPhases.tcp.toFixed(1)}ms`,
@@ -235,6 +235,6 @@ export class RequestController {
 
     private formatSizeStatusBar(response: HttpResponse) {
         this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
-        this._sizeStatusBarItem.tooltip = `Response Size:${EOL}Headers: ${filesize(response.headersSizeInBytes)}${EOL}Body: ${filesize(response.bodySizeInBytes)}`;
+        this._sizeStatusBarItem.tooltip = `Breakdown of Response Size:${EOL}Headers: ${filesize(response.headersSizeInBytes)}${EOL}Body: ${filesize(response.bodySizeInBytes)}`;
     }
 }

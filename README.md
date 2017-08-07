@@ -51,7 +51,11 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, click the `Send Request` link above the request, or use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate __webview__ panel of Visual Studio Code. If you'd like to use the full power of searching, selecting or manipulating in Visual Studio Code, you can also preview response in __an untitled document__ by setting `rest-client.previewResponseInUntitledDocument` to `true`, by default the value is `false`. When a request is issued, ![cloud upload](images/loading.gif) will be displayed in the status bar, after receiving the response, the icon will be changed to the duration and response size. When hovering over the duration status bar, you could view the breakdown duration details of _Socket_, _DNS_, _TCP_, _First Byte_ and _Download_. When hovering over the response size status bar, you could view the breakdown response size details of _headers_ and _body_.
+Once you prepared a request, click the `Send Request` link above the request, or use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate __webview__ panel of Visual Studio Code. If you'd like to use the full power of searching, selecting or manipulating in Visual Studio Code, you can also preview response in __an untitled document__ by setting `rest-client.previewResponseInUntitledDocument` to `true`, by default the value is `false`. When a request is issued, ![cloud upload](images/loading.gif) will be displayed in the status bar, after receiving the response, the icon will be changed to the duration and response size.
+
+You can view the breakdown of the response time when hovering over the duration status bar, you could view the duration details of _Socket_, _DNS_, _TCP_, _First Byte_ and _Download_.
+
+When hovering over the response size status bar, you could view the breakdown response size details of _headers_ and _body_.
 
 > All the shortcuts in REST Client Extension are __ONLY__ available for file language mode `http` and `plaintext`.
 
