@@ -12,8 +12,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 
-var cp = require('copy-paste');
-var mime = require('mime-types');
+let cp = require('copy-paste');
+let mime = require('mime-types');
 
 export class ResponseController {
     private _restClientSettings: RestClientSettings;
@@ -86,7 +86,7 @@ export class ResponseController {
     private getFullResponseString(response: HttpResponse): string {
         let statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
         let headerString = '';
-        for (var header in response.headers) {
+        for (let header in response.headers) {
             if (response.headers.hasOwnProperty(header)) {
                 headerString += `${header}: ${response.headers[header]}${os.EOL}`;
             }

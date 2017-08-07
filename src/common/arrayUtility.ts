@@ -2,7 +2,8 @@
 
 export class ArrayUtility {
     public static skipWhile<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean): T[] {
-        for (var index = 0; index < items.length; index++) {
+        let index = 0;
+        for (; index < items.length; index++) {
             if (!callbackfn(items[index], index, items)) {
                 break;
             }

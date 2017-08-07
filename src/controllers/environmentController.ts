@@ -28,7 +28,7 @@ export class EnvironmentController {
         let currentEnvironment = await EnvironmentController.getCurrentEnvironment();
         let itemPickList: EnvironmentPickItem[] = [];
         itemPickList.push(EnvironmentController.noEnvironmentPickItem);
-        for (var name in this._restClientSettings.environmentVariables) {
+        for (let name in this._restClientSettings.environmentVariables) {
             let item = new EnvironmentPickItem(name, name);
             if (item.name === currentEnvironment.name) {
                 item.description = '$(check)';
@@ -61,7 +61,7 @@ export class EnvironmentController {
         }
 
         let settings = new RestClientSettings();
-        for (var environmentName in settings.environmentVariables) {
+        for (let environmentName in settings.environmentVariables) {
             if (environmentName === environment.name) {
                 return settings.environmentVariables[environmentName];
             }

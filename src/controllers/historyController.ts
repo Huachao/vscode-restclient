@@ -8,8 +8,8 @@ import { Telemetry } from '../telemetry';
 import { EOL } from 'os';
 import * as fs from 'fs';
 
-var tmp = require('tmp');
-var moment = require('moment');
+let tmp = require('tmp');
+let moment = require('moment');
 
 export class HistoryController {
     private _outputChannel: OutputChannel;
@@ -78,7 +78,7 @@ export class HistoryController {
                 }
                 let output = `${request.method.toUpperCase()} ${request.url}${EOL}`;
                 if (request.headers) {
-                    for (var header in request.headers) {
+                    for (let header in request.headers) {
                         if (request.headers.hasOwnProperty(header)) {
                             let value = request.headers[header];
                             output += `${header}: ${value}${EOL}`;

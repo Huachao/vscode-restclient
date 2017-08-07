@@ -12,7 +12,7 @@ import * as path from 'path';
 
 const hljs = require('highlight.js');
 
-var autoLinker = require('autolinker');
+let autoLinker = require('autolinker');
 
 export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentContentProvider {
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
@@ -142,7 +142,7 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
 
     private static formatHeaders(headers: { [key: string]: string }): string {
         let headerString = '';
-        for (var header in headers) {
+        for (let header in headers) {
             if (headers.hasOwnProperty(header)) {
                 let value = headers[header];
                 if (typeof headers[header] !== 'string') {

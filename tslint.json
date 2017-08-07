@@ -4,11 +4,32 @@
         "no-unused-expression": true,
         "no-trailing-whitespace": true,
         "no-duplicate-variable": true,
+        "no-var-keyword": true,
         "class-name": true,
         "curly": true,
+        "one-line": [
+            true,
+            "check-catch",
+            "check-finally",
+            "check-else",
+            "check-open-brace",
+            "check-whitespace"
+        ],
         "semicolon": [
              "always"
          ],
-        "triple-equals": true
+        "variable-name": [
+            true,
+            "ban-keywords"
+        ],
+        "triple-equals": true,
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-separator",
+            "check-type"
+        ]
     }
 }

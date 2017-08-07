@@ -63,7 +63,7 @@ export class UntitledFileContentProvider {
     private static extractStandardResponseInformation(response: HttpResponse) {
         let responseStatusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${EOL}`;
         let headers = '';
-        for (var header in response.headers) {
+        for (let header in response.headers) {
             if (response.headers.hasOwnProperty(header)) {
                 let value = response.headers[header];
                 if (typeof response.headers[header] !== 'string') {

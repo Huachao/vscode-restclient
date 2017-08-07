@@ -172,7 +172,7 @@ export class CodeSnippetController {
     private convertToHARHttpRequest(request: HttpRequest): HARHttpRequest {
         // convert headers
         let headers: HARHeader[] = [];
-        for (var key in request.headers) {
+        for (let key in request.headers) {
             let headerValue = request.headers[key];
             if (key.toLowerCase() === 'authorization') {
                 headerValue = CodeSnippetController.normalizeAuthHeader(headerValue);
@@ -188,8 +188,7 @@ export class CodeSnippetController {
                 let cookieParts = pair.split('=', 2);
                 if (cookieParts.length === 2) {
                     cookies.push(new HARCookie(cookieParts[0].trim(), cookieParts[1].trim()));
-                }
-                else {
+                } else {
                     cookies.push(new HARCookie(cookieParts[0].trim(), ''));
                 }
             });
