@@ -217,14 +217,14 @@
       },
       {
         "command": "rest-client.cancel-request",
-        "key": "ctrl+alt+q",
-        "mac": "cmd+alt+q",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+alt+k",
         "when": "editorTextFocus && editorLangId == 'http'"
       },
       {
         "command": "rest-client.cancel-request",
-        "key": "ctrl+alt+q",
-        "mac": "cmd+alt+q",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+alt+k",
         "when": "editorTextFocus && editorLangId == 'plaintext'"
       },
       {
