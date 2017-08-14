@@ -14,7 +14,7 @@ import * as path from 'path';
 
 var encodeUrl = require('encodeurl');
 var request = require('request');
-var cookieStore = require('tough-cookie-file-store');
+var cookieStore = require('tough-cookie-file-store-bugfix');
 var iconv = require('iconv-lite');
 
 export class HttpClient {
