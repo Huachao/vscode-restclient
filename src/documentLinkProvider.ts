@@ -2,6 +2,7 @@
 
 import { DocumentLink, DocumentLinkProvider, TextDocument, Range, Position, Uri, workspace, CancellationToken } from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 
 export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
 
@@ -32,23 +33,20 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
     }
 
     private normalizeLink(document: TextDocument, link: string, base: string): Uri {
-        const uri = Uri.parse(link);
-        if (uri.scheme) {
-            return uri;
-        }
-
-        // assume it must be a file
         let resourcePath;
-        if (!uri.path) {
-            resourcePath = document.uri.path;
-        } else if (path.isAbsolute(uri.path)) {
-            resourcePath = uri.path;
-        } else if (workspace.rootPath) {
-            resourcePath = path.join(workspace.rootPath, uri.path);
+        if (path.isAbsolute(link)) {
+            resourcePath = link;
         } else {
-            resourcePath = path.join(base, uri.path);
+            if (workspace.rootPath) {
+                resourcePath = path.join(workspace.rootPath, link);
+                if (!fs.existsSync(resourcePath)) {
+                    resourcePath = path.join(base, link);
+                }
+            } else {
+                resourcePath = path.join(base, link);
+            }
         }
 
-        return Uri.parse(`command:rest-client._openDocumentLink?${encodeURIComponent(JSON.stringify({ fragment: uri.fragment, path: resourcePath }))}`);
+        return Uri.parse(`command:rest-client._openDocumentLink?${encodeURIComponent(JSON.stringify({ path: resourcePath }))}`);
     }
 }
