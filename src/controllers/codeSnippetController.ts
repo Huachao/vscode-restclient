@@ -125,12 +125,14 @@ export class CodeSnippetController {
     }
 
     public async copy() {
+        Telemetry.sendEvent('Copy Code Snippet');
         if (this._convertedResult) {
             cp.copy(this._convertedResult);
         }
     }
 
     public async copyAsCurl() {
+        Telemetry.sendEvent('Copy Request As cURL');
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return;
