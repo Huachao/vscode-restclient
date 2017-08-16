@@ -6,10 +6,14 @@ import { RequestParserUtil } from './requestParserUtil';
 
 var yargs = require('yargs');
 
+const DefaultContentType: string = 'application/x-www-form-urlencoded';
+
 export class CurlRequestParser implements IRequestParser {
+
     public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string, parseFileContentAsStream: boolean): HttpRequest {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(requestRawText.trim()));
+        requestText = requestText.replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2');
         let yargObject = yargs(requestText);
         let parsedArguments = yargObject.argv;
 
@@ -29,6 +33,13 @@ export class CurlRequestParser implements IRequestParser {
             headers = RequestParserUtil.parseRequestHeaders(parsedHeaders);
         }
 
+        //parse cookie
+        let cookieString: string = parsedArguments.b || parsedArguments.cookie;
+        if (cookieString && cookieString.includes('=')) {
+            // Doesn't support cookie jar
+            headers['Cookie'] = cookieString;
+        }
+
         let user = parsedArguments.u || parsedArguments.user;
         if (user) {
             headers['Authorization'] = `Basic ${new Buffer(user).toString('base64')}`;
@@ -36,6 +47,14 @@ export class CurlRequestParser implements IRequestParser {
 
         // parse body
         let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-binary'];
+        if (Array.isArray(body)) {
+            body = body.join('&');
+        }
+
+        // Set Content-Type header to application/x-www-form-urlencoded if has body and missing this header
+        if (body && !CurlRequestParser.hasContentTypeHeader(headers)) {
+            headers['Content-Type'] = DefaultContentType;
+        }
 
         // parse method
         let method: string = <string>(parsedArguments.X || parsedArguments.request);
@@ -52,5 +71,15 @@ export class CurlRequestParser implements IRequestParser {
 
     private static mergeMultipleSpacesIntoSingle(text: string): string {
         return text.replace(/\s{2,}/g, ' ');
+    }
+
+    private static hasContentTypeHeader(headers: { [key: string]: string }): boolean {
+        for (let header in headers) {
+            if (header.toLowerCase() === 'content-type') {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
