@@ -342,7 +342,7 @@ Content-Type: application/json
 
 {
     "name": "{{name}}",
-    "address": "{{address}"
+    "address": "{{address}}"
 }
 ```
 
