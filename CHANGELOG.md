@@ -1,3 +1,11 @@
+## 0.15.2 (2017/8/22)
+* __Breaking Change__ [Remap keybinding of _Cancel Request_ from `Ctrl/Cmd+Alt+Q` to `Ctrl/Cmd+Alt+K`](https://github.com/Huachao/vscode-restclient/issues/115)
+* __Bug Fix__: [Missing parameters in CURL/POST body](https://github.com/Huachao/vscode-restclient/issues/112)
+* __Bug Fix__: Add telemetry events for copy commands
+* __Bug Fix (Partial)__: [Fix request body file path click bug in _Windows_](https://github.com/Huachao/vscode-restclient/issues/110)
+* __Bug Fix (Partial)__: [Allow cookie path ends with trailing slash](https://github.com/Huachao/vscode-restclient/issues/113)
+* __Bug Fix (Partial)__: [Update README.md to include the details of supported curl options](https://github.com/Huachao/vscode-restclient/issues/113)
+
 ## 0.15.1 (2017/8/3)
 * __Bug Fix__: Fix autocompletion not working
 * __Improvement__: Add backslash to escape special character(`\n`, `\r` and `\t`)
