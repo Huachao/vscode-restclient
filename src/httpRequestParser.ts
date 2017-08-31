@@ -12,8 +12,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Stream } from 'stream';
 
-var CombinedStream = require('combined-stream');
-var encodeurl = require('encodeurl');
+const CombinedStream = require('combined-stream');
+const encodeurl = require('encodeurl');
 
 export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
@@ -50,7 +50,7 @@ export class HttpRequestParser implements IRequestParser {
                 let headerLines = lines.slice(headerStartLine, headerEndLine);
                 let index = 0;
                 let queryString = '';
-                for (; index < headerLines.length;) {
+                for (; index < headerLines.length; ) {
                     let headerLine = (headerLines[index]).trim();
                     if (headerLine[0] in { '?': '', '&': '' } && headerLine.split('=').length === 2) {
                         queryString += headerLine;
@@ -132,7 +132,7 @@ export class HttpRequestParser implements IRequestParser {
             return lines.join(EOL);
         } else {
             if (parseFileContentAsStream) {
-                var combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
+                let combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
                 lines.forEach(line => {
                     if (HttpRequestParser.uploadFromFileSyntax.test(line)) {
                         let groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
@@ -160,7 +160,7 @@ export class HttpRequestParser implements IRequestParser {
                         let groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
                         if (groups !== null && groups.length === 2) {
                             let fileUploadPath = groups[1];
-                            var fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
+                            let fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
                             if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
                                 contents.push(fs.readFileSync(fileAbsolutePath));
                             } else {
@@ -205,7 +205,7 @@ export class HttpRequestParser implements IRequestParser {
 
     private static getContentTypeHeader(headers: { [key: string]: string }) {
         if (headers) {
-            for (var header in headers) {
+            for (let header in headers) {
                 if (header.toLowerCase() === 'content-type') {
                     return headers[header];
                 }

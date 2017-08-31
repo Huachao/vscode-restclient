@@ -10,7 +10,7 @@ export class MimeUtility {
         let types = params[0].trim().split('+');
         let charset = null;
         if (params.length > 1) {
-            for (var i = 1; i < params.length; i++) {
+            for (let i = 1; i < params.length; i++) {
                 let attributes = params[i].trim().split('=', 2);
                 if (attributes.length === 2 && attributes[0].toLowerCase() === 'charset') {
                     charset = attributes[1].trim();

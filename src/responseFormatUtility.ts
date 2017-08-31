@@ -2,7 +2,7 @@
 
 import { window } from 'vscode';
 import { MimeUtility } from './mimeUtility';
-var pd = require('pretty-data').pd;
+const pd = require('pretty-data').pd;
 
 export class ResponseFormatUtility {
     public static FormatBody(body: string, contentType: string): string {

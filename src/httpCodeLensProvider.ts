@@ -15,7 +15,7 @@ export class HttpCodeLensProvider implements CodeLensProvider {
 
         let requestRange: [number, number][] = [];
         let start: number = 0;
-        for (var index = 0; index < delimitedLines.length; index++) {
+        for (let index = 0; index < delimitedLines.length; index++) {
             let end = delimitedLines[index] - 1;
             if (start <= end) {
                 requestRange.push([start, end]);
@@ -23,7 +23,7 @@ export class HttpCodeLensProvider implements CodeLensProvider {
             }
         }
 
-        for (var index = 0; index < requestRange.length; index++) {
+        for (let index = 0; index < requestRange.length; index++) {
             let blockStart = requestRange[index][0];
             let blockEnd = requestRange[index][1];
 

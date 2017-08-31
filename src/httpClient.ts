@@ -12,10 +12,10 @@ import * as url from 'url';
 import * as fs from 'fs';
 import * as path from 'path';
 
-var encodeUrl = require('encodeurl');
-var request = require('request');
-var cookieStore = require('tough-cookie-file-store-bugfix');
-var iconv = require('iconv-lite');
+const encodeUrl = require('encodeurl');
+const request = require('request');
+const cookieStore = require('tough-cookie-file-store-bugfix');
+const iconv = require('iconv-lite');
 
 export class HttpClient {
     private _settings: RestClientSettings;
@@ -113,9 +113,9 @@ export class HttpClient {
                 }
 
                 // adjust response header case, due to the response headers in request package is in lowercase
-                var headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
+                let headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
                 let adjustedResponseHeaders: { [key: string]: string } = {};
-                for (var header in response.headers) {
+                for (let header in response.headers) {
                     let adjustedHeaderName = header;
                     if (headersDic[header]) {
                         adjustedHeaderName = headersDic[header];
@@ -158,7 +158,7 @@ export class HttpClient {
 
     public static getHeaderValue(headers: { [key: string]: string }, headerName: string): string {
         if (headers) {
-            for (var key in headers) {
+            for (let key in headers) {
                 if (key.toLowerCase() === headerName.toLowerCase()) {
                     return headers[key];
                 }
@@ -220,8 +220,8 @@ export class HttpClient {
         let port = resolvedUrl.port;
         let excludeHostsProxyList = Array.from(new Set(excludeHostsForProxy.map(eh => eh.toLowerCase())));
 
-        for (var index = 0; index < excludeHostsProxyList.length; index++) {
-            var eh = excludeHostsProxyList[index];
+        for (let index = 0; index < excludeHostsProxyList.length; index++) {
+            let eh = excludeHostsProxyList[index];
             let urlParts = eh.split(":");
             if (!port) {
                 // if no port specified in request url, host name must exactly match
@@ -252,9 +252,10 @@ export class HttpClient {
         }
 
         // the path should be relative path
-        var rootPath = workspace.rootPath;
+        let rootPath = workspace.rootPath;
+        let absolutePath = '';
         if (rootPath) {
-            var absolutePath = path.join(rootPath, absoluteOrRelativePath);
+            absolutePath = path.join(rootPath, absoluteOrRelativePath);
             if (fs.existsSync(absolutePath)) {
                 return absolutePath;
             } else {

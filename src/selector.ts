@@ -22,7 +22,7 @@ export class Selector {
 
     public static getDelimiterRows(lines: string[]) {
         let rows: number[] = [];
-        for (var index = 0; index < lines.length; index++) {
+        for (let index = 0; index < lines.length; index++) {
             if (lines[index].match(/^#{3,}/)) {
                 rows.push(index);
             }
@@ -50,7 +50,7 @@ export class Selector {
             return lines.slice(delimiterLineNumbers[delimiterLineNumbers.length - 1] + 1).join(EOL);
         }
 
-        for (var index = 0; index < delimiterLineNumbers.length - 1; index++) {
+        for (let index = 0; index < delimiterLineNumbers.length - 1; index++) {
             let start = delimiterLineNumbers[index];
             let end = delimiterLineNumbers[index + 1];
             if (start < currentLine && currentLine < end) {

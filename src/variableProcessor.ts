@@ -4,8 +4,8 @@ import { window } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from './constants';
 import { Func } from './common/delegates';
-var uuid = require('node-uuid');
-var moment = require('moment');
+const uuid = require('node-uuid');
+const moment = require('moment');
 
 export class VariableProcessor {
 
@@ -17,7 +17,7 @@ export class VariableProcessor {
 
     public static async processRawRequest(request: string) {
         let globalVariables = VariableProcessor.getGlobalVariables();
-        for (var variablePattern in globalVariables) {
+        for (let variablePattern in globalVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variablePattern}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, globalVariables[variablePattern]);
@@ -25,7 +25,7 @@ export class VariableProcessor {
         }
 
         let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
-        for (var [variableName, variableValue] of fileVariables) {
+        for (let [variableName, variableValue] of fileVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, variableValue);
@@ -33,7 +33,7 @@ export class VariableProcessor {
         }
 
         let environmentVariables = await EnvironmentController.getCustomVariables();
-        for (var variableName in environmentVariables) {
+        for (let variableName in environmentVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, environmentVariables[variableName]);
@@ -89,7 +89,7 @@ export class VariableProcessor {
                 let originalValue = match[2];
                 let value = '';
                 let isPrevCharEscape = false;
-                for (var index = 0; index < originalValue.length; index++) {
+                for (let index = 0; index < originalValue.length; index++) {
                     let currentChar = originalValue[index];
                     if (isPrevCharEscape) {
                         isPrevCharEscape = false;

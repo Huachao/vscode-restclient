@@ -4,7 +4,7 @@ import { HttpRequest } from './models/httpRequest';
 import { IRequestParser } from './models/IRequestParser';
 import { RequestParserUtil } from './requestParserUtil';
 
-var yargs = require('yargs');
+const yargs = require('yargs');
 
 const DefaultContentType: string = 'application/x-www-form-urlencoded';
 

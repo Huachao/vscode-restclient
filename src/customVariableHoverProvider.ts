@@ -16,7 +16,7 @@ export class CustomVariableHoverProvider implements HoverProvider {
         let selectedVariableName = document.getText(wordRange);
 
         let fileCustomVariables = VariableProcessor.getCustomVariablesInCurrentFile();
-        for (var [variableName, variableValue] of fileCustomVariables) {
+        for (let [variableName, variableValue] of fileCustomVariables) {
             if (variableName === selectedVariableName) {
                 let contents: MarkedString[] = [variableValue, { language: 'http', value: `File Variable ${variableName}` }];
                 return new Hover(contents, wordRange);
@@ -24,7 +24,7 @@ export class CustomVariableHoverProvider implements HoverProvider {
         }
 
         let environmentCustomVariables = await EnvironmentController.getCustomVariables();
-        for (var variableName in environmentCustomVariables) {
+        for (let variableName in environmentCustomVariables) {
             if (variableName === selectedVariableName) {
                 let contents: MarkedString[] = [environmentCustomVariables[variableName], { language: 'http', value: `Environment Variable ${variableName}` }];
                 return new Hover(contents, wordRange);

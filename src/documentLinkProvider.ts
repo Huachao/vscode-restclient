@@ -14,8 +14,8 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
         const text = document.getText();
 
         let lines: string[] = text.split(/\r?\n/g);
-        for (var index = 0; index < lines.length; index++) {
-            var line = lines[index];
+        for (let index = 0; index < lines.length; index++) {
+            let line = lines[index];
             let match: RegExpMatchArray;
             if (match = this._linkPattern.exec(line)) {
                 let filePath = match[2];

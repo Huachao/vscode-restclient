@@ -8,7 +8,7 @@ export class HttpCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
         let completionItems: CompletionItem[] = [];
 
-        var elements = await HttpElementFactory.getHttpElements(document.lineAt(position).text);
+        let elements = await HttpElementFactory.getHttpElements(document.lineAt(position).text);
         elements.map(e => {
             let item = new CompletionItem(e.name);
             item.detail = `HTTP ${ElementType[e.type]}`;
