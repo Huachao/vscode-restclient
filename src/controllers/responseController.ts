@@ -6,7 +6,7 @@ import { HttpResponse } from '../models/httpResponse';
 import { MimeUtility } from '../mimeUtility';
 import { PersistUtility } from '../persistUtility';
 import { RestClientSettings } from '../models/configurationSettings';
-import { Telemetry } from '../telemetry';
+import { trace } from "../decorator";
 import * as Constants from '../constants';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -24,8 +24,8 @@ export class ResponseController {
         this._restClientSettings = new RestClientSettings();
     }
 
+    @trace('Response-Save')
     public async save(uri: Uri) {
-        Telemetry.sendEvent('Response-Save');
         if (!uri) {
             return;
         }
@@ -51,8 +51,8 @@ export class ResponseController {
         }
     }
 
+    @trace('Response-Save-Body')
     public async saveBody(uri: Uri) {
-        Telemetry.sendEvent('Response-Save-Body');
         if (!uri) {
             return;
         }

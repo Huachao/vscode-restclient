@@ -11,7 +11,7 @@ import { RestClientSettings } from '../models/configurationSettings';
 import { PersistUtility } from '../persistUtility';
 import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
 import { UntitledFileContentProvider } from '../views/responseUntitledFileContentProvider';
-import { Telemetry } from '../telemetry';
+import { trace } from "../decorator";
 import { VariableProcessor } from '../variableProcessor';
 import { RequestStore } from '../requestStore';
 import { ResponseStore } from '../responseStore';
@@ -48,8 +48,8 @@ export class RequestController {
         workspace.onDidCloseTextDocument((params) => this.onDidCloseTextDocument(params));
     }
 
+    @trace('Request')
     public async run(range: Range) {
-        Telemetry.sendEvent('Request');
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return;
@@ -84,9 +84,8 @@ export class RequestController {
         await this.runCore(httpRequest);
     }
 
+    @trace('Rerun Request')
     public async rerun() {
-        Telemetry.sendEvent('Rerun Request');
-
         let httpRequest = RequestStore.getLatest();
         if (!httpRequest) {
             return;
@@ -95,8 +94,8 @@ export class RequestController {
         await this.runCore(httpRequest);
     }
 
+    @trace('Cancel Request')
     public async cancel() {
-        Telemetry.sendEvent('Cancel Request');
 
         if (RequestStore.isCompleted()) {
             return;

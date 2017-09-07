@@ -13,6 +13,7 @@ import { CodeSnippetClient } from '../models/codeSnippetClient';
 import { CodeSnippetTextDocumentContentProvider } from '../views/codeSnippetTextDocumentContentProvider';
 import { Selector } from '../selector';
 import { Telemetry } from '../telemetry';
+import { trace } from "../decorator";
 import * as Constants from '../constants';
 import { EOL } from 'os';
 
@@ -124,15 +125,15 @@ export class CodeSnippetController {
         }
     }
 
+    @trace('Copy Code Snippet')
     public async copy() {
-        Telemetry.sendEvent('Copy Code Snippet');
         if (this._convertedResult) {
             cp.copy(this._convertedResult);
         }
     }
 
+    @trace('Copy Request As cURL')
     public async copyAsCurl() {
-        Telemetry.sendEvent('Copy Request As cURL');
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return;

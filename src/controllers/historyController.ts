@@ -4,7 +4,7 @@ import { window, workspace, OutputChannel } from 'vscode';
 import { PersistUtility } from '../persistUtility';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
-import { Telemetry } from '../telemetry';
+import { trace } from "../decorator";
 import { EOL } from 'os';
 import * as fs from 'fs';
 
@@ -18,8 +18,8 @@ export class HistoryController {
         this._outputChannel = window.createOutputChannel('REST');
     }
 
+    @trace('History')
     public async save() {
-        Telemetry.sendEvent('History');
         try {
             let requests = await PersistUtility.loadRequests();
             if (!requests || requests.length <= 0) {
@@ -52,8 +52,8 @@ export class HistoryController {
         }
     }
 
+    @trace('Clear History')
     public async clear() {
-        Telemetry.sendEvent('Clear History');
         try {
             window.showInformationMessage(`Do you really want to clear request history?`, { title: 'Yes' }, { title: 'No' })
                 .then(async function (btn) {

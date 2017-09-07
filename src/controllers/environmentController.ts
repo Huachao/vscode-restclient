@@ -5,7 +5,7 @@ import { RestClientSettings } from '../models/configurationSettings';
 import { EnvironmentPickItem } from '../models/environmentPickItem';
 import { PersistUtility } from '../persistUtility';
 import * as Constants from '../constants';
-import { Telemetry } from '../telemetry';
+import { trace } from "../decorator";
 
 export class EnvironmentController {
     public static noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
@@ -23,8 +23,8 @@ export class EnvironmentController {
         this._restClientSettings = new RestClientSettings();
     }
 
+    @trace('Switch Environment')
     public async switchEnvironment() {
-        Telemetry.sendEvent('Switch Environment');
         let currentEnvironment = await EnvironmentController.getCurrentEnvironment();
         let itemPickList: EnvironmentPickItem[] = [];
         itemPickList.push(EnvironmentController.noEnvironmentPickItem);
