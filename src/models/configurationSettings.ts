@@ -21,6 +21,7 @@ export interface IRestClientSettings {
     includeAdditionalInfoInResponse: boolean;
     hostCertificates: Map<string, HostCertificate>;
     useTrunkedTransferEncodingForSendingFileContent: boolean;
+    suppressResponseBodyContentTypeValidationWarning: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -43,6 +44,7 @@ export class RestClientSettings implements IRestClientSettings {
     public includeAdditionalInfoInResponse: boolean;
     public hostCertificates: Map<string, HostCertificate>;
     public useTrunkedTransferEncodingForSendingFileContent: boolean;
+    public suppressResponseBodyContentTypeValidationWarning: boolean;
 
     public constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -75,6 +77,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.includeAdditionalInfoInResponse = restClientSettings.get<boolean>("includeAdditionalInfoInResponse", false);
         this.hostCertificates = restClientSettings.get<Map<string, HostCertificate>>("certificates", new Map<string, HostCertificate>());
         this.useTrunkedTransferEncodingForSendingFileContent = restClientSettings.get<boolean>("useTrunkedTransferEncodingForSendingFileContent", true);
+        this.suppressResponseBodyContentTypeValidationWarning = restClientSettings.get<boolean>("suppressResponseBodyContentTypeValidationWarning", false);
 
         let httpSettings = workspace.getConfiguration('http');
         this.proxy = httpSettings.get<string>('proxy', undefined);

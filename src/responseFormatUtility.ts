@@ -5,7 +5,7 @@ import { MimeUtility } from './mimeUtility';
 const pd = require('pretty-data').pd;
 
 export class ResponseFormatUtility {
-    public static FormatBody(body: string, contentType: string): string {
+    public static FormatBody(body: string, contentType: string, suppressValidation: boolean): string {
         if (contentType) {
             let mime = MimeUtility.parse(contentType);
             let type = mime.type;
@@ -14,7 +14,7 @@ export class ResponseFormatUtility {
                 suffix === '+json') {
                 if (ResponseFormatUtility.IsJsonString(body)) {
                     body = JSON.stringify(JSON.parse(body), null, 2);
-                } else {
+                } else if (!suppressValidation) {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                 }
             } else if (type === 'application/xml' ||

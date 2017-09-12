@@ -405,6 +405,11 @@
           "type": "boolean",
           "default": true,
           "description": "Use trunked transfer encoding for sending file content as request body"
+        },
+        "rest-client.suppressResponseBodyContentTypeValidationWarning": {
+          "type": "boolean",
+          "default": false,
+          "description": "Suppress response body content type validation"
         }
       }
     }

@@ -34,7 +34,7 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
                 if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType)) {
                     innerHtml = `<img src="data:${contentType};base64,${new Buffer(response.bodyStream).toString('base64')}">`;
                 } else {
-                    let code = this.highlightResponse(response);
+                    let code = this.highlightResponse(response, this.settings.suppressResponseBodyContentTypeValidationWarning);
                     width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
                     innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
                 }
@@ -53,13 +53,13 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
         }
     }
 
-    private highlightResponse(response: HttpResponse): string {
+    private highlightResponse(response: HttpResponse, suppressValidation: boolean): string {
         let code = '';
         let nonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
 ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
         code += hljs.highlight('http', nonBodyPart + '\r\n').value;
         let contentType = response.getResponseHeaderValue("content-type");
-        let bodyPart = `${ResponseFormatUtility.FormatBody(response.body, contentType)}`;
+        let bodyPart = `${ResponseFormatUtility.FormatBody(response.body, contentType, suppressValidation)}`;
         let bodyLanguageAlias = HttpResponseTextDocumentContentProvider.getHighlightLanguageAlias(contentType);
         if (bodyLanguageAlias) {
             code += hljs.highlight(bodyLanguageAlias, bodyPart).value;
