@@ -221,7 +221,6 @@ export class RequestController {
     private formatDurationStatusBar(response: HttpResponse) {
         this._durationStatusBarItem.command = null;
         this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
-        // this._durationStatusBarItem.tooltip = `Duration:${EOL}Total: ${response`;
         this._durationStatusBarItem.tooltip = [
             'Breakdown of Duration:',
             `Socket: ${response.timingPhases.wait.toFixed(1)}ms`,
