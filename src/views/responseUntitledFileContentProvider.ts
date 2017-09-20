@@ -6,10 +6,16 @@ import { ResponseFormatUtility } from '../responseFormatUtility';
 import { EOL } from 'os';
 
 export class UntitledFileContentProvider {
-    public static createHttpResponseUntitledFile(response: HttpResponse, createNewFile: boolean, autoSetLanguage: boolean, additionalInfo: boolean) {
+    public static createHttpResponseUntitledFile(
+        response: HttpResponse,
+        createNewFile: boolean,
+        autoSetLanguage: boolean,
+        additionalInfo: boolean,
+        suppressValidation: boolean
+    ) {
 
         const language = autoSetLanguage ? UntitledFileContentProvider.languageFromContentType(response) : 'http';
-        const content = UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage);
+        const content = UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage, suppressValidation);
         workspace.openTextDocument({ 'language': language, 'content': content }).then(document => {
             window.showTextDocument(document, { viewColumn: ViewColumn.Two, preserveFocus: false, preview: !createNewFile });
         });
@@ -31,8 +37,8 @@ export class UntitledFileContentProvider {
         return 'http';
     }
 
-    private static formatResponse(response: HttpResponse, language: string, additionalInfo: boolean, autoSetLanguage: boolean) {
-        const { responseStatusLine, headers, body } = UntitledFileContentProvider.extractStandardResponseInformation(response);
+    private static formatResponse(response: HttpResponse, language: string, additionalInfo: boolean, autoSetLanguage: boolean, suppressValidation: boolean) {
+        const { responseStatusLine, headers, body } = UntitledFileContentProvider.extractStandardResponseInformation(response, suppressValidation);
         let responseInformation;
         if (additionalInfo) {
             const formattedAdditionalInfo = UntitledFileContentProvider.formatAdditionalResponseInformation(response);
@@ -60,7 +66,7 @@ export class UntitledFileContentProvider {
         return `${requestURL}${elapsedTime}`;
     }
 
-    private static extractStandardResponseInformation(response: HttpResponse) {
+    private static extractStandardResponseInformation(response: HttpResponse, suppressValidation: boolean) {
         let responseStatusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${EOL}`;
         let headers = '';
         for (let header in response.headers) {
@@ -72,7 +78,7 @@ export class UntitledFileContentProvider {
                 headers += `${header}: ${value}${EOL}`;
             }
         }
-        let body = ResponseFormatUtility.FormatBody(response.body, response.getResponseHeaderValue("content-type"));
+        let body = ResponseFormatUtility.FormatBody(response.body, response.getResponseHeaderValue("content-type"), suppressValidation);
         return { responseStatusLine, headers, body };
     }
 

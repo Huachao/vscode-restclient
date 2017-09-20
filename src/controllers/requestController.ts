@@ -144,7 +144,8 @@ export class RequestController {
                         response,
                         this._restClientSettings.showResponseInDifferentTab,
                         this._restClientSettings.previewResponseSetUntitledDocumentLanguageByContentType,
-                        this._restClientSettings.includeAdditionalInfoInResponse
+                        this._restClientSettings.includeAdditionalInfoInResponse,
+                        this._restClientSettings.suppressResponseBodyContentTypeValidationWarning
                     );
                 } else {
                     await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`);
