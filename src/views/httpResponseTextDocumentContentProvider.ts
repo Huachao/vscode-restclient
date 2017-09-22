@@ -7,12 +7,12 @@ import { HttpResponse } from "../models/httpResponse";
 import { MimeUtility } from '../mimeUtility';
 import { ResponseFormatUtility } from '../responseFormatUtility';
 import { ResponseStore } from '../responseStore';
+import { PreviewOption } from '../models/previewOption';
 import * as Constants from '../constants';
 import * as path from 'path';
 
+const autoLinker = require('autolinker');
 const hljs = require('highlight.js');
-
-let autoLinker = require('autolinker');
 
 export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentContentProvider {
     private static cssFilePath: string = path.join(extensions.getExtension(Constants.ExtensionId).extensionPath, Constants.CSSFolderName, Constants.CSSFileName);
@@ -34,7 +34,7 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
                 if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType)) {
                     innerHtml = `<img src="data:${contentType};base64,${new Buffer(response.bodyStream).toString('base64')}">`;
                 } else {
-                    let code = this.highlightResponse(response, this.settings.suppressResponseBodyContentTypeValidationWarning);
+                    let code = this.highlightResponse(response);
                     width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
                     innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
                 }
@@ -53,19 +53,50 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
         }
     }
 
-    private highlightResponse(response: HttpResponse, suppressValidation: boolean): string {
+    private highlightResponse(response: HttpResponse): string {
         let code = '';
-        let nonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
-${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
-        code += hljs.highlight('http', nonBodyPart + '\r\n').value;
-        let contentType = response.getResponseHeaderValue("content-type");
-        let bodyPart = `${ResponseFormatUtility.FormatBody(response.body, contentType, suppressValidation)}`;
-        let bodyLanguageAlias = HttpResponseTextDocumentContentProvider.getHighlightLanguageAlias(contentType);
-        if (bodyLanguageAlias) {
-            code += hljs.highlight(bodyLanguageAlias, bodyPart).value;
-        } else {
-            code += hljs.highlightAuto(bodyPart).value;
+        let previewOption = this.settings.previewOption;
+        if (previewOption === PreviewOption.Exchange) {
+            // for add request details
+            let request = response.request;
+            let requestNonBodyPart = `${request.method} ${request.url} HTTP/1.1
+${HttpResponseTextDocumentContentProvider.formatHeaders(request.headers)}`;
+            code += hljs.highlight('http', requestNonBodyPart + '\r\n').value;
+            if (request.body) {
+                let requestContentType = request.getRequestHeaderValue("content-type");
+                if (typeof request.body !== 'string') {
+                    request.body = 'NOTE: Request Body From File Not Shown';
+                }
+                let requestBodyPart = `${ResponseFormatUtility.FormatBody(request.body.toString(), requestContentType, false)}`;
+                let bodyLanguageAlias = HttpResponseTextDocumentContentProvider.getHighlightLanguageAlias(requestContentType);
+                if (bodyLanguageAlias) {
+                    code += hljs.highlight(bodyLanguageAlias, requestBodyPart).value;
+                } else {
+                    code += hljs.highlightAuto(requestBodyPart).value;
+                }
+                code += '\r\n';
+            }
+
+            code += '\r\n'.repeat(2);
         }
+
+        if (previewOption !== PreviewOption.Body) {
+            let responseNonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
+${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
+            code += hljs.highlight('http', responseNonBodyPart + (previewOption !== PreviewOption.Headers ? '\r\n' : '')).value;
+        }
+
+        if (previewOption !== PreviewOption.Headers) {
+            let responseContentType = response.getResponseHeaderValue("content-type");
+            let responseBodyPart = `${ResponseFormatUtility.FormatBody(response.body, responseContentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
+            let bodyLanguageAlias = HttpResponseTextDocumentContentProvider.getHighlightLanguageAlias(responseContentType);
+            if (bodyLanguageAlias) {
+                code += hljs.highlight(bodyLanguageAlias, responseBodyPart).value;
+            } else {
+                code += hljs.highlightAuto(responseBodyPart).value;
+            }
+        }
+
         return code;
     }
 

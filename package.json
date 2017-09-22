@@ -410,6 +410,17 @@
           "type": "boolean",
           "default": false,
           "description": "Suppress response body content type validation"
+        },
+        "rest-client.previewOption": {
+          "type": "string",
+          "enum": [
+            "full",
+            "headers",
+            "body",
+            "exchange"
+          ],
+          "default": "full",
+          "description": "Response preview output option. 'full' for whole response message(status line, headers and body). 'headers' for response headers(as well as status line). 'body' for response body only. 'exchange' for whole HTTP exchange (request and response)"
         }
       }
     }

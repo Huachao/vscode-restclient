@@ -1,5 +1,6 @@
 import { workspace } from 'vscode';
 import { HostCertificate } from '../models/hostCertificate';
+import { PreviewOption, fromString as ParsePreviewOptionStr } from '../models/previewOption';
 
 export interface IRestClientSettings {
     followRedirect: boolean;
@@ -22,6 +23,8 @@ export interface IRestClientSettings {
     hostCertificates: Map<string, HostCertificate>;
     useTrunkedTransferEncodingForSendingFileContent: boolean;
     suppressResponseBodyContentTypeValidationWarning: boolean;
+
+    previewOption: PreviewOption;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -45,6 +48,8 @@ export class RestClientSettings implements IRestClientSettings {
     public hostCertificates: Map<string, HostCertificate>;
     public useTrunkedTransferEncodingForSendingFileContent: boolean;
     public suppressResponseBodyContentTypeValidationWarning: boolean;
+
+    public previewOption: PreviewOption;
 
     public constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -78,6 +83,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.hostCertificates = restClientSettings.get<Map<string, HostCertificate>>("certificates", new Map<string, HostCertificate>());
         this.useTrunkedTransferEncodingForSendingFileContent = restClientSettings.get<boolean>("useTrunkedTransferEncodingForSendingFileContent", true);
         this.suppressResponseBodyContentTypeValidationWarning = restClientSettings.get<boolean>("suppressResponseBodyContentTypeValidationWarning", false);
+        this.previewOption = ParsePreviewOptionStr(restClientSettings.get<string>("previewOption", "full"));
 
         let httpSettings = workspace.getConfiguration('http');
         this.proxy = httpSettings.get<string>('proxy', undefined);

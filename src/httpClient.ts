@@ -142,6 +142,13 @@ export class HttpClient {
                         response.timingPhases.tcp,
                         response.timingPhases.firstByte,
                         response.timingPhases.download
+                    ),
+                    new HttpRequest(
+                        options.method,
+                        options.url,
+                        HttpClient.capitalizeHeaderName(response.toJSON().request.headers),
+                        httpRequest.body,
+                        httpRequest.rawBody
                     )));
             })
                 .on('data', function (data) {
@@ -271,5 +278,17 @@ export class HttpClient {
             window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
             return;
         }
+    }
+
+    private static capitalizeHeaderName(headers: { [key: string]: string }): { [key: string]: string } {
+        let normalizedHeaders = {};
+        if (headers) {
+            for (let header in headers) {
+                let capitalizedName = header.replace(/([^-]+)/g, h => h.charAt(0).toUpperCase() + h.slice(1));
+                normalizedHeaders[capitalizedName] = headers[header];
+            }
+        }
+
+        return normalizedHeaders;
     }
 }
