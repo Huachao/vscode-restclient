@@ -1,8 +1,11 @@
 "use strict";
 
+import { workspace } from 'vscode';
 import { HttpRequest } from './models/httpRequest';
 import { IRequestParser } from './models/IRequestParser';
 import { RequestParserUtil } from './requestParserUtil';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const yargs = require('yargs');
 
@@ -51,6 +54,19 @@ export class CurlRequestParser implements IRequestParser {
             body = body.join('&');
         }
 
+        if (typeof body === 'string' && body[0] === '@') {
+            let fileAbsolutePath = CurlRequestParser.resolveFilePath(body.substring(1), requestAbsoluteFilePath);
+            if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
+                if (parseFileContentAsStream) {
+                    body = fs.createReadStream(fileAbsolutePath);
+                } else {
+                    body = fs.readFileSync(fileAbsolutePath).toString();
+                }
+            } else {
+                body = body.substring(1);
+            }
+        }
+
         // Set Content-Type header to application/x-www-form-urlencoded if has body and missing this header
         if (body && !CurlRequestParser.hasContentTypeHeader(headers)) {
             headers['Content-Type'] = DefaultContentType;
@@ -63,6 +79,28 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         return new HttpRequest(method, url, headers, body, body);
+    }
+
+    private static resolveFilePath(refPath: string, httpFilePath: string): string {
+        if (path.isAbsolute(refPath)) {
+            return fs.existsSync(refPath) ? refPath : null;
+        }
+
+        let rootPath = workspace.rootPath;
+        let absolutePath;
+        if (rootPath) {
+            absolutePath = path.join(rootPath, refPath);
+            if (fs.existsSync(absolutePath)) {
+                return absolutePath;
+            }
+        }
+
+        absolutePath = path.join(path.dirname(httpFilePath), refPath);
+        if (fs.existsSync(absolutePath)) {
+            return absolutePath;
+        }
+
+        return null;
     }
 
     private static mergeIntoSingleLine(text: string): string {
