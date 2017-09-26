@@ -12,6 +12,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * View image response directly in pane
 * Save raw response and response body only to local disk
 * Customize font(size/family/weight) in response preview
+* Preview response with expected parts(_headers only_, _body only_, _full response_ and _both request and response_)
 * Authentication support for:
     - Basic Auth
     - Digest Auth
@@ -180,7 +181,7 @@ We add the capability to directly run [curl request](https://curl.haxx.se/) in R
 * -H, --header(no _@_ support)
 * -b, --cookie(no cookie jar file support)
 * -u, --user(Basic auth support only)
-* -d, --data, --data-binary
+* -d, --data, --data-binaryåå
 
 ## Copy Request As cURL
 Sometimes you may want to get the curl format of a http request quickly and save it to clipboard, just pressing `F1` and then selecting/typing `Rest Client: Copy Request As cURL` or simply right click in the editor, and select `Copy Request As cURL`.
@@ -385,6 +386,14 @@ X-Request-Id: {{token}}
 ## Customize Response Preview
 REST Client Extension adds the ability to control the font family, size and weight used in the response preview.
 
+By default, REST Client Extension only previews the full response in preview panel(_status line_, _headers_ and _body_). You can control which part should be previewed via the `rest-client.previewOption` setting:
+Option | Description
+------ | -----------
+full | Default. Full response is previewed
+headers | Only the response headers(including _status line_) are previewed
+body | Only the response body is previewed
+exchange | Preview the whole HTTP exchange(request and response)
+
 ## Settings
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
 * `rest-client.defaultuseragent`: If User-Agent header is omitted in request header, this value will be added as user agent for each request. (Default is __vscode-restclient__)
@@ -403,7 +412,9 @@ REST Client Extension adds the ability to control the font family, size and weig
 * `rest-client.includeAdditionalInfoInResponse`: Include additional information such as request URL and response time when preview is set to use untitled document. (Default is __false__)
 * `rest-client.certificates`: Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file). (Default is __{}__)
 * `rest-client.useTrunkedTransferEncodingForSendingFileContent`: Use trunked transfer encoding for sending file content as request body. (Default is __true__)
-
+* `rest-client.suppressResponseBodyContentTypeValidationWarning`: Suppress response body content type validation. (Default is __false__)
+* `rest-client.rest-client.previewOption`: Response preview output option. Option details is described above. (Default is __full__)
+[]()
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 
 ## License

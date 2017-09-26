@@ -1,3 +1,8 @@
+## 0.15.3 (2017/9/26)
+* __Bug Fix__: [Info/Warning notifications blocking all tabs](https://github.com/Huachao/vscode-restclient/issues/119)
+* __Bug Fix__: [cURL -d option not working properly with @](https://github.com/Huachao/vscode-restclient/issues/120)
+* __Improvement__: [Info/Warning notifications blocking all tabs](https://github.com/Huachao/vscode-restclient/issues/99)
+
 ## 0.15.2 (2017/8/22)
 * __Breaking Change__ [Remap keybinding of _Cancel Request_ from `Ctrl/Cmd+Alt+Q` to `Ctrl/Cmd+Alt+K`](https://github.com/Huachao/vscode-restclient/issues/115)
 * __Bug Fix__: [Missing parameters in CURL/POST body](https://github.com/Huachao/vscode-restclient/issues/112)

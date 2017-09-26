@@ -67,7 +67,7 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(request.headers)}`;
                 if (typeof request.body !== 'string') {
                     request.body = 'NOTE: Request Body From File Not Shown';
                 }
-                let requestBodyPart = `${ResponseFormatUtility.FormatBody(request.body.toString(), requestContentType, false)}`;
+                let requestBodyPart = `${ResponseFormatUtility.FormatBody(request.body.toString(), requestContentType, true)}`;
                 let bodyLanguageAlias = HttpResponseTextDocumentContentProvider.getHighlightLanguageAlias(requestContentType);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, requestBodyPart).value;
