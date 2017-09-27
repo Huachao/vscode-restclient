@@ -387,6 +387,7 @@ X-Request-Id: {{token}}
 REST Client Extension adds the ability to control the font family, size and weight used in the response preview.
 
 By default, REST Client Extension only previews the full response in preview panel(_status line_, _headers_ and _body_). You can control which part should be previewed via the `rest-client.previewOption` setting:
+
 Option | Description
 ------ | -----------
 full | Default. Full response is previewed
