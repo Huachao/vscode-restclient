@@ -416,6 +416,7 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.suppressResponseBodyContentTypeValidationWarning`: Suppress response body content type validation. (Default is __false__)
 * `rest-client.previewOption`: Response preview output option. Option details is described above. (Default is __full__)
 []()
+
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 
 ## License
