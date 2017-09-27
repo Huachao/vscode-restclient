@@ -414,7 +414,7 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.certificates`: Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file). (Default is __{}__)
 * `rest-client.useTrunkedTransferEncodingForSendingFileContent`: Use trunked transfer encoding for sending file content as request body. (Default is __true__)
 * `rest-client.suppressResponseBodyContentTypeValidationWarning`: Suppress response body content type validation. (Default is __false__)
-* `rest-client.rest-client.previewOption`: Response preview output option. Option details is described above. (Default is __full__)
+* `rest-client.previewOption`: Response preview output option. Option details is described above. (Default is __full__)
 []()
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 
