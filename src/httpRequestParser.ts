@@ -17,7 +17,7 @@ const encodeurl = require('encodeurl');
 
 export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
-    private static readonly uploadFromFileSyntax: RegExp = new RegExp('^\<[ \t]+([^ \t]*)[ \t]*$');
+    private static readonly uploadFromFileSyntax = /^<\s+([\S]*)\s*$/;
 
     public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string, parseFileContentAsStream: boolean): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
