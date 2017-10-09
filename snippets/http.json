@@ -2,53 +2,59 @@
     "Get request block": {
         "prefix": "get",
         "body": [
-           "GET ${url} HTTP/1.1"
-        ]
+           "GET ${1:url} HTTP/1.1"
+        ],
+        "description": "GET Request"
     },
     "Delete request block": {
         "prefix": "delete",
         "body": [
-           "DELETE ${url} HTTP/1.1"
-        ]
+           "DELETE ${1:url} HTTP/1.1"
+        ],
+        "description": "DELETE Request"
     },
     "Post request block": {
         "prefix": "post",
         "body": [
-            "POST ${url} HTTP/1.1",
-            "${header name}: ${header value}",
+            "POST ${1:url} HTTP/1.1",
+            "${2:header name}: ${3:header value}",
             "",
-            "${content}"
-        ]
+            "${4:content}"
+        ],
+        "description": "POST Request"
     },
     "Put request block": {
         "prefix": "put",
         "body": [
-            "PUT ${url} HTTP/1.1",
-            "${header name}: ${header value}",
+            "PUT ${1:url} HTTP/1.1",
+            "${2:header name}: ${3:header value}",
             "",
-            "${content}"
-        ]
+            "${4:content}"
+        ],
+        "description": "PUT Request"
     },
     "SOAP request block": {
         "prefix": "soap",
         "body": [
-            "POST ${url} HTTP/1.1",
+            "POST ${1:url} HTTP/1.1",
             "Content-Type: application/soap+xml",
-            "${header name}: ${header value}",
+            "${2:header name}: ${3:header value}",
             "",
             "<soap:Envelope",
             "\txmlns:soap=\"http://www.w3.org/2001/12/soap-envelope\"",
             "\tsoap:encodingStyle=\"http://www.w3.org/2001/12/soap-encoding\">",
             "\t<soap:Body>",
-            "\t\t${content}",
+            "\t\t${4:content}",
             "\t</soap:Body>",
             "</soap:Envelope>"
-        ]
+        ],
+        "description": "SOAP Request"
     },
     "File level custom variable": {
         "prefix": "variable",
         "body": [
-            "@${name} = ${value}"
-        ]
+            "@${1:name} = ${2:value}"
+        ],
+        "description": "Define Custom File Variable"
     }
 }
