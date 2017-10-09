@@ -47,10 +47,11 @@ export class HttpClient {
             let scheme = authorization.substr(0, start);
             if (scheme === 'Digest' || scheme === 'Basic') {
                 let params = authorization.substr(start).trim().split(' ');
-                if (params.length === 2) {
+                let [user, pass] = params;
+                if (user && pass) {
                     options.auth = {
-                        user: params[0],
-                        pass: params[1],
+                        user,
+                        pass,
                         sendImmediately: scheme === 'Basic'
                     };
                 }
@@ -237,11 +238,8 @@ export class HttpClient {
                 };
             } else {
                 // if port specified, match host without port or hostname:port exactly match
-                if (urlParts.length === 1 && urlParts[0] === hostName) {
-                    return true;
-                } else if (urlParts.length === 2 && urlParts[0] === hostName && urlParts[1] === port) {
-                    return true;
-                }
+                let [ph, pp] = urlParts;
+                return ph === hostName && (!pp || pp === port);
             }
         }
 

@@ -24,8 +24,7 @@ export class HttpCodeLensProvider implements CodeLensProvider {
         }
 
         for (let index = 0; index < requestRange.length; index++) {
-            let blockStart = requestRange[index][0];
-            let blockEnd = requestRange[index][1];
+            let [blockStart, blockEnd] = requestRange[index];
 
             // get real start for current requestRange
             while (blockStart <= blockEnd) {
