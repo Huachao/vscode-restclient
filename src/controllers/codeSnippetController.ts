@@ -188,12 +188,8 @@ export class CodeSnippetController {
         let cookieHeader = headers.find(header => header.name.toLowerCase() === 'cookie');
         if (cookieHeader) {
             cookieHeader.value.split(';').forEach(pair => {
-                let cookieParts = pair.split('=', 2);
-                if (cookieParts.length === 2) {
-                    cookies.push(new HARCookie(cookieParts[0].trim(), cookieParts[1].trim()));
-                } else {
-                    cookies.push(new HARCookie(cookieParts[0].trim(), ''));
-                }
+                let [headerName, headerValue = ''] = pair.split('=', 2);
+                cookies.push(new HARCookie(headerName.trim(), headerValue.trim()));
             });
         }
 
