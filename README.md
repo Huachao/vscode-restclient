@@ -82,7 +82,7 @@ content-type: application/json
 `REST Client Extension` also provides another flexibility that you can use mouse to highlight the text in file as request text.
 
 ## Install
-Press `F1`, type `ext install rest-client`.
+Press `F1`, type `ext install` then search for `rest-client`.
 
 ## Making Request
 ![rest-client](images/usage.gif)
