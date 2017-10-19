@@ -83,7 +83,10 @@ export class HttpRequestParser implements IRequestParser {
 
         // if Host header provided and url is relative path, change to absolute url
         if (HttpClient.getHeaderValue(headers, 'Host') && requestLine.url[0] === '/') {
-            requestLine.url = `http://${HttpClient.getHeaderValue(headers, 'Host')}${requestLine.url}`;
+            let host = HttpClient.getHeaderValue(headers, 'Host');
+            let [, port] = host.split(':');
+            let scheme = port === '443' ? 'https' : 'http';
+            requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
         // parse body
