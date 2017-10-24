@@ -1,6 +1,7 @@
 'use strict';
 
 import { DocumentLink, DocumentLinkProvider, TextDocument, Range, Position, Uri, workspace, CancellationToken } from 'vscode';
+import { getWorkspaceRootPath } from './workspaceUtility';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -37,8 +38,9 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
         if (path.isAbsolute(link)) {
             resourcePath = link;
         } else {
-            if (workspace.rootPath) {
-                resourcePath = path.join(workspace.rootPath, link);
+            let rootPath = getWorkspaceRootPath();
+            if (rootPath) {
+                resourcePath = path.join(rootPath, link);
                 if (!fs.existsSync(resourcePath)) {
                     resourcePath = path.join(base, link);
                 }

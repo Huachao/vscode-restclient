@@ -24,7 +24,7 @@
     "url": "https://github.com/Huachao/vscode-restclient.git"
   },
   "engines": {
-    "vscode": "^1.12.0"
+    "vscode": "^1.17.0"
   },
   "categories": [
     "Other",
@@ -257,46 +257,55 @@
         "rest-client.followredirect": {
           "type": "boolean",
           "default": true,
+          "scope": "resource",
           "description": "Follow HTTP 3xx responses as redirects."
         },
         "rest-client.defaultuseragent": {
           "type": "string",
           "default": "vscode-restclient",
+          "scope": "resource",
           "description": "If User-Agent header is omitted in request header, this value will be added as user agent for each request."
         },
         "rest-client.timeoutinmilliseconds": {
           "type": "integer",
           "default": 0,
+          "scope": "resource",
           "description": "Timeout in milliseconds. 0 for infinity"
         },
         "rest-client.showResponseInDifferentTab": {
           "type": "boolean",
           "default": false,
+          "scope": "resource",
           "description": "Show response in different tab"
         },
         "rest-client.rememberCookiesForSubsequentRequests": {
           "type": "boolean",
           "default": true,
+          "scope": "resource",
           "description": "Remember cookies for subsequent requests"
         },
         "rest-client.enableTelemetry": {
           "type": "boolean",
           "default": true,
+          "scope": "resource",
           "description": "Send out anonymous usage data"
         },
         "rest-client.excludeHostsForProxy": {
           "type": "array",
           "default": [],
+          "scope": "resource",
           "description": "Excluded hosts when using using proxy settings"
         },
         "rest-client.fontSize": {
           "type": "number",
           "default": null,
+          "scope": "resource",
           "description": "Controls the font size in pixels used in the response preview"
         },
         "rest-client.fontFamily": {
           "type": "string",
           "default": null,
+          "scope": "resource",
           "description": "Controls the font family used in the response preview"
         },
         "rest-client.fontWeight": {
@@ -316,11 +325,13 @@
             "800",
             "900"
           ],
+          "scope": "resource",
           "description": "Controls the font weight used in the response preview"
         },
         "rest-client.environmentVariables": {
           "type": "object",
           "default": {},
+          "scope": "resource",
           "description": "Sets the environments and custom variables belongs to it (e.g., {\"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
           "additionalProperties": {
             "anyOf": [
@@ -343,26 +354,31 @@
         "rest-client.mimeAndFileExtensionMapping": {
           "type": "object",
           "default": {},
+          "scope": "resource",
           "description": "Sets the custom mapping of mime type and file extension of saved response body (e.g., {\"application/atom+xml\": \"xml\"})"
         },
         "rest-client.previewResponseInUntitledDocument": {
           "type": "boolean",
           "default": false,
+          "scope": "resource",
           "description": "Preview response in untitled document if set to true, otherwise displayed in html view"
         },
         "rest-client.previewResponseSetUntitledDocumentLanguageByContentType": {
           "type": "boolean",
           "default": false,
+          "scope": "resource",
           "description": "Attempt to automatically set document language based on Content-Type header when showing each response in new tab"
         },
         "rest-client.includeAdditionalInfoInResponse": {
           "type": "boolean",
           "default": false,
+          "scope": "resource",
           "description": "Include additional information such as request URL and response time when preview is set to use untitled document"
         },
         "rest-client.certificates": {
           "type": "object",
           "default": {},
+          "scope": "resource",
           "description": "Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file)",
           "pattern": "^(?!http(s?)://)",
           "additionalProperties": {
@@ -404,11 +420,13 @@
         "rest-client.useTrunkedTransferEncodingForSendingFileContent": {
           "type": "boolean",
           "default": true,
+          "scope": "resource",
           "description": "Use trunked transfer encoding for sending file content as request body"
         },
         "rest-client.suppressResponseBodyContentTypeValidationWarning": {
           "type": "boolean",
           "default": false,
+          "scope": "resource",
           "description": "Suppress response body content type validation"
         },
         "rest-client.previewOption": {
@@ -420,6 +438,7 @@
             "exchange"
           ],
           "default": "full",
+          "scope": "resource",
           "description": "Response preview output option. 'full' for whole response message(status line, headers and body). 'headers' for response headers(as well as status line). 'body' for response body only. 'exchange' for whole HTTP exchange (request and response)"
         }
       }

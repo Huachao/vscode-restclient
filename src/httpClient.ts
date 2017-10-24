@@ -1,6 +1,6 @@
 "use strict";
 
-import { window, workspace } from 'vscode';
+import { window } from 'vscode';
 import { RestClientSettings } from './models/configurationSettings';
 import { HttpRequest } from './models/httpRequest';
 import { HttpResponse } from './models/httpResponse';
@@ -8,6 +8,7 @@ import { HttpResponseTimingPhases } from './models/httpResponseTimingPhases';
 import { HostCertificate } from './models/hostCertificate';
 import { PersistUtility } from './persistUtility';
 import { MimeUtility } from './mimeUtility';
+import { getWorkspaceRootPath } from './workspaceUtility';
 import * as url from 'url';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -257,7 +258,7 @@ export class HttpClient {
         }
 
         // the path should be relative path
-        let rootPath = workspace.rootPath;
+        let rootPath = getWorkspaceRootPath();
         let absolutePath = '';
         if (rootPath) {
             absolutePath = path.join(rootPath, absoluteOrRelativePath);

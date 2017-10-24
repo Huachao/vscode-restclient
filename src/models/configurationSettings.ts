@@ -1,4 +1,4 @@
-import { workspace } from 'vscode';
+import { window, workspace, WorkspaceConfiguration } from 'vscode';
 import { HostCertificate } from '../models/hostCertificate';
 import { PreviewOption, fromString as ParsePreviewOptionStr } from '../models/previewOption';
 
@@ -60,7 +60,7 @@ export class RestClientSettings implements IRestClientSettings {
     }
 
     private initializeSettings() {
-        let restClientSettings = workspace.getConfiguration("rest-client");
+        let restClientSettings = this.getWorkspaceConfiguration();
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultUserAgent = restClientSettings.get<string>("defaultuseragent", "vscode-restclient");
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
@@ -89,5 +89,14 @@ export class RestClientSettings implements IRestClientSettings {
         this.proxy = httpSettings.get<string>('proxy', undefined);
         this.proxyStrictSSL = httpSettings.get<boolean>('proxyStrictSSL', false);
         this.enableTelemetry = httpSettings.get<boolean>('enableTelemetry', true);
+    }
+
+    private getWorkspaceConfiguration(): WorkspaceConfiguration {
+        let editor = window.activeTextEditor;
+        if (editor && editor.document) {
+            return workspace.getConfiguration("rest-client", editor.document.uri);
+        } else {
+            return workspace.getConfiguration("rest-client");
+        }
     }
 }
