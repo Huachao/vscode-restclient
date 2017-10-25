@@ -2,11 +2,8 @@
 
 import { CodeLensProvider, TextDocument, CancellationToken, CodeLens, Command, Range } from 'vscode';
 import { Selector } from './selector';
-import * as Constants from './constants';
 
 export class HttpCodeLensProvider implements CodeLensProvider {
-    public static responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
-
     public provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {
         let blocks: CodeLens[] = [];
         let lines: string[] = document.getText().split(/\r?\n/g);
@@ -28,16 +25,16 @@ export class HttpCodeLensProvider implements CodeLensProvider {
 
             // get real start for current requestRange
             while (blockStart <= blockEnd) {
-                if (this.isEmptyLine(lines[blockStart]) ||
-                    this.isCommentLine(lines[blockStart]) ||
-                    this.isVariableDefinitionLine(lines[blockStart])) {
+                if (Selector.isEmptyLine(lines[blockStart]) ||
+                    Selector.isCommentLine(lines[blockStart]) ||
+                    Selector.isVariableDefinitionLine(lines[blockStart])) {
                     blockStart++;
                 } else {
                     break;
                 }
             }
 
-            if (this.isResponseStatusLine(lines[blockStart])) {
+            if (Selector.isResponseStatusLine(lines[blockStart])) {
                 continue;
             }
 
@@ -53,21 +50,5 @@ export class HttpCodeLensProvider implements CodeLensProvider {
         }
 
         return Promise.resolve(blocks);
-    }
-
-    private isCommentLine(line: string): boolean {
-        return Constants.CommentIdentifiersRegex.test(line);
-    }
-
-    private isEmptyLine(line: string): boolean {
-        return line.trim() === '';
-    }
-
-    private isVariableDefinitionLine(line: string): boolean {
-        return Constants.VariableDefinitionRegex.test(line);
-    }
-
-    private isResponseStatusLine(line: string): boolean {
-        return HttpCodeLensProvider.responseStatusLineRegex.test(line);
     }
 }

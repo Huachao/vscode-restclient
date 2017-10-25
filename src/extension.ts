@@ -13,6 +13,7 @@ import { CustomVariableDefinitionProvider } from './customVariableDefinitionProv
 import { CustomVariableReferenceProvider } from './customVariableReferenceProvider';
 import { HttpCodeLensProvider } from './httpCodeLensProvider';
 import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
+import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -53,6 +54,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerDocumentLinkProvider('http', new RequestBodyDocumentLinkProvider()));
     context.subscriptions.push(languages.registerDefinitionProvider('http', new CustomVariableDefinitionProvider()));
     context.subscriptions.push(languages.registerReferenceProvider('http', new CustomVariableReferenceProvider()));
+    context.subscriptions.push(languages.registerDocumentSymbolProvider('http', new HttpDocumentSymbolProvider()));
 }
 
 // this method is called when your extension is deactivated

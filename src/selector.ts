@@ -2,8 +2,11 @@
 
 import { TextEditor, Range } from 'vscode';
 import { EOL } from 'os';
+import * as Constants from './constants';
 
 export class Selector {
+    private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
+
     public getSelectedText(editor: TextEditor, range: Range = null): string {
         if (!editor || !editor.document) {
             return null;
@@ -28,6 +31,22 @@ export class Selector {
             }
         }
         return rows;
+    }
+
+    public static isCommentLine(line: string): boolean {
+        return Constants.CommentIdentifiersRegex.test(line);
+    }
+
+    public static isEmptyLine(line: string): boolean {
+        return line.trim() === '';
+    }
+
+    public static isVariableDefinitionLine(line: string): boolean {
+        return Constants.VariableDefinitionRegex.test(line);
+    }
+
+    public static isResponseStatusLine(line: string): boolean {
+        return Selector.responseStatusLineRegex.test(line);
     }
 
     private getDelimitedText(fullText: string, currentLine: number): string {
