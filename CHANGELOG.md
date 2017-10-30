@@ -1,3 +1,10 @@
+## 0.16.0 (2017/10/30)
+* __Feature__: [Support goto symbols(request or file level cusom variable) in http file](https://github.com/Huachao/vscode-restclient/issues/126)
+* __Improvement__: [Info/Warning notifications blocking all tabs](https://github.com/Huachao/vscode-restclient/issues/99)
+* __Improvement__: Adopt multi root workspace API
+* __Improvement__: Update README.md to reflect installation and code lens update
+* __Bug Fix__: Set the scheme to `https` if host is of port 443
+
 ## 0.15.3 (2017/9/26)
 * __Bug Fix__: [Info/Warning notifications blocking all tabs](https://github.com/Huachao/vscode-restclient/issues/119)
 * __Bug Fix__: [cURL -d option not working properly with @](https://github.com/Huachao/vscode-restclient/issues/120)

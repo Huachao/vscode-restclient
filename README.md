@@ -36,6 +36,8 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Comments (line starts with `#` or `//`) support
     - Support `json` and `xml` body indentation, comment shortcut and auto closing brackets
     - Code snippets for operations like `GET` and `POST`
+    - Support navigate to symbol definitions(request and file level custom variable) in open `http` file
+    - CodeLens support to add an actionable link to send request
 
 ## Usage
 In editor, type a HTTP request as simple as below:
@@ -290,6 +292,11 @@ Currently auto completion will be enabled for following seven categories:
 5. Custom variables in current environment/file
 6. MIME Types for `Accept` and `Content-Type` headers
 7. Authentication scheme for `Basic` and `Digest`
+
+### Navigate to Symbols in Request File
+A single `http` file may define lots of requests and file level custom variables, it will be difficult to find the request/variable you want. We leverage from the _Goto Symbol Feature_ of _Visual Studio Code_ to support to navigate(goto) to request/variable with shortcut `Ctrl+Shift+O`(`Cmd+Shift+O` for macOS), or simpy press `F1`, type `@`.
+![Goto Symbols](images/navigate.png)
+
 
 ## Environments
 Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different product environments, like devbox, sandbox and production.
