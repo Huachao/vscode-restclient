@@ -33,10 +33,10 @@ export class VariableProcessor {
         }
 
         let environmentVariables = await EnvironmentController.getCustomVariables();
-        for (let variableName in environmentVariables) {
+        for (let [variableName, variableValue] of environmentVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
-                request = request.replace(regex, environmentVariables[variableName]);
+                request = request.replace(regex, variableValue);
             }
         }
 

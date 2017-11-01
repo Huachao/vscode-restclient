@@ -24,9 +24,9 @@ export class CustomVariableHoverProvider implements HoverProvider {
         }
 
         let environmentCustomVariables = await EnvironmentController.getCustomVariables();
-        for (let variableName in environmentCustomVariables) {
+        for (let [variableName, variableValue] of environmentCustomVariables) {
             if (variableName === selectedVariableName) {
-                let contents: MarkedString[] = [environmentCustomVariables[variableName], { language: 'http', value: `Environment Variable ${variableName}` }];
+                let contents: MarkedString[] = [variableValue, { language: 'http', value: `Environment Variable ${variableName}` }];
                 return new Hover(contents, wordRange);
             }
         }

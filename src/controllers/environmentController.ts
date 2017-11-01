@@ -8,8 +8,10 @@ import * as Constants from '../constants';
 import { trace } from "../decorator";
 
 export class EnvironmentController {
-    public static noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
-        'No Environment', Constants.NoEnvironmentSelectedName, 'DO NOT Use Any Environment');
+    private static readonly noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
+        'No Environment', Constants.NoEnvironmentSelectedName, 'You Can Still Use Variables Defined In $shared Environment');
+
+    private static readonly sharedEnvironmentName: string = '$shared';
 
     private _environmentStatusBarItem: StatusBarItem;
     private _restClientSettings: RestClientSettings;
@@ -29,6 +31,9 @@ export class EnvironmentController {
         let itemPickList: EnvironmentPickItem[] = [];
         itemPickList.push(EnvironmentController.noEnvironmentPickItem);
         for (let name in this._restClientSettings.environmentVariables) {
+            if (name === EnvironmentController.sharedEnvironmentName) {
+                continue;
+            }
             let item = new EnvironmentPickItem(name, name);
             if (item.name === currentEnvironment.name) {
                 item.description = '$(check)';
@@ -61,13 +66,18 @@ export class EnvironmentController {
         }
 
         let settings = new RestClientSettings();
-        for (let environmentName in settings.environmentVariables) {
-            if (environmentName === environment.name) {
-                return settings.environmentVariables[environmentName];
-            }
-        }
+        let environments = settings.environmentVariables;
+        let variables = {};
+        Object.assign(
+            variables,
+            environments[EnvironmentController.sharedEnvironmentName] || {},
+            environments[environment.name] || {});
 
-        return new Map<string, string>();
+        const map = new Map<string, string>();
+        Object.keys(variables).forEach(key => {
+            map.set(key, variables[key]);
+        });
+        return map;
     }
 
     public dispose() {

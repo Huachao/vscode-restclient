@@ -107,8 +107,8 @@ export class HttpElementFactory {
 
         // add environment custom variables
         let customVariables = await EnvironmentController.getCustomVariables();
-        for (let variableName in customVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.EnvironmentCustomVariable, null, `Value: ${customVariables[variableName]}`, new SnippetString(`{{${variableName}}}`)));
+        for (let [variableName, variableValue] of customVariables) {
+            originalElements.push(new HttpElement(variableName, ElementType.EnvironmentCustomVariable, null, `Value: ${variableValue}`, new SnippetString(`{{${variableName}}}`)));
         }
 
         // add file custom variables

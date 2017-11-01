@@ -33,7 +33,8 @@
   ],
   "keywords": [
     "REST",
-    "Http"
+    "Http",
+    "multi-root ready"
   ],
   "activationEvents": [
     "onCommand:rest-client.request",
@@ -330,7 +331,7 @@
         },
         "rest-client.environmentVariables": {
           "type": "object",
-          "default": {},
+          "default": {"$shared": {}},
           "scope": "resource",
           "description": "Sets the environments and custom variables belongs to it (e.g., {\"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
           "additionalProperties": {
