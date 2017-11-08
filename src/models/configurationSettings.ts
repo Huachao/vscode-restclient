@@ -23,7 +23,6 @@ export interface IRestClientSettings {
     hostCertificates: Map<string, HostCertificate>;
     useTrunkedTransferEncodingForSendingFileContent: boolean;
     suppressResponseBodyContentTypeValidationWarning: boolean;
-
     previewOption: PreviewOption;
 }
 
@@ -48,7 +47,6 @@ export class RestClientSettings implements IRestClientSettings {
     public hostCertificates: Map<string, HostCertificate>;
     public useTrunkedTransferEncodingForSendingFileContent: boolean;
     public suppressResponseBodyContentTypeValidationWarning: boolean;
-
     public previewOption: PreviewOption;
 
     public constructor() {
