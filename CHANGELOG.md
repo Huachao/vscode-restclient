@@ -1,6 +1,10 @@
+## 0.16.1 (2017/11/17)
+* __Feature__: [Support shared variables can be used across all the environemnts](https://github.com/Huachao/vscode-restclient/issues/128)
+* __Feature__: [Request block fold/unfold feature in .http/.rest file](https://github.com/Huachao/vscode-restclient/issues/139)
+
 ## 0.16.0 (2017/10/30)
-* __Feature__: [Support goto symbols(request or file level cusom variable) in http file](https://github.com/Huachao/vscode-restclient/issues/126)
-* __Improvement__: Adopt multi root workspace API
+* __Feature__: [Support goto symbols(request or file level custom variable) in http file](https://github.com/Huachao/vscode-restclient/issues/126)
+* __Improvement__: [Adopt multi root workspace API](https://github.com/Huachao/vscode-restclient/issues/133)
 * __Improvement__: Update README.md to reflect installation and code lens update
 * __Bug Fix__: Set the scheme to `https` if host is of port 443
 
@@ -142,7 +146,7 @@
 * __Feature__: Support generate code snippets for various languages and libraries
 * __Improvement__: Allow copy saved response path
 * __Improvement__: Add description for HTTP headers in autocompletion
-* __Bug Fix__: Use comma to concat multiple cookies 
+* __Bug Fix__: Use comma to concat multiple cookies
 
 ## 0.9.0 (2016/10/25)
 * __Feature__: Add clear history command
@@ -213,7 +217,7 @@
 * __Bug Fix__: Update README to reflect latest changes
 
 ## 0.6.0 (2016/7/21)
-* __Bug Fix__: Preview response with css file which takes theme style into consideration. Fix the issue [avoid the white background](https://github.com/Huachao/vscode-restclient/issues/12) 
+* __Bug Fix__: Preview response with css file which takes theme style into consideration. Fix the issue [avoid the white background](https://github.com/Huachao/vscode-restclient/issues/12)
 
 ## 0.5.5 (2016/7/20)
 * __Bug Fix__: [Allow host header in request headers](https://github.com/Huachao/vscode-restclient/issues/10)
@@ -249,7 +253,7 @@
 * __Bug Fix__: Getting history request items from previous versions
 
 ## 0.2.1 (2016/5/18)
-* __Feature__: Timeout in milliseconds, less or equal than 0 represents for infinity, default is `0` 
+* __Feature__: Timeout in milliseconds, less or equal than 0 represents for infinity, default is `0`
 
 ## 0.2.0 (2016/4/27)
 * __Feature__: Add http request history
