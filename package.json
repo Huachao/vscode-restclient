@@ -333,7 +333,7 @@
           "type": "object",
           "default": {"$shared": {}},
           "scope": "resource",
-          "description": "Sets the environments and custom variables belongs to it (e.g., {\"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
+          "description": "Sets the environments and custom variables belongs to it, especially the special environment name '$shared' is used to create variables shared across all the individual environments (e.g., {\"$shared\": {\"version\": \"v1\"}, \"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
           "additionalProperties": {
             "anyOf": [
               {
