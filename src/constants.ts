@@ -22,6 +22,6 @@ export const GuidVariableDescription = "Add a RFC 4122 v4 UUID";
 export const RandomInt = "$randomInt";
 export const RandomIntDescription = "Returns a random integer between min (included) and max (excluded)";
 
-export const CommentIdentifiersRegex: RegExp = new RegExp('^\\s*(\#|\/\/)');
+export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
-export const VariableDefinitionRegex: RegExp = new RegExp('^\\s*@([^\\s=]+)\\s*=\\s*(.+)\\s*$');
+export const VariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.+)\s*$/;
