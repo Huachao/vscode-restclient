@@ -4,8 +4,8 @@ import { window } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from './constants';
 import { Func } from './common/delegates';
+import * as moment from 'moment';
 const uuid = require('node-uuid');
-const moment = require('moment');
 
 export class VariableProcessor {
 
@@ -50,7 +50,7 @@ export class VariableProcessor {
                 let groups = regex.exec(match);
                 if (groups !== null && groups.length === 3) {
                     return groups[1] && groups[2]
-                        ? moment.utc().add(groups[1], groups[2]).unix()
+                        ? moment.utc().add(Number(groups[1]), <moment.DurationInputArg2>groups[2]).unix()
                         : moment.utc().unix();
                 }
                 return match;

@@ -472,7 +472,7 @@
     "httpsnippet": "^1.16.5",
     "iconv-lite": "^0.4.15",
     "mime-types": "^2.1.14",
-    "moment": "^2.15.1",
+    "moment": "^2.19.2",
     "node-uuid": "^1.4.7",
     "pretty-data": "^0.40.0",
     "request": "^2.81.0",

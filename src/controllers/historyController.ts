@@ -7,9 +7,9 @@ import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { trace } from "../decorator";
 import { EOL } from 'os';
 import * as fs from 'fs';
+import * as moment from 'moment';
 
 let tmp = require('tmp');
-let moment = require('moment');
 
 export class HistoryController {
     private _outputChannel: OutputChannel;
