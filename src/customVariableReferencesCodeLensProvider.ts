@@ -44,10 +44,6 @@ export class CustomVariableReferencesCodeLensProvider implements CodeLensProvide
                     break;
                 }
             }
-
-            if (Selector.isResponseStatusLine(lines[blockStart])) {
-                continue;
-            }
         }
 
         return Promise.resolve(blocks);
