@@ -16,32 +16,22 @@ export class RequestStore {
     }
 
     public static getLatest(): HttpRequest {
-        if (RequestStore.cache.has(RequestStore.currentRequestId)) {
-            return RequestStore.cache.get(RequestStore.currentRequestId);
-        } else {
-            return null;
-        }
+        return RequestStore.cache.get(RequestStore.currentRequestId) || null;
     }
 
-    public static cancel(requestId: string = null) {
-        requestId = requestId || RequestStore.currentRequestId;
-        if (!RequestStore.cancelledRequestIds.has(requestId)) {
-            RequestStore.cancelledRequestIds.add(requestId);
-        }
+    public static cancel(requestId: string = RequestStore.currentRequestId) {
+        RequestStore.cancelledRequestIds.add(requestId);
     }
 
     public static isCancelled(requestId: string) {
-        return requestId && RequestStore.cancelledRequestIds.has(requestId);
+        return RequestStore.cancelledRequestIds.has(requestId);
     }
 
     public static complete(requestId: string) {
-        if (requestId) {
-            RequestStore.completedRequestIds.add(requestId);
-        }
+        return requestId && RequestStore.completedRequestIds.add(requestId);
     }
 
-    public static isCompleted(requestId: string = null) {
-        requestId = requestId || RequestStore.currentRequestId;
+    public static isCompleted(requestId: string = RequestStore.currentRequestId) {
         return RequestStore.completedRequestIds.has(requestId);
     }
 }

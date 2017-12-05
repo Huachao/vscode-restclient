@@ -10,8 +10,8 @@ export class Telemetry {
 
     public static sendEvent(eventName: string, properties?: { [key: string]: string }) {
         try {
-            let client = appInsights.getClient(Constants.AiKey);
             if (Telemetry.restClientSettings.enableTelemetry) {
+                let client = appInsights.getClient(Constants.AiKey);
                 client.trackEvent(eventName, properties);
             }
         } catch (error) {
