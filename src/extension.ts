@@ -14,6 +14,7 @@ import { CustomVariableReferenceProvider } from './customVariableReferenceProvid
 import { HttpCodeLensProvider } from './httpCodeLensProvider';
 import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
 import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
+import { RequestLines } from './models/requestLines';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -32,7 +33,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(historyController);
     context.subscriptions.push(codeSnippetController);
     context.subscriptions.push(environmentController);
-    context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, range: Range) => requestController.run(range))));
+    context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, requestLines: RequestLines) => requestController.run(requestLines))));
     context.subscriptions.push(commands.registerCommand('rest-client.rerun-last-request', () => requestController.rerun()));
     context.subscriptions.push(commands.registerCommand('rest-client.cancel-request', () => requestController.cancel()));
     context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.save()));

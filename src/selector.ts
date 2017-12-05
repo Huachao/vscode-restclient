@@ -33,6 +33,11 @@ export class Selector {
         return rows;
     }
 
+    public static getResponseVariable(line: string): string {
+        const matched = line.match(Constants.ResponseVariableDefinitionRegex);
+        return matched && matched.length >= 2 ? matched[1] : null;
+    } 
+
     public static isCommentLine(line: string): boolean {
         return Constants.CommentIdentifiersRegex.test(line);
     }

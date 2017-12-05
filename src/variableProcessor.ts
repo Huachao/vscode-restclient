@@ -1,10 +1,13 @@
 'use strict';
+import { HttpResponse } from "./models/httpResponse"
 
 import { window } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
-import * as Constants from './constants';
+import * as Constants from "./constants"
 import { Func } from './common/delegates';
-import * as moment from 'moment';
+import * as moment from "moment"
+import { ResponseCache } from "./responseCache";
+import { HttpResponseCacheKey } from "./models/httpResponseCacheKey";
 const uuid = require('node-uuid');
 
 export class VariableProcessor {
@@ -37,6 +40,28 @@ export class VariableProcessor {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, variableValue);
+            }
+        }
+
+        let responseVariables = VariableProcessor.getResponseVariablesInCurrentFile();
+        for (let [variableName, response] of responseVariables) {
+            let regex = new RegExp(`\\{\\{\\s*${variableName}.*\\s*\\}\\}`, 'g');
+            let matches = request.match(regex);
+            if (matches && matches.length > 0) {
+                for (var i = 0; i < matches.length; i++) {
+                    var responseVar = matches[i].replace('{{', '').replace('}}', '');
+                    var parts = responseVar.split('.');
+                    let value = response;
+                    for (var j = 1; j < parts.length; j++) {
+                        const part = parts[j];
+                        if (part === "body") {
+                            value = JSON.parse(value[part]);                            
+                        } else {
+                            value = value[part];   
+                        }
+                    }
+                    request = request.replace(new RegExp(`\\{\\{\\s*${responseVar}\\s*\\}\\}`, 'g'), value.toString());
+                }   
             }
         }
 
@@ -103,6 +128,30 @@ export class VariableProcessor {
                     }
                 }
                 variables.set(key, value);
+            }
+        });
+
+        return variables;
+    }
+
+    public static getResponseVariablesInCurrentFile(): Map<string, HttpResponse> {
+        let variables = new Map<string, HttpResponse>();
+        let editor = window.activeTextEditor;
+        if (!editor || !editor.document) {
+            return variables;
+        }
+
+        let document = editor.document.getText();
+        let lines: string[] = document.split(/\r?\n/g);
+        let documentUri = editor.document.uri.toString();
+        lines.forEach(line => {
+            let match: RegExpExecArray;
+            if (match = Constants.ResponseVariableDefinitionRegex.exec(line)) {
+                let key = match[1];
+                const response = ResponseCache.get(new HttpResponseCacheKey(key, documentUri));
+                if (response) {
+                    variables.set(key, response);
+                }
             }
         });
 
