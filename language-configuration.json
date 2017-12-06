@@ -16,7 +16,7 @@
     "folding": {
         "markers": {
             "start": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|curl)\\s+",
-            "end": "^#{3,}"
+            "end": "^#{3,}$"
         }
     }
 }
