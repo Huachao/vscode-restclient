@@ -20,8 +20,8 @@ export class RequestParserUtil {
             let normalizedFieldName = fieldName.trim().toLowerCase();
             let normalizedFieldValue = fieldValue.trim();
             if (!headerNames[normalizedFieldName]) {
-                headerNames[normalizedFieldName] = fieldName;
-                headers[fieldName] = normalizedFieldValue;
+                headerNames[normalizedFieldName] = fieldName.trim();
+                headers[fieldName.trim()] = normalizedFieldValue;
             } else {
                 let splitter = normalizedFieldName === 'cookie' ? ';' : ',';
                 headers[headerNames[normalizedFieldName]] += `${splitter}${normalizedFieldValue}`;
