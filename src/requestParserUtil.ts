@@ -10,21 +10,20 @@ export class RequestParserUtil {
             let fieldValue: string;
             let separatorIndex = headerLine.indexOf(':');
             if (separatorIndex === -1) {
-                fieldName = headerLine;
+                fieldName = headerLine.trim();
                 fieldValue = '';
             } else {
-                fieldName = headerLine.substring(0, separatorIndex);
-                fieldValue = headerLine.substring(separatorIndex + 1);
+                fieldName = headerLine.substring(0, separatorIndex).trim();
+                fieldValue = headerLine.substring(separatorIndex + 1).trim();
             }
 
-            let normalizedFieldName = fieldName.trim().toLowerCase();
-            let normalizedFieldValue = fieldValue.trim();
+            let normalizedFieldName = fieldName.toLowerCase();
             if (!headerNames[normalizedFieldName]) {
-                headerNames[normalizedFieldName] = fieldName.trim();
-                headers[fieldName.trim()] = normalizedFieldValue;
+                headerNames[normalizedFieldName] = fieldName;
+                headers[fieldName] = fieldValue;
             } else {
                 let splitter = normalizedFieldName === 'cookie' ? ';' : ',';
-                headers[headerNames[normalizedFieldName]] += `${splitter}${normalizedFieldValue}`;
+                headers[headerNames[normalizedFieldName]] += `${splitter}${fieldValue}`;
             }
         });
 
