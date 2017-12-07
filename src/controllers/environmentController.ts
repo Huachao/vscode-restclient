@@ -17,12 +17,15 @@ export class EnvironmentController {
     private _restClientSettings: RestClientSettings;
 
     public constructor(initEnvironment: EnvironmentPickItem) {
-        this._environmentStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
-        this._environmentStatusBarItem.command = 'rest-client.switch-environment';
-        this._environmentStatusBarItem.text = initEnvironment.label;
-        this._environmentStatusBarItem.tooltip = 'Switch REST Client Environment';
-        this._environmentStatusBarItem.show();
         this._restClientSettings = new RestClientSettings();
+
+        if (this._restClientSettings.showStatusBarItem) {
+            this._environmentStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
+            this._environmentStatusBarItem.command = 'rest-client.switch-environment';
+            this._environmentStatusBarItem.text = initEnvironment.label;
+            this._environmentStatusBarItem.tooltip = 'Switch REST Client Environment';
+            this._environmentStatusBarItem.show();
+        }
     }
 
     @trace('Switch Environment')
@@ -46,7 +49,9 @@ export class EnvironmentController {
             return;
         }
 
-        this._environmentStatusBarItem.text = item.label;
+        if (this._restClientSettings.showStatusBarItem) {
+            this._environmentStatusBarItem.text = item.label;
+        }
 
         await PersistUtility.saveEnvironment(item);
     }
