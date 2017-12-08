@@ -35,6 +35,7 @@ export class RestClientSettings implements IRestClientSettings {
     public proxyStrictSSL: boolean;
     public rememberCookiesForSubsequentRequests: boolean;
     public enableTelemetry: boolean;
+    public showEnvironmentStatusBarItem: boolean;
     public excludeHostsForProxy: string[];
     public fontSize?: number;
     public fontFamily: string;
@@ -87,6 +88,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.proxy = httpSettings.get<string>('proxy', undefined);
         this.proxyStrictSSL = httpSettings.get<boolean>('proxyStrictSSL', false);
         this.enableTelemetry = httpSettings.get<boolean>('enableTelemetry', true);
+        this.showEnvironmentStatusBarItem = restClientSettings.get<boolean>('showEnvironmentStatusBarItem', true);
     }
 
     private getWorkspaceConfiguration(): WorkspaceConfiguration {
