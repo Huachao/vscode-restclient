@@ -19,7 +19,7 @@ export class EnvironmentController {
     public constructor(initEnvironment: EnvironmentPickItem) {
         this._restClientSettings = new RestClientSettings();
 
-        if (this._restClientSettings.showStatusBarItem) {
+        if (this._restClientSettings.showEnvironmentStatusBarItem) {
             this._environmentStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
             this._environmentStatusBarItem.command = 'rest-client.switch-environment';
             this._environmentStatusBarItem.text = initEnvironment.label;
@@ -49,7 +49,7 @@ export class EnvironmentController {
             return;
         }
 
-        if (this._restClientSettings.showStatusBarItem) {
+        if (this._restClientSettings.showEnvironmentStatusBarItem) {
             this._environmentStatusBarItem.text = item.label;
         }
 

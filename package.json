@@ -442,7 +442,7 @@
           "scope": "resource",
           "description": "Response preview output option. 'full' for whole response message(status line, headers and body). 'headers' for response headers(as well as status line). 'body' for response body only. 'exchange' for whole HTTP exchange (request and response)"
         },
-        "rest-client.showStatusBarItem": {
+        "rest-client.showEnvironmentStatusBarItem": {
           "type": "boolean",
           "default": true,
           "scope": "resource",
