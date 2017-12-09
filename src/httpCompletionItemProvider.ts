@@ -1,4 +1,5 @@
 'use strict';
+import { VariableUtility } from "./variableUtility"
 
 import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind } from 'vscode';
 import { HttpElementFactory } from './httpElementFactory';
@@ -6,6 +7,10 @@ import { ElementType } from './models/httpElement';
 
 export class HttpCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
+        if (VariableUtility.isPartialResponseVariable(document, position)) {
+            return;
+        }
+
         let completionItems: CompletionItem[] = [];
 
         let elements = await HttpElementFactory.getHttpElements(document.lineAt(position).text);

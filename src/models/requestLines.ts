@@ -1,6 +1,6 @@
-import { Range } from "vscode";
-
 "use strict";
+
+import { Range } from "vscode";
 
 export class RequestLines {
     public constructor(

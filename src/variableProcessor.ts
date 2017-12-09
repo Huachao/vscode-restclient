@@ -1,7 +1,8 @@
 'use strict';
+import { VariableType } from "./models/variableType"
 import { HttpResponse } from "./models/httpResponse"
 
-import { window } from 'vscode';
+import { window, TextDocument } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from "./constants"
 import { Func } from './common/delegates';
@@ -135,15 +136,20 @@ export class VariableProcessor {
     }
 
     public static getResponseVariablesInCurrentFile(): Map<string, HttpResponse> {
-        let variables = new Map<string, HttpResponse>();
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
-            return variables;
+            return  new Map<string, HttpResponse>();
         }
 
-        let document = editor.document.getText();
-        let lines: string[] = document.split(/\r?\n/g);
-        let documentUri = editor.document.uri.toString();
+        return VariableProcessor.getResponseVariablesInFile(editor.document);
+    }
+
+    public static getResponseVariablesInFile(document: TextDocument): Map<string, HttpResponse> {
+        let variables = new Map<string, HttpResponse>();
+
+        let text = document.getText();
+        let lines: string[] = text.split(/\r?\n/g);
+        let documentUri = document.uri.toString();
         lines.forEach(line => {
             let match: RegExpExecArray;
             if (match = Constants.ResponseVariableDefinitionRegex.exec(line)) {
@@ -156,5 +162,29 @@ export class VariableProcessor {
         });
 
         return variables;
+    }
+
+    public static async getVariableExist(variableName: string): Promise<{ exists: boolean, type?: VariableType }> {
+        let globalVariables = VariableProcessor.getGlobalVariables();
+        if (globalVariables[variableName]) {
+            return { exists: true, type: VariableType.Global };
+        }
+
+        let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
+        if (fileVariables.has(variableName)) {
+            return { exists: true, type: VariableType.Custom };            
+        }
+
+        let environmentVariables = await EnvironmentController.getCustomVariables();
+        if (environmentVariables.has(variableName)) {
+            return { exists: true, type: VariableType.Environment };            
+        }
+
+        let responseVariables = VariableProcessor.getResponseVariablesInCurrentFile();
+        if (responseVariables.has(variableName)) {
+            return { exists: true, type: VariableType.Response };            
+        }
+
+        return { exists: false }
     }
 }

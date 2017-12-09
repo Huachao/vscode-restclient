@@ -1,6 +1,6 @@
 'use strict';
 
-import { TextDocument, Position } from 'vscode';
+import { TextDocument, Position, TextLine, Range } from 'vscode';
 
 export class VariableUtility {
     public static isVariableDefinition(document: TextDocument, position: Position): boolean {
@@ -31,5 +31,53 @@ export class VariableUtility {
         }
 
         return true;
+    }
+
+    public static isResponseVariableReference(document: TextDocument, position: Position): boolean {
+        let wordRange = document.getWordRangeAtPosition(position, /(\w+)(\.\w+|\[\d+\])+/);
+        let lineRange = document.lineAt(position);
+        if (!wordRange
+            || wordRange.start.character < 2
+            || wordRange.end.character > lineRange.range.end.character - 1
+            || lineRange.text[wordRange.start.character - 1] !== '{'
+            || lineRange.text[wordRange.start.character - 2] !== '{'
+            || lineRange.text[wordRange.end.character] !== '}'
+            || lineRange.text[wordRange.end.character + 1] !== '}') {
+            // not a custom variable reference syntax
+            return false;
+        }
+
+        return true;
+    }
+
+    public static isPartialResponseVariable(document: TextDocument, position: Position): boolean {
+        let wordRange = document.getWordRangeAtPosition(position, /(\w+)(\.\w*|\[\d*\]?)+/);
+        let lineRange = document.lineAt(position);
+        if (!wordRange
+            || wordRange.start.character < 2
+            || wordRange.end.character > lineRange.range.end.character - 1
+            || lineRange.text[wordRange.start.character - 1] !== '{'
+            || lineRange.text[wordRange.start.character - 2] !== '{'
+            || lineRange.text[wordRange.end.character] !== '}'
+            || lineRange.text[wordRange.end.character + 1] !== '}') {
+            // not a custom variable reference syntax
+            return false;
+        }
+
+        return true;
+    }
+
+    public static getResponseVariable(wordRange: Range, lineRange: TextLine, position: Position) {
+        let index = position.character - 1;
+        if (wordRange) {
+            wordRange.start.character
+        }
+        // Look behind for start of variable
+        for (; index >= 0; index--) {
+            if (lineRange.text[index-1] === "{" && lineRange.text[index-2] === "{") 
+                break;
+        }
+
+        return lineRange.text.substring(index, wordRange ? wordRange.end.character : position.character - 1)
     }
 }
