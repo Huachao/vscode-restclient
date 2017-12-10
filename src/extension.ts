@@ -1,6 +1,7 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+import { VariableDiagnosticsProvider } from "./variableDiagnosticsProvider"
 import { ResponseVariableCompletionItemProvider } from "./responseVariableCompletionItemProvider"
 import { ExtensionContext, commands, languages, TextDocument, Range, Uri, workspace, window } from 'vscode';
 import { RequestController } from './controllers/requestController';
@@ -25,7 +26,6 @@ export async function activate(context: ExtensionContext) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "rest-client" is now active!');
-
     let requestController = new RequestController();
     let historyController = new HistoryController();
     let responseController = new ResponseController();
@@ -60,6 +60,9 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerDefinitionProvider('http', new CustomVariableDefinitionProvider()));
     context.subscriptions.push(languages.registerReferenceProvider('http', new CustomVariableReferenceProvider()));
     context.subscriptions.push(languages.registerDocumentSymbolProvider('http', new HttpDocumentSymbolProvider()));
+
+    let diagnostic = new VariableDiagnosticsProvider();	
+	diagnostic.activate(context.subscriptions);
 }
 
 // this method is called when your extension is deactivated

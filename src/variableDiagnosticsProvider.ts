@@ -1,0 +1,97 @@
+'use strict';
+import { VariableProcessor } from "./variableProcessor"
+
+import { commands, workspace,languages, Diagnostic, DiagnosticSeverity, DiagnosticCollection, TextDocument, Range, Position, Disposable } from 'vscode';
+
+export class VariableDiagnosticsProvider {
+	
+    private diagnosticCollection: DiagnosticCollection;
+    	
+	public activate(subscriptions: Disposable[]) {
+        this.diagnosticCollection = languages.createDiagnosticCollection();
+        
+		workspace.onDidOpenTextDocument(this.checkVariables, this, subscriptions);
+		workspace.onDidCloseTextDocument((textDocument)=> {
+			this.diagnosticCollection.delete(textDocument.uri);
+		}, null, subscriptions);
+        workspace.onDidSaveTextDocument(this.checkVariables, this, subscriptions);
+
+		// Check all open documents
+		workspace.textDocuments.forEach(this.checkVariables, this);
+    }
+    
+	public dispose(): void {
+		this.diagnosticCollection.clear();
+		this.diagnosticCollection.dispose();
+	}
+
+	private async checkVariables(document: TextDocument) {
+		if (document.languageId !== 'http') {
+			return;
+        }
+
+        let diagnostics: Diagnostic[] = [];
+        
+        let vars = this.findVariables(document);
+
+        let varNames = vars.map((v) => v.variableName.split(".")[0].split("[")[0]);
+        
+        // Distinct varNames
+        varNames = Array.from(new Set(varNames));
+
+        let existArray = await VariableProcessor.getVariablesExist(varNames);
+        
+        existArray.forEach((ea) => {
+            if (!ea.exists) {
+                vars.forEach((v) => {
+                    if (v.variableName == ea.name) {
+                        diagnostics.push({
+                            severity: DiagnosticSeverity.Error,
+                            range: new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
+                            message: `${v.variableName} should be spelled TypeScript`,
+                            source: 'ex',
+                            code: "10",
+                        });
+                    }
+                })
+            }
+        })
+
+        this.diagnosticCollection.set(document.uri, diagnostics);        
+    }
+    
+    private findVariables(document: TextDocument) : Variable[] {
+        let vars: Variable[] = []
+        let lines = document.getText().split(/\r?\n/g);
+        let pattern = /\{\{(\w+)(\.\w+|\[\d+\])*\}\}/;        
+        lines.forEach((line, i) => {
+            let match: RegExpExecArray;
+            let currentIndex = 0;
+            while (match = pattern.exec(line)) {
+                let variableName = match[1];
+                let startIndex = match.index + 2;
+                let endIndex = startIndex +variableName.length;
+                vars.push(new Variable(
+                    variableName,
+                    currentIndex + startIndex,
+                    currentIndex + endIndex,
+                    i
+                ));
+                line = line.substring(endIndex + 2);
+                currentIndex += endIndex + 2;
+            }
+        })
+
+        return vars;
+    }
+}
+
+class Variable {
+    constructor(
+        public variableName: string,
+        public startIndex: number,
+        public endIndex: number,
+        public lineNumber: number) {
+        
+    }
+}

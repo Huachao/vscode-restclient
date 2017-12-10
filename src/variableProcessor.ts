@@ -9,6 +9,7 @@ import { Func } from './common/delegates';
 import * as moment from "moment"
 import { ResponseCache } from "./responseCache";
 import { HttpResponseCacheKey } from "./models/httpResponseCacheKey";
+import { ResponseProcessor } from "./responseProcessor";
 const uuid = require('node-uuid');
 
 export class VariableProcessor {
@@ -51,17 +52,12 @@ export class VariableProcessor {
             if (matches && matches.length > 0) {
                 for (var i = 0; i < matches.length; i++) {
                     var responseVar = matches[i].replace('{{', '').replace('}}', '');
-                    var parts = responseVar.split('.');
-                    let value = response;
-                    for (var j = 1; j < parts.length; j++) {
-                        const part = parts[j];
-                        if (part === "body") {
-                            value = JSON.parse(value[part]);                            
-                        } else {
-                            value = value[part];   
-                        }
+                    try {
+                        const value = ResponseProcessor.getValueAtPath(response, responseVar);
+                        request = request.replace(new RegExp(`\\{\\{\\s*${responseVar}\\s*\\}\\}`, 'g'), value.toString());
+                    } catch {
+                        window.showWarningMessage(`Could not merge in response variable. Is ${responseVar} the correct path?`)
                     }
-                    request = request.replace(new RegExp(`\\{\\{\\s*${responseVar}\\s*\\}\\}`, 'g'), value.toString());
                 }   
             }
         }
@@ -164,27 +160,51 @@ export class VariableProcessor {
         return variables;
     }
 
-    public static async getVariableExist(variableName: string): Promise<{ exists: boolean, type?: VariableType }> {
+    public static async getVariablesExist(variables: string[]): Promise<{ name: string, exists: boolean, type?: VariableType }[]> {
         let globalVariables = VariableProcessor.getGlobalVariables();
-        if (globalVariables[variableName]) {
-            return { exists: true, type: VariableType.Global };
-        }
-
         let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
-        if (fileVariables.has(variableName)) {
-            return { exists: true, type: VariableType.Custom };            
-        }
-
         let environmentVariables = await EnvironmentController.getCustomVariables();
-        if (environmentVariables.has(variableName)) {
-            return { exists: true, type: VariableType.Environment };            
-        }
-
         let responseVariables = VariableProcessor.getResponseVariablesInCurrentFile();
-        if (responseVariables.has(variableName)) {
-            return { exists: true, type: VariableType.Response };            
-        }
 
-        return { exists: false }
+        var checkList = [];
+
+        variables.forEach((v) => {
+
+            if (globalVariables[v]) {
+                checkList.push({ 
+                    name: v, 
+                    exists: true, 
+                    type: VariableType.Global });
+                return;
+            }
+            if (fileVariables.has(v)) {
+                checkList.push({ 
+                    name: v, 
+                    exists: true, 
+                    type: VariableType.Custom });
+                return;            
+            }
+            if (environmentVariables.has(v)) {
+                checkList.push({ 
+                    name: v, 
+                    exists: true, 
+                    type: VariableType.Environment });
+                return;         
+            }
+            if (responseVariables.has(v)) {
+                checkList.push({ 
+                    name: v, 
+                    exists: true, 
+                    type: VariableType.Response });
+                return;           
+            }
+
+            checkList.push({
+                name: v,
+                exists: false
+            })
+        });
+
+        return checkList;
     }
 }
