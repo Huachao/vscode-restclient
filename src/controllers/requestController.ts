@@ -1,4 +1,5 @@
 "use strict";
+import { RequestLines } from "../models/requestLines"
 
 import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument, Range } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
@@ -18,6 +19,8 @@ import { ResponseStore } from '../responseStore';
 import { Selector } from '../selector';
 import * as Constants from '../constants';
 import { EOL } from 'os';
+import { HttpResponseCacheKey } from "../models/httpResponseCacheKey";
+import { ResponseCache } from "../responseCache";
 
 const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();
@@ -49,14 +52,14 @@ export class RequestController {
     }
 
     @trace('Request')
-    public async run(range: Range) {
+    public async run(requestLines: RequestLines) {
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return;
         }
 
         // Get selected text of selected lines or full document
-        let selectedText = new Selector().getSelectedText(editor, range);
+        let selectedText = new Selector().getSelectedText(editor, requestLines.range);
         if (!selectedText) {
             return;
         }
@@ -79,6 +82,10 @@ export class RequestController {
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName, this._restClientSettings.useTrunkedTransferEncodingForSendingFileContent);
         if (!httpRequest) {
             return;
+        }
+
+        if (requestLines.reponseVar) {
+            httpRequest.responseCacheKey = new HttpResponseCacheKey(requestLines.reponseVar, requestLines.requestDocumentUri);
         }
 
         await this.runCore(httpRequest);
@@ -135,6 +142,9 @@ export class RequestController {
 
             let previewUri = this.generatePreviewUri();
             ResponseStore.add(previewUri.toString(), response);
+            if (httpRequest.responseCacheKey) {
+                ResponseCache.add(httpRequest.responseCacheKey, response);
+            }
 
             this._responseTextProvider.update(this._previewUri);
 

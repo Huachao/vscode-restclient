@@ -1,10 +1,15 @@
 'use strict';
+import { VariableType } from "./models/variableType"
+import { HttpResponse } from "./models/httpResponse"
 
-import { window } from 'vscode';
+import { window, TextDocument } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
-import * as Constants from './constants';
+import * as Constants from "./constants"
 import { Func } from './common/delegates';
-import * as moment from 'moment';
+import * as moment from "moment"
+import { ResponseCache } from "./responseCache";
+import { HttpResponseCacheKey } from "./models/httpResponseCacheKey";
+import { ResponseProcessor } from "./responseProcessor";
 const uuid = require('node-uuid');
 
 export class VariableProcessor {
@@ -37,6 +42,23 @@ export class VariableProcessor {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, variableValue);
+            }
+        }
+
+        let responseVariables = VariableProcessor.getResponseVariablesInCurrentFile();
+        for (let [variableName, response] of responseVariables) {
+            let regex = new RegExp(`\\{\\{\\s*${variableName}.*\\s*\\}\\}`, 'g');
+            let matches = request.match(regex);
+            if (matches && matches.length > 0) {
+                for (var i = 0; i < matches.length; i++) {
+                    var responseVar = matches[i].replace('{{', '').replace('}}', '');
+                    try {
+                        const value = ResponseProcessor.getValueAtPath(response, responseVar);
+                        request = request.replace(new RegExp(`\\{\\{\\s*${responseVar}\\s*\\}\\}`, 'g'), value.toString());
+                    } catch {
+                        window.showWarningMessage(`Could not merge in response variable. Is ${responseVar} the correct path?`)
+                    }
+                }   
             }
         }
 
@@ -107,5 +129,82 @@ export class VariableProcessor {
         });
 
         return variables;
+    }
+
+    public static getResponseVariablesInCurrentFile(): Map<string, HttpResponse> {
+        let editor = window.activeTextEditor;
+        if (!editor || !editor.document) {
+            return  new Map<string, HttpResponse>();
+        }
+
+        return VariableProcessor.getResponseVariablesInFile(editor.document);
+    }
+
+    public static getResponseVariablesInFile(document: TextDocument): Map<string, HttpResponse> {
+        let variables = new Map<string, HttpResponse>();
+
+        let text = document.getText();
+        let lines: string[] = text.split(/\r?\n/g);
+        let documentUri = document.uri.toString();
+        lines.forEach(line => {
+            let match: RegExpExecArray;
+            if (match = Constants.ResponseVariableDefinitionRegex.exec(line)) {
+                let key = match[1];
+                const response = ResponseCache.get(new HttpResponseCacheKey(key, documentUri));
+                if (response) {
+                    variables.set(key, response);
+                }
+            }
+        });
+
+        return variables;
+    }
+
+    public static async getVariablesExist(variables: string[]): Promise<{ name: string, exists: boolean, type?: VariableType }[]> {
+        let globalVariables = VariableProcessor.getGlobalVariables();
+        let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
+        let environmentVariables = await EnvironmentController.getCustomVariables();
+        let responseVariables = VariableProcessor.getResponseVariablesInCurrentFile();
+
+        var checkList = [];
+
+        variables.forEach((v) => {
+
+            if (globalVariables[v]) {
+                checkList.push({ 
+                    name: v, 
+                    exists: true, 
+                    type: VariableType.Global });
+                return;
+            }
+            if (fileVariables.has(v)) {
+                checkList.push({ 
+                    name: v, 
+                    exists: true, 
+                    type: VariableType.Custom });
+                return;            
+            }
+            if (environmentVariables.has(v)) {
+                checkList.push({ 
+                    name: v, 
+                    exists: true, 
+                    type: VariableType.Environment });
+                return;         
+            }
+            if (responseVariables.has(v)) {
+                checkList.push({ 
+                    name: v, 
+                    exists: true, 
+                    type: VariableType.Response });
+                return;           
+            }
+
+            checkList.push({
+                name: v,
+                exists: false
+            })
+        });
+
+        return checkList;
     }
 }

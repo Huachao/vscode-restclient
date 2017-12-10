@@ -1,6 +1,8 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+import { VariableDiagnosticsProvider } from "./variableDiagnosticsProvider"
+import { ResponseVariableCompletionItemProvider } from "./responseVariableCompletionItemProvider"
 import { ExtensionContext, commands, languages, TextDocument, Range, Uri, workspace, window } from 'vscode';
 import { RequestController } from './controllers/requestController';
 import { HistoryController } from './controllers/historyController';
@@ -14,6 +16,8 @@ import { CustomVariableReferenceProvider } from './customVariableReferenceProvid
 import { HttpCodeLensProvider } from './httpCodeLensProvider';
 import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
 import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
+import { RequestLines } from './models/requestLines';
+import { ResponseVariableHoverProvider } from './responseVariableHoverProvider';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -22,7 +26,6 @@ export async function activate(context: ExtensionContext) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "rest-client" is now active!');
-
     let requestController = new RequestController();
     let historyController = new HistoryController();
     let responseController = new ResponseController();
@@ -32,7 +35,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(historyController);
     context.subscriptions.push(codeSnippetController);
     context.subscriptions.push(environmentController);
-    context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, range: Range) => requestController.run(range))));
+    context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, requestLines: RequestLines) => requestController.run(requestLines))));
     context.subscriptions.push(commands.registerCommand('rest-client.rerun-last-request', () => requestController.rerun()));
     context.subscriptions.push(commands.registerCommand('rest-client.cancel-request', () => requestController.cancel()));
     context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.save()));
@@ -49,12 +52,17 @@ export async function activate(context: ExtensionContext) {
         });
     }));
     context.subscriptions.push(languages.registerCompletionItemProvider('http', new HttpCompletionItemProvider()));
+    context.subscriptions.push(languages.registerCompletionItemProvider('http', new ResponseVariableCompletionItemProvider(), '.'));
     context.subscriptions.push(languages.registerHoverProvider('http', new CustomVariableHoverProvider()));
+    context.subscriptions.push(languages.registerHoverProvider('http', new ResponseVariableHoverProvider()));
     context.subscriptions.push(languages.registerCodeLensProvider('http', new HttpCodeLensProvider()));
     context.subscriptions.push(languages.registerDocumentLinkProvider('http', new RequestBodyDocumentLinkProvider()));
     context.subscriptions.push(languages.registerDefinitionProvider('http', new CustomVariableDefinitionProvider()));
     context.subscriptions.push(languages.registerReferenceProvider('http', new CustomVariableReferenceProvider()));
     context.subscriptions.push(languages.registerDocumentSymbolProvider('http', new HttpDocumentSymbolProvider()));
+
+    let diagnostic = new VariableDiagnosticsProvider();	
+	diagnostic.activate(context.subscriptions);
 }
 
 // this method is called when your extension is deactivated
