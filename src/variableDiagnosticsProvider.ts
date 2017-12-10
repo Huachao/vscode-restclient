@@ -48,7 +48,7 @@ export class VariableDiagnosticsProvider {
                         diagnostics.push({
                             severity: DiagnosticSeverity.Error,
                             range: new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
-                            message: `${v.variableName} should be spelled TypeScript`,
+                            message: `${v.variableName} is not loaded in memory`,
                             source: 'ex',
                             code: "10",
                         });
