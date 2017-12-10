@@ -3,7 +3,6 @@
 import { HttpResponse } from './models/httpResponse';
 
 export class ResponseStore {
-    public static VariableCache: Map<string, HttpResponse> = new Map<string, HttpResponse>();    
     private static cache: Map<string, HttpResponse> = new Map<string, HttpResponse>();
     private static lastResponseUri: string = null;
 
@@ -11,11 +10,8 @@ export class ResponseStore {
         return ResponseStore.cache.size;
     }
 
-    public static add(uri: string, response: HttpResponse, responseVar?: string) {
+    public static add(uri: string, response: HttpResponse) {
         ResponseStore.cache.set(uri, response);
-        if (responseVar) {
-            ResponseStore.VariableCache.set(responseVar, response);            
-        }
         ResponseStore.lastResponseUri = uri;
     }
 

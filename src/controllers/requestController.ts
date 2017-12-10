@@ -134,7 +134,7 @@ export class RequestController {
             this._sizeStatusBarItem.show();
 
             let previewUri = this.generatePreviewUri();
-            ResponseStore.add(previewUri.toString(), response, httpRequest.responseVar);
+            ResponseStore.add(previewUri.toString(), response);
 
             this._responseTextProvider.update(this._previewUri);
 

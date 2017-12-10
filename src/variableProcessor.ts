@@ -5,8 +5,6 @@ import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from './constants';
 import { Func } from './common/delegates';
 import * as moment from 'moment';
-import { HttpResponse } from './models/httpResponse';
-import { ResponseStore } from './responseStore';
 const uuid = require('node-uuid');
 
 export class VariableProcessor {
@@ -39,28 +37,6 @@ export class VariableProcessor {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, variableValue);
-            }
-        }
-
-        let responseVariables = VariableProcessor.getResponseVariables();
-        for (let [variableName, response] of responseVariables) {
-            let regex = new RegExp(`\\{\\{\\s*${variableName}.*\\s*\\}\\}`, 'g');
-            let matches = request.match(regex);
-            if (matches && matches.length > 0) {
-                for (var i = 0; i < matches.length; i++) {
-                    var responseVar = matches[i].replace('{{', '').replace('}}', '');
-                    var parts = responseVar.split('.');
-                    let value = response;
-                    for (var j = 1; j < parts.length; j++) {
-                        const part = parts[j];
-                        if (part === "body") {
-                            value = JSON.parse(value[part]);                            
-                        } else {
-                            value = value[part];   
-                        }
-                    }
-                    request = request.replace(new RegExp(`\\{\\{\\s*${responseVar}\\s*\\}\\}`, 'g'), value.toString());
-                }   
             }
         }
 
@@ -131,9 +107,5 @@ export class VariableProcessor {
         });
 
         return variables;
-    }
-
-    public static getResponseVariables(): Map<string, HttpResponse> {
-        return ResponseStore.VariableCache;
     }
 }

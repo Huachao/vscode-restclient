@@ -8,8 +8,7 @@ export class HttpRequest {
         public url: string,
         public headers: { [key: string]: string },
         public body: string | Stream,
-        public rawBody: string,
-        public responseVar?: string) {
+        public rawBody: string) {
     }
 
     public getRequestHeaderValue(name: string) {

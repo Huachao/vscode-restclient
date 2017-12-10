@@ -96,17 +96,10 @@ export class HttpRequestParser implements IRequestParser {
             body = encodeurl(body);
         }
 
-        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), requestLine.responseVar);
+        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL));
     }
 
-    private static parseRequestLine(line: string): { method: string, url: string, responseVar?: string } {
-        let responseVar = null;
-        if (line.match(/(.+ -> .+)/)) {
-          const requestAndResponseVar = line.split(" -> ");
-          line = requestAndResponseVar[0];
-          responseVar = requestAndResponseVar[1];
-        }
-
+    private static parseRequestLine(line: string): { method: string, url: string } {
         // Request-Line = Method SP Request-URI SP HTTP-Version CRLF
         let words = line.split(' ').filter(Boolean);
 
@@ -128,8 +121,7 @@ export class HttpRequestParser implements IRequestParser {
 
         return {
             method: method,
-            url: url,
-            responseVar: responseVar
+            url: url
         };
     }
 
