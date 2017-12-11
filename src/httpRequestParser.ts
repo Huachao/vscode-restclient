@@ -52,7 +52,7 @@ export class HttpRequestParser implements IRequestParser {
                 let queryString = '';
                 for (; index < headerLines.length; ) {
                     let headerLine = (headerLines[index]).trim();
-                    if (headerLine[0] in { '?': '', '&': '' } && headerLine.split('=').length === 2) {
+                    if (headerLine[0] in { '?': '', '&': '' }) {
                         queryString += headerLine;
                         index++;
                         continue;
