@@ -17,7 +17,7 @@ export class ResponseVariableHoverProvider implements HoverProvider {
         const wordRange = document.getWordRangeAtPosition(position, /\w+(\[\d+\])*/);
         let lineRange = document.lineAt(position);
     
-        const fullPath = VariableUtility.getResponseVariable(wordRange, lineRange, position);
+        const fullPath = VariableUtility.getResponseVariablePath(wordRange, lineRange, position);
 
         const fileResponseVariables = VariableProcessor.getResponseVariablesInFile(document);
         for (let [variableName, response] of fileResponseVariables) {

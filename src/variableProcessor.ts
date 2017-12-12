@@ -96,14 +96,19 @@ export class VariableProcessor {
     }
 
     public static getCustomVariablesInCurrentFile(): Map<string, string> {
-        let variables = new Map<string, string>();
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
-            return variables;
+            return new Map<string, string>();
         }
 
-        let document = editor.document.getText();
-        let lines: string[] = document.split(/\r?\n/g);
+        return VariableProcessor.getCustomVariablesInFile(editor.document);
+    }
+
+    public static getCustomVariablesInFile(document: TextDocument): Map<string, string> {
+        let variables = new Map<string, string>();
+
+        let text = document.getText();
+        let lines: string[] = text.split(/\r?\n/g);
         lines.forEach(line => {
             let match: RegExpExecArray;
             if (match = Constants.VariableDefinitionRegex.exec(line)) {
@@ -129,7 +134,7 @@ export class VariableProcessor {
         });
 
         return variables;
-    }
+    }        
 
     public static getResponseVariablesInCurrentFile(): Map<string, HttpResponse> {
         let editor = window.activeTextEditor;
@@ -160,51 +165,44 @@ export class VariableProcessor {
         return variables;
     }
 
-    public static async getVariablesExist(variables: string[]): Promise<{ name: string, exists: boolean, type?: VariableType }[]> {
-        let globalVariables = VariableProcessor.getGlobalVariables();
-        let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
+    public static async checkVariableDefinitionExists(document: TextDocument, variableNames: string[]): Promise<{ name: string, exists: boolean }[]> {
+        let definitions = await VariableProcessor.getVariableDefinitionsInFile(document);
+
+        return variableNames.map((name) => 
+            ({name, exists: definitions.has(name)})
+        );
+    }
+
+    public static async getVariableDefinitionsInFile(document: TextDocument): Promise<Map<string, VariableType[]>> {
+        let fileVariables = VariableProcessor.getCustomVariablesInFile(document);
         let environmentVariables = await EnvironmentController.getCustomVariables();
-        let responseVariables = VariableProcessor.getResponseVariablesInCurrentFile();
+        let responseVariables = VariableProcessor.getResponseVariablesInFile(document);
 
-        var checkList = [];
-
-        variables.forEach((v) => {
-
-            if (globalVariables[v]) {
-                checkList.push({ 
-                    name: v, 
-                    exists: true, 
-                    type: VariableType.Global });
-                return;
-            }
-            if (fileVariables.has(v)) {
-                checkList.push({ 
-                    name: v, 
-                    exists: true, 
-                    type: VariableType.Custom });
-                return;            
-            }
-            if (environmentVariables.has(v)) {
-                checkList.push({ 
-                    name: v, 
-                    exists: true, 
-                    type: VariableType.Environment });
-                return;         
-            }
-            if (responseVariables.has(v)) {
-                checkList.push({ 
-                    name: v, 
-                    exists: true, 
-                    type: VariableType.Response });
-                return;           
-            }
-
-            checkList.push({
-                name: v,
-                exists: false
-            })
+        let variableDefinitions = new Map<string, VariableType[]>();
+        fileVariables.forEach((val, key) => {
+            variableDefinitions.set(key, [ VariableType.Custom ]);
         });
 
-        return checkList;
+        environmentVariables.forEach((val, key) => {
+            if (variableDefinitions.has(key)) {
+                let types = variableDefinitions.get(key);
+                types.push(VariableType.Environment);
+                variableDefinitions.set(key, types);
+            } else {
+                variableDefinitions.set(key, [ VariableType.Environment ]);
+            }
+        });
+
+        responseVariables.forEach((val, key) => {
+            if (variableDefinitions.has(key)) {
+                let types = variableDefinitions.get(key);
+                types.push(VariableType.Response);
+                variableDefinitions.set(key, types);
+            } else {
+                variableDefinitions.set(key, [ VariableType.Response ]);
+            }
+        });
+
+        return variableDefinitions;
     }
 }

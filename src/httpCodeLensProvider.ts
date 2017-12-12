@@ -42,7 +42,7 @@ export class HttpCodeLensProvider implements CodeLensProvider {
             if (blockStart <= blockEnd) {
                 let reponseVar = null;
                 if (blockStart > 0) {
-                    reponseVar = Selector.getResponseVariable(lines[blockStart-1]);
+                    reponseVar = Selector.getResponseVariableDefinitionName(lines[blockStart-1]);
                 }
                 const range = new Range(blockStart, 0, blockEnd, 0);
                 const requestLines = new RequestLines(range, document.uri.toString(), reponseVar);

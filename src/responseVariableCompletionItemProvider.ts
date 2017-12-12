@@ -9,14 +9,14 @@ import { ElementType } from './models/httpElement';
 
 export class ResponseVariableCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
-        if (!VariableUtility.isPartialResponseVariable(document, position)) {
+        if (!VariableUtility.isPartialResponseVariableReference(document, position)) {
             return [];
         }
                 
         const wordRange = document.getWordRangeAtPosition(position);
         let lineRange = document.lineAt(position);
 
-        const fullPath = VariableUtility.getResponseVariable(wordRange, lineRange, position);
+        const fullPath = VariableUtility.getResponseVariablePath(wordRange, lineRange, position);
 
         let completionItems: CompletionItem[] = [];        
 

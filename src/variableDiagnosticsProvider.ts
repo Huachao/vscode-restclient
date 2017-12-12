@@ -39,7 +39,7 @@ export class VariableDiagnosticsProvider {
         // Distinct varNames
         varNames = Array.from(new Set(varNames));
 
-        let existArray = await VariableProcessor.getVariablesExist(varNames);
+        let existArray = await VariableProcessor.checkVariableDefinitionExists(document, varNames);
         
         existArray.forEach((ea) => {
             if (!ea.exists) {

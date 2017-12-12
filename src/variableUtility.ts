@@ -19,40 +19,22 @@ export class VariableUtility {
     public static isVariableReference(document: TextDocument, position: Position): boolean {
         let wordRange = document.getWordRangeAtPosition(position);
         let lineRange = document.lineAt(position);
-        if (!wordRange
-            || wordRange.start.character < 2
-            || wordRange.end.character > lineRange.range.end.character - 1
-            || lineRange.text[wordRange.start.character - 1] !== '{'
-            || lineRange.text[wordRange.start.character - 2] !== '{'
-            || lineRange.text[wordRange.end.character] !== '}'
-            || lineRange.text[wordRange.end.character + 1] !== '}') {
-            // not a custom variable reference syntax
-            return false;
-        }
-
-        return true;
+        return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
     }
 
     public static isResponseVariableReference(document: TextDocument, position: Position): boolean {
         let wordRange = document.getWordRangeAtPosition(position, /(\w+)(\.\w+|\[\d+\])+/);
         let lineRange = document.lineAt(position);
-        if (!wordRange
-            || wordRange.start.character < 2
-            || wordRange.end.character > lineRange.range.end.character - 1
-            || lineRange.text[wordRange.start.character - 1] !== '{'
-            || lineRange.text[wordRange.start.character - 2] !== '{'
-            || lineRange.text[wordRange.end.character] !== '}'
-            || lineRange.text[wordRange.end.character + 1] !== '}') {
-            // not a custom variable reference syntax
-            return false;
-        }
-
-        return true;
+        return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
     }
 
-    public static isPartialResponseVariable(document: TextDocument, position: Position): boolean {
+    public static isPartialResponseVariableReference(document: TextDocument, position: Position): boolean {
         let wordRange = document.getWordRangeAtPosition(position, /(\w+)(\.\w*|\[\d*\]?)+/);
         let lineRange = document.lineAt(position);
+        return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
+    }
+
+    private static isVariableReferenceFromLine(wordRange: Range, lineRange: TextLine) {
         if (!wordRange
             || wordRange.start.character < 2
             || wordRange.end.character > lineRange.range.end.character - 1
@@ -67,7 +49,7 @@ export class VariableUtility {
         return true;
     }
 
-    public static getResponseVariable(wordRange: Range, lineRange: TextLine, position: Position) {
+    public static getResponseVariablePath(wordRange: Range, lineRange: TextLine, position: Position) {
         let index = position.character - 1;
         if (wordRange) {
             wordRange.start.character
