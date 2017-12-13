@@ -1,12 +1,20 @@
 {
     "rules": {
+        "class-name": true,
+        "comment-format": [
+            true,
+            "check-space"
+        ],
+        "curly": true,
+        "indent": [
+            true,
+            "spaces"
+        ],
+        "no-duplicate-variable": true,
+        "no-trailing-whitespace": true,
         "no-unused-variable": true,
         "no-unused-expression": true,
-        "no-trailing-whitespace": true,
-        "no-duplicate-variable": true,
         "no-var-keyword": true,
-        "class-name": true,
-        "curly": true,
         "one-line": [
             true,
             "check-catch",
@@ -16,7 +24,8 @@
             "check-whitespace"
         ],
         "semicolon": [
-             "always"
+            true,
+            "always"
          ],
         "variable-name": [
             true,

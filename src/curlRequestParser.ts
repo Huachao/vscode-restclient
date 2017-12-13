@@ -36,7 +36,7 @@ export class CurlRequestParser implements IRequestParser {
             headers = RequestParserUtil.parseRequestHeaders(parsedHeaders);
         }
 
-        //parse cookie
+        // parse cookie
         let cookieString: string = parsedArguments.b || parsedArguments.cookie;
         if (cookieString && cookieString.includes('=')) {
             // Doesn't support cookie jar
