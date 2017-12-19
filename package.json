@@ -113,7 +113,7 @@
       },
       {
         "command": "rest-client.save-response",
-        "title": "Save Response",
+        "title": "Save Full Response",
         "icon": {
           "light": "./images/save.svg",
           "dark": "./images/save-inverse.svg"
