@@ -8,7 +8,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Send/Cancel/Rerun __HTTP request__ in editor and view response in a separate pane with syntax highlight
 * Send __CURL command__ in editor and copy HTTP request as `CURL command`
 * Auto save and view/clear request history
-* Support _MULTIPLE_ requests in the same file
+* Support _MULTIPLE_ requests in the same file (`###` delimiter)
 * View image response directly in pane
 * Save raw response and response body only to local disk
 * Customize font(size/family/weight) in response preview
