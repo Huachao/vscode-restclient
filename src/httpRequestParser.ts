@@ -112,9 +112,13 @@ export class HttpRequestParser implements IRequestParser {
         } else {
             // Provides both request method and url
             method = words.shift();
+            url = line.trim().substring(method.length).trim();
             let match = words[words.length - 1].match(/HTTP\/.*/gi);
-            let end = match ? line.length - match[0].length : line.length;
-            url = line.substring(method.length, end).trim();
+            if (match) {
+                url = url.substring(0, url.lastIndexOf(words[words.length - 1])).trim();
+            }
+            // let end = match ? line.length - match[0].length : line.length;
+            // url = line.trim().substring(method.length, end).trim();
         }
 
         return {
