@@ -4,11 +4,11 @@
 * __Bug Fix__: [In multiple lines query string mode, query parameter without '=' and value is ignored](https://github.com/Huachao/vscode-restclient/issues/144)
 * __Bug Fix__: Recognize indented request headers
 * __Improvement__: [Allow hiding switch environment status bar item via settings](https://github.com/Huachao/vscode-restclient/pull/142) [(@VFK)](https://github.com/VFK/)
-* __Improvement__: Update ECONNREFUSED error message to hint possible incorrect proxy setting
-* __Improvement__: Use pure delimiter lines as foling boundary
+* __Improvement__: Update `ECONNREFUSED` error message to hint possible incorrect proxy setting
+* __Improvement__: Use pure delimiter lines as folding boundary
 
 ## 0.16.1 (2017/11/17)
-* __Feature__: [Support shared variables can be used across all the environemnts](https://github.com/Huachao/vscode-restclient/issues/128)
+* __Feature__: [Support shared variables can be used across all the environments](https://github.com/Huachao/vscode-restclient/issues/128)
 * __Feature__: [Request block fold/unfold feature in .http/.rest file](https://github.com/Huachao/vscode-restclient/issues/139)
 
 ## 0.16.0 (2017/10/30)
