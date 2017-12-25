@@ -24,6 +24,9 @@ export interface IRestClientSettings {
     useTrunkedTransferEncodingForSendingFileContent: boolean;
     suppressResponseBodyContentTypeValidationWarning: boolean;
     previewOption: PreviewOption;
+    disableHighlightResonseBodyForLargeResponse: boolean;
+    disableAddingHrefLinkForLargeResponse: boolean;
+    largeResponseBodySizeLimitInMB: number;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -49,6 +52,9 @@ export class RestClientSettings implements IRestClientSettings {
     public useTrunkedTransferEncodingForSendingFileContent: boolean;
     public suppressResponseBodyContentTypeValidationWarning: boolean;
     public previewOption: PreviewOption;
+    public disableHighlightResonseBodyForLargeResponse: boolean;
+    public disableAddingHrefLinkForLargeResponse: boolean;
+    public largeResponseBodySizeLimitInMB: number;
 
     public constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -82,6 +88,9 @@ export class RestClientSettings implements IRestClientSettings {
         this.hostCertificates = restClientSettings.get<Map<string, HostCertificate>>("certificates", new Map<string, HostCertificate>());
         this.useTrunkedTransferEncodingForSendingFileContent = restClientSettings.get<boolean>("useTrunkedTransferEncodingForSendingFileContent", true);
         this.suppressResponseBodyContentTypeValidationWarning = restClientSettings.get<boolean>("suppressResponseBodyContentTypeValidationWarning", false);
+        this.disableHighlightResonseBodyForLargeResponse = restClientSettings.get<boolean>("disableHighlightResonseBodyForLargeResponse", true);
+        this.disableAddingHrefLinkForLargeResponse = restClientSettings.get<boolean>("disableAddingHrefLinkForLargeResponse", true);
+        this.largeResponseBodySizeLimitInMB = restClientSettings.get<number>("largeResponseBodySizeLimitInMB", 5);
         this.previewOption = ParsePreviewOptionStr(restClientSettings.get<string>("previewOption", "full"));
 
         let httpSettings = workspace.getConfiguration('http');

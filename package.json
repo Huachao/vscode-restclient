@@ -447,6 +447,26 @@
           "default": true,
           "scope": "resource",
           "description": "Show environment picker in status bar"
+        },
+        "rest-client.disableHighlightResonseBodyForLargeResponse": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Controls whether to highlight response body for response whose size is larger than limit specified by 'rest-client.largeResponseSizeLimitInMB'"
+        },
+        "rest-client.disableAddingHrefLinkForLargeResponse": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Controls whether to add href link in previewed response for response whose size is larger than limit specified by 'rest-client.largeResponseSizeLimitInMB'"
+        },
+        "rest-client.largeResponseBodySizeLimitInMB": {
+          "type": "number",
+          "default": 5,
+          "minimum": 0,
+          "exclusiveMinimum": true,
+          "scope": "resource",
+          "description": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when 'rest-client.disableHighlightResonseBodyForLargeResponse' and/or 'rest-client.disableAddingHrefLinkForLargeResponse' is set to true"
         }
       }
     }
