@@ -108,7 +108,7 @@ export class VariableProcessor {
                 }
 
                 const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${codeResponse.userCode}`;
-                const prompt2 = `Code copied to the clipboard. Confirm when signed in.\r\n\r\nCode: ${codeResponse.userCode}`;
+                const prompt2 = `Azure AD verification page opened in default browser. Paste code to complete sign in (already copied to the clipboard) and confirm when done. Token will be copied to the clipboard when done.\r\n\r\nCode: ${codeResponse.userCode}`;
                 const signIn = "Sign in";
                 const tryAgain = "Try again";
                 const done = "Done";
@@ -123,8 +123,10 @@ export class VariableProcessor {
                                 window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireTokenWithDeviceCode\r\nError: ${tokenError.message}`, messageBoxOptions);
                                 return reject(tokenError);
                             }
-        
-                            resolve(tokenResponse ? `${tokenResponse.tokenType} ${tokenResponse.accessToken}` : null);
+                            
+                            const token = tokenResponse ? `${tokenResponse.tokenType} ${tokenResponse.accessToken}` : null;
+                            copyPaste.copy(token);
+                            resolve(token);
                         });
                     } else {
                         return reject("Cancelled");
