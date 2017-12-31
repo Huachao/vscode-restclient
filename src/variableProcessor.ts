@@ -9,7 +9,7 @@ const uuid = require('node-uuid');
 const adal = require('adal-node');
 const copyPaste = require('copy-paste');
 
-const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s*|\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))\\}\\}`;
+const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s*|\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))\\}\\}`;
 const aadTokenCache = {};
 
 // see UserCodeInfo at https://github.com/AzureAD/azure-activedirectory-library-for-nodejs/blob/dev/lib/adal.d.ts
@@ -96,11 +96,15 @@ export class VariableProcessor {
         const tld = targetApp.substring(targetApp.lastIndexOf(".") + 1, targetApp.length - 1);
         const endpoint = Constants.AzureActiveDirectorySignInUrls[tld] || Constants.AzureActiveDirectorySignInUrls.public;
 
-        // get tenant id from input, if specified
+        // parse input options ([new] [domain|tenantId])
         let tenantId = "common";
+        let forceNewToken = false;
         const groups = new RegExp(aadRegexPattern).exec(url);
-        if (groups && groups.length > 2 && groups[2]) {
-            tenantId = groups[2];
+        if (groups) {
+            forceNewToken = (groups.length > 2 && groups[2] == Constants.AzureActiveDirectoryForceNewOption);
+            if (groups.length > 4 && groups[4]) {
+                tenantId = groups[4];
+            }
         }
 
         const signInUrl = `${endpoint}${tenantId}`;
@@ -111,7 +115,7 @@ export class VariableProcessor {
         
         const promise = new Promise<string>((resolve, reject) => {
             // use previous token, if one has been obtained and hasn't expired
-            const cachedToken = aadTokenCache[tenantId];
+            const cachedToken = !forceNewToken && aadTokenCache[tenantId];
             if (cachedToken && cachedToken.expiry > new Date()) {
                 return resolve(cachedToken.token);
             }
