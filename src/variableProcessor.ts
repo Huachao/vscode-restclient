@@ -9,7 +9,7 @@ const uuid = require('node-uuid');
 const adal = require('adal-node');
 const copyPaste = require('copy-paste');
 
-const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s*|\\s+([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))\\}\\}`;
+const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s*|\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))\\}\\}`;
 
 // see UserCodeInfo at https://github.com/AzureAD/azure-activedirectory-library-for-nodejs/blob/dev/lib/adal.d.ts
 interface SignInCode {
