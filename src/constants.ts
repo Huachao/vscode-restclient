@@ -18,7 +18,12 @@ export const TimeStampVariableName = "$timestamp";
 export const TimeStampVariableDescription = "Add a number of milliseconds between 1970/1/1 UTC Time and now. \
  You can also provide the offset with current time in the format {{$timestamp number string}}";
 export const GuidVariableName = "$guid";
+export const GuidVariableDescription = "Add a RFC 4122 v4 UUID";
+export const RandomInt = "$randomInt";
+export const RandomIntDescription = "Returns a random integer between min (included) and max (excluded)";
+
 export const AzureActiveDirectoryVariableName = "$aadToken";
+export const AzureActiveDirectoryDescription = "Prompts to sign in to Azure AD and adds the token to the request";
 export const AzureActiveDirectoryClientId = "aebc6443-996d-45c2-90f0-388ff96faa56";  // VS Code client id
 export const AzureActiveDirectorySignInUrls = {
     ppe: "https://login.windows-ppe.net/",  // for testing purposes only
@@ -27,9 +32,6 @@ export const AzureActiveDirectorySignInUrls = {
     de: "https://login.microsoftonline.de/",
     us: "https://login.microsoftonline.us/",
 };
-export const GuidVariableDescription = "Add a RFC 4122 v4 UUID";
-export const RandomInt = "$randomInt";
-export const RandomIntDescription = "Returns a random integer between min (included) and max (excluded)";
 
 export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 

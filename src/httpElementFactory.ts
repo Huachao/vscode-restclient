@@ -104,7 +104,13 @@ export class HttpElementFactory {
             null,
             Constants.RandomIntDescription,
             new SnippetString(`{{$\${name:${Constants.RandomInt.slice(1)}} \${1:min} \${2:max}}}`)));
-
+        originalElements.push(new HttpElement(
+            Constants.AzureActiveDirectoryVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.AzureActiveDirectoryDescription,
+            new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryVariableName.slice(1)}}}}`)));
+    
         // add environment custom variables
         let customVariables = await EnvironmentController.getCustomVariables();
         for (let [variableName, variableValue] of customVariables) {
