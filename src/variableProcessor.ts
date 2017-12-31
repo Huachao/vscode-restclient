@@ -10,6 +10,7 @@ const adal = require('adal-node');
 const copyPaste = require('copy-paste');
 
 const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s*|\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))\\}\\}`;
+const aadTokenCache = {};
 
 // see UserCodeInfo at https://github.com/AzureAD/azure-activedirectory-library-for-nodejs/blob/dev/lib/adal.d.ts
 interface SignInCode {
@@ -109,6 +110,12 @@ export class VariableProcessor {
         const messageBoxOptions = { modal: true };
         
         const promise = new Promise<string>((resolve, reject) => {
+            // use previous token, if one has been obtained and hasn't expired
+            const cachedToken = aadTokenCache[tenantId];
+            if (cachedToken && cachedToken.expiry > new Date()) {
+                return resolve(cachedToken.token);
+            }
+
             authContext.acquireUserCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: SignInCode) => {
                 if (codeError) {
                     window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireUserCode\r\n\r\n${codeError.message}`, messageBoxOptions);
@@ -133,6 +140,11 @@ export class VariableProcessor {
                             }
                             
                             const token = tokenResponse ? `${tokenResponse.tokenType} ${tokenResponse.accessToken}` : null;
+                            
+                            // save token using both specified and resulting domain/tenantId to cover more reuse scenarios
+                            aadTokenCache[tenantId] = aadTokenCache[tokenResponse.tenantId] = { token: token, expiry: tokenResponse.expiresOn };
+                            
+                            // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
                             copyPaste.copy(token);
                             resolve(token);
                         });
