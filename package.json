@@ -486,6 +486,7 @@
     "vscode": "^1.0.0"
   },
   "dependencies": {
+    "adal-node": "^0.1.26",
     "applicationinsights": "^0.18.0",
     "autolinker": "^1.4.0",
     "code-highlight-linenums": "^0.2.1",
