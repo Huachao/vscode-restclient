@@ -103,7 +103,7 @@ export class VariableProcessor {
         const promise = new Promise<string>((resolve, reject) => {
             authContext.acquireUserCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: SignInCode) => {
                 if (codeError) {
-                    window.showErrorMessage(`Sign in failed (new code): ${codeError.message}`, messageBoxOptions);
+                    window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireUserCode\r\nError: ${codeError.message}`, messageBoxOptions);
                     return reject(codeError);
                 }
 
@@ -120,7 +120,7 @@ export class VariableProcessor {
                     } else if (value == done) {
                         authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: SignInToken) => {
                             if (tokenError) {
-                                window.showErrorMessage(`Sign in failed (get token): ${tokenError.message}`, messageBoxOptions);
+                                window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireTokenWithDeviceCode\r\nError: ${tokenError.message}`, messageBoxOptions);
                                 return reject(tokenError);
                             }
         
