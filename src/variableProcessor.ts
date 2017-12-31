@@ -9,6 +9,8 @@ const uuid = require('node-uuid');
 const adal = require('adal-node');
 const copyPaste = require('copy-paste');
 
+const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s*|\\s+([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))\\}\\}`;
+
 // see UserCodeInfo at https://github.com/AzureAD/azure-activedirectory-library-for-nodejs/blob/dev/lib/adal.d.ts
 interface SignInCode {
     deviceCode: string;
@@ -61,9 +63,9 @@ export class VariableProcessor {
         }
 
         // special-casing AAD token since it's the only variable that requires a promise
-        let regex = new RegExp(`\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}\\s*\\}\\}`, 'g');
-        if (regex.test(request)) {
-            request = request.replace(regex, await VariableProcessor.getAadToken(request));
+        let aadRegex = new RegExp(aadRegexPattern, 'g');
+        if (aadRegex.test(request)) {
+            request = request.replace(aadRegex, await VariableProcessor.getAadToken(request));
         }
 
         let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
@@ -93,7 +95,13 @@ export class VariableProcessor {
         const tld = targetApp.substring(targetApp.lastIndexOf(".") + 1, targetApp.length - 1);
         const endpoint = Constants.AzureActiveDirectorySignInUrls[tld] || Constants.AzureActiveDirectorySignInUrls.public;
 
-        const tenantId = "common";
+        // get tenant id from input, if specified
+        let tenantId = "common";
+        const groups = new RegExp(aadRegexPattern).exec(url);
+        if (groups && groups.length > 2 && groups[2]) {
+            tenantId = groups[2];
+        }
+
         const signInUrl = `${endpoint}${tenantId}`;
         const authContext: any = new adal.AuthenticationContext(signInUrl);
 
@@ -103,7 +111,7 @@ export class VariableProcessor {
         const promise = new Promise<string>((resolve, reject) => {
             authContext.acquireUserCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: SignInCode) => {
                 if (codeError) {
-                    window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireUserCode\r\nError: ${codeError.message}`, messageBoxOptions);
+                    window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireUserCode\r\n\r\n${codeError.message}`, messageBoxOptions);
                     return reject(codeError);
                 }
 
@@ -120,7 +128,7 @@ export class VariableProcessor {
                     } else if (value == done) {
                         authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: SignInToken) => {
                             if (tokenError) {
-                                window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireTokenWithDeviceCode\r\nError: ${tokenError.message}`, messageBoxOptions);
+                                window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireTokenWithDeviceCode\r\n\r\n${tokenError.message}`, messageBoxOptions);
                                 return reject(tokenError);
                             }
                             

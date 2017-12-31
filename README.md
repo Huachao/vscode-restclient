@@ -22,7 +22,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Support both __environment__ and __file__ custom variables
     - Auto completion and hover support for both environment and file custom variables
     - Go to definition and find all references support _ONLY_ for file custom variables
-    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}`, and `{{$aadToken}}`
+    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}`, and `{{$aadToken [tenantId]}}`
     - Easily create/update/delete environments and custom variables in setting file
     - Support environment switch
     - Support shared environment to provide variables that available in all environments
@@ -368,7 +368,8 @@ Content-Type: application/json
 Global variables provide a pre-defined set of variables that can be used in any part of the request(Url/Headers/Body) in the format `{{$variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
-* `{{$aadToken}}`: Specify within the `Authorization` header to embed an Azure Active Directory token (i.e. `Authorization: {{$aadToken}}`)
+* `{{$aadToken [tenantId]}}`: Add `Authorization: {{$aadToken}}` to attach an Azure Active Directory token to the request
+  *tenantId*: Optional. Unique identifier (GUID) for the directory. Default is account's home directory.
 * `{{$timestamp}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`. The option string you can specify in timestamp are:
 
 Option | Description
