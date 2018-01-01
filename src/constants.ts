@@ -26,6 +26,7 @@ export const AzureActiveDirectoryVariableName = "$aadToken";
 export const AzureActiveDirectoryDescription = "Prompts to sign in to Azure AD and adds the token to the request";
 export const AzureActiveDirectoryClientId = "aebc6443-996d-45c2-90f0-388ff96faa56";  // VS Code client id
 export const AzureActiveDirectoryForceNewOption = "new";
+export const AzureActiveDirectoryClearCacheOption = "clear";
 export const AzureClouds = {
     ppe: {
         aad: "https://login.windows-ppe.net/",  // for testing purposes only

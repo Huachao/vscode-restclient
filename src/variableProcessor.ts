@@ -9,7 +9,7 @@ const uuid = require('node-uuid');
 const adal = require('adal-node');
 const copyPaste = require('copy-paste');
 
-const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
+const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}|${Constants.AzureActiveDirectoryClearCacheOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
 const aadTokenCache = {};
 
 // see UserCodeInfo at https://github.com/AzureAD/azure-activedirectory-library-for-nodejs/blob/dev/lib/adal.d.ts
@@ -89,8 +89,8 @@ export class VariableProcessor {
     }
 
     public static async getAadToken(url: string): Promise<string> {
-        // get target app from URL
-        let targetApp = (new RegExp("^[^\\s]+\\s+([^:]*:///?[^/]*/)").exec(url) || [url])[1];
+        // get target app from URL (fall back to empty string to support clear-only scenario)
+        let targetApp = (new RegExp("^[^\\s]+\\s+([^:]*:///?[^/]*/)").exec(url) || [url])[1] || "";
 
         // detect known cloud URLs + fix audiences
         let defaultCloud = null;
@@ -117,7 +117,7 @@ export class VariableProcessor {
             cloud = targetApp.substring(targetApp.lastIndexOf(".") + 1, targetApp.length - 1);
         }
 
-        // parse input options -- [new] [public|cn|de|us|ppe] [<domain|tenantId>]
+        // parse input options -- [new|clear] [public|cn|de|us|ppe] [<domain|tenantId>]
         let tenantId = "common";
         let forceNewToken = false;
         const groups = new RegExp(aadRegexPattern).exec(url);
@@ -125,6 +125,18 @@ export class VariableProcessor {
             forceNewToken = (groups.length > 2 && groups[2] === Constants.AzureActiveDirectoryForceNewOption);
             cloud = (groups.length > 4 && groups[4]) || cloud;
             tenantId = (groups.length > 6 && groups[6]) || tenantId;
+
+            // clear cache
+            if (groups.length > 2 && groups[2] === Constants.AzureActiveDirectoryClearCacheOption) {
+                for (let key in aadTokenCache) {
+                    delete aadTokenCache[key];
+                }
+
+                // if only clearing, return
+                if (url === `{{${Constants.AzureActiveDirectoryVariableName} ${Constants.AzureActiveDirectoryClearCacheOption}}}`) {
+                    return null;
+                }
+            }
         }
 
         // verify cloud (default to public)

@@ -22,7 +22,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Support both __environment__ and __file__ custom variables
     - Auto completion and hover support for both environment and file custom variables
     - Go to definition and find all references support _ONLY_ for file custom variables
-    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>]}}`
+    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}`, and `{{$aadToken [new|clear] [public|cn|de|us|ppe] [<domain|tenantId>]}}`
     - Easily create/update/delete environments and custom variables in setting file
     - Support environment switch
     - Support shared environment to provide variables that available in all environments
@@ -368,9 +368,9 @@ Content-Type: application/json
 
 ### Global Variables
 Global variables provide a pre-defined set of variables that can be used in any part of the request(Url/Headers/Body) in the format `{{$variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
-* `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
+* `{{$aadToken [new|clear] [public|cn|de|us|ppe] [<domain|tenantId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
 
-  `new`: Optional. Specify `new` to get a new token. Default: Reuse non-expired token for the specified directory.
+  `new|clear`: Optional. Specify `new` to get a new token and `clear` (or just restart Code) to fully clear the in-memory token cache. Default: Reuse non-expired token for the specified directory.
 
   `public|cn|de|us|ppe`: Optional. Specify top-level domain (TLD) to get a token for the specified government cloud, `public` for the public cloud, or `ppe` for internal testing. Default: TLD of the REST endpoint; `public` if not valid.
 
@@ -434,7 +434,7 @@ GET https://management.azure.com/subscriptions
 Authorization: {{$aadToken contoso.com}}
 ```
 
-Do not reuse older token -- force re-authentication (e.g. switch account):
+Do not reuse older token -- force re-authentication for current directory (e.g. switch account):
 
 ```http
 GET https://management.azure.com/subscriptions
@@ -442,7 +442,17 @@ GET https://management.azure.com/subscriptions
 Authorization: {{$aadToken new contoso.com}}
 ```
 
-_**NOTE:** "new" can be used with any other options, as long as it's first._
+Clear in-memory tocken cache -- force re-authentication for all directories:
+
+```http
+GET https://management.azure.com/subscriptions
+    ?api-version=2017-08-01
+Authorization: {{$aadToken clear contoso.com}}
+```
+
+_**NOTE:** REST Client uses an in-memory token cache that clears when Code is restarted.
+
+_**NOTE:** `new` and `clear` can be used with any other options, as long as they're first. Order is important for all options._
 
 Implicit cloud selection (via REST endpoint TLD):
 
