@@ -9,7 +9,7 @@ const uuid = require('node-uuid');
 const adal = require('adal-node');
 const copyPaste = require('copy-paste');
 
-const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s*|\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))\\}\\}`;
+const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
 const aadTokenCache = {};
 
 // see UserCodeInfo at https://github.com/AzureAD/azure-activedirectory-library-for-nodejs/blob/dev/lib/adal.d.ts
@@ -63,12 +63,6 @@ export class VariableProcessor {
             }
         }
 
-        // special-casing AAD token since it's the only variable that requires a promise
-        let aadRegex = new RegExp(aadRegexPattern, 'g');
-        if (aadRegex.test(request)) {
-            request = request.replace(aadRegex, await VariableProcessor.getAadToken(request));
-        }
-
         let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
         for (let [variableName, variableValue] of fileVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
@@ -85,37 +79,67 @@ export class VariableProcessor {
             }
         }
 
+        // promise-based variables using URL-inspection must be last
+        let aadRegex = new RegExp(aadRegexPattern, 'g');
+        if (aadRegex.test(request)) {
+            request = request.replace(aadRegex, await VariableProcessor.getAadToken(request));
+        }
+
         return request;
     }
 
     public static async getAadToken(url: string): Promise<string> {
         // get target app from URL
-        const targetApp = (new RegExp('^[^\\s]+\\s+([^:]*:///?[^/]*/)').exec(url) || [url])[1];
+        let targetApp = (new RegExp("^[^\\s]+\\s+([^:]*:///?[^/]*/)").exec(url) || [url])[1];
 
-        // get the target cloud sign-in URL
-        const tld = targetApp.substring(targetApp.lastIndexOf(".") + 1, targetApp.length - 1);
-        const endpoint = Constants.AzureActiveDirectorySignInUrls[tld] || Constants.AzureActiveDirectorySignInUrls.public;
+        // detect known cloud URLs + fix audiences
+        let defaultCloud = null;
+        let cloud = null;
+        for (let c in Constants.AzureClouds) {
+            // set first cloud to be default
+            if (!defaultCloud) { defaultCloud = c; }
 
-        // parse input options ([new] [domain|tenantId])
+            let found = false;
+            for (let api in Constants.AzureClouds[c]) {
+                if (api.endsWith("Audience")) { continue; }
+                if (targetApp === Constants.AzureClouds[c][api]) {
+                    cloud = c;
+                    targetApp = Constants.AzureClouds[c][api + "Audience"] || targetApp;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) { break; }
+        }
+
+        // fall back to URL TLD
+        if (cloud === null) {
+            cloud = targetApp.substring(targetApp.lastIndexOf(".") + 1, targetApp.length - 1);
+        }
+
+        // parse input options -- [new] [public|cn|de|us|ppe] [<domain|tenantId>]
         let tenantId = "common";
         let forceNewToken = false;
         const groups = new RegExp(aadRegexPattern).exec(url);
         if (groups) {
-            forceNewToken = (groups.length > 2 && groups[2] == Constants.AzureActiveDirectoryForceNewOption);
-            if (groups.length > 4 && groups[4]) {
-                tenantId = groups[4];
-            }
+            forceNewToken = (groups.length > 2 && groups[2] === Constants.AzureActiveDirectoryForceNewOption);
+            cloud = (groups.length > 4 && groups[4]) || cloud;
+            tenantId = (groups.length > 6 && groups[6]) || tenantId;
         }
 
+        // verify cloud (default to public)
+        cloud = Constants.AzureClouds[cloud] ? cloud : defaultCloud;
+
+        const endpoint = Constants.AzureClouds[cloud].aad;
         const signInUrl = `${endpoint}${tenantId}`;
         const authContext: any = new adal.AuthenticationContext(signInUrl);
 
         const clientId = Constants.AzureActiveDirectoryClientId;
         const messageBoxOptions = { modal: true };
-        
+
         const promise = new Promise<string>((resolve, reject) => {
             // use previous token, if one has been obtained and hasn't expired
-            const cachedToken = !forceNewToken && aadTokenCache[tenantId];
+            const cachedToken = !forceNewToken && aadTokenCache[`${cloud}:${tenantId}`];
             if (cachedToken && cachedToken.expiry > new Date()) {
                 return resolve(cachedToken.token);
             }
@@ -127,27 +151,27 @@ export class VariableProcessor {
                 }
 
                 const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${codeResponse.userCode}`;
-                const prompt2 = `Azure AD verification page opened in default browser. Paste code to complete sign in (already copied to the clipboard) and confirm when done. Token will be copied to the clipboard when done.\r\n\r\nCode: ${codeResponse.userCode}`;
+                const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n4. Token will be copied to the clipboard when finished\r\n\r\nCode: ${codeResponse.userCode}`;
                 const signIn = "Sign in";
                 const tryAgain = "Try again";
                 const done = "Done";
                 const signInPrompt = value => {
-                    if (value == signIn || value == tryAgain) {
+                    if (value === signIn || value === tryAgain) {
                         copyPaste.copy(codeResponse.userCode);
-                        commands.executeCommand('vscode.open', Uri.parse(codeResponse.verificationUrl));
+                        commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
                         window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
-                    } else if (value == done) {
+                    } else if (value === done) {
                         authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: SignInToken) => {
                             if (tokenError) {
                                 window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireTokenWithDeviceCode\r\n\r\n${tokenError.message}`, messageBoxOptions);
                                 return reject(tokenError);
                             }
-                            
+
                             const token = tokenResponse ? `${tokenResponse.tokenType} ${tokenResponse.accessToken}` : null;
-                            
+
                             // save token using both specified and resulting domain/tenantId to cover more reuse scenarios
-                            aadTokenCache[tenantId] = aadTokenCache[tokenResponse.tenantId] = { token: token, expiry: tokenResponse.expiresOn };
-                            
+                            aadTokenCache[`${cloud}:${tenantId}`] = aadTokenCache[`${cloud}:${tokenResponse.tenantId}`] = { token: token, expiry: tokenResponse.expiresOn };
+
                             // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
                             copyPaste.copy(token);
                             resolve(token);
@@ -159,11 +183,11 @@ export class VariableProcessor {
                 window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
             });
         });
-        
+
         promise.catch(error => {
             console.error(error);
         });
-        
+
         return promise;
     }
 
@@ -211,7 +235,7 @@ export class VariableProcessor {
             if (match = Constants.VariableDefinitionRegex.exec(line)) {
                 let key = match[1];
                 let originalValue = match[2];
-                let value = '';
+                let value = "";
                 let isPrevCharEscape = false;
                 for (let index = 0; index < originalValue.length; index++) {
                     let currentChar = originalValue[index];
@@ -219,7 +243,7 @@ export class VariableProcessor {
                         isPrevCharEscape = false;
                         value += this.escapee.get(currentChar) || currentChar;
                     } else {
-                        if (currentChar === '\\') {
+                        if (currentChar === "\\") {
                             isPrevCharEscape = true;
                             continue;
                         }
