@@ -5,6 +5,7 @@ import { Selector } from './selector';
 import { getCurrentHttpFileName } from './workspaceUtility';
 import { RequestParserFactory } from './models/requestParserFactory';
 import { VariableProcessor } from './variableProcessor';
+import { ArrayUtility } from "./common/arrayUtility";
 import * as url from 'url';
 import { EOL } from 'os';
 
@@ -65,7 +66,8 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             }
 
             if (blockStart <= blockEnd) {
-                let text = await VariableProcessor.processRawRequest(lines.slice(blockStart, blockEnd + 1).join(EOL));
+                let text = await VariableProcessor.processRawRequest(this.getRequestLines(lines.slice(blockStart, blockEnd + 1)).join(EOL));
+                console.log(text);
                 let [name, container] = this.getRequestSymbolInfo(text);
                 symbols.push(
                     new SymbolInformation(
@@ -91,6 +93,15 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
         let request = parser.parseHttpRequest(text, window.activeTextEditor.document.fileName, true);
         let parsedUrl = url.parse(request.url);
         return [`${request.method} ${parsedUrl.path}`, parsedUrl.host];
+    }
+
+    private getRequestLines(lines: string[]): string[] {
+        if (lines.length <= 1) {
+            return lines;
+        }
+
+        let end = ArrayUtility.firstIndexOf(lines, val => val.trim()[0] !== '?' && val.trim()[0] !== '&', 1);
+        return lines.slice(0, end);
     }
 
 }
