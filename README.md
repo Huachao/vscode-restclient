@@ -185,6 +185,7 @@ We add the capability to directly run [curl request](https://curl.haxx.se/) in R
 * -X, --request
 * -L, --location, --url
 * -H, --header(no _@_ support)
+* -I, --head
 * -b, --cookie(no cookie jar file support)
 * -u, --user(Basic auth support only)
 * -d, --data, --data-binary
