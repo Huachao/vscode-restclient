@@ -5,9 +5,9 @@ import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from './constants';
 import { Func } from './common/delegates';
 import * as adal from 'adal-node';
-import * as copyPaste from 'copy-paste';
 import * as moment from 'moment';
-import * as uuid from 'node-uuid';
+const copyPaste = require('copy-paste');
+const uuid = require('node-uuid');
 
 const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
 const aadTokenCache = {};
@@ -94,7 +94,7 @@ export class VariableProcessor {
         let forceNewToken = false;
         const groups = new RegExp(aadRegexPattern).exec(url);
         if (groups) {
-            forceNewToken = (groups[2] === Constants.AzureActiveDirectoryForceNewOption);
+            forceNewToken = groups[2] === Constants.AzureActiveDirectoryForceNewOption;
             cloud = groups[4] || cloud;
             tenantId = groups[6] || tenantId;
         }

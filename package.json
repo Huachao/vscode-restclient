@@ -43,6 +43,7 @@
     "onCommand:rest-client.save-response",
     "onCommand:rest-client.save-response-body",
     "onCommand:rest-client.switch-environment",
+    "onCommand:rest-client.clear-aad-token-cache",
     "onLanguage:http"
   ],
   "main": "./out/src/extension",
@@ -146,6 +147,11 @@
       {
         "command": "rest-client.copy-request-as-curl",
         "title": "Copy Request As cURL",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.clear-aad-token-cache",
+        "title": "Clear Azure AD token cache",
         "category": "Rest Client"
       }
     ],
