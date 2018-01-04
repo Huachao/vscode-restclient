@@ -22,7 +22,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Support both __environment__ and __file__ custom variables
     - Auto completion and hover support for both environment and file custom variables
     - Go to definition and find all references support _ONLY_ for file custom variables
-    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}` and `{{$timestamp}}`
+    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>]}}`
     - Easily create/update/delete environments and custom variables in setting file
     - Support environment switch
     - Support shared environment to provide variables that available in all environments
@@ -220,6 +220,8 @@ Another icon in the upper right corner of the response preview tab is the `Save 
 ## Authentication
 We have supported some most common authentication schemes like _Basic Auth_, _Digest Auth_ and _SSL Client Certificates_.
 
+See Global Variables for information about built-in support for Azure Active Directory.
+
 ### Basic Auth
 HTTP Basic Auth is a widely used protocol for simple username/password authentication. We support __two__ formats of Authorization header to use Basic Auth.
 1. Add the value of Authorization header in the base64 encoding of `username:password`.
@@ -367,6 +369,14 @@ Content-Type: application/json
 
 ### Global Variables
 Global variables provide a pre-defined set of variables that can be used in any part of the request(Url/Headers/Body) in the format `{{$variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
+* `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
+
+  `new`: Optional. Specify `new` to force re-authentication and get a new token for the specified directory. Default: Reuse non-expired token for the specified directory from an in-memory cache. (Use `F1 > Rest Client: Clear Azure AD token cache` or restart Code to clear the cache.)
+
+  `public|cn|de|us|ppe`: Optional. Specify top-level domain (TLD) to get a token for the specified government cloud, `public` for the public cloud, or `ppe` for internal testing. Default: TLD of the REST endpoint; `public` if not valid.
+
+  `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Account home directory.
+
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
 * `{{$timestamp}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`. The option string you can specify in timestamp are:
@@ -398,6 +408,64 @@ X-Request-Id: {{token}}
     "review_count": "{{$randomInt 5, 200}}"
 }
 ```
+
+#### Azure Active Directory samples
+
+Use the default directory for the account
+
+```http
+GET https://management.azure.com/subscriptions
+    ?api-version=2017-08-01
+Authorization: {{$aadToken}}
+```
+
+Explicit directory using tenant ID:
+
+```http
+GET https://management.azure.com/subscriptions
+    ?api-version=2017-08-01
+Authorization: {{$aadToken 00000000-0000-0000-0000-000000000000}}
+```
+
+Explicit directory using domain name:
+
+```http
+GET https://management.azure.com/subscriptions
+    ?api-version=2017-08-01
+Authorization: {{$aadToken contoso.com}}
+```
+
+Do not reuse older token -- force re-authentication for current directory (e.g. switch account):
+
+```http
+GET https://management.azure.com/subscriptions
+    ?api-version=2017-08-01
+Authorization: {{$aadToken new contoso.com}}
+```
+
+_**NOTE:** REST Client uses an in-memory token cache that clears when Code is restarted. You can clear the token cache manually by using `F1 > Rest Client: Clear Azure AD token cache`._
+
+_**NOTE:** `new` can be used with any other options, as long as it's specified first. Order is important for all options._
+
+Implicit cloud selection (via REST endpoint TLD):
+
+```http
+GET https://management.microsoftazure.de/subscriptions
+    ?api-version=2017-08-01
+Authorization: {{$aadToken}}
+```
+
+Explicit cloud selection:
+
+```http
+GET https://management.usgovcloudapi.net/subscriptions
+    ?api-version=2017-08-01
+Authorization: {{$aadToken us}}
+```
+
+_**NOTE:** Azure China does not work like the other clouds. Use of Azure China is allowed, but may fail._
+
+_**NOTE:** Use of Azure AD is not limited to Azure APIs. Inclusion here is for demonstration purposes only._
 
 ## Customize Response Preview
 REST Client Extension adds the ability to control the font family, size and weight used in the response preview.

@@ -43,6 +43,7 @@
     "onCommand:rest-client.save-response",
     "onCommand:rest-client.save-response-body",
     "onCommand:rest-client.switch-environment",
+    "onCommand:rest-client.clear-aad-token-cache",
     "onLanguage:http"
   ],
   "main": "./out/src/extension",
@@ -146,6 +147,11 @@
       {
         "command": "rest-client.copy-request-as-curl",
         "title": "Copy Request As cURL",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.clear-aad-token-cache",
+        "title": "Clear Azure AD token cache",
         "category": "Rest Client"
       }
     ],
@@ -486,6 +492,7 @@
     "vscode": "^1.0.0"
   },
   "dependencies": {
+    "adal-node": "^0.1.26",
     "applicationinsights": "^0.18.0",
     "autolinker": "^1.4.0",
     "code-highlight-linenums": "^0.2.1",
