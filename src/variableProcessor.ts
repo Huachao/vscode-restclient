@@ -45,7 +45,7 @@ export class VariableProcessor {
             }
         }
 
-        // promise-based variables using URL-inspection must be last
+        // any vars that make decisions on the URL (request var) must be last so all vars have been evaluated
         let aadRegex = new RegExp(aadRegexPattern, 'g');
         if (aadRegex.test(request)) {
             request = request.replace(aadRegex, await VariableProcessor.getAadToken(request));
