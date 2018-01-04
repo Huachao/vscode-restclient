@@ -67,7 +67,6 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
 
             if (blockStart <= blockEnd) {
                 let text = await VariableProcessor.processRawRequest(this.getRequestLines(lines.slice(blockStart, blockEnd + 1)).join(EOL));
-                console.log(text);
                 let [name, container] = this.getRequestSymbolInfo(text);
                 symbols.push(
                     new SymbolInformation(

@@ -10,6 +10,11 @@
             true,
             "spaces"
         ],
+        "no-console": [
+            true,
+            "log",
+            "error"
+        ],
         "no-duplicate-variable": true,
         "no-trailing-whitespace": true,
         "no-unused-variable": true,
