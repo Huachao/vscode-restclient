@@ -24,9 +24,14 @@ export const RandomIntDescription = "Returns a random integer between min (inclu
 
 export const AzureActiveDirectoryVariableName = "$aadToken";
 export const AzureActiveDirectoryDescription = "Prompts to sign in to Azure AD and adds the token to the request";
-export const AzureActiveDirectoryClientId = "aebc6443-996d-45c2-90f0-388ff96faa56";  // VS Code client id
+/**
+ * NOTE: The client id represents an AAD app people sign in to. The client id is sent to AAD to indicate what app
+ * is requesting a token for the user. When the user signs in, AAD shows the name of the app to confirm the user is
+ * authorizing the right app to act on their behalf. We're using Visual Studio Code's client id since that is the
+ * overarching app people will think of when they are signing in.
+ */
+export const AzureActiveDirectoryClientId = "aebc6443-996d-45c2-90f0-388ff96faa56";
 export const AzureActiveDirectoryForceNewOption = "new";
-export const AzureActiveDirectoryClearCacheOption = "clear";
 export const AzureClouds = {
     ppe: {
         aad: "https://login.windows-ppe.net/",  // for testing purposes only

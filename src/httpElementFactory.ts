@@ -110,7 +110,7 @@ export class HttpElementFactory {
             null,
             Constants.AzureActiveDirectoryDescription,
             new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryVariableName.slice(1)}}}}`)));
-    
+
         // add environment custom variables
         let customVariables = await EnvironmentController.getCustomVariables();
         for (let [variableName, variableValue] of customVariables) {

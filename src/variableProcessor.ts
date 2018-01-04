@@ -4,47 +4,13 @@ import { commands, Uri, window } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from './constants';
 import { Func } from './common/delegates';
+import * as adal from 'adal-node';
+import * as copyPaste from 'copy-paste';
 import * as moment from 'moment';
-const uuid = require('node-uuid');
-const adal = require('adal-node');
-const copyPaste = require('copy-paste');
+import * as uuid from 'node-uuid';
 
-const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}|${Constants.AzureActiveDirectoryClearCacheOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
+const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
 const aadTokenCache = {};
-
-// see UserCodeInfo at https://github.com/AzureAD/azure-activedirectory-library-for-nodejs/blob/dev/lib/adal.d.ts
-interface SignInCode {
-    deviceCode: string;
-    expiresIn: number;
-    interval: number;
-    message: string;
-    userCode: string;
-    verificationUrl: string;
-    error?: any;
-    errorDescription?: any;
-    [x: string]: any;
-}
-
-// see TokenResponse at https://github.com/AzureAD/azure-activedirectory-library-for-nodejs/blob/dev/lib/adal.d.ts
-interface SignInToken {
-    tokenType: string;
-    expiresIn: number;
-    expiresOn: Date | string;
-    resource: string;
-    accessToken: string;
-    refreshToken?: string;
-    createdOn?: Date | string;
-    userId?: string;
-    isUserIdDisplayable?: boolean;
-    tenantId?: string;
-    oid?: string;
-    givenName?: string;
-    familyName?: string;
-    identityProvider?: string;
-    error?: any;
-    errorDescription?: any;
-    [x: string]: any;
-}
 
 export class VariableProcessor {
 
@@ -88,8 +54,14 @@ export class VariableProcessor {
         return request;
     }
 
+    public static async clearAadTokenCache() {
+        for (let key in aadTokenCache) {
+            delete aadTokenCache[key];
+        }
+    }
+
     public static async getAadToken(url: string): Promise<string> {
-        // get target app from URL (fall back to empty string to support clear-only scenario)
+        // get target app from URL
         let targetApp = (new RegExp("^[^\\s]+\\s+([^:]*:///?[^/]*/)").exec(url) || [url])[1] || "";
 
         // detect known cloud URLs + fix audiences
@@ -117,26 +89,14 @@ export class VariableProcessor {
             cloud = targetApp.substring(targetApp.lastIndexOf(".") + 1, targetApp.length - 1);
         }
 
-        // parse input options -- [new|clear] [public|cn|de|us|ppe] [<domain|tenantId>]
+        // parse input options -- [new] [public|cn|de|us|ppe] [<domain|tenantId>]
         let tenantId = "common";
         let forceNewToken = false;
         const groups = new RegExp(aadRegexPattern).exec(url);
         if (groups) {
-            forceNewToken = (groups.length > 2 && groups[2] === Constants.AzureActiveDirectoryForceNewOption);
-            cloud = (groups.length > 4 && groups[4]) || cloud;
-            tenantId = (groups.length > 6 && groups[6]) || tenantId;
-
-            // clear cache
-            if (groups.length > 2 && groups[2] === Constants.AzureActiveDirectoryClearCacheOption) {
-                for (let key in aadTokenCache) {
-                    delete aadTokenCache[key];
-                }
-
-                // if only clearing, return
-                if (url === `{{${Constants.AzureActiveDirectoryVariableName} ${Constants.AzureActiveDirectoryClearCacheOption}}}`) {
-                    return null;
-                }
-            }
+            forceNewToken = (groups[2] === Constants.AzureActiveDirectoryForceNewOption);
+            cloud = groups[4] || cloud;
+            tenantId = groups[6] || tenantId;
         }
 
         // verify cloud (default to public)
@@ -156,7 +116,7 @@ export class VariableProcessor {
                 return resolve(cachedToken.token);
             }
 
-            authContext.acquireUserCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: SignInCode) => {
+            authContext.acquireUserCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: adal.UserCodeInfo) => {
                 if (codeError) {
                     window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireUserCode\r\n\r\n${codeError.message}`, messageBoxOptions);
                     return reject(codeError);
@@ -173,7 +133,7 @@ export class VariableProcessor {
                         commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
                         window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
                     } else if (value === done) {
-                        authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: SignInToken) => {
+                        authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: adal.TokenResponse) => {
                             if (tokenError) {
                                 window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireTokenWithDeviceCode\r\n\r\n${tokenError.message}`, messageBoxOptions);
                                 return reject(tokenError);
