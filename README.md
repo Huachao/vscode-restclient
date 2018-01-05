@@ -371,7 +371,7 @@ Content-Type: application/json
 Global variables provide a pre-defined set of variables that can be used in any part of the request(Url/Headers/Body) in the format `{{$variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
 * `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
 
-  `new`: Optional. Specify `new` to force re-authentication and get a new token for the specified directory. Default: Reuse non-expired token for the specified directory from an in-memory cache. (Use `F1 > Rest Client: Clear Azure AD token cache` or restart Code to clear the cache.)
+  `new`: Optional. Specify `new` to force re-authentication and get a new token for the specified directory. Default: Reuse non-expired token for the specified directory from an in-memory cache. (Use `F1 > Rest Client: Clear Azure AD Token Cache` or restart Visual Studio Code to clear the cache.)
 
   `public|cn|de|us|ppe`: Optional. Specify top-level domain (TLD) to get a token for the specified government cloud, `public` for the public cloud, or `ppe` for internal testing. Default: TLD of the REST endpoint; `public` if not valid.
 
@@ -443,7 +443,7 @@ GET https://management.azure.com/subscriptions
 Authorization: {{$aadToken new contoso.com}}
 ```
 
-_**NOTE:** REST Client uses an in-memory token cache that clears when Code is restarted. You can clear the token cache manually by using `F1 > Rest Client: Clear Azure AD token cache`._
+_**NOTE:** REST Client uses an in-memory token cache that clears when Visual Studio Code is restarted. You can clear the token cache manually by using `F1 > Rest Client: Clear Azure AD Token Cache`._
 
 _**NOTE:** `new` can be used with any other options, as long as it's specified first. Order is important for all options._
 

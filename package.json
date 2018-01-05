@@ -151,7 +151,7 @@
       },
       {
         "command": "rest-client.clear-aad-token-cache",
-        "title": "Clear Azure AD token cache",
+        "title": "Clear Azure AD Token Cache",
         "category": "Rest Client"
       }
     ],
