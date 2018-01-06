@@ -16,7 +16,9 @@ export class CurlRequestParser implements IRequestParser {
     public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string, parseFileContentAsStream: boolean): HttpRequest {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(requestRawText.trim()));
-        requestText = requestText.replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2');
+        requestText = requestText
+            .replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2')
+            .replace(/(-I|--head)/, '-X HEAD');
         let yargObject = yargs(requestText);
         let parsedArguments = yargObject.argv;
 

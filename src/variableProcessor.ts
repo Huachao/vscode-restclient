@@ -109,7 +109,7 @@ export class VariableProcessor {
         const clientId = Constants.AzureActiveDirectoryClientId;
         const messageBoxOptions = { modal: true };
 
-        const promise = new Promise<string>((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             // use previous token, if one has been obtained and hasn't expired
             const cachedToken = !forceNewToken && aadTokenCache[`${cloud}:${tenantId}`];
             if (cachedToken && cachedToken.expiry > new Date()) {
@@ -148,19 +148,11 @@ export class VariableProcessor {
                             copyPaste.copy(token);
                             resolve(token);
                         });
-                    } else {
-                        return reject("Cancelled");
                     }
                 };
                 window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
             });
         });
-
-        promise.catch(error => {
-            console.error(error);
-        });
-
-        return promise;
     }
 
     public static getGlobalVariables(): { [key: string]: Func<string, string> } {

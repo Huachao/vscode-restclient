@@ -185,6 +185,7 @@ We add the capability to directly run [curl request](https://curl.haxx.se/) in R
 * -X, --request
 * -L, --location, --url
 * -H, --header(no _@_ support)
+* -I, --head
 * -b, --cookie(no cookie jar file support)
 * -u, --user(Basic auth support only)
 * -d, --data, --data-binary
@@ -298,12 +299,12 @@ Currently auto completion will be enabled for following seven categories:
 7. Authentication scheme for `Basic` and `Digest`
 
 ### Navigate to Symbols in Request File
-A single `http` file may define lots of requests and file level custom variables, it will be difficult to find the request/variable you want. We leverage from the _Goto Symbol Feature_ of _Visual Studio Code_ to support to navigate(goto) to request/variable with shortcut `Ctrl+Shift+O`(`Cmd+Shift+O` for macOS), or simpy press `F1`, type `@`.
+A single `http` file may define lots of requests and file level custom variables, it will be difficult to find the request/variable you want. We leverage from the _Goto Symbol Feature_ of _Visual Studio Code_ to support to navigate(goto) to request/variable with shortcut `Ctrl+Shift+O`(`Cmd+Shift+O` for macOS), or simply press `F1`, type `@`.
 ![Goto Symbols](images/navigate.png)
 
 
 ## Environments
-Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different product environments, like devbox, sandbox and production. We also support the __shared__ environment(identified by special environment name _$shared_) to provide a set of variables that are avaiable in all environments. And you can define the same name variable in your specified environment to overwrite the value in shared environment.
+Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different product environments, like devbox, sandbox and production. We also support the __shared__ environment(identified by special environment name _$shared_) to provide a set of variables that are available in all environments. And you can define the same name variable in your specified environment to overwrite the value in shared environment.
 
 Environments and corresponding variables of `REST Client Extension` are defined in setting file of `Visual Studio Code`, so you can create/update/delete environments and variables at any time you wish. The changes will take effect right away. If you __DO NOT__ want to use any environment, you can choose `No Environment` in the environments list. Currently, if you select `No Environment`, variables defined in shared environment are still available. See [here](#variables) for more details about environment variables usage and other kinds of variables. Below is a sample piece of setting file for custom environments and environment level variables:
 ```json
@@ -338,7 +339,7 @@ Custom variables belong to either the environment or file scope. The environment
 
 For environment variables, each environment is a set of key value pairs defined in setting file, key is the variable name, while value is variable value. Only custom variables in selected environment and shared environment are available to you. Current active environment name is displayed in the right bottom of `Visual Studio Code`, when you click it, you can switch environment, current active environment's name will be marked with a check sign in the end. And you can also switch environment using shortcut `Ctrl+Alt+E`(`Cmd+Alt+E` for macOS), or press `F1` and then select/type `Rest Client: Switch Environment`. When you write custom variables in `http` file, auto completion will be available to you, so if you have a variable named `host`, you don't need to type the full word `{{host}}` by yourself, simply type `host` or even less characters, it will prompt you the `host` variable as well as its actual value. After you select it, the value will be autocompleted with `{{host}}`. And if you hover on it, its value will also be displayed.
 
-For file variables, each variable definition follows syntax __`@variableName = variableValue`__. And variable name __MUST NOT__ contains any spaces. As for variable value, it can be consist of any characters, even white spaces are allowed for them (Leading and trailing white spaces will be ignored). If you want to input some special character like line break, you can use the _backslash_ `\` to escapse, like `\n`. And variables can be defined in a common block of code which is also separated by `###`. You can also define them before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the variables in the `http` file, they can be referenced in any requests of the file. For file scope variables, you can also benefit from some `Visual Studio Code` features like _Go to definition_ and _Find All References_.
+For file variables, each variable definition follows syntax __`@variableName = variableValue`__. And variable name __MUST NOT__ contains any spaces. As for variable value, it can be consist of any characters, even white spaces are allowed for them (Leading and trailing white spaces will be ignored). If you want to input some special character like line break, you can use the _backslash_ `\` to escape, like `\n`. And variables can be defined in a common block of code which is also separated by `###`. You can also define them before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the variables in the `http` file, they can be referenced in any requests of the file. For file scope variables, you can also benefit from some `Visual Studio Code` features like _Go to definition_ and _Find All References_.
 
 ```http
 @name = Huachao Mao
@@ -370,7 +371,7 @@ Content-Type: application/json
 Global variables provide a pre-defined set of variables that can be used in any part of the request(Url/Headers/Body) in the format `{{$variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
 * `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
 
-  `new`: Optional. Specify `new` to force re-authentication and get a new token for the specified directory. Default: Reuse non-expired token for the specified directory from an in-memory cache. (Use `F1 > Rest Client: Clear Azure AD token cache` or restart Code to clear the cache.)
+  `new`: Optional. Specify `new` to force re-authentication and get a new token for the specified directory. Default: Reuse non-expired token for the specified directory from an in-memory cache. (Use `F1 > Rest Client: Clear Azure AD Token Cache` or restart Visual Studio Code to clear the cache.)
 
   `public|cn|de|us|ppe`: Optional. Specify top-level domain (TLD) to get a token for the specified government cloud, `public` for the public cloud, or `ppe` for internal testing. Default: TLD of the REST endpoint; `public` if not valid.
 
@@ -442,7 +443,7 @@ GET https://management.azure.com/subscriptions
 Authorization: {{$aadToken new contoso.com}}
 ```
 
-_**NOTE:** REST Client uses an in-memory token cache that clears when Code is restarted. You can clear the token cache manually by using `F1 > Rest Client: Clear Azure AD token cache`._
+_**NOTE:** REST Client uses an in-memory token cache that clears when Visual Studio Code is restarted. You can clear the token cache manually by using `F1 > Rest Client: Clear Azure AD Token Cache`._
 
 _**NOTE:** `new` can be used with any other options, as long as it's specified first. Order is important for all options._
 
