@@ -107,51 +107,88 @@ export class VariableProcessor {
         const authContext: any = new adal.AuthenticationContext(signInUrl);
 
         const clientId = Constants.AzureActiveDirectoryClientId;
-        const messageBoxOptions = { modal: true };
 
         return new Promise<string>((resolve, reject) => {
-            // use previous token, if one has been obtained and hasn't expired
-            const cachedToken = !forceNewToken && aadTokenCache[`${cloud}:${tenantId}`];
-            if (cachedToken && cachedToken.expiry > new Date()) {
-                return resolve(cachedToken.token);
-            }
-
-            authContext.acquireUserCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: adal.UserCodeInfo) => {
-                if (codeError) {
-                    window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireUserCode\r\n\r\n${codeError.message}`, messageBoxOptions);
-                    return reject(codeError);
+            const resolveToken = (token: adal.TokenResponse, cache: boolean = true, copy?: boolean) => {
+                if (cache) {
+                    // save token using both specified and resulting domain/tenantId to cover more reuse scenarios
+                    aadTokenCache[`${cloud}:${tenantId}`] = aadTokenCache[`${cloud}:${token.tenantId}`] = token;
                 }
 
-                const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${codeResponse.userCode}`;
-                const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n4. Token will be copied to the clipboard when finished\r\n\r\nCode: ${codeResponse.userCode}`;
-                const signIn = "Sign in";
-                const tryAgain = "Try again";
-                const done = "Done";
-                const signInPrompt = value => {
-                    if (value === signIn || value === tryAgain) {
-                        copyPaste.copy(codeResponse.userCode);
-                        commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
-                        window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
-                    } else if (value === done) {
-                        authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: adal.TokenResponse) => {
-                            if (tokenError) {
-                                window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: acquireTokenWithDeviceCode\r\n\r\n${tokenError.message}`, messageBoxOptions);
-                                return reject(tokenError);
-                            }
+                const tokenString = token ? `${token.tokenType} ${token.accessToken}` : null;
+                if (copy && tokenString) {
+                    // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
+                    copyPaste.copy(tokenString);
+                }
 
-                            const token = tokenResponse ? `${tokenResponse.tokenType} ${tokenResponse.accessToken}` : null;
+                resolve(tokenString);
+            };
+            const acquireToken = () => this._acquireToken(resolveToken, reject, authContext, cloud, tenantId, targetApp, clientId);
 
-                            // save token using both specified and resulting domain/tenantId to cover more reuse scenarios
-                            aadTokenCache[`${cloud}:${tenantId}`] = aadTokenCache[`${cloud}:${tokenResponse.tenantId}`] = { token: token, expiry: tokenResponse.expiresOn };
+            // use previous token, if one has been obtained for the directory
+            const cachedToken = !forceNewToken && <adal.TokenResponse>aadTokenCache[`${cloud}:${tenantId}`];
+            if (cachedToken) {
+                // if token expired, try to refresh; otherwise, use cached token
+                if (cachedToken.expiresOn <= new Date()) {
+                    authContext.acquireTokenWithRefreshToken(cachedToken.refreshToken, clientId, targetApp, (refreshError: Error, refreshResponse: adal.TokenResponse) => {
+                        // if refresh fails, acquire new token; otherwise, cache updated token
+                        if (refreshError) {
+                            acquireToken();
+                        } else {
+                            resolveToken(refreshResponse);
+                        }
+                    });
+                } else {
+                    resolveToken(cachedToken, false);
+                }
+                return;
+            }
 
-                            // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
-                            copyPaste.copy(token);
-                            resolve(token);
-                        });
-                    }
-                };
-                window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
-            });
+            acquireToken();
+        });
+    }
+
+    private static _acquireToken(
+            resolve: (value?: adal.TokenResponse | PromiseLike<adal.TokenResponse>, cache?: boolean, copy?: boolean) => void,
+            reject: (reason?: any) => void,
+            authContext: adal.AuthenticationContext,
+            cloud: string,
+            tenantId: string,
+            targetApp: string,
+            clientId: string) {
+        const messageBoxOptions = { modal: true };
+        const signInFailed = (stage: string, message: string) => {
+            window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: ${stage}\r\n\r\n${message}`, messageBoxOptions);
+        };
+        authContext.acquireUserCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: adal.UserCodeInfo) => {
+            if (codeError) {
+                signInFailed("acquireUserCode", codeError.message);
+                return reject(codeError);
+            }
+
+            const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${codeResponse.userCode}`;
+            const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n4. Token will be copied to the clipboard when finished\r\n\r\nCode: ${codeResponse.userCode}`;
+            const signIn = "Sign in";
+            const tryAgain = "Try again";
+            const done = "Done";
+            const signInPrompt = value => {
+                if (value === signIn || value === tryAgain) {
+                    copyPaste.copy(codeResponse.userCode);
+                    commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
+                    window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
+                } else if (value === done) {
+                    authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: adal.TokenResponse) => {
+                        if (tokenError) {
+                            signInFailed("acquireTokenWithDeviceCode", tokenError.message);
+                            return reject(tokenError);
+                        }
+
+                        // explicitly copy this token since we've informed the user in the dialog
+                        return resolve(tokenResponse, true, true);
+                    });
+                }
+            };
+            window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
         });
     }
 
