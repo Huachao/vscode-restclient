@@ -54,13 +54,13 @@ export class VariableProcessor {
         return request;
     }
 
-    public static async clearAadTokenCache() {
+    public static clearAadTokenCache() {
         for (let key in aadTokenCache) {
             delete aadTokenCache[key];
         }
     }
 
-    public static async getAadToken(url: string): Promise<string> {
+    public static getAadToken(url: string): Promise<string> {
         // get target app from URL
         let targetApp = (new RegExp("^[^\\s]+\\s+([^:]*:///?[^/]*/)").exec(url) || [url])[1] || "";
 
@@ -104,7 +104,7 @@ export class VariableProcessor {
 
         const endpoint = Constants.AzureClouds[cloud].aad;
         const signInUrl = `${endpoint}${tenantId}`;
-        const authContext: any = new adal.AuthenticationContext(signInUrl);
+        const authContext = new adal.AuthenticationContext(signInUrl);
 
         const clientId = Constants.AzureActiveDirectoryClientId;
 
@@ -149,13 +149,14 @@ export class VariableProcessor {
     }
 
     private static _acquireToken(
-            resolve: (value?: adal.TokenResponse | PromiseLike<adal.TokenResponse>, cache?: boolean, copy?: boolean) => void,
-            reject: (reason?: any) => void,
-            authContext: adal.AuthenticationContext,
-            cloud: string,
-            tenantId: string,
-            targetApp: string,
-            clientId: string) {
+        resolve: (value?: adal.TokenResponse | PromiseLike<adal.TokenResponse>, cache?: boolean, copy?: boolean) => void,
+        reject: (reason?: any) => void,
+        authContext: adal.AuthenticationContext,
+        cloud: string,
+        tenantId: string,
+        targetApp: string,
+        clientId: string
+    ) {
         const messageBoxOptions = { modal: true };
         const signInFailed = (stage: string, message: string) => {
             window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: ${stage}\r\n\r\n${message}`, messageBoxOptions);
