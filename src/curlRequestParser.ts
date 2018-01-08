@@ -51,7 +51,7 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         // parse body
-        let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-binary'];
+        let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-ascii'] || parsedArguments['data-binary'];
         if (Array.isArray(body)) {
             body = body.join('&');
         }
