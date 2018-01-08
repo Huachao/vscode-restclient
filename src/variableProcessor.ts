@@ -1,9 +1,12 @@
 'use strict';
 
-import { commands, Uri, window } from 'vscode';
+import { commands, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from './constants';
 import { Func } from './common/delegates';
+import { HttpClient } from './httpClient';
+import { HttpRequest } from './models/httpRequest';
+import { RestClientSettings } from './models/configurationSettings';
 import * as adal from 'adal-node';
 import * as moment from 'moment';
 const copyPaste = require('copy-paste');
@@ -90,7 +93,7 @@ export class VariableProcessor {
         }
 
         // parse input options -- [new] [public|cn|de|us|ppe] [<domain|tenantId>]
-        let tenantId = "common";
+        let tenantId = Constants.AzureActiveDirectoryDefaultTenantId;
         let forceNewToken = false;
         const groups = new RegExp(aadRegexPattern).exec(url);
         if (groups) {
@@ -184,6 +187,63 @@ export class VariableProcessor {
                             return reject(tokenError);
                         }
 
+                        // if no directory chosen, pick one (otherwise, the token is likely useless :P)
+                        if (tenantId === Constants.AzureActiveDirectoryDefaultTenantId) {
+                            const settings = new RestClientSettings();
+                            const client = new HttpClient(settings);
+                            const request = new HttpRequest(
+                                "GET", `${Constants.AzureClouds[cloud].arm}/tenants?api-version=2017-08-01`,
+                                { Authorization: this._getTokenString(tokenResponse) }, null, null);
+                            return client.send(request).then(async value => {
+                                const items = JSON.parse(value.body).value;
+                                const directories: QuickPickItem[] = [];
+                                items.forEach(element => {
+                                    const count = element.domains.length;
+                                    const domain = `${element.domains[0]}${count > 1 ? " (+" + (count - 1) + " more)" : ""}`;
+
+                                    /**
+                                     * People with multiple directories sometimes end up 2 or more "Default Directory"
+                                     * names. To improve findability and recognition speed, we are prepending the domain
+                                     * prefix (e.g. abc.onmicrosoft.com == "abc (Default Directory)"), making the sorted
+                                     * list easier to traverse.
+                                     */
+                                    let displayName = element.displayName;
+                                    if (displayName === Constants.AzureActiveDirectoryDefaultDisplayName) {
+                                        const separator = domain.indexOf(".");
+                                        displayName = `${separator > 0 ? domain.substring(0, separator) : domain} (${displayName})`;
+                                    }
+                                    directories.push({ label: displayName, description: element.tenantId, detail: domain });
+                                });
+
+                                // default to first directory
+                                let result = directories.length && directories[0];
+
+                                if (directories.length > 1) {
+                                    // sort by display name and domain (in case display name isn't unique)
+                                    directories.sort((a, b) => a.label + a.detail < b.label + b.detail ? -1 : 1);
+
+                                    const options: QuickPickOptions = {
+                                        matchOnDescription: true,  // tenant id
+                                        matchOnDetail: true,       // url
+                                        placeHolder: `Select the directory to sign in to or press 'Esc' to use the default`,
+                                        ignoreFocusOut: true,      // keep list open when focus is lost (so we don't have to get the device code again)
+                                    };
+                                    result = await window.showQuickPick(directories, options);
+                                }
+
+                                // if directory selected, sign in to that directory; otherwise, stick with the default
+                                if (result) {
+                                    const newDirAuthContext = new adal.AuthenticationContext(`${Constants.AzureClouds[cloud].aad}${result.description}`);
+                                    newDirAuthContext.acquireTokenWithRefreshToken(tokenResponse.refreshToken, clientId, null, (newDirError: Error, newDirResponse: adal.TokenResponse) => {
+                                        // cache/copy new directory token, if successful
+                                        resolve(newDirError ? tokenResponse : newDirResponse, true, true);
+                                    });
+                                } else {
+                                    return resolve(tokenResponse, true, true);
+                                }
+                            });
+                        }
+
                         // explicitly copy this token since we've informed the user in the dialog
                         return resolve(tokenResponse, true, true);
                     });
@@ -191,6 +251,10 @@ export class VariableProcessor {
             };
             window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
         });
+    }
+
+    private static _getTokenString(token: adal.TokenResponse) {
+        return token ? `${token.tokenType} ${token.accessToken}` : null;
     }
 
     public static getGlobalVariables(): { [key: string]: Func<string, string> } {
