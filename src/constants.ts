@@ -32,6 +32,8 @@ export const AzureActiveDirectoryDescription = "Prompts to sign in to Azure AD a
  */
 export const AzureActiveDirectoryClientId = "aebc6443-996d-45c2-90f0-388ff96faa56";
 export const AzureActiveDirectoryForceNewOption = "new";
+export const AzureActiveDirectoryDefaultTenantId = "common";
+export const AzureActiveDirectoryDefaultDisplayName = "Default Directory";
 export const AzureClouds = {
     ppe: {
         aad: "https://login.windows-ppe.net/",  // for testing purposes only

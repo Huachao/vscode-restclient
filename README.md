@@ -375,7 +375,7 @@ Global variables provide a pre-defined set of variables that can be used in any 
 
   `public|cn|de|us|ppe`: Optional. Specify top-level domain (TLD) to get a token for the specified government cloud, `public` for the public cloud, or `ppe` for internal testing. Default: TLD of the REST endpoint; `public` if not valid.
 
-  `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Account home directory.
+  `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a dropdown or press `Esc` to use the home directory (`common` for Microsoft Account).
 
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
@@ -411,7 +411,7 @@ X-Request-Id: {{token}}
 
 #### Azure Active Directory samples
 
-Use the default directory for the account
+Pick a directory from a list or use the default directory for the account:
 
 ```http
 GET https://management.azure.com/subscriptions
