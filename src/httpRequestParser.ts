@@ -52,7 +52,7 @@ export class HttpRequestParser implements IRequestParser {
                 let queryString = '';
                 for (; index < headerLines.length; ) {
                     let headerLine = (headerLines[index]).trim();
-                    if (headerLine[0] in { '?': '', '&': '' }) {
+                    if (~['?', '&'].indexOf(headerLine[0])) {
                         queryString += headerLine;
                         index++;
                         continue;
@@ -117,8 +117,6 @@ export class HttpRequestParser implements IRequestParser {
             if (match) {
                 url = url.substring(0, url.lastIndexOf(words[words.length - 1])).trim();
             }
-            // let end = match ? line.length - match[0].length : line.length;
-            // url = line.trim().substring(method.length, end).trim();
         }
 
         return {
