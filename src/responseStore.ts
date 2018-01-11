@@ -20,14 +20,10 @@ export class ResponseStore {
     }
 
     public static remove(uri: string) {
-        if (ResponseStore.cache.has(uri)) {
-            ResponseStore.cache.delete(uri);
-        }
+        ResponseStore.cache.delete(uri);
     }
 
     public static getLatestResponse(): HttpResponse {
-        return ResponseStore.lastResponseUri !== null
-            ? ResponseStore.get(ResponseStore.lastResponseUri)
-            : null;
+        return ResponseStore.get(ResponseStore.lastResponseUri);
     }
 }

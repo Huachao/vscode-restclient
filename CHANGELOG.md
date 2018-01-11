@@ -1,12 +1,21 @@
+## 0.16.2 (2017/12/22)
+* __Feature__: Add custom variable references codelens
+* __Bug Fix__: [In single line query string mode, continuous whitespaces were collapsed into one](https://github.com/Huachao/vscode-restclient/issues/143)
+* __Bug Fix__: [In multiple lines query string mode, query parameter without '=' and value is ignored](https://github.com/Huachao/vscode-restclient/issues/144)
+* __Bug Fix__: Recognize indented request headers
+* __Improvement__: [Allow hiding switch environment status bar item via settings](https://github.com/Huachao/vscode-restclient/pull/142) [(@VFK)](https://github.com/VFK/)
+* __Improvement__: Update `ECONNREFUSED` error message to hint possible incorrect proxy setting
+* __Improvement__: Use pure delimiter lines as folding boundary
+
 ## 0.16.1 (2017/11/17)
-* __Feature__: [Support shared variables can be used across all the environemnts](https://github.com/Huachao/vscode-restclient/issues/128)
+* __Feature__: [Support shared variables can be used across all the environments](https://github.com/Huachao/vscode-restclient/issues/128)
 * __Feature__: [Request block fold/unfold feature in .http/.rest file](https://github.com/Huachao/vscode-restclient/issues/139)
 
 ## 0.16.0 (2017/10/30)
 * __Feature__: [Support goto symbols(request or file level custom variable) in http file](https://github.com/Huachao/vscode-restclient/issues/126)
+* __Bug Fix__: Set the scheme to `https` if host is of port 443
 * __Improvement__: [Adopt multi root workspace API](https://github.com/Huachao/vscode-restclient/issues/133)
 * __Improvement__: Update README.md to reflect installation and code lens update
-* __Bug Fix__: Set the scheme to `https` if host is of port 443
 
 ## 0.15.3 (2017/9/26)
 * __Bug Fix__: [Info/Warning notifications blocking all tabs](https://github.com/Huachao/vscode-restclient/issues/119)

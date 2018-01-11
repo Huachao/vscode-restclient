@@ -3,6 +3,14 @@
 import { MIME } from './models/mime';
 
 export class MimeUtility {
+    private static readonly supportedImagesFormats = [
+        'image/jpeg',
+        'image/gif',
+        'image/webp',
+        'image/png',
+        'image/bmp'
+    ];
+
     public static parse(contentTypeString: string) {
         // application/json; charset=utf-8
         // application/vnd.github.chitauri-preview+sha
@@ -28,7 +36,7 @@ export class MimeUtility {
         }
 
         let type = MimeUtility.parse(contentTypeString).type;
-        return type === 'image/jpeg' || type === 'image/gif' || type === 'image/webp' || type === 'image/png' || type === 'image/bmp';
+        return Boolean(~MimeUtility.supportedImagesFormats.indexOf(type));
     }
 
     public static isMultiPartFormData(contentTypeString: string): boolean {

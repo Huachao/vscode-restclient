@@ -45,7 +45,9 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
             </head>
             <body>
                 <div>
-                    ${this.addUrlLinks(innerHtml)}
+                    ${this.settings.disableAddingHrefLinkForLargeResponse && response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024
+                        ? innerHtml
+                        : this.addUrlLinks(innerHtml)}
                     <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="scroll(0,0)"><span class="icon"></span></a>
                 </div>
             </body>`;
@@ -89,11 +91,16 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
         if (previewOption !== PreviewOption.Headers) {
             let responseContentType = response.getResponseHeaderValue("content-type");
             let responseBodyPart = `${ResponseFormatUtility.FormatBody(response.body, responseContentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
-            let bodyLanguageAlias = HttpResponseTextDocumentContentProvider.getHighlightLanguageAlias(responseContentType);
-            if (bodyLanguageAlias) {
-                code += hljs.highlight(bodyLanguageAlias, responseBodyPart).value;
+            if (this.settings.disableHighlightResonseBodyForLargeResponse &&
+                response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024) {
+                code += responseBodyPart;
             } else {
-                code += hljs.highlightAuto(responseBodyPart).value;
+                let bodyLanguageAlias = HttpResponseTextDocumentContentProvider.getHighlightLanguageAlias(responseContentType);
+                if (bodyLanguageAlias) {
+                    code += hljs.highlight(bodyLanguageAlias, responseBodyPart).value;
+                } else {
+                    code += hljs.highlightAuto(responseBodyPart).value;
+                }
             }
         }
 
@@ -127,7 +134,7 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
         let max = (1 + code.length).toString().length;
 
         code = code
-            .map(function(line, i) {
+            .map(function (line, i) {
                 return '<span class="line width-' + max + '" start="' + (1 + i) + '">' + line + '</span>';
             })
             .join('\n');
@@ -140,7 +147,7 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
             newline = /\r\n|\r|\n/,
             closingTag = /^<\//;
 
-        return code.replace(matcher, function(match) {
+        return code.replace(matcher, function (match) {
             if (newline.test(match)) {
                 if (openSpans.length) {
                     return openSpans.map(() => '</span>').join('') + match + openSpans.join('');

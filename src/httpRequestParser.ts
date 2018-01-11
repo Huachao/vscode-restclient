@@ -52,7 +52,7 @@ export class HttpRequestParser implements IRequestParser {
                 let queryString = '';
                 for (; index < headerLines.length; ) {
                     let headerLine = (headerLines[index]).trim();
-                    if (headerLine[0] in { '?': '', '&': '' } && headerLine.split('=').length === 2) {
+                    if (~['?', '&'].indexOf(headerLine[0])) {
                         queryString += headerLine;
                         index++;
                         continue;
@@ -112,11 +112,11 @@ export class HttpRequestParser implements IRequestParser {
         } else {
             // Provides both request method and url
             method = words.shift();
-            if (words[words.length - 1].match(/HTTP\/.*/gi)) {
-                words.pop();
+            url = line.trim().substring(method.length).trim();
+            let match = words[words.length - 1].match(/HTTP\/.*/gi);
+            if (match) {
+                url = url.substring(0, url.lastIndexOf(words[words.length - 1])).trim();
             }
-
-            url = words.join(' ');
         }
 
         return {

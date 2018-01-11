@@ -2,7 +2,7 @@
 import { VariableType } from "./models/variableType"
 import { HttpResponse } from "./models/httpResponse"
 
-import { window, TextDocument } from 'vscode';
+import { commands, QuickPickItem, QuickPickOptions, Uri, window, TextDocument } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from "./constants"
 import { Func } from './common/delegates';
@@ -10,7 +10,16 @@ import * as moment from "moment"
 import { ResponseCache } from "./responseCache";
 import { HttpResponseCacheKey } from "./models/httpResponseCacheKey";
 import { ResponseProcessor } from "./responseProcessor";
+import { HttpClient } from './httpClient';
+import { HttpRequest } from './models/httpRequest';
+import { RestClientSettings } from './models/configurationSettings';
+import * as adal from 'adal-node';
+import * as moment from 'moment';
+const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
+
+const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
+const aadTokenCache = {};
 
 export class VariableProcessor {
 
@@ -62,7 +71,213 @@ export class VariableProcessor {
             }
         }
 
+        // any vars that make decisions on the URL (request var) must be last so all vars have been evaluated
+        let aadRegex = new RegExp(aadRegexPattern, 'g');
+        if (aadRegex.test(request)) {
+            request = request.replace(aadRegex, await VariableProcessor.getAadToken(request));
+        }
+
         return request;
+    }
+
+    public static clearAadTokenCache() {
+        for (let key in aadTokenCache) {
+            delete aadTokenCache[key];
+        }
+    }
+
+    public static getAadToken(url: string): Promise<string> {
+        // get target app from URL
+        let targetApp = (new RegExp("^[^\\s]+\\s+([^:]*:///?[^/]*/)").exec(url) || [url])[1] || "";
+
+        // detect known cloud URLs + fix audiences
+        let defaultCloud = null;
+        let cloud = null;
+        for (let c in Constants.AzureClouds) {
+            // set first cloud to be default
+            if (!defaultCloud) { defaultCloud = c; }
+
+            let found = false;
+            for (let api in Constants.AzureClouds[c]) {
+                if (api.endsWith("Audience")) { continue; }
+                if (targetApp === Constants.AzureClouds[c][api]) {
+                    cloud = c;
+                    targetApp = Constants.AzureClouds[c][api + "Audience"] || targetApp;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) { break; }
+        }
+
+        // fall back to URL TLD
+        if (cloud === null) {
+            cloud = targetApp.substring(targetApp.lastIndexOf(".") + 1, targetApp.length - 1);
+        }
+
+        // parse input options -- [new] [public|cn|de|us|ppe] [<domain|tenantId>]
+        let tenantId = Constants.AzureActiveDirectoryDefaultTenantId;
+        let forceNewToken = false;
+        const groups = new RegExp(aadRegexPattern).exec(url);
+        if (groups) {
+            forceNewToken = groups[2] === Constants.AzureActiveDirectoryForceNewOption;
+            cloud = groups[4] || cloud;
+            tenantId = groups[6] || tenantId;
+        }
+
+        // verify cloud (default to public)
+        cloud = Constants.AzureClouds[cloud] ? cloud : defaultCloud;
+
+        const endpoint = Constants.AzureClouds[cloud].aad;
+        const signInUrl = `${endpoint}${tenantId}`;
+        const authContext = new adal.AuthenticationContext(signInUrl);
+
+        const clientId = Constants.AzureActiveDirectoryClientId;
+
+        return new Promise<string>((resolve, reject) => {
+            const resolveToken = (token: adal.TokenResponse, cache: boolean = true, copy?: boolean) => {
+                if (cache) {
+                    // save token using both specified and resulting domain/tenantId to cover more reuse scenarios
+                    aadTokenCache[`${cloud}:${tenantId}`] = aadTokenCache[`${cloud}:${token.tenantId}`] = token;
+                }
+
+                const tokenString = token ? `${token.tokenType} ${token.accessToken}` : null;
+                if (copy && tokenString) {
+                    // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
+                    copyPaste.copy(tokenString);
+                }
+
+                resolve(tokenString);
+            };
+            const acquireToken = () => this._acquireToken(resolveToken, reject, authContext, cloud, tenantId, targetApp, clientId);
+
+            // use previous token, if one has been obtained for the directory
+            const cachedToken = !forceNewToken && <adal.TokenResponse>aadTokenCache[`${cloud}:${tenantId}`];
+            if (cachedToken) {
+                // if token expired, try to refresh; otherwise, use cached token
+                if (cachedToken.expiresOn <= new Date()) {
+                    authContext.acquireTokenWithRefreshToken(cachedToken.refreshToken, clientId, targetApp, (refreshError: Error, refreshResponse: adal.TokenResponse) => {
+                        // if refresh fails, acquire new token; otherwise, cache updated token
+                        if (refreshError) {
+                            acquireToken();
+                        } else {
+                            resolveToken(refreshResponse);
+                        }
+                    });
+                } else {
+                    resolveToken(cachedToken, false);
+                }
+                return;
+            }
+
+            acquireToken();
+        });
+    }
+
+    private static _acquireToken(
+        resolve: (value?: adal.TokenResponse | PromiseLike<adal.TokenResponse>, cache?: boolean, copy?: boolean) => void,
+        reject: (reason?: any) => void,
+        authContext: adal.AuthenticationContext,
+        cloud: string,
+        tenantId: string,
+        targetApp: string,
+        clientId: string
+    ) {
+        const messageBoxOptions = { modal: true };
+        const signInFailed = (stage: string, message: string) => {
+            window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: ${stage}\r\n\r\n${message}`, messageBoxOptions);
+        };
+        authContext.acquireUserCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: adal.UserCodeInfo) => {
+            if (codeError) {
+                signInFailed("acquireUserCode", codeError.message);
+                return reject(codeError);
+            }
+
+            const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${codeResponse.userCode}`;
+            const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n4. Token will be copied to the clipboard when finished\r\n\r\nCode: ${codeResponse.userCode}`;
+            const signIn = "Sign in";
+            const tryAgain = "Try again";
+            const done = "Done";
+            const signInPrompt = value => {
+                if (value === signIn || value === tryAgain) {
+                    copyPaste.copy(codeResponse.userCode);
+                    commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
+                    window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
+                } else if (value === done) {
+                    authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: adal.TokenResponse) => {
+                        if (tokenError) {
+                            signInFailed("acquireTokenWithDeviceCode", tokenError.message);
+                            return reject(tokenError);
+                        }
+
+                        // if no directory chosen, pick one (otherwise, the token is likely useless :P)
+                        if (tenantId === Constants.AzureActiveDirectoryDefaultTenantId) {
+                            const settings = new RestClientSettings();
+                            const client = new HttpClient(settings);
+                            const request = new HttpRequest(
+                                "GET", `${Constants.AzureClouds[cloud].arm}/tenants?api-version=2017-08-01`,
+                                { Authorization: this._getTokenString(tokenResponse) }, null, null);
+                            return client.send(request).then(async value => {
+                                const items = JSON.parse(value.body).value;
+                                const directories: QuickPickItem[] = [];
+                                items.forEach(element => {
+                                    const count = element.domains.length;
+                                    const domain = `${element.domains[0]}${count > 1 ? " (+" + (count - 1) + " more)" : ""}`;
+
+                                    /**
+                                     * People with multiple directories sometimes end up 2 or more "Default Directory"
+                                     * names. To improve findability and recognition speed, we are prepending the domain
+                                     * prefix (e.g. abc.onmicrosoft.com == "abc (Default Directory)"), making the sorted
+                                     * list easier to traverse.
+                                     */
+                                    let displayName = element.displayName;
+                                    if (displayName === Constants.AzureActiveDirectoryDefaultDisplayName) {
+                                        const separator = domain.indexOf(".");
+                                        displayName = `${separator > 0 ? domain.substring(0, separator) : domain} (${displayName})`;
+                                    }
+                                    directories.push({ label: displayName, description: element.tenantId, detail: domain });
+                                });
+
+                                // default to first directory
+                                let result = directories.length && directories[0];
+
+                                if (directories.length > 1) {
+                                    // sort by display name and domain (in case display name isn't unique)
+                                    directories.sort((a, b) => a.label + a.detail < b.label + b.detail ? -1 : 1);
+
+                                    const options: QuickPickOptions = {
+                                        matchOnDescription: true,  // tenant id
+                                        matchOnDetail: true,       // url
+                                        placeHolder: `Select the directory to sign in to or press 'Esc' to use the default`,
+                                        ignoreFocusOut: true,      // keep list open when focus is lost (so we don't have to get the device code again)
+                                    };
+                                    result = await window.showQuickPick(directories, options);
+                                }
+
+                                // if directory selected, sign in to that directory; otherwise, stick with the default
+                                if (result) {
+                                    const newDirAuthContext = new adal.AuthenticationContext(`${Constants.AzureClouds[cloud].aad}${result.description}`);
+                                    newDirAuthContext.acquireTokenWithRefreshToken(tokenResponse.refreshToken, clientId, null, (newDirError: Error, newDirResponse: adal.TokenResponse) => {
+                                        // cache/copy new directory token, if successful
+                                        resolve(newDirError ? tokenResponse : newDirResponse, true, true);
+                                    });
+                                } else {
+                                    return resolve(tokenResponse, true, true);
+                                }
+                            });
+                        }
+
+                        // explicitly copy this token since we've informed the user in the dialog
+                        return resolve(tokenResponse, true, true);
+                    });
+                }
+            };
+            window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
+        });
+    }
+
+    private static _getTokenString(token: adal.TokenResponse) {
+        return token ? `${token.tokenType} ${token.accessToken}` : null;
     }
 
     public static getGlobalVariables(): { [key: string]: Func<string, string> } {
@@ -114,7 +329,7 @@ export class VariableProcessor {
             if (match = Constants.VariableDefinitionRegex.exec(line)) {
                 let key = match[1];
                 let originalValue = match[2];
-                let value = '';
+                let value = "";
                 let isPrevCharEscape = false;
                 for (let index = 0; index < originalValue.length; index++) {
                     let currentChar = originalValue[index];
@@ -122,7 +337,7 @@ export class VariableProcessor {
                         isPrevCharEscape = false;
                         value += this.escapee.get(currentChar) || currentChar;
                     } else {
-                        if (currentChar === '\\') {
+                        if (currentChar === "\\") {
                             isPrevCharEscape = true;
                             continue;
                         }

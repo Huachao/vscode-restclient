@@ -24,6 +24,9 @@ export interface IRestClientSettings {
     useTrunkedTransferEncodingForSendingFileContent: boolean;
     suppressResponseBodyContentTypeValidationWarning: boolean;
     previewOption: PreviewOption;
+    disableHighlightResonseBodyForLargeResponse: boolean;
+    disableAddingHrefLinkForLargeResponse: boolean;
+    largeResponseBodySizeLimitInMB: number;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -35,6 +38,7 @@ export class RestClientSettings implements IRestClientSettings {
     public proxyStrictSSL: boolean;
     public rememberCookiesForSubsequentRequests: boolean;
     public enableTelemetry: boolean;
+    public showEnvironmentStatusBarItem: boolean;
     public excludeHostsForProxy: string[];
     public fontSize?: number;
     public fontFamily: string;
@@ -48,6 +52,9 @@ export class RestClientSettings implements IRestClientSettings {
     public useTrunkedTransferEncodingForSendingFileContent: boolean;
     public suppressResponseBodyContentTypeValidationWarning: boolean;
     public previewOption: PreviewOption;
+    public disableHighlightResonseBodyForLargeResponse: boolean;
+    public disableAddingHrefLinkForLargeResponse: boolean;
+    public largeResponseBodySizeLimitInMB: number;
 
     public constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -81,12 +88,16 @@ export class RestClientSettings implements IRestClientSettings {
         this.hostCertificates = restClientSettings.get<Map<string, HostCertificate>>("certificates", new Map<string, HostCertificate>());
         this.useTrunkedTransferEncodingForSendingFileContent = restClientSettings.get<boolean>("useTrunkedTransferEncodingForSendingFileContent", true);
         this.suppressResponseBodyContentTypeValidationWarning = restClientSettings.get<boolean>("suppressResponseBodyContentTypeValidationWarning", false);
+        this.disableHighlightResonseBodyForLargeResponse = restClientSettings.get<boolean>("disableHighlightResonseBodyForLargeResponse", true);
+        this.disableAddingHrefLinkForLargeResponse = restClientSettings.get<boolean>("disableAddingHrefLinkForLargeResponse", true);
+        this.largeResponseBodySizeLimitInMB = restClientSettings.get<number>("largeResponseBodySizeLimitInMB", 5);
         this.previewOption = ParsePreviewOptionStr(restClientSettings.get<string>("previewOption", "full"));
 
         let httpSettings = workspace.getConfiguration('http');
         this.proxy = httpSettings.get<string>('proxy', undefined);
         this.proxyStrictSSL = httpSettings.get<boolean>('proxyStrictSSL', false);
         this.enableTelemetry = httpSettings.get<boolean>('enableTelemetry', true);
+        this.showEnvironmentStatusBarItem = restClientSettings.get<boolean>('showEnvironmentStatusBarItem', true);
     }
 
     private getWorkspaceConfiguration(): WorkspaceConfiguration {

@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.16.1",
+  "version": "0.16.2",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -43,6 +43,7 @@
     "onCommand:rest-client.save-response",
     "onCommand:rest-client.save-response-body",
     "onCommand:rest-client.switch-environment",
+    "onCommand:rest-client.clear-aad-token-cache",
     "onLanguage:http"
   ],
   "main": "./out/src/extension",
@@ -113,7 +114,7 @@
       },
       {
         "command": "rest-client.save-response",
-        "title": "Save Response",
+        "title": "Save Full Response",
         "icon": {
           "light": "./images/save.svg",
           "dark": "./images/save-inverse.svg"
@@ -146,6 +147,11 @@
       {
         "command": "rest-client.copy-request-as-curl",
         "title": "Copy Request As cURL",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.clear-aad-token-cache",
+        "title": "Clear Azure AD Token Cache",
         "category": "Rest Client"
       }
     ],
@@ -441,6 +447,32 @@
           "default": "full",
           "scope": "resource",
           "description": "Response preview output option. 'full' for whole response message(status line, headers and body). 'headers' for response headers(as well as status line). 'body' for response body only. 'exchange' for whole HTTP exchange (request and response)"
+        },
+        "rest-client.showEnvironmentStatusBarItem": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Show environment picker in status bar"
+        },
+        "rest-client.disableHighlightResonseBodyForLargeResponse": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Controls whether to highlight response body for response whose size is larger than limit specified by 'rest-client.largeResponseSizeLimitInMB'"
+        },
+        "rest-client.disableAddingHrefLinkForLargeResponse": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Controls whether to add href link in previewed response for response whose size is larger than limit specified by 'rest-client.largeResponseSizeLimitInMB'"
+        },
+        "rest-client.largeResponseBodySizeLimitInMB": {
+          "type": "number",
+          "default": 5,
+          "minimum": 0,
+          "exclusiveMinimum": true,
+          "scope": "resource",
+          "description": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when 'rest-client.disableHighlightResonseBodyForLargeResponse' and/or 'rest-client.disableAddingHrefLinkForLargeResponse' is set to true"
         }
       }
     }
@@ -460,6 +492,7 @@
     "vscode": "^1.0.0"
   },
   "dependencies": {
+    "adal-node": "^0.1.26",
     "applicationinsights": "^0.18.0",
     "autolinker": "^1.4.0",
     "code-highlight-linenums": "^0.2.1",
@@ -472,7 +505,7 @@
     "httpsnippet": "^1.16.5",
     "iconv-lite": "^0.4.15",
     "mime-types": "^2.1.14",
-    "moment": "^2.19.2",
+    "moment": "^2.20.1",
     "node-uuid": "^1.4.7",
     "pretty-data": "^0.40.0",
     "request": "^2.81.0",

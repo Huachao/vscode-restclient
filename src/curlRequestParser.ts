@@ -16,7 +16,9 @@ export class CurlRequestParser implements IRequestParser {
     public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string, parseFileContentAsStream: boolean): HttpRequest {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(requestRawText.trim()));
-        requestText = requestText.replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2');
+        requestText = requestText
+            .replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2')
+            .replace(/(-I|--head)/, '-X HEAD');
         let yargObject = yargs(requestText);
         let parsedArguments = yargObject.argv;
 
@@ -36,7 +38,7 @@ export class CurlRequestParser implements IRequestParser {
             headers = RequestParserUtil.parseRequestHeaders(parsedHeaders);
         }
 
-        //parse cookie
+        // parse cookie
         let cookieString: string = parsedArguments.b || parsedArguments.cookie;
         if (cookieString && cookieString.includes('=')) {
             // Doesn't support cookie jar
@@ -49,7 +51,7 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         // parse body
-        let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-binary'];
+        let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-ascii'] || parsedArguments['data-binary'];
         if (Array.isArray(body)) {
             body = body.join('&');
         }
