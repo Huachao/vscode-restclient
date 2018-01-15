@@ -198,8 +198,53 @@ export class VariableProcessor {
                                 const items = JSON.parse(value.body).value;
                                 const directories: QuickPickItem[] = [];
                                 items.forEach(element => {
+                                    /**
+                                     * Some directories have multiple domains, but ARM doesn't return the primary domain
+                                     * first. For instance, Microsoft has 268 domains and "microsoft.com" is #12. This
+                                     * block attempts to pick the closest match based on the first word of the display
+                                     * name (e.g. "Foo" in "Foo Bar"). If the search fails, the first domain is used.
+                                     */
+                                    let displayName = element.displayName;
                                     const count = element.domains.length;
-                                    const domain = `${element.domains[0]}${count > 1 ? " (+" + (count - 1) + " more)" : ""}`;
+                                    let domain = element.domains && element.domains[0];
+                                    if (count > 1) {
+                                        try {
+                                            // find the best matches
+                                            const displayNameSpaceIndex = displayName.indexOf(" ");
+                                            const displayNameFirstWord = displayNameSpaceIndex > -1
+                                                ? displayName.substring(0, displayNameSpaceIndex)
+                                                : displayName;
+                                            let bestMatches = [];
+                                            const bestMatchesRegex = new RegExp(`(^${displayNameFirstWord}\.com$)|(^${displayNameFirstWord}\.[a-z]+(?:\.[a-z]+)?$)|(^${displayNameFirstWord}[a-z]+\.com$)|(^${displayNameFirstWord}[^:]*$)|(^[^:]*${displayNameFirstWord}[^:]*$)`, "gi");
+                                            const bestMatchesRegexGroups = bestMatchesRegex.source.match(new RegExp(`${displayNameFirstWord}`, "g")).length;
+                                            for (let d of element.domains) {
+                                                // find matches; use empty array for all captures (+1 for the full string) if no matches found
+                                                const matches = bestMatchesRegex.exec(d)
+                                                    || Array(bestMatchesRegexGroups + 1).fill(null);
+
+                                                // stop looking if the best match is found
+                                                bestMatches[0] = matches[1];
+                                                if (bestMatches[0]) {
+                                                    break;
+                                                }
+
+                                                // keep old matches, save new matches
+                                                for (let g = 1; g < bestMatchesRegexGroups; g++) {
+                                                    bestMatches[g] = bestMatches[g] || matches[g + 1];
+                                                }
+                                            }
+
+                                            // use the first match in the array of matches
+                                            domain = bestMatches.find(m => m) || domain;
+                                        } catch (e) {
+                                            /**
+                                             * Source: Anything
+                                             * Reason: Anything
+                                             * Action: Ignore
+                                             */
+                                         }
+                                        domain = `${domain} (+${count - 1} more)`;
+                                    }
 
                                     /**
                                      * People with multiple directories sometimes end up 2 or more "Default Directory"
@@ -207,7 +252,6 @@ export class VariableProcessor {
                                      * prefix (e.g. abc.onmicrosoft.com == "abc (Default Directory)"), making the sorted
                                      * list easier to traverse.
                                      */
-                                    let displayName = element.displayName;
                                     if (displayName === Constants.AzureActiveDirectoryDefaultDisplayName) {
                                         const separator = domain.indexOf(".");
                                         displayName = `${separator > 0 ? domain.substring(0, separator) : domain} (${displayName})`;
