@@ -215,30 +215,28 @@ export class VariableProcessor {
                                                 ? displayName.substring(0, displayNameSpaceIndex)
                                                 : displayName;
                                             let bestMatches = [];
+                                            const bestMatchesRegex = new RegExp(`(^${displayNameFirstWord}\.com$)|(^${displayNameFirstWord}\.[a-z]+(?:\.[a-z]+)?$)|(^${displayNameFirstWord}[a-z]+\.com$)|(^${displayNameFirstWord}[^:]*$)|(^[^:]*${displayNameFirstWord}[^:]*$)`, "gi");
+                                            const bestMatchesRegexGroups = (bestMatchesRegex.source.match(new RegExp(`${displayNameFirstWord}`, "g")) || []).length;
                                             for (let d in element.domains) {
-                                                const matches = new RegExp(`(^${displayNameFirstWord}\.com$)|(^${displayNameFirstWord}\.[a-z]+(?:\.[a-z]+)?$)|(^${displayNameFirstWord}[a-z]+\.com$)|(^${displayNameFirstWord}[^:]*$)|(^[^:]*${displayNameFirstWord}[^:]*$)`, "gi")
-                                                    .exec(element.domains[d]) || [null, null, null, null, null, null];
+                                                // find matches; use empty array for all captures (+1 for the full string) if no matches found
+                                                const matches = bestMatchesRegex.exec(element.domains[d])
+                                                    || Array(bestMatchesRegexGroups + 1).fill(null);
 
                                                 // stop looking if the best match is found
-                                                bestMatches[0] = bestMatches[0] || matches[1];
+                                                bestMatches[0] = matches[1];
                                                 if (bestMatches[0]) {
                                                     break;
                                                 }
 
-                                                bestMatches[1] = bestMatches[1] || matches[2];
-                                                bestMatches[2] = bestMatches[2] || matches[3];
-                                                bestMatches[3] = bestMatches[3] || matches[4];
-                                                bestMatches[4] = bestMatches[4] || matches[5];
-                                            }
-
-                                            // use best match
-                                            for (let m in bestMatches) {
-                                                if (bestMatches[m]) {
-                                                    domain = bestMatches[m];
-                                                    break;
+                                                // keep old matches, save new matches
+                                                for (let g = 1; g < bestMatchesRegexGroups; g++) {
+                                                    bestMatches[g] = bestMatches[g] || matches[g + 1];
                                                 }
                                             }
-                                        } catch {
+
+                                            // use the first match in the array of matches
+                                            domain = bestMatches.find(m => m) || domain;
+                                        } catch (e) {
                                             /**
                                              * Source: Anything
                                              * Reason: Anything
