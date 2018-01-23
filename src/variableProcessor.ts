@@ -14,7 +14,6 @@ import { HttpClient } from './httpClient';
 import { HttpRequest } from './models/httpRequest';
 import { RestClientSettings } from './models/configurationSettings';
 import * as adal from 'adal-node';
-import * as moment from 'moment';
 const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
 
