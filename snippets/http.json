@@ -2,14 +2,14 @@
     "Get request block": {
         "prefix": "get",
         "body": [
-           "GET ${1:url} HTTP/1.1"
+            "GET ${1:url} HTTP/1.1"
         ],
         "description": "GET Request"
     },
     "Delete request block": {
         "prefix": "delete",
         "body": [
-           "DELETE ${1:url} HTTP/1.1"
+            "DELETE ${1:url} HTTP/1.1"
         ],
         "description": "DELETE Request"
     },
