@@ -24,10 +24,6 @@ import { VariableProcessor } from './variableProcessor';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: ExtensionContext) {
-
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "rest-client" is now active!');
     let requestController = new RequestController();
     let historyController = new HistoryController();
     let responseController = new ResponseController();
