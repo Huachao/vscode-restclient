@@ -16,6 +16,52 @@
         <key>patterns</key>
         <array>
             <dict>
+                <key>begin</key>
+                <string>^\s*(?=[\{\[])</string>
+                <key>name</key>
+                <string>http.request.body.json</string>
+                <key>end</key>
+                <string>^\s*(\#{3,}.*)?\s*$</string>
+                <key>endCaptures</key>
+                <dict>
+                    <key>0</key>
+                    <dict>
+                        <key>name</key>
+                        <string>comment.source.sharp.http</string>
+                    </dict>
+                </dict>
+                <key>patterns</key>
+                <array>
+                    <dict>
+                        <key>include</key>
+                        <string>source.json</string>
+                    </dict>
+                </array>
+            </dict>
+            <dict>
+                <key>begin</key>
+                <string>^\s*(?=\<\S)</string>
+                <key>name</key>
+                <string>http.request.body.xml</string>
+                <key>end</key>
+                <string>^\s*(\#{3,}.*)?\s*$</string>
+                <key>endCaptures</key>
+                <dict>
+                    <key>0</key>
+                    <dict>
+                        <key>name</key>
+                        <string>comment.source.sharp.http</string>
+                    </dict>
+                </dict>
+                <key>patterns</key>
+                <array>
+                    <dict>
+                        <key>include</key>
+                        <string>text.xml</string>
+                    </dict>
+                </array>
+            </dict>
+            <dict>
                 <key>match</key>
                 <string>^\s*#.*$\n?</string>
                 <key>name</key>
