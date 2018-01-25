@@ -21,7 +21,7 @@
                 <key>name</key>
                 <string>http.request.body.json</string>
                 <key>end</key>
-                <string>^\s*(\#{3,}.*)?\s*$</string>
+                <string>^\s*(\#{3,}.*?)?\s*$</string>
                 <key>endCaptures</key>
                 <dict>
                     <key>0</key>
@@ -44,7 +44,7 @@
                 <key>name</key>
                 <string>http.request.body.xml</string>
                 <key>end</key>
-                <string>^\s*(\#{3,}.*)?\s*$</string>
+                <string>^\s*(\#{3,}.*?)?\s*$</string>
                 <key>endCaptures</key>
                 <dict>
                     <key>0</key>
@@ -117,7 +117,7 @@
                     </dict>
                 </dict>
                 <key>match</key>
-                <string>^([\w\-]+)\s*\:\s*(.*?)\s*</string>
+                <string>^([\w\-]+)\s*\:\s*(\S*)\s*</string>
                 <key>name</key>
                 <string>http.requestheaders</string>
             </dict>
