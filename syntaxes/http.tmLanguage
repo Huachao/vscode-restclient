@@ -117,7 +117,7 @@
                     </dict>
                 </dict>
                 <key>match</key>
-                <string>^([\w\-]+)\s*\:\s*(\S*)\s*</string>
+                <string>^([\w\-]+)\s*\:\s*(.*?)\s*$</string>
                 <key>name</key>
                 <string>http.requestheaders</string>
             </dict>
