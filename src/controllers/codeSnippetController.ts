@@ -61,7 +61,7 @@ export class CodeSnippetController {
         this._selectedText = selectedText;
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName, true);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
         if (!httpRequest) {
             return;
         }
@@ -161,7 +161,7 @@ export class CodeSnippetController {
         this._selectedText = selectedText;
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName, true);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
         if (!httpRequest) {
             return;
         }

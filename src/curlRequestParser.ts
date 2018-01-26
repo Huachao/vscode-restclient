@@ -13,12 +13,12 @@ const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
 export class CurlRequestParser implements IRequestParser {
 
-    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string, parseFileContentAsStream: boolean): HttpRequest {
+    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(requestRawText.trim()));
         requestText = requestText
             .replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2')
-            .replace(/(-I|--head)/, '-X HEAD');
+            .replace(/(-I|--head)(?=\s+)/, '-X HEAD');
         let yargObject = yargs(requestText);
         let parsedArguments = yargObject.argv;
 
@@ -59,11 +59,7 @@ export class CurlRequestParser implements IRequestParser {
         if (typeof body === 'string' && body[0] === '@') {
             let fileAbsolutePath = CurlRequestParser.resolveFilePath(body.substring(1), requestAbsoluteFilePath);
             if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
-                if (parseFileContentAsStream) {
-                    body = fs.createReadStream(fileAbsolutePath);
-                } else {
-                    body = fs.readFileSync(fileAbsolutePath).toString();
-                }
+                body = fs.createReadStream(fileAbsolutePath);
             } else {
                 body = body.substring(1);
             }

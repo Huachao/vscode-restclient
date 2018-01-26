@@ -89,7 +89,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
 
     private getRequestSymbolInfo(text: string): [string, string] {
         let parser = HttpDocumentSymbolProvider.requestParserFactory.createRequestParser(text);
-        let request = parser.parseHttpRequest(text, window.activeTextEditor.document.fileName, true);
+        let request = parser.parseHttpRequest(text, window.activeTextEditor.document.fileName);
         let parsedUrl = url.parse(request.url);
         return [`${request.method} ${parsedUrl.path}`, parsedUrl.host];
     }

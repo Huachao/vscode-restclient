@@ -12,6 +12,7 @@ import { getWorkspaceRootPath } from './workspaceUtility';
 import * as url from 'url';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Stream, Readable } from 'stream';
 
 const encodeUrl = require('encodeurl');
 const request = require('request');
@@ -27,11 +28,16 @@ export class HttpClient {
     }
 
     public async send(httpRequest: HttpRequest): Promise<HttpResponse> {
+        let body: string | Stream | Buffer = httpRequest.body;
+        if (body && typeof body !== 'string') {
+            body = await this.convertStreamToBuffer(body);
+        }
+
         let options: any = {
             url: encodeUrl(httpRequest.url),
             headers: httpRequest.headers,
             method: httpRequest.method,
-            body: httpRequest.body,
+            body,
             encoding: null,
             time: true,
             timeout: this._settings.timeoutInMilliseconds,
@@ -149,7 +155,7 @@ export class HttpClient {
                         options.method,
                         options.url,
                         HttpClient.capitalizeHeaderName(response.toJSON().request.headers),
-                        httpRequest.body,
+                        httpRequest.body instanceof Buffer ? fs.createReadStream(httpRequest.body) : httpRequest.body,
                         httpRequest.rawBody
                     )));
             })
@@ -175,6 +181,16 @@ export class HttpClient {
         }
 
         return null;
+    }
+
+    private async convertStreamToBuffer(stream: Stream): Promise<Buffer> {
+        return new Promise<Buffer>((resolve, reject) => {
+            const buffers: Buffer[] = [];
+            stream.on('data', buffer => buffers.push(typeof buffer === 'string' ? Buffer.from(buffer) : buffer));
+            stream.on('end', () => resolve(Buffer.concat(buffers)));
+            stream.on('error', error => reject(error));
+            (<Readable>stream).resume();
+        });
     }
 
     private getRequestCertificate(requestUrl: string): { cert?: string, key?: string, pfx?: string, passphrase?: string } {

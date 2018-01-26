@@ -76,7 +76,7 @@ export class RequestController {
         selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName, this._restClientSettings.useTrunkedTransferEncodingForSendingFileContent);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
         if (!httpRequest) {
             return;
         }
