@@ -12,7 +12,7 @@ import { getWorkspaceRootPath } from './workspaceUtility';
 import * as url from 'url';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Stream, Readable } from 'stream';
+import { Stream } from 'stream';
 
 const encodeUrl = require('encodeurl');
 const request = require('request');
@@ -189,7 +189,7 @@ export class HttpClient {
             stream.on('data', buffer => buffers.push(typeof buffer === 'string' ? Buffer.from(buffer) : buffer));
             stream.on('end', () => resolve(Buffer.concat(buffers)));
             stream.on('error', error => reject(error));
-            (<Readable>stream).resume();
+            (<any>stream).resume();
         });
     }
 
