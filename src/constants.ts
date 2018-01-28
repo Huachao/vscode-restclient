@@ -1,15 +1,16 @@
 'use strict';
 
-export const ExtensionId: string = 'humao.rest-client';
+export const ExtensionId: string = 's-kainet.rest-client';
 export const AiKey: string = 'ad746e27-4a36-441c-8b94-5db178f81ae3';
 export const CSSFileName: string = 'rest-client.css';
 export const CSSFolderName: string = 'styles';
-export const ExtensionFolderName: string = '.rest-client';
+export const ExtensionFolderName: string = '.sp-rest-client';
 export const HistoryFileName: string = 'history.json';
 export const CookieFileName: string = 'cookie.json';
 export const EnvironmentFileName: string = 'environment.json';
 export const DefaultResponseDownloadFolderName: string = 'responses/raw';
 export const DefaultResponseBodyDownloadFolerName: string = 'responses/body';
+export const SharePointAuthEnvironmentKey: string = 'sp-auth';
 export const HistoryItemsMaxCount: number = 50;
 
 export const NoEnvironmentSelectedName: string = 'c0cfe680-4fcd-4b71-a4ba-8cfaee57680a';

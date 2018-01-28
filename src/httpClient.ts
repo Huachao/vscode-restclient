@@ -13,6 +13,7 @@ import * as url from 'url';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Stream } from 'stream';
+import { AuthProcessorFactory } from './auth/authProcessorFactory';
 
 const encodeUrl = require('encodeurl');
 const request = require('request');
@@ -87,6 +88,10 @@ export class HttpClient {
 
         let size = 0;
         let headersSize = 0;
+
+        let authProcessor = await AuthProcessorFactory.resolveAuthProcessor(httpRequest);
+        options = await authProcessor.process(options);
+
         return new Promise<HttpResponse>((resolve, reject) => {
             request(options, function (error, response, body) {
                 if (error) {

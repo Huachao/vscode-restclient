@@ -1,27 +1,27 @@
 {
   "name": "rest-client",
-  "displayName": "REST Client",
-  "description": "REST Client for Visual Studio Code",
-  "version": "0.17.0",
-  "publisher": "humao",
+  "displayName": "SP REST Client",
+  "description": "SharePoint REST Client for Visual Studio Code",
+  "version": "0.0.5",
+  "publisher": "s-kainet",
   "author": {
     "name": "Huachao Mao",
     "email": "huachaomao@gmail.com"
   },
-  "icon": "images/rest_icon.png",
+  "icon": "images/sp_rest_icon.png",
   "galleryBanner": {
     "color": "#000000",
     "theme": "dark"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Huachao/vscode-restclient/issues",
-    "email": "huachaomao@gmail.com"
+    "url": "https://github.com/s-KaiNet/vscode-restclient/issues",
+    "email": "sergeev.srg@gmail.com"
   },
-  "homepage": "https://github.com/Huachao/vscode-restclient/blob/master/README.md",
+  "homepage": "https://github.com/s-KaiNet/vscode-restclient",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Huachao/vscode-restclient.git"
+    "url": "https://github.com/s-KaiNet/vscode-restclient.git"
   },
   "engines": {
     "vscode": "^1.17.0"
@@ -506,6 +506,8 @@
     "iconv-lite": "^0.4.15",
     "mime-types": "^2.1.14",
     "moment": "^2.20.1",
+    "node-sp-auth": "^2.3.2",
+    "node-sp-auth-config": "^2.4.2",
     "node-uuid": "^1.4.7",
     "pretty-data": "^0.40.0",
     "request": "^2.81.0",
