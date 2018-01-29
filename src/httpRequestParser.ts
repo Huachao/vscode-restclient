@@ -85,7 +85,7 @@ export class HttpRequestParser implements IRequestParser {
         if (HttpClient.getHeaderValue(headers, 'Host') && requestLine.url[0] === '/') {
             let host = HttpClient.getHeaderValue(headers, 'Host');
             let [, port] = host.split(':');
-            let scheme = port === '443' ? 'https' : 'http';
+            let scheme = port === '443' || port === '8443' ? 'https' : 'http';
             requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
@@ -127,7 +127,7 @@ export class HttpRequestParser implements IRequestParser {
 
     private static parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string): string | Stream {
         if (!lines || lines.length === 0) {
-            return <string>null;
+            return null;
         }
 
         // Check if needed to upload file
