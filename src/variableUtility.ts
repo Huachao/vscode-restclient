@@ -81,18 +81,4 @@ export class VariableUtility {
         };
         return locations;
     }
-    
-    public static getRequestVariablePath(wordRange: Range, lineRange: TextLine, position: Position) {
-        let index = position.character - 1;
-        if (wordRange) {
-            wordRange.start.character
-        }
-        // Look behind for start of variable
-        for (; index >= 0; index--) {
-            if (lineRange.text[index-1] === "{" && lineRange.text[index-2] === "{") 
-                break;
-        }
-
-        return lineRange.text.substring(index, wordRange ? wordRange.end.character : position.character - 1)
-    }
 }

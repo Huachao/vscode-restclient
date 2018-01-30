@@ -3,7 +3,7 @@ import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueP
 import { VariableProcessor } from "./variableProcessor"
 import { VariableUtility } from "./variableUtility"
 
-import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind } from 'vscode';
+import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind, Range, TextLine } from 'vscode';
 import { HttpElementFactory } from './httpElementFactory';
 import { ElementType } from './models/httpElement';
 
@@ -16,8 +16,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
         const wordRange = document.getWordRangeAtPosition(position);
         let lineRange = document.lineAt(position);
 
-        const fullPath = VariableUtility.getRequestVariablePath(wordRange, lineRange, position);
-
+        const fullPath = this.getRequestVariableCompletionPath(wordRange, lineRange, position);
         let completionItems: CompletionItem[] = [];        
 
         const fileRequestVariables = VariableProcessor.getRequestVariablesInFile(document);
@@ -41,5 +40,19 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
         }
 
         return completionItems;
+    }
+
+    private getRequestVariableCompletionPath(wordRange: Range, lineRange: TextLine, position: Position) {
+        let index = position.character - 1;
+        // Look behind for start of variable
+        for (; index >= 0; index--) {
+            if (lineRange.text[index-1] === "{" && lineRange.text[index-2] === "{") 
+                break;
+        }
+
+        var path = lineRange.text.substring(index, wordRange ? wordRange.start.character : position.character - 1)
+        return path && path.substring(path.length-1) === "." 
+            ? path.substring(0, path.length-1) 
+            : path;
     }
 }

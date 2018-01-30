@@ -65,7 +65,7 @@ export class VariableProcessor {
                         const value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
                         request = request.replace(new RegExp(`\\{\\{\\s*${requestVariable}\\s*\\}\\}`, 'g'), value.toString());
                     } catch {
-                        window.showWarningMessage(`Could not merge in response variable. Is ${requestVariable} the correct path?`)
+                        window.showWarningMessage(`Could not merge in request variable. Is ${requestVariable} the correct path?`)
                     }
                 }   
             }
