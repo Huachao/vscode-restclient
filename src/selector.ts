@@ -33,8 +33,8 @@ export class Selector {
         return rows;
     }
 
-    public static getResponseVariableDefinitionName(line: string): string {
-        const matched = line.match(Constants.ResponseVariableDefinitionRegex);
+    public static getRequestVariableDefinitionName(line: string): string {
+        const matched = line.match(Constants.RequestVariableDefinitionRegex);
         return matched && matched.length >= 2 ? matched[1] : null;
     } 
 

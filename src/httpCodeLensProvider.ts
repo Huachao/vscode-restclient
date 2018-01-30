@@ -40,12 +40,12 @@ export class HttpCodeLensProvider implements CodeLensProvider {
             }
 
             if (blockStart <= blockEnd) {
-                let reponseVar = null;
+                let requestVariable = null;
                 if (blockStart > 0) {
-                    reponseVar = Selector.getResponseVariableDefinitionName(lines[blockStart-1]);
+                    requestVariable = Selector.getRequestVariableDefinitionName(lines[blockStart-1]);
                 }
                 const range = new Range(blockStart, 0, blockEnd, 0);
-                const requestLines = new RequestLines(range, document.uri.toString(), reponseVar);
+                const requestLines = new RequestLines(range, document.uri.toString(), requestVariable);
                 const cmd: Command = {
                     arguments: [document, requestLines],
                     title: 'Send Request',

@@ -1,7 +1,7 @@
 "use strict";
 
 import { Stream } from 'stream';
-import { HttpResponseCacheKey } from './httpResponseCacheKey';
+import { RequestVariableCacheKey } from './requestVariableCacheKey';
 
 export class HttpRequest {
     public constructor(
@@ -10,7 +10,7 @@ export class HttpRequest {
         public headers: { [key: string]: string },
         public body: string | Stream,
         public rawBody: string,
-        public responseCacheKey?: HttpResponseCacheKey) {
+        public requestVariableCacheKey?: RequestVariableCacheKey) {
     }
 
     public getRequestHeaderValue(name: string) {

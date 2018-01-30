@@ -1,15 +1,15 @@
 'use strict';
-import { ResponseProcessor } from "./responseProcessor"
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor"
 
 import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Position } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import { VariableProcessor } from './variableProcessor';
 import { VariableUtility } from './variableUtility';
 
-export class ResponseVariableHoverProvider implements HoverProvider {
+export class RequestVariableHoverProvider implements HoverProvider {
 
     public async provideHover(document: TextDocument, position: Position, token: CancellationToken): Promise<Hover> {
-        if (!VariableUtility.isResponseVariableReference(document, position)) {
+        if (!VariableUtility.isRequestVariableReference(document, position)) {
             return;
         }
 
@@ -17,13 +17,13 @@ export class ResponseVariableHoverProvider implements HoverProvider {
         const wordRange = document.getWordRangeAtPosition(position, /\w+(\[\d+\])*/);
         let lineRange = document.lineAt(position);
     
-        const fullPath = VariableUtility.getResponseVariablePath(wordRange, lineRange, position);
+        const fullPath = VariableUtility.getRequestVariablePath(wordRange, lineRange, position);
 
-        const fileResponseVariables = VariableProcessor.getResponseVariablesInFile(document);
-        for (let [variableName, response] of fileResponseVariables) {
+        const fileRequestVariables = VariableProcessor.getRequestVariablesInFile(document);
+        for (let [variableName, variableValue] of fileRequestVariables) {
             let regex = new RegExp(`(${variableName})($|\.|\[\d+\])`);            
             if (regex.test(fullPath)) {
-                const value = await ResponseProcessor.getValueAtPath(response, fullPath);
+                const value = await RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath);
 
                 let contents: MarkedString[] = [JSON.stringify(value), { language: 'http', value: `Response Variable ${variableName}` }];
                 return new Hover(contents, wordRange);

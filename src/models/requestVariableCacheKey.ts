@@ -1,6 +1,6 @@
 "use strict";
 
-export class HttpResponseCacheKey {
+export class RequestVariableCacheKey {
     public constructor(
         public key: string,
         public documentUri: string) {

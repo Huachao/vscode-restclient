@@ -1,5 +1,5 @@
 'use strict';
-import { ResponseProcessor } from "./responseProcessor"
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor"
 import { VariableProcessor } from "./variableProcessor"
 import { VariableUtility } from "./variableUtility"
 
@@ -7,24 +7,24 @@ import { CompletionItemProvider, TextDocument, Position, CancellationToken, Comp
 import { HttpElementFactory } from './httpElementFactory';
 import { ElementType } from './models/httpElement';
 
-export class ResponseVariableCompletionItemProvider implements CompletionItemProvider {
+export class RequestVariableCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
-        if (!VariableUtility.isPartialResponseVariableReference(document, position)) {
+        if (!VariableUtility.isPartialRequestVariableReference(document, position)) {
             return [];
         }
                 
         const wordRange = document.getWordRangeAtPosition(position);
         let lineRange = document.lineAt(position);
 
-        const fullPath = VariableUtility.getResponseVariablePath(wordRange, lineRange, position);
+        const fullPath = VariableUtility.getRequestVariablePath(wordRange, lineRange, position);
 
         let completionItems: CompletionItem[] = [];        
 
-        const fileResponseVariables = VariableProcessor.getResponseVariablesInFile(document);
-        for (let [variableName, response] of fileResponseVariables) {
+        const fileRequestVariables = VariableProcessor.getRequestVariablesInFile(document);
+        for (let [variableName, variableValue] of fileRequestVariables) {
             let regex = new RegExp(`(${variableName})($|\.|\[\d+\])`);          
             if (regex.test(fullPath)) {
-                const valueAtPath = ResponseProcessor.getValueAtPath(response, fullPath);
+                const valueAtPath = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath);
                 if (valueAtPath) {
                     let props = Object.getOwnPropertyNames(valueAtPath);
                     

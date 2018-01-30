@@ -2,7 +2,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import { VariableDiagnosticsProvider } from "./variableDiagnosticsProvider"
-import { ResponseVariableCompletionItemProvider } from "./responseVariableCompletionItemProvider"
+import { RequestVariableCompletionItemProvider } from "./requestVariableCompletionItemProvider"
 import { ExtensionContext, commands, languages, TextDocument, Range, Uri, workspace, window } from 'vscode';
 import { RequestController } from './controllers/requestController';
 import { HistoryController } from './controllers/historyController';
@@ -18,7 +18,7 @@ import { HttpCodeLensProvider } from './httpCodeLensProvider';
 import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
 import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
 import { RequestLines } from './models/requestLines';
-import { ResponseVariableHoverProvider } from './responseVariableHoverProvider';
+import { RequestVariableHoverProvider } from './requestVariableHoverProvider';
 import { VariableProcessor } from './variableProcessor';
 
 // this method is called when your extension is activated
@@ -51,9 +51,9 @@ export async function activate(context: ExtensionContext) {
         });
     }));
     context.subscriptions.push(languages.registerCompletionItemProvider('http', new HttpCompletionItemProvider()));
-    context.subscriptions.push(languages.registerCompletionItemProvider('http', new ResponseVariableCompletionItemProvider(), '.'));
+    context.subscriptions.push(languages.registerCompletionItemProvider('http', new RequestVariableCompletionItemProvider(), '.'));
     context.subscriptions.push(languages.registerHoverProvider('http', new CustomVariableHoverProvider()));
-    context.subscriptions.push(languages.registerHoverProvider('http', new ResponseVariableHoverProvider()));
+    context.subscriptions.push(languages.registerHoverProvider('http', new RequestVariableHoverProvider()));
     context.subscriptions.push(languages.registerCodeLensProvider('http', new HttpCodeLensProvider()));
     context.subscriptions.push(languages.registerCodeLensProvider('http', new CustomVariableReferencesCodeLensProvider()));
     context.subscriptions.push(languages.registerDocumentLinkProvider('http', new RequestBodyDocumentLinkProvider()));

@@ -124,9 +124,9 @@ export class HttpElementFactory {
         }
 
         // add response variables
-        let responseVariables = VariableProcessor.getResponseVariablesInCurrentFile();
-        for (let [variableName, response] of responseVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.ResponseVariable, '^\\s*[^@]', `Value: HttpResponse`, new SnippetString(`{{${variableName}}}`)));
+        let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile();
+        for (let [variableName, variableValue] of requestVariables) {
+            originalElements.push(new HttpElement(variableName, ElementType.RequestVariable, '^\\s*[^@]', `Value: HttpResponse`, new SnippetString(`{{${variableName}}}`)));
         }
 
         // add urls from history

@@ -2,7 +2,7 @@
 
 export enum VariableType {
     Custom,
-    Response,
+    Request,
     Global,
     Environment
 }

@@ -6,6 +6,6 @@ export class RequestLines {
     public constructor(
         public range: Range,
         public requestDocumentUri: string,
-        public reponseVar?: string) {
+        public requestVariable?: string) {
     }
 }

@@ -19,8 +19,9 @@ import { ResponseStore } from '../responseStore';
 import { Selector } from '../selector';
 import * as Constants from '../constants';
 import { EOL } from 'os';
-import { HttpResponseCacheKey } from "../models/httpResponseCacheKey";
-import { ResponseCache } from "../responseCache";
+import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
+import { RequestVariableCache } from "../requestVariableCache";
+import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
 
 const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();
@@ -84,8 +85,8 @@ export class RequestController {
             return;
         }
 
-        if (requestLines.reponseVar) {
-            httpRequest.responseCacheKey = new HttpResponseCacheKey(requestLines.reponseVar, requestLines.requestDocumentUri);
+        if (requestLines.requestVariable) {
+            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestLines.requestVariable, requestLines.requestDocumentUri);
         }
 
         await this.runCore(httpRequest);
@@ -142,8 +143,8 @@ export class RequestController {
 
             let previewUri = this.generatePreviewUri();
             ResponseStore.add(previewUri.toString(), response);
-            if (httpRequest.responseCacheKey) {
-                ResponseCache.add(httpRequest.responseCacheKey, response);
+            if (httpRequest.requestVariableCacheKey) {
+                RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
             }
 
             this._responseTextProvider.update(this._previewUri);

@@ -62,4 +62,4 @@ export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
 export const VariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.+)\s*$/;
 
-export const ResponseVariableDefinitionRegex: RegExp = /#.*\s+@name\s+(\w+).*/;
+export const RequestVariableDefinitionRegex: RegExp = /#.*\s+@name\s+(\w+).*/;

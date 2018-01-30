@@ -7,13 +7,14 @@ import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from "./constants"
 import { Func } from './common/delegates';
 import * as moment from "moment"
-import { ResponseCache } from "./responseCache";
-import { HttpResponseCacheKey } from "./models/httpResponseCacheKey";
-import { ResponseProcessor } from "./responseProcessor";
+import { RequestVariableCache } from "./requestVariableCache";
+import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { HttpClient } from './httpClient';
 import { HttpRequest } from './models/httpRequest';
 import { RestClientSettings } from './models/configurationSettings';
 import * as adal from 'adal-node';
+import { RequestVariableCacheValue } from "./models/requestVariableCacheValue";
 const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
 
@@ -53,18 +54,18 @@ export class VariableProcessor {
             }
         }
 
-        let responseVariables = VariableProcessor.getResponseVariablesInCurrentFile();
-        for (let [variableName, response] of responseVariables) {
+        let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile();
+        for (let [variableName, variableValue] of requestVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variableName}.*\\s*\\}\\}`, 'g');
             let matches = request.match(regex);
             if (matches && matches.length > 0) {
                 for (var i = 0; i < matches.length; i++) {
-                    var responseVar = matches[i].replace('{{', '').replace('}}', '');
+                    var requestVariable = matches[i].replace('{{', '').replace('}}', '');
                     try {
-                        const value = ResponseProcessor.getValueAtPath(response, responseVar);
-                        request = request.replace(new RegExp(`\\{\\{\\s*${responseVar}\\s*\\}\\}`, 'g'), value.toString());
+                        const value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
+                        request = request.replace(new RegExp(`\\{\\{\\s*${requestVariable}\\s*\\}\\}`, 'g'), value.toString());
                     } catch {
-                        window.showWarningMessage(`Could not merge in response variable. Is ${responseVar} the correct path?`)
+                        window.showWarningMessage(`Could not merge in response variable. Is ${requestVariable} the correct path?`)
                     }
                 }   
             }
@@ -394,26 +395,26 @@ export class VariableProcessor {
         return variables;
     }        
 
-    public static getResponseVariablesInCurrentFile(): Map<string, HttpResponse> {
+    public static getRequestVariablesInCurrentFile(): Map<string, RequestVariableCacheValue> {
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
-            return  new Map<string, HttpResponse>();
+            return  new Map<string, RequestVariableCacheValue>();
         }
 
-        return VariableProcessor.getResponseVariablesInFile(editor.document);
+        return VariableProcessor.getRequestVariablesInFile(editor.document);
     }
 
-    public static getResponseVariablesInFile(document: TextDocument): Map<string, HttpResponse> {
-        let variables = new Map<string, HttpResponse>();
+    public static getRequestVariablesInFile(document: TextDocument): Map<string, RequestVariableCacheValue> {
+        let variables = new Map<string, RequestVariableCacheValue>();
 
         let text = document.getText();
         let lines: string[] = text.split(/\r?\n/g);
         let documentUri = document.uri.toString();
         lines.forEach(line => {
             let match: RegExpExecArray;
-            if (match = Constants.ResponseVariableDefinitionRegex.exec(line)) {
+            if (match = Constants.RequestVariableDefinitionRegex.exec(line)) {
                 let key = match[1];
-                const response = ResponseCache.get(new HttpResponseCacheKey(key, documentUri));
+                const response = RequestVariableCache.get(new RequestVariableCacheKey(key, documentUri));
                 if (response) {
                     variables.set(key, response);
                 }
@@ -434,7 +435,7 @@ export class VariableProcessor {
     public static async getVariableDefinitionsInFile(document: TextDocument): Promise<Map<string, VariableType[]>> {
         let fileVariables = VariableProcessor.getCustomVariablesInFile(document);
         let environmentVariables = await EnvironmentController.getCustomVariables();
-        let responseVariables = VariableProcessor.getResponseVariablesInFile(document);
+        let requestVariables = VariableProcessor.getRequestVariablesInFile(document);
 
         let variableDefinitions = new Map<string, VariableType[]>();
         fileVariables.forEach((val, key) => {
@@ -451,13 +452,13 @@ export class VariableProcessor {
             }
         });
 
-        responseVariables.forEach((val, key) => {
+        requestVariables.forEach((val, key) => {
             if (variableDefinitions.has(key)) {
                 let types = variableDefinitions.get(key);
-                types.push(VariableType.Response);
+                types.push(VariableType.Request);
                 variableDefinitions.set(key, types);
             } else {
-                variableDefinitions.set(key, [ VariableType.Response ]);
+                variableDefinitions.set(key, [ VariableType.Request ]);
             }
         });
 

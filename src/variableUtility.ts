@@ -23,13 +23,13 @@ export class VariableUtility {
         return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
     }
 
-    public static isResponseVariableReference(document: TextDocument, position: Position): boolean {
+    public static isRequestVariableReference(document: TextDocument, position: Position): boolean {
         let wordRange = document.getWordRangeAtPosition(position, /(\w+)(\.\w+|\[\d+\])+/);
         let lineRange = document.lineAt(position);
         return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
     }
 
-    public static isPartialResponseVariableReference(document: TextDocument, position: Position): boolean {
+    public static isPartialRequestVariableReference(document: TextDocument, position: Position): boolean {
         let wordRange = document.getWordRangeAtPosition(position, /(\w+)(\.\w*|\[\d*\]?)+/);
         let lineRange = document.lineAt(position);
         return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
@@ -82,7 +82,7 @@ export class VariableUtility {
         return locations;
     }
     
-    public static getResponseVariablePath(wordRange: Range, lineRange: TextLine, position: Position) {
+    public static getRequestVariablePath(wordRange: Range, lineRange: TextLine, position: Position) {
         let index = position.character - 1;
         if (wordRange) {
             wordRange.start.character
