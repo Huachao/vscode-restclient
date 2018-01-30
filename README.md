@@ -502,6 +502,9 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.suppressResponseBodyContentTypeValidationWarning`: Suppress response body content type validation. (Default is __false__)
 * `rest-client.previewOption`: Response preview output option. Option details is described above. (Default is __full__)
 []()
+* `rest-client.disableHighlightResonseBodyForLargeResponse`: Controls whether to highlight response body for response whose size is larger than limit specified by `rest-client.largeResponseSizeLimitInMB`. (Default is __true__)
+* `rest-client.disableAddingHrefLinkForLargeResponse`: Controls whether to add href link in previewed response for response whose size is larger than limit specified by `rest-client.largeResponseSizeLimitInMB`. (Default is __true__)
+* `rest-client.largeResponseBodySizeLimitInMB`: Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when `rest-client.disableHighlightResonseBodyForLargeResponse` and/or `rest-client.disableAddingHrefLinkForLargeResponse` is set to true. (Default is __5__)
 
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 

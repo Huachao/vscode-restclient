@@ -1,3 +1,11 @@
+## 0.17.0 (2018/1/30)
+* __Feature__: [Add Azure Active Directory Support](https://github.com/Huachao/vscode-restclient/pulls/150)
+* __Feature__: [Highlight JSON/XML request body automatically](https://github.com/Huachao/vscode-restclient/issues/135)
+* __Feature__: [Add settings to disable response formatting and link recognition for large response](https://github.com/Huachao/vscode-restclient/issues/147)
+* __Improvement__: Refactor sending request body from specified file path logic
+* __Improvement__: Add _8443_ port as _https_ scheme indicator
+* __Improvement__: Support `--data-ascii` option in curl
+
 ## 0.16.2 (2017/12/22)
 * __Feature__: Add custom variable references codelens
 * __Bug Fix__: [In single line query string mode, continuous whitespaces were collapsed into one](https://github.com/Huachao/vscode-restclient/issues/143)
