@@ -17,6 +17,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Basic Auth
     - Digest Auth
     - SSL Client Certificates
+    - Azure Active Directory
 * Environments and custom/global system variables support
     - Use custom/global variables in any place of request(_URL_, _Headers_, _Body_)
     - Support both __environment__ and __file__ custom variables
@@ -218,9 +219,7 @@ Another icon in the upper right corner of the response preview tab is the `Save 
 ```
 
 ## Authentication
-We have supported some most common authentication schemes like _Basic Auth_, _Digest Auth_ and _SSL Client Certificates_.
-
-See Global Variables for information about built-in support for Azure Active Directory.
+We have supported some most common authentication schemes like _Basic Auth_, _Digest Auth_, _SSL Client Certificates_ and _Azure Active Directory(Azure AD)_.
 
 ### Basic Auth
 HTTP Basic Auth is a widely used protocol for simple username/password authentication. We support __two__ formats of Authorization header to use Basic Auth.
@@ -273,6 +272,9 @@ Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like
     }
 }
 ```
+
+### Azure Active Directory(Azure AD)
+Azure AD is Microsoft’s multi-tenant, cloud based directory and identity management service. [Michael Flanakin (@flanakin)](https://github.com/flanakin) implemented this feature, and for more details, please refer to the [Global Variables](#global-variables) section for more details.
 
 ## Generate Code Snippet
 ![Generate Code Snippet](images/code-snippet.gif)
@@ -409,7 +411,7 @@ X-Request-Id: {{token}}
 }
 ```
 
-#### Azure Active Directory samples
+#### Azure AD samples
 
 Pick a directory from a list or use the default directory for the account:
 
