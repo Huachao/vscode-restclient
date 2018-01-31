@@ -55,7 +55,7 @@ export class RequestVariableCacheValueProcessor {
             } else {
                 return RequestVariableCacheValueProcessor.resolveParts(
                     response, 
-                    parts.slice(3, parts.length)
+                    parts.slice(2, parts.length)
                 );
             }    
         } else {
