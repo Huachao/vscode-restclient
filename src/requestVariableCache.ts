@@ -2,6 +2,7 @@
 
 import { RequestVariableCacheKey } from "./models/requestVariableCacheKey"
 import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
+import { fireEvent } from "./events/requestVariableEvent";
 
 export class RequestVariableCache {
     private static cache: Map<string, RequestVariableCacheValue> = new Map<string, RequestVariableCacheValue>();
@@ -12,6 +13,7 @@ export class RequestVariableCache {
 
     public static add(cacheKey: RequestVariableCacheKey, value: RequestVariableCacheValue) {
         RequestVariableCache.cache.set(cacheKey.getCacheKey(), value);
+        fireEvent({ cacheKey });
     }
 
     public static get(cacheKey: RequestVariableCacheKey): RequestVariableCacheValue {

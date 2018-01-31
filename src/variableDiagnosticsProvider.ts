@@ -1,7 +1,10 @@
 'use strict';
 import { VariableProcessor } from "./variableProcessor"
 
-import { commands, workspace,languages, Diagnostic, DiagnosticSeverity, DiagnosticCollection, TextDocument, Range, Position, Disposable } from 'vscode';
+import { commands, workspace, languages, Diagnostic, DiagnosticSeverity, DiagnosticCollection, TextDocument, Range, Position, Disposable } from 'vscode';
+import { event } from "./events/requestVariableEvent";
+
+
 
 export class VariableDiagnosticsProvider {
 	
@@ -17,13 +20,21 @@ export class VariableDiagnosticsProvider {
         workspace.onDidSaveTextDocument(this.checkVariables, this, subscriptions);
 
 		// Check all open documents
-		workspace.textDocuments.forEach(this.checkVariables, this);
+        this.checkVariablesInAllTextDocuments();
+        
+        event(() => {
+            this.checkVariablesInAllTextDocuments();
+        })
     }
     
 	public dispose(): void {
 		this.diagnosticCollection.clear();
 		this.diagnosticCollection.dispose();
-	}
+    }
+    
+    public async checkVariablesInAllTextDocuments() {
+        workspace.textDocuments.forEach(this.checkVariables, this);
+    }
 
 	private async checkVariables(document: TextDocument) {
 		if (document.languageId !== 'http') {

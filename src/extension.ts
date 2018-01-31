@@ -20,6 +20,7 @@ import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
 import { RequestLines } from './models/requestLines';
 import { RequestVariableHoverProvider } from './requestVariableHoverProvider';
 import { VariableProcessor } from './variableProcessor';
+import { RequestVariableCache } from "./requestVariableCache";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -60,9 +61,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerDefinitionProvider('http', new CustomVariableDefinitionProvider()));
     context.subscriptions.push(languages.registerReferenceProvider('http', new CustomVariableReferenceProvider()));
     context.subscriptions.push(languages.registerDocumentSymbolProvider('http', new HttpDocumentSymbolProvider()));
-
-    let diagnostic = new VariableDiagnosticsProvider();	
-	diagnostic.activate(context.subscriptions);
+    new VariableDiagnosticsProvider().activate(context.subscriptions);
 }
 
 // this method is called when your extension is deactivated
