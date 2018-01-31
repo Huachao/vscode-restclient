@@ -211,8 +211,8 @@
 * __Bug Fix__: [Allow request without headers](https://github.com/Huachao/vscode-restclient/issues/32)
 
 ## 0.7.2 (2016/8/17)
-* __Improvement__: [Add loading icon in status bar](https://github.com/Huachao/vscode-restclient/issues/13)
 * __Feature__: Support comment shortcut, request body indentation and auto closing brackets
+* __Improvement__: [Add loading icon in status bar](https://github.com/Huachao/vscode-restclient/issues/13)
 
 ## 0.7.1 (2016/8/9)
 * __Bug Fix__: [Filter comments start with white spaces](https://github.com/Huachao/vscode-restclient/issues/28)
