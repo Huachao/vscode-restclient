@@ -123,6 +123,12 @@ export class HttpElementFactory {
             originalElements.push(new HttpElement(variableName, ElementType.FileCustomVariable, '^\\s*[^@]', `Value: ${variableValue}`, new SnippetString(`{{${variableName}}}`)));
         }
 
+        // add request variables
+        let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile();
+        for (let [variableName, variableValue] of requestVariables) {
+            originalElements.push(new HttpElement(variableName, ElementType.RequestVariable, '^\\s*[^@]', `Value: HttpResponse`, new SnippetString(`{{${variableName}}}`)));
+        }
+
         // add urls from history
         let historyItems = await PersistUtility.loadRequests();
         let distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));

@@ -1,4 +1,5 @@
 'use strict';
+import { RequestLines } from "./models/requestLines"
 
 import { CodeLensProvider, TextDocument, CancellationToken, CodeLens, Command, Range } from 'vscode';
 import { Selector } from './selector';
@@ -39,9 +40,14 @@ export class HttpCodeLensProvider implements CodeLensProvider {
             }
 
             if (blockStart <= blockEnd) {
+                let requestVariable = null;
+                if (blockStart > 0) {
+                    requestVariable = Selector.getRequestVariableDefinitionName(lines[blockStart-1]);
+                }
                 const range = new Range(blockStart, 0, blockEnd, 0);
+                const requestLines = new RequestLines(range, document.uri.toString(), requestVariable);
                 const cmd: Command = {
-                    arguments: [document, range],
+                    arguments: [document, requestLines],
                     title: 'Send Request',
                     command: 'rest-client.request'
                 };

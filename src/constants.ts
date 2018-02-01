@@ -61,3 +61,5 @@ export const AzureClouds = {
 export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
 export const VariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.+)\s*$/;
+
+export const RequestVariableDefinitionRegex: RegExp = /#.*\s+@name\s+(\w+).*/;

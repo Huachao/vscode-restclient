@@ -1,14 +1,20 @@
 'use strict';
+import { VariableType } from "./models/variableType"
+import { HttpResponse } from "./models/httpResponse"
 
-import { commands, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
+import { commands, QuickPickItem, QuickPickOptions, Uri, window, TextDocument } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
-import * as Constants from './constants';
+import * as Constants from "./constants"
 import { Func } from './common/delegates';
+import * as moment from "moment"
+import { RequestVariableCache } from "./requestVariableCache";
+import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { HttpClient } from './httpClient';
 import { HttpRequest } from './models/httpRequest';
 import { RestClientSettings } from './models/configurationSettings';
 import * as adal from 'adal-node';
-import * as moment from 'moment';
+import { RequestVariableCacheValue } from "./models/requestVariableCacheValue";
 const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
 
@@ -45,6 +51,23 @@ export class VariableProcessor {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, variableValue);
+            }
+        }
+
+        let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile();
+        for (let [variableName, variableValue] of requestVariables) {
+            let regex = new RegExp(`\\{\\{\\s*${variableName}.*\\s*\\}\\}`, 'g');
+            let matches = request.match(regex);
+            if (matches && matches.length > 0) {
+                for (var i = 0; i < matches.length; i++) {
+                    var requestVariable = matches[i].replace('{{', '').replace('}}', '');
+                    try {
+                        const value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
+                        request = request.replace(new RegExp(`\\{\\{\\s*${requestVariable}\\s*\\}\\}`, 'g'), value.toString());
+                    } catch {
+                        window.showWarningMessage(`Could not merge in request variable. Is ${requestVariable} the correct path?`)
+                    }
+                }   
             }
         }
 
@@ -332,14 +355,19 @@ export class VariableProcessor {
     }
 
     public static getCustomVariablesInCurrentFile(): Map<string, string> {
-        let variables = new Map<string, string>();
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
-            return variables;
+            return new Map<string, string>();
         }
 
-        let document = editor.document.getText();
-        let lines: string[] = document.split(/\r?\n/g);
+        return VariableProcessor.getCustomVariablesInFile(editor.document);
+    }
+
+    public static getCustomVariablesInFile(document: TextDocument): Map<string, string> {
+        let variables = new Map<string, string>();
+
+        let text = document.getText();
+        let lines: string[] = text.split(/\r?\n/g);
         lines.forEach(line => {
             let match: RegExpExecArray;
             if (match = Constants.VariableDefinitionRegex.exec(line)) {
@@ -365,5 +393,75 @@ export class VariableProcessor {
         });
 
         return variables;
+    }        
+
+    public static getRequestVariablesInCurrentFile(): Map<string, RequestVariableCacheValue> {
+        let editor = window.activeTextEditor;
+        if (!editor || !editor.document) {
+            return  new Map<string, RequestVariableCacheValue>();
+        }
+
+        return VariableProcessor.getRequestVariablesInFile(editor.document);
+    }
+
+    public static getRequestVariablesInFile(document: TextDocument): Map<string, RequestVariableCacheValue> {
+        let variables = new Map<string, RequestVariableCacheValue>();
+
+        let text = document.getText();
+        let lines: string[] = text.split(/\r?\n/g);
+        let documentUri = document.uri.toString();
+        lines.forEach(line => {
+            let match: RegExpExecArray;
+            if (match = Constants.RequestVariableDefinitionRegex.exec(line)) {
+                let key = match[1];
+                const response = RequestVariableCache.get(new RequestVariableCacheKey(key, documentUri));
+                if (response) {
+                    variables.set(key, response);
+                }
+            }
+        });
+
+        return variables;
+    }
+
+    public static async checkVariableDefinitionExists(document: TextDocument, variableNames: string[]): Promise<{ name: string, exists: boolean }[]> {
+        let definitions = await VariableProcessor.getVariableDefinitionsInFile(document);
+
+        return variableNames.map((name) => 
+            ({name, exists: definitions.has(name)})
+        );
+    }
+
+    public static async getVariableDefinitionsInFile(document: TextDocument): Promise<Map<string, VariableType[]>> {
+        let fileVariables = VariableProcessor.getCustomVariablesInFile(document);
+        let environmentVariables = await EnvironmentController.getCustomVariables();
+        let requestVariables = VariableProcessor.getRequestVariablesInFile(document);
+
+        let variableDefinitions = new Map<string, VariableType[]>();
+        fileVariables.forEach((val, key) => {
+            variableDefinitions.set(key, [ VariableType.Custom ]);
+        });
+
+        environmentVariables.forEach((val, key) => {
+            if (variableDefinitions.has(key)) {
+                let types = variableDefinitions.get(key);
+                types.push(VariableType.Environment);
+                variableDefinitions.set(key, types);
+            } else {
+                variableDefinitions.set(key, [ VariableType.Environment ]);
+            }
+        });
+
+        requestVariables.forEach((val, key) => {
+            if (variableDefinitions.has(key)) {
+                let types = variableDefinitions.get(key);
+                types.push(VariableType.Request);
+                variableDefinitions.set(key, types);
+            } else {
+                variableDefinitions.set(key, [ VariableType.Request ]);
+            }
+        });
+
+        return variableDefinitions;
     }
 }
