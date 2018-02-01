@@ -1,8 +1,6 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { VariableDiagnosticsProvider } from "./variableDiagnosticsProvider";
-import { RequestVariableCompletionItemProvider } from "./requestVariableCompletionItemProvider";
 import { ExtensionContext, commands, languages, TextDocument, Uri, workspace, window } from 'vscode';
 import { RequestController } from './controllers/requestController';
 import { HistoryController } from './controllers/historyController';
@@ -19,7 +17,9 @@ import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
 import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
 import { RequestLines } from './models/requestLines';
 import { RequestVariableHoverProvider } from './requestVariableHoverProvider';
+import { RequestVariableCompletionItemProvider } from "./requestVariableCompletionItemProvider";
 import { VariableProcessor } from './variableProcessor';
+import { VariableDiagnosticsProvider } from "./variableDiagnosticsProvider";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

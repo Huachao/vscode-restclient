@@ -1,10 +1,9 @@
 'use strict';
-import { VariableProcessor } from "./variableProcessor";
 
 import { workspace, languages, Diagnostic, DiagnosticSeverity, DiagnosticCollection, TextDocument, Range, Position, Disposable } from 'vscode';
+
 import { event } from "./events/requestVariableEvent";
-
-
+import { VariableProcessor } from "./variableProcessor";
 
 export class VariableDiagnosticsProvider {
 

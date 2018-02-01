@@ -1,8 +1,10 @@
 'use strict';
-import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
+
 import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Position, Range, TextLine } from 'vscode';
+
 import { VariableProcessor } from './variableProcessor';
 import { VariableUtility } from './variableUtility';
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 
 export class RequestVariableHoverProvider implements HoverProvider {
 

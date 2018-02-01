@@ -1,9 +1,10 @@
 'use strict';
+
+import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind, Range, TextLine } from 'vscode';
+
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { VariableProcessor } from "./variableProcessor";
 import { VariableUtility } from "./variableUtility";
-
-import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind, Range, TextLine } from 'vscode';
 
 export class RequestVariableCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {

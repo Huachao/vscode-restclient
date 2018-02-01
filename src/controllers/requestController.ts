@@ -1,5 +1,4 @@
 "use strict";
-import { RequestLines } from "../models/requestLines";
 import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -17,10 +16,12 @@ import { RequestStore } from '../requestStore';
 import { ResponseStore } from '../responseStore';
 import { Selector } from '../selector';
 import * as Constants from '../constants';
-import { EOL } from 'os';
+import { RequestLines } from "../models/requestLines";
 import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
 import { RequestVariableCache } from "../requestVariableCache";
 import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
+
+import { EOL } from 'os';
 
 const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();

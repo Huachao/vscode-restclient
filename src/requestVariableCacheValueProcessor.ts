@@ -1,9 +1,9 @@
 "use strict";
+import { window } from "vscode";
 
 import { MimeUtility } from "./mimeUtility";
 import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
 import { HttpResponse } from './models/httpResponse';
-import { window } from "vscode";
 
 const validPathRegex = new RegExp(/(\w+)(\.\w+|\[\d+\])*/);
 const partRegex = new RegExp(/(\w+)(\[\d+\])*/);

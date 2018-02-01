@@ -1,5 +1,4 @@
 'use strict';
-import { VariableType } from "./models/variableType";
 
 import { commands, QuickPickItem, QuickPickOptions, Uri, window, TextDocument } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
@@ -12,8 +11,9 @@ import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueP
 import { HttpClient } from './httpClient';
 import { HttpRequest } from './models/httpRequest';
 import { RestClientSettings } from './models/configurationSettings';
-import * as adal from 'adal-node';
 import { RequestVariableCacheValue } from "./models/requestVariableCacheValue";
+import { VariableType } from "./models/variableType";
+import * as adal from 'adal-node';
 const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
 
