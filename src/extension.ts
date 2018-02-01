@@ -1,7 +1,7 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext, commands, languages, TextDocument, Uri, workspace, window } from 'vscode';
+import { ExtensionContext, commands, languages, TextDocument, Range, Uri, workspace, window } from 'vscode';
 import { RequestController } from './controllers/requestController';
 import { HistoryController } from './controllers/historyController';
 import { ResponseController } from './controllers/responseController';
@@ -15,7 +15,6 @@ import { CustomVariableReferencesCodeLensProvider } from './customVariableRefere
 import { HttpCodeLensProvider } from './httpCodeLensProvider';
 import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
 import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
-import { RequestLines } from './models/requestLines';
 import { RequestVariableHoverProvider } from './requestVariableHoverProvider';
 import { RequestVariableCompletionItemProvider } from "./requestVariableCompletionItemProvider";
 import { VariableProcessor } from './variableProcessor';
@@ -33,7 +32,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(historyController);
     context.subscriptions.push(codeSnippetController);
     context.subscriptions.push(environmentController);
-    context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, requestLines: RequestLines) => requestController.run(requestLines))));
+    context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, range: Range) => requestController.run(range))));
     context.subscriptions.push(commands.registerCommand('rest-client.rerun-last-request', () => requestController.rerun()));
     context.subscriptions.push(commands.registerCommand('rest-client.cancel-request', () => requestController.cancel()));
     context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.save()));

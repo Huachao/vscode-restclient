@@ -2,7 +2,6 @@
 
 import { CodeLensProvider, TextDocument, CancellationToken, CodeLens, Command, Range } from 'vscode';
 import { Selector } from './selector';
-import { RequestLines } from "./models/requestLines";
 
 export class HttpCodeLensProvider implements CodeLensProvider {
     public provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {
@@ -40,14 +39,9 @@ export class HttpCodeLensProvider implements CodeLensProvider {
             }
 
             if (blockStart <= blockEnd) {
-                let requestVariable = null;
-                if (blockStart > 0) {
-                    requestVariable = Selector.getRequestVariableDefinitionName(lines[blockStart - 1]);
-                }
                 const range = new Range(blockStart, 0, blockEnd, 0);
-                const requestLines = new RequestLines(range, document.uri.toString(), requestVariable);
                 const cmd: Command = {
-                    arguments: [document, requestLines],
+                    arguments: [document, range],
                     title: 'Send Request',
                     command: 'rest-client.request'
                 };

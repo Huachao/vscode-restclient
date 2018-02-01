@@ -1,5 +1,6 @@
 "use strict";
-import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument } from 'vscode';
+
+import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument, Range } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
@@ -16,7 +17,6 @@ import { RequestStore } from '../requestStore';
 import { ResponseStore } from '../responseStore';
 import { Selector } from '../selector';
 import * as Constants from '../constants';
-import { RequestLines } from "../models/requestLines";
 import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
 import { RequestVariableCache } from "../requestVariableCache";
 import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
@@ -53,17 +53,21 @@ export class RequestController {
     }
 
     @trace('Request')
-    public async run(requestLines: RequestLines) {
+    public async run(range: Range) {
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return;
         }
 
+        const selector = new Selector();
+
         // Get selected text of selected lines or full document
-        let selectedText = new Selector().getSelectedText(editor, requestLines.range);
+        let selectedText = selector.getSelectedText(editor, range);
         if (!selectedText) {
             return;
         }
+
+        const requestVariable = selector.getRequestVariableForSelectedText(editor, range);
 
         // remove comment lines
         let lines: string[] = selectedText.split(/\r?\n/g);
@@ -85,8 +89,8 @@ export class RequestController {
             return;
         }
 
-        if (requestLines.requestVariable) {
-            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestLines.requestVariable, requestLines.requestDocumentUri);
+        if (requestVariable) {
+            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, editor.document.uri.toString());
         }
 
         await this.runCore(httpRequest);
