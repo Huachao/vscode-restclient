@@ -1,6 +1,5 @@
 'use strict';
-import { VariableUtility } from "./variableUtility"
-
+import { VariableUtility } from "./variableUtility";
 import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind } from 'vscode';
 import { HttpElementFactory } from './httpElementFactory';
 import { ElementType } from './models/httpElement';

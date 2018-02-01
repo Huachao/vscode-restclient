@@ -1,7 +1,6 @@
 "use strict";
-import { RequestLines } from "../models/requestLines"
-
-import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument, Range } from 'vscode';
+import { RequestLines } from "../models/requestLines";
+import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';

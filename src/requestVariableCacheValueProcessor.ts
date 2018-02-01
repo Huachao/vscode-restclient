@@ -1,31 +1,33 @@
 "use strict";
 
-import { MimeUtility } from "./mimeUtility"
+import { MimeUtility } from "./mimeUtility";
 import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
 import { HttpResponse } from './models/httpResponse';
 import { window } from "vscode";
 
-const validPathRegex = new RegExp(/(\w+)(\.\w+|\[\d+\])*/)
-const partRegex = new RegExp(/(\w+)(\[\d+\])*/)
-const arrayIndexRegex = new RegExp(/\[(\d+)\]/)
+const validPathRegex = new RegExp(/(\w+)(\.\w+|\[\d+\])*/);
+const partRegex = new RegExp(/(\w+)(\[\d+\])*/);
+const arrayIndexRegex = new RegExp(/\[(\d+)\]/);
 
 export class RequestVariableCacheValueProcessor {
     public static getValueAtPath(value: RequestVariableCacheValue, path: string): any {
-        if (!value 
-            || !path 
-            || !RequestVariableCacheValueProcessor.isValidPath(path)) {
-            return undefined;            
+        if (!value
+            || !path
+            || !RequestVariableCacheValueProcessor.isValidPath(path)) {
+            return undefined;
         }
 
         const parts = path.split(".");
-        
+
         // Expect first part to be variable name
-        if (parts.length === 1) return value;
+        if (parts.length === 1) {
+            return value;
+        }
 
         switch (parts[1]) {
             case "request":
                 return RequestVariableCacheValueProcessor.resolveParts(
-                    value.request, 
+                    value.request,
                     parts.slice(2, parts.length)
                 );
             case "response":
@@ -38,7 +40,7 @@ export class RequestVariableCacheValueProcessor {
 
     private static resolveResponse(response: HttpResponse, parts: string[]) {
         if (parts.length >= 3) {
-            var matches = parts[2].match(partRegex);
+            const matches = parts[2].match(partRegex);
             // Must parse body specifically
             if (matches[1] === "body") {
                 let bodyValue = RequestVariableCacheValueProcessor.parseResponseBody(response);
@@ -49,15 +51,15 @@ export class RequestVariableCacheValueProcessor {
                     }
                 }
                 return RequestVariableCacheValueProcessor.resolveParts(
-                    bodyValue, 
+                    bodyValue,
                     parts.slice(3, parts.length)
                 );
             } else {
                 return RequestVariableCacheValueProcessor.resolveParts(
-                    response, 
+                    response,
                     parts.slice(2, parts.length)
                 );
-            }    
+            }
         } else {
             return response;
         }
@@ -86,7 +88,7 @@ export class RequestVariableCacheValueProcessor {
 
     public static parseResponseBody(response: HttpResponse) {
         const {body} = response;
-        const contentType = response.getResponseHeaderValue("content-type")
+        const contentType = response.getResponseHeaderValue("content-type");
         if (contentType) {
             let mime = MimeUtility.parse(contentType);
             let type = mime.type;

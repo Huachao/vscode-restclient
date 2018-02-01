@@ -125,7 +125,7 @@ export class HttpElementFactory {
 
         // add request variables
         let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile();
-        for (let [variableName, variableValue] of requestVariables) {
+        for (let [variableName] of requestVariables) {
             originalElements.push(new HttpElement(variableName, ElementType.RequestVariable, '^\\s*[^@]', `Value: HttpResponse`, new SnippetString(`{{${variableName}}}`)));
         }
 

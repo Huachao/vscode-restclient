@@ -1,12 +1,11 @@
 'use strict';
-import { VariableType } from "./models/variableType"
-import { HttpResponse } from "./models/httpResponse"
+import { VariableType } from "./models/variableType";
 
 import { commands, QuickPickItem, QuickPickOptions, Uri, window, TextDocument } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
-import * as Constants from "./constants"
+import * as Constants from "./constants";
 import { Func } from './common/delegates';
-import * as moment from "moment"
+import * as moment from "moment";
 import { RequestVariableCache } from "./requestVariableCache";
 import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
@@ -59,15 +58,15 @@ export class VariableProcessor {
             let regex = new RegExp(`\\{\\{\\s*${variableName}.*\\s*\\}\\}`, 'g');
             let matches = request.match(regex);
             if (matches && matches.length > 0) {
-                for (var i = 0; i < matches.length; i++) {
-                    var requestVariable = matches[i].replace('{{', '').replace('}}', '');
+                for (let i = 0; i < matches.length; i++) {
+                    const requestVariable = matches[i].replace('{{', '').replace('}}', '');
                     try {
                         const value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
                         request = request.replace(new RegExp(`\\{\\{\\s*${requestVariable}\\s*\\}\\}`, 'g'), value.toString());
                     } catch {
-                        window.showWarningMessage(`Could not merge in request variable. Is ${requestVariable} the correct path?`)
+                        window.showWarningMessage(`Could not merge in request variable. Is ${requestVariable} the correct path?`);
                     }
-                }   
+                }
             }
         }
 
@@ -393,7 +392,7 @@ export class VariableProcessor {
         });
 
         return variables;
-    }        
+    }
 
     public static getRequestVariablesInCurrentFile(): Map<string, RequestVariableCacheValue> {
         let editor = window.activeTextEditor;
@@ -427,7 +426,7 @@ export class VariableProcessor {
     public static async checkVariableDefinitionExists(document: TextDocument, variableNames: string[]): Promise<{ name: string, exists: boolean }[]> {
         let definitions = await VariableProcessor.getVariableDefinitionsInFile(document);
 
-        return variableNames.map((name) => 
+        return variableNames.map((name) =>
             ({name, exists: definitions.has(name)})
         );
     }

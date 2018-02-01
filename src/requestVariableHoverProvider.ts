@@ -1,8 +1,6 @@
 'use strict';
-import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor"
-
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Position, Range, TextLine } from 'vscode';
-import { EnvironmentController } from './controllers/environmentController';
 import { VariableProcessor } from './variableProcessor';
 import { VariableUtility } from './variableUtility';
 
@@ -16,12 +14,12 @@ export class RequestVariableHoverProvider implements HoverProvider {
         // Lookup word + optional array path
         const wordRange = document.getWordRangeAtPosition(position, /\w+(\[\d+\])*/);
         let lineRange = document.lineAt(position);
-    
+
         const fullPath = this.getRequestVariableHoverPath(wordRange, lineRange, position);
 
         const fileRequestVariables = VariableProcessor.getRequestVariablesInFile(document);
         for (let [variableName, variableValue] of fileRequestVariables) {
-            let regex = new RegExp(`(${variableName})($|\.|\[\d+\])`);            
+            let regex = new RegExp(`(${variableName})($|\.|\[\d+\])`);
             if (regex.test(fullPath)) {
                 const value = await RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath);
 
@@ -38,10 +36,11 @@ export class RequestVariableHoverProvider implements HoverProvider {
         let index = position.character - 1;
         // Look behind for start of variable
         for (; index >= 0; index--) {
-            if (lineRange.text[index-1] === "{" && lineRange.text[index-2] === "{") 
+            if (lineRange.text[index - 1] === "{" && lineRange.text[index - 2] === "{") {
                 break;
+            }
         }
 
-        return lineRange.text.substring(index, wordRange ? wordRange.end.character : position.character - 1)
+        return lineRange.text.substring(index, wordRange ? wordRange.end.character : position.character - 1);
     }
 }

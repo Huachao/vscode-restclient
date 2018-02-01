@@ -1,6 +1,6 @@
 "use strict";
 
-import { RequestVariableCacheKey } from "./models/requestVariableCacheKey"
+import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
 import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
 import { fireEvent } from "./events/requestVariableEvent";
 

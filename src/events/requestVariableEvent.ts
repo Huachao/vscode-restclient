@@ -1,4 +1,4 @@
-import { Event, EventEmitter } from "vscode";
+import { EventEmitter } from "vscode";
 import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
 
 interface RequestVariableEvent {
