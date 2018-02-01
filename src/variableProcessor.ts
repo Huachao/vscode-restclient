@@ -62,7 +62,8 @@ export class VariableProcessor {
                     const requestVariable = matches[i].replace('{{', '').replace('}}', '');
                     try {
                         const value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
-                        request = request.replace(new RegExp(`\\{\\{\\s*${requestVariable}\\s*\\}\\}`, 'g'), value.toString());
+                        const escapedVariable = requestVariable.replace("[", "\\[").replace("]", "\\]");
+                        request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), value.toString());
                     } catch {
                         window.showWarningMessage(`Could not merge in request variable. Is ${requestVariable} the correct path?`);
                     }
