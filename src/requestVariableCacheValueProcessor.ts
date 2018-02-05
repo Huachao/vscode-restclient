@@ -24,23 +24,27 @@ export class RequestVariableCacheValueProcessor {
             return value;
         }
 
-        switch (parts[1]) {
+        const [name, type, ...rest] = parts;
+
+        switch (type) {
             case "request":
                 return RequestVariableCacheValueProcessor.resolveParts(
                     value.request,
-                    parts.slice(2, parts.length)
+                    rest
                 );
             case "response":
-                const { response } = value;
-                return RequestVariableCacheValueProcessor.resolveResponse(response, parts);
+                return RequestVariableCacheValueProcessor.resolveResponse(
+                    value.response, 
+                    rest
+                );
             default:
                 return undefined;
         }
     }
 
-    private static resolveResponse(response: HttpResponse, parts: string[]) {
-        if (parts.length >= 3) {
-            const matches = parts[2].match(partRegex);
+    private static resolveResponse(response: HttpResponse, responseParts: string[]) {
+        if (responseParts.length > 0) {
+            const matches = responseParts[0].match(partRegex);
             // Must parse body specifically
             if (matches[1] === "body") {
                 let bodyValue = RequestVariableCacheValueProcessor.parseResponseBody(response);
@@ -50,14 +54,15 @@ export class RequestVariableCacheValueProcessor {
                         bodyValue = bodyValue[matches[j].match(arrayIndexRegex)[1]];
                     }
                 }
+                const [body, ...bodyParts]  = responseParts;
                 return RequestVariableCacheValueProcessor.resolveParts(
                     bodyValue,
-                    parts.slice(3, parts.length)
+                    bodyParts
                 );
             } else {
                 return RequestVariableCacheValueProcessor.resolveParts(
                     response,
-                    parts.slice(2, parts.length)
+                    responseParts
                 );
             }
         } else {
