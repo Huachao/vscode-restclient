@@ -1,41 +1,35 @@
 'use strict';
 
-import { workspace, languages, Diagnostic, DiagnosticSeverity, DiagnosticCollection, TextDocument, Range, Position, Disposable } from 'vscode';
+import { workspace, languages, Diagnostic, DiagnosticSeverity, DiagnosticCollection, TextDocument, Range, Position } from 'vscode';
 
-import { event } from "./events/requestVariableEvent";
+import { OnRequestVariableEvent } from "./events/requestVariableEvent";
 import { VariableProcessor } from "./variableProcessor";
 
 export class VariableDiagnosticsProvider {
+    private httpDiagnosticCollection: DiagnosticCollection;
 
-    private diagnosticCollection: DiagnosticCollection;
+    constructor() {
+        this.httpDiagnosticCollection = languages.createDiagnosticCollection();
 
-    public activate(subscriptions: Disposable[]) {
-        this.diagnosticCollection = languages.createDiagnosticCollection();
-
-        workspace.onDidOpenTextDocument(this.checkVariables, this, subscriptions);
-        workspace.onDidCloseTextDocument((textDocument) => {
-            this.diagnosticCollection.delete(textDocument.uri);
-        }, null, subscriptions);
-        workspace.onDidSaveTextDocument(this.checkVariables, this, subscriptions);
-
-        // Check all open documents
         this.checkVariablesInAllTextDocuments();
 
-        event(() => {
-            this.checkVariablesInAllTextDocuments();
-        });
+        OnRequestVariableEvent(this.checkVariablesInAllTextDocuments);
     }
 
     public dispose(): void {
-        this.diagnosticCollection.clear();
-        this.diagnosticCollection.dispose();
+        this.httpDiagnosticCollection.clear();
+        this.httpDiagnosticCollection.dispose();
     }
 
-    public async checkVariablesInAllTextDocuments() {
+    public deleteDocumentFromDiagnosticCollection(textDocument: TextDocument) {
+        this.httpDiagnosticCollection.delete(textDocument.uri);
+    }
+
+    public checkVariablesInAllTextDocuments() {
         workspace.textDocuments.forEach(this.checkVariables, this);
     }
 
-    private async checkVariables(document: TextDocument) {
+    public async checkVariables(document: TextDocument) {
         if (document.languageId !== 'http') {
             return;
         }
@@ -51,23 +45,23 @@ export class VariableDiagnosticsProvider {
 
         let existArray = await VariableProcessor.checkVariableDefinitionExists(document, varNames);
 
-        existArray.forEach((ea) => {
-            if (!ea.exists) {
+        existArray.forEach(({name, exists}) => {
+            if (!exists) {
                 vars.forEach((v) => {
-                    if (v.variableName === ea.name) {
+                    if (v.variableName === name) {
                         diagnostics.push({
                             severity: DiagnosticSeverity.Error,
                             range: new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
                             message: `${v.variableName} is not loaded in memory`,
-                            source: 'ex',
-                            code: "10",
+                            source: 'http',
+                            code: 0,
                         });
                     }
                 });
             }
         });
 
-        this.diagnosticCollection.set(document.uri, diagnostics);
+        this.httpDiagnosticCollection.set(document.uri, diagnostics);
     }
 
     private findVariables(document: TextDocument) : Variable[] {

@@ -24,7 +24,7 @@ export class RequestVariableCacheValueProcessor {
             return value;
         }
 
-        const [name, type, ...rest] = parts;
+        const [, type, ...rest] = parts;
 
         switch (type) {
             case "request":
@@ -34,7 +34,7 @@ export class RequestVariableCacheValueProcessor {
                 );
             case "response":
                 return RequestVariableCacheValueProcessor.resolveResponse(
-                    value.response, 
+                    value.response,
                     rest
                 );
             default:
@@ -54,7 +54,7 @@ export class RequestVariableCacheValueProcessor {
                         bodyValue = bodyValue[matches[j].match(arrayIndexRegex)[1]];
                     }
                 }
-                const [body, ...bodyParts]  = responseParts;
+                const [, ...bodyParts]  = responseParts;
                 return RequestVariableCacheValueProcessor.resolveParts(
                     bodyValue,
                     bodyParts
