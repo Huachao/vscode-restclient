@@ -4,13 +4,13 @@ import { Stream } from 'stream';
 import { RequestVariableCacheKey } from './requestVariableCacheKey';
 
 export class HttpRequest {
+    public requestVariableCacheKey?: RequestVariableCacheKey;
     public constructor(
         public method: string,
         public url: string,
         public headers: { [key: string]: string },
         public body: string | Stream,
-        public rawBody: string,
-        public requestVariableCacheKey?: RequestVariableCacheKey) {
+        public rawBody: string) {
     }
 
     public getRequestHeaderValue(name: string) {
