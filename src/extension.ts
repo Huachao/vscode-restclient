@@ -61,11 +61,11 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerDocumentSymbolProvider('http', new HttpDocumentSymbolProvider()));
 
     const diagnosticsProviders = new VariableDiagnosticsProvider();
-    workspace.onDidOpenTextDocument(diagnosticsProviders.checkVariables, this, context.subscriptions);
+    workspace.onDidOpenTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
     workspace.onDidCloseTextDocument((textDocument) => {
         diagnosticsProviders.deleteDocumentFromDiagnosticCollection(textDocument);
     }, null, context.subscriptions);
-    workspace.onDidSaveTextDocument(diagnosticsProviders.checkVariables, this, context.subscriptions);
+    workspace.onDidSaveTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
 }
 
 // this method is called when your extension is deactivated
