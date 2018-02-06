@@ -13,7 +13,7 @@ export class VariableDiagnosticsProvider {
 
         this.checkVariablesInAllTextDocuments();
 
-        OnRequestVariableEvent(this.checkVariablesInAllTextDocuments);
+        OnRequestVariableEvent(() => this.checkVariablesInAllTextDocuments());
     }
 
     public dispose(): void {
@@ -38,14 +38,14 @@ export class VariableDiagnosticsProvider {
 
         let vars = this.findVariables(document);
 
-        let varNames = vars.map((v) => v.variableName.split(".")[0].split("[")[0]);
+        let varNames = vars.map((v) => v.variableName);
 
         // Distinct varNames
         varNames = Array.from(new Set(varNames));
 
         let existArray = await VariableProcessor.checkVariableDefinitionExists(document, varNames);
 
-        existArray.forEach(({name, exists}) => {
+        existArray.forEach(({ name, exists }) => {
             if (!exists) {
                 vars.forEach((v) => {
                     if (v.variableName === name) {
@@ -64,7 +64,7 @@ export class VariableDiagnosticsProvider {
         this.httpDiagnosticCollection.set(document.uri, diagnostics);
     }
 
-    private findVariables(document: TextDocument) : Variable[] {
+    private findVariables(document: TextDocument): Variable[] {
         let vars: Variable[] = [];
         let lines = document.getText().split(/\r?\n/g);
         let pattern = /\{\{(\w+)(\.\w+|\[\d+\])*\}\}/;
