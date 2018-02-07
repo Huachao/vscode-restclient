@@ -67,7 +67,7 @@ export class VariableDiagnosticsProvider {
     private findVariables(document: TextDocument): Variable[] {
         let vars: Variable[] = [];
         let lines = document.getText().split(/\r?\n/g);
-        let pattern = /\{\{(\w+)(\.\w+|\[\d+\])*\}\}/;
+        let pattern = /\{\{(\w+)(\..*?)*\}\}/;
         lines.forEach((line, i) => {
             let match: RegExpExecArray;
             let currentIndex = 0;

@@ -444,9 +444,7 @@ export class VariableProcessor {
 
         environmentVariables.forEach((val, key) => {
             if (variableDefinitions.has(key)) {
-                let types = variableDefinitions.get(key);
-                types.push(VariableType.Environment);
-                variableDefinitions.set(key, types);
+                variableDefinitions.get(key).push(VariableType.Environment);
             } else {
                 variableDefinitions.set(key, [ VariableType.Environment ]);
             }
@@ -454,9 +452,7 @@ export class VariableProcessor {
 
         requestVariables.forEach((val, key) => {
             if (variableDefinitions.has(key)) {
-                let types = variableDefinitions.get(key);
-                types.push(VariableType.Request);
-                variableDefinitions.set(key, types);
+                variableDefinitions.get(key).push(VariableType.Request);
             } else {
                 variableDefinitions.set(key, [ VariableType.Request ]);
             }
