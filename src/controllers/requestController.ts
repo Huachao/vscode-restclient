@@ -18,6 +18,24 @@ import { ResponseStore } from '../responseStore';
 import { Selector } from '../selector';
 import * as Constants from '../constants';
 import { EOL } from 'os';
+import * as Path from 'path';
+import { glob, readFile } from "../common/fsUtility";
+import { runRequestScript } from "../scriptUtility";
+import { toHttpString } from "../common/valueUtility";
+import { isNil } from "lodash";
+import * as Enumerable from 'node-enumerable';
+
+interface RunCoreOptions {
+    openResponse?: boolean;
+    responseResolver?: (err: any, response: HttpResponse) => void;
+    showErrors?: boolean;
+}
+
+interface StringDocument {
+    file: string;
+    text: string;
+}
+
 
 const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();
@@ -48,6 +66,47 @@ export class RequestController {
         workspace.onDidCloseTextDocument((params) => this.onDidCloseTextDocument(params));
     }
 
+    private async createHttpRequestFromActiveTextEditor(range: Range) {
+        let editor = window.activeTextEditor;
+        if (!editor || !editor.document) {
+            return;
+        }
+
+        // Get selected text of selected lines or full document
+        let selectedText = new Selector().getSelectedText(editor, range);
+        if (!selectedText) {
+            return;
+        }
+
+        selectedText = await this.parseTextForRequest(selectedText);
+
+        // parse http request
+        return new RequestParserFactory().createRequestParser(selectedText)
+                                         .parseHttpRequest(selectedText, editor.document.fileName);
+    }
+
+    private async parseTextForRequest(text: string) {
+        if (!text) {
+            return text;
+        }
+
+        // remove comment lines
+        let lines: string[] = text.split(/\r?\n/g);
+        text = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
+        if ('' === text) {
+            return text;
+        }
+
+        const BASE_TEXT = text;
+
+        // remove file variables definition lines
+        lines = text.split(/\r?\n/g);
+        text = ArrayUtility.skipWhile(lines, l => Constants.VariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
+
+        // variables replacement
+        return await VariableProcessor.processRawRequest(text, BASE_TEXT);
+    }
+
     @trace('Request')
     public async run(range: Range) {
         let editor = window.activeTextEditor;
@@ -61,19 +120,7 @@ export class RequestController {
             return;
         }
 
-        // remove comment lines
-        let lines: string[] = selectedText.split(/\r?\n/g);
-        selectedText = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
-        if (selectedText === '') {
-            return;
-        }
-
-        // remove file variables definition lines
-        lines = selectedText.split(/\r?\n/g);
-        selectedText = ArrayUtility.skipWhile(lines, l => Constants.VariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
-
-        // variables replacement
-        selectedText = await VariableProcessor.processRawRequest(selectedText);
+        selectedText = await this.parseTextForRequest(selectedText);
 
         // parse http request
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
@@ -82,6 +129,127 @@ export class RequestController {
         }
 
         await this.runCore(httpRequest);
+    }
+
+    @trace('Request Script')
+    public async runScript(range: Range) {
+        try {
+            const SCRIPT_EDITOR = window.activeTextEditor;
+            if (!SCRIPT_EDITOR || !SCRIPT_EDITOR.document) {
+                return;
+            }
+
+            const WORKSPACES = workspace.workspaceFolders;
+            const REQUEST_DOCUMENTS: StringDocument[] = [];
+
+            if (WORKSPACES) {
+                const FILES: string[] = [];
+                for (const WS of WORKSPACES) {
+                    const MATCHES = (await glob('**/*.{http,rest}', {
+                        absolute: true,
+                        nocase: true,
+                        nodir: true,
+                        nosort: true,
+                        cwd: WS.uri.fsPath,
+                        root: WS.uri.fsPath,
+                    })).forEach(m => FILES.push(m));
+                }
+
+                for (const F of Enumerable.from(FILES).distinct()) {
+                    REQUEST_DOCUMENTS.push({
+                        file: F,
+                        text: (await readFile(F)).toString('ascii'),
+                    });
+                }
+            }
+
+            let quickPickItems = REQUEST_DOCUMENTS.map(doc => {
+                return {
+                    label: Path.basename(doc.file),
+                    description: '',
+                    detail: Path.dirname(doc.file),
+                    document: doc,
+                };
+            });
+            quickPickItems = Enumerable.from(quickPickItems).orderBy(qp => {
+                return qp.label.toLowerCase().trim();
+            }).thenBy(qp => {
+                return qp.detail.toLowerCase().trim();
+            }).toArray();
+
+            if (quickPickItems.length < 1) {
+                window.showWarningMessage(
+                    'No requests found!'
+                );
+
+                return;
+            }
+
+            const SELECTED_QP_ITEM = await window.showQuickPick(quickPickItems, {
+                placeHolder: 'Select the request file, the script should be run for ...',
+            });
+
+            let selectedRequestDocument: StringDocument;
+
+            if (SELECTED_QP_ITEM) {
+                selectedRequestDocument = SELECTED_QP_ITEM.document;
+            }
+
+            if (!selectedRequestDocument) {
+                return;
+            }
+
+            const SCRIPT = SCRIPT_EDITOR.document.getText(range);
+            const SCRIPT_FILE = SCRIPT_EDITOR.document.fileName;
+            const REQUEST_FILE = selectedRequestDocument.file;
+            const REQUEST_DIR = Path.dirname(REQUEST_FILE);
+            const UNPARSED_REQUEST = selectedRequestDocument.text;
+
+            await runRequestScript({
+                buildRequest: async (opts) => {
+                    const VARS = opts.vars || {};                
+
+                    let parsedRequest = UNPARSED_REQUEST;
+                    for (const VAR_NAME in VARS) {
+                        const VALUE = toHttpString(VARS[VAR_NAME]);
+
+                        parsedRequest = '@' + `${VAR_NAME} = ${VALUE}\n\n` + parsedRequest;
+                    }
+                    parsedRequest += "\n";
+
+                    parsedRequest = await this.parseTextForRequest(parsedRequest);
+
+                    return new RequestParserFactory().createRequestParser(parsedRequest)
+                                                     .parseHttpRequest(parsedRequest, REQUEST_FILE);
+                },
+                cwd: REQUEST_DIR,
+                requestFile: REQUEST_FILE,
+                run: async (opts) => {
+                    let response: HttpResponse;
+
+                    await this.runCore(opts.request, {
+                        openResponse: false,
+                        responseResolver: (err, resp) => {
+                            if (err) {
+                                throw err;
+                            }
+                            else {
+                                response = resp;
+                            }
+                        },
+                        showErrors: false,
+                    });
+
+                    return response;
+                },                
+                script: SCRIPT,
+                scriptFile: SCRIPT_FILE,
+                uuid: uuid,
+            });
+        }
+        catch (e) {
+            window.showErrorMessage(`Could not execute script: '${e}'`);
+        }
     }
 
     @trace('Rerun Request')
@@ -111,7 +279,16 @@ export class RequestController {
         this._durationStatusBarItem.tooltip = null;
     }
 
-    private async runCore(httpRequest: HttpRequest) {
+    private async runCore(httpRequest: HttpRequest, opts?: RunCoreOptions) {
+        if (!opts) {
+            opts = {};
+        }
+
+        let showErrors = true;
+        if (!isNil(opts.showErrors)) {
+            showErrors = opts.showErrors;
+        }
+
         let requestId = uuid.v4();
         RequestStore.add(<string>requestId, httpRequest);
 
@@ -119,8 +296,10 @@ export class RequestController {
         this.setSendingProgressStatusText();
 
         // set http request
+        let err: any;
+        let response: HttpResponse;
         try {
-            let response = await this._httpClient.send(httpRequest);
+            response = await this._httpClient.send(httpRequest);
 
             // check cancel
             if (RequestStore.isCancelled(<string>requestId)) {
@@ -133,31 +312,42 @@ export class RequestController {
             this.formatSizeStatusBar(response);
             this._sizeStatusBarItem.show();
 
-            let previewUri = this.generatePreviewUri();
-            ResponseStore.add(previewUri.toString(), response);
+            let showResponse = true;
+            if (!isNil(opts.openResponse)) {
+                showResponse = opts.openResponse;
+            }
 
-            this._responseTextProvider.update(this._previewUri);
+            if (showResponse) {
+                let previewUri = this.generatePreviewUri();
+                ResponseStore.add(previewUri.toString(), response);
 
-            try {
-                if (this._restClientSettings.previewResponseInUntitledDocument) {
-                    UntitledFileContentProvider.createHttpResponseUntitledFile(
-                        response,
-                        this._restClientSettings.showResponseInDifferentTab,
-                        this._restClientSettings.previewResponseSetUntitledDocumentLanguageByContentType,
-                        this._restClientSettings.includeAdditionalInfoInResponse,
-                        this._restClientSettings.suppressResponseBodyContentTypeValidationWarning
-                    );
-                } else {
-                    await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`);
+                this._responseTextProvider.update(this._previewUri);
+
+                try {
+                    if (this._restClientSettings.previewResponseInUntitledDocument) {
+                        UntitledFileContentProvider.createHttpResponseUntitledFile(
+                            response,
+                            this._restClientSettings.showResponseInDifferentTab,
+                            this._restClientSettings.previewResponseSetUntitledDocumentLanguageByContentType,
+                            this._restClientSettings.includeAdditionalInfoInResponse,
+                            this._restClientSettings.suppressResponseBodyContentTypeValidationWarning
+                        );
+                    } else {
+                        await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`);
+                    }
+                } catch (reason) {
+                    if (showErrors) {
+                        window.showErrorMessage(reason);
+                    }
                 }
-            } catch (reason) {
-                window.showErrorMessage(reason);
             }
 
             // persist to history json file
             let serializedRequest = SerializedHttpRequest.convertFromHttpRequest(httpRequest);
             await PersistUtility.saveRequest(serializedRequest);
         } catch (error) {
+            err = error;
+
             // check cancel
             if (RequestStore.isCancelled(<string>requestId)) {
                 return;
@@ -173,10 +363,17 @@ export class RequestController {
             this.clearSendProgressStatusText();
             this._durationStatusBarItem.command = null;
             this._durationStatusBarItem.text = '';
-            window.showErrorMessage(error.message);
+
+            if (showErrors) {
+                window.showErrorMessage(error.message);
+            }            
         } finally {
             RequestStore.complete(<string>requestId);
-        }
+
+            if (opts.responseResolver) {
+                opts.responseResolver(err, response);
+            }
+        }        
     }
 
     public dispose() {

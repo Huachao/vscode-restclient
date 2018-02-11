@@ -468,6 +468,83 @@ _**NOTE:** Azure China does not work like the other clouds. Use of Azure China i
 
 _**NOTE:** Use of Azure AD is not limited to Azure APIs. Inclusion here is for demonstration purposes only._
 
+## Scripts
+
+You can run [Node.js](https://nodejs.org/) based scripts to realize batch operations, for example.
+
+If you have a file with a list of user IDs, like `users.txt`, and a request with one or more variables like that:
+
+```http
+POST https://example.com/users/{{uid}}
+
+{{body}}
+```
+
+you can define code to execute a request for each value:
+
+```javascript
+// load the list of user IDs
+const USER_IDS = $fs.readFileSync($cwd + '/users.txt', 'utf8')
+                    .split("\n")
+                    .map(line => line.trim())
+                    .filter(line => '' !== line);
+
+$each(USER_IDS, (userId) => {
+    // update progress text
+    $progress("Loading data of user '" + userId + "' ...");
+
+    // run a request for 'userId'
+    return $request(
+        // vars
+        {
+            // @uid
+            'uid': userId,            
+            // @body
+            'body': $fs.readFileSync($cwd + '/user_to_create_' + userId + '.json')
+        },
+
+        // completed action
+        (err, response) => {
+            if (err) {
+                $vscode.window.showErrorMessage('ERROR: ' + err);
+            }
+            else {
+                $fs.writeFileSync($cwd + '/new_user_' + userId + '.json',
+                                  response.body,
+                                  'ascii');
+            }
+        }
+    );
+});
+```
+
+The following contants and module are provided:
+
+| Name   | Description |
+| ------ | ----------- |
+| `_` | [lodash](https://lodash.com/) module |
+| `$cwd` | The path of the underlying request file. |
+| `$each(list, action)` | Iterates over a sequence or an array. |
+| `$fs` | [fs-extra](https://github.com/jprichardson/node-fs-extra) module |
+| `$fullPath(path[, basePath])` | Returns the full version of a path. |
+| `$glob` | [glob](https://github.com/isaacs/node-glob) module |
+| `$lastRequest` | The last HTTP request. |
+| `$lastResponse` | The last HTTP response. |
+| `$linq` | [node-enumerable](https://github.com/mkloubert/node-enumerable) module |
+| `$minimatch` | [minimatch](https://github.com/isaacs/minimatch) module |
+| `$moment` | [Moment.js](https://momentjs.com/) module |
+| `$now()` | Returns the current time as [Moment.js](https://momentjs.com/) object. |
+| `$path` | [Path](https://nodejs.org/api/path.html) module |
+| `$require(id)` | Includes a module from the extension's context. |
+| `$request([vars, [completedAction]])` | Starts a request for the underlying HTTP file. |
+| `$runsSince([unitOfTime[, precise]])` | The time, the script is running, s. [Moment.diff](https://momentjs.com/docs/#/displaying/difference/). |
+| `$sleep(ms = 1000)` | Waits a number of milliseconds). |
+| `$start` | The start time as [Moment.js](https://momentjs.com/) object. |
+| `$utc()` | Returns the current UTC time as [Moment.js](https://momentjs.com/) object. |
+| `$uuid` | [node-uuid](https://github.com/broofa/node-uuid) module |
+| `$vscode` | [Visual Studio Code](https://code.visualstudio.com/docs/extensionAPI/vscode-api) API |
+| `$workspaces` | Array of [workspace folders](https://code.visualstudio.com/docs/extensionAPI/vscode-api#WorkspaceFolder). |
+
 ## Customize Response Preview
 REST Client Extension adds the ability to control the font family, size and weight used in the response preview.
 

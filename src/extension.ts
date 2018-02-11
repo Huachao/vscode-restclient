@@ -30,6 +30,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(codeSnippetController);
     context.subscriptions.push(environmentController);
     context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, range: Range) => requestController.run(range))));
+    context.subscriptions.push(commands.registerCommand('rest-client.request-run-script', ((document: TextDocument, range: Range) => requestController.runScript(range))));
     context.subscriptions.push(commands.registerCommand('rest-client.rerun-last-request', () => requestController.rerun()));
     context.subscriptions.push(commands.registerCommand('rest-client.cancel-request', () => requestController.cancel()));
     context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.save()));

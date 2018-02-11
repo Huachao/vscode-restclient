@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -38,6 +38,7 @@
   ],
   "activationEvents": [
     "onCommand:rest-client.request",
+    "onCommand:rest-client.request-run-script",
     "onCommand:rest-client.history",
     "onCommand:rest-client.clear-history",
     "onCommand:rest-client.save-response",
@@ -153,6 +154,11 @@
         "command": "rest-client.clear-aad-token-cache",
         "title": "Clear Azure AD Token Cache",
         "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.request-run-script",
+        "title": "Run As REST Script",
+        "category": "Rest Client"
       }
     ],
     "menus": {
@@ -188,6 +194,11 @@
           "command": "rest-client.copy-request-as-curl",
           "when": "editorTextFocus && editorLangId == http",
           "group": "rest-client@3"
+        },
+        {
+          "command": "rest-client.request-run-script",
+          "when": "editorTextFocus && editorLangId == javascript",
+          "group": "rest-client@4"
         }
       ]
     },
@@ -197,12 +208,6 @@
         "key": "ctrl+alt+r",
         "mac": "cmd+alt+r",
         "when": "editorTextFocus && editorLangId == 'http'"
-      },
-      {
-        "command": "rest-client.request",
-        "key": "ctrl+alt+r",
-        "mac": "cmd+alt+r",
-        "when": "editorTextFocus && editorLangId == 'plaintext'"
       },
       {
         "command": "rest-client.rerun-last-request",
@@ -337,7 +342,9 @@
         },
         "rest-client.environmentVariables": {
           "type": "object",
-          "default": {"$shared": {}},
+          "default": {
+            "$shared": {}
+          },
           "scope": "resource",
           "description": "Sets the environments and custom variables belongs to it, especially the special environment name '$shared' is used to create variables shared across all the individual environments (e.g., {\"$shared\": {\"version\": \"v1\"}, \"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
           "additionalProperties": {
@@ -484,6 +491,10 @@
     "tslint": "tslint --project tsconfig.json"
   },
   "devDependencies": {
+    "@types/fs-extra": "^5.0.0",
+    "@types/glob": "^5.0.35",
+    "@types/lodash": "^4.14.102",
+    "@types/minimatch": "^3.0.3",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
     "mocha": "^3.2.0",
@@ -501,11 +512,16 @@
     "elegant-spinner": "^1.0.1",
     "encodeurl": "^1.0.1",
     "filesize": "^3.3.0",
+    "fs-extra": "^5.0.0",
+    "glob": "^7.1.2",
     "highlight.js": "^9.6.0",
     "httpsnippet": "^1.16.5",
     "iconv-lite": "^0.4.15",
+    "lodash": "^4.17.5",
     "mime-types": "^2.1.14",
+    "minimatch": "^3.0.4",
     "moment": "^2.20.1",
+    "node-enumerable": "^3.9.0",
     "node-uuid": "^1.4.7",
     "pretty-data": "^0.40.0",
     "request": "^2.81.0",

@@ -1,5 +1,6 @@
 'use strict';
 
+import { isNil } from 'lodash';
 import { commands, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import * as Constants from './constants';
@@ -23,7 +24,7 @@ export class VariableProcessor {
         ['t', '\t']
     ]);
 
-    public static async processRawRequest(request: string) {
+    public static async processRawRequest(request: string, baseText?: string) {
         let globalVariables = VariableProcessor.getGlobalVariables();
         for (let variablePattern in globalVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variablePattern}\\s*\\}\\}`, 'g');
@@ -32,7 +33,14 @@ export class VariableProcessor {
             }
         }
 
-        let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
+        let fileVariables: Map<string, string>;
+        if (arguments.length > 1) {
+            fileVariables = VariableProcessor.getCustomVariablesFromText(baseText);
+        }
+        else {
+            fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
+        }
+
         for (let [variableName, variableValue] of fileVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
@@ -332,37 +340,48 @@ export class VariableProcessor {
     }
 
     public static getCustomVariablesInCurrentFile(): Map<string, string> {
-        let variables = new Map<string, string>();
+        let text: string;
+
         let editor = window.activeTextEditor;
-        if (!editor || !editor.document) {
-            return variables;
+        if (editor && editor.document) {
+            text = editor.document.getText();
         }
 
-        let document = editor.document.getText();
-        let lines: string[] = document.split(/\r?\n/g);
-        lines.forEach(line => {
-            let match: RegExpExecArray;
-            if (match = Constants.VariableDefinitionRegex.exec(line)) {
-                let key = match[1];
-                let originalValue = match[2];
-                let value = "";
-                let isPrevCharEscape = false;
-                for (let index = 0; index < originalValue.length; index++) {
-                    let currentChar = originalValue[index];
-                    if (isPrevCharEscape) {
-                        isPrevCharEscape = false;
-                        value += this.escapee.get(currentChar) || currentChar;
-                    } else {
-                        if (currentChar === "\\") {
-                            isPrevCharEscape = true;
-                            continue;
+        return VariableProcessor.getCustomVariablesFromText(text);
+    }
+
+    public static getCustomVariablesFromText(text: string): Map<string, string> {
+        let variables = new Map<string, string>();
+
+        if (!isNil(text)) {
+            text = '' + text;
+
+            let lines: string[] = text.split(/\r?\n/g);
+            lines.forEach(line => {
+                let match: RegExpExecArray;
+                if (match = Constants.VariableDefinitionRegex.exec(line)) {
+                    let key = match[1];
+                    let originalValue = match[2];
+                    let value = "";
+                    let isPrevCharEscape = false;
+                    for (let index = 0; index < originalValue.length; index++) {
+                        let currentChar = originalValue[index];
+                        if (isPrevCharEscape) {
+                            isPrevCharEscape = false;
+                            value += this.escapee.get(currentChar) || currentChar;
+                        } else {
+                            if (currentChar === "\\") {
+                                isPrevCharEscape = true;
+                                continue;
+                            }
+                            value += currentChar;
                         }
-                        value += currentChar;
                     }
+
+                    variables.set(key, value);
                 }
-                variables.set(key, value);
-            }
-        });
+            });
+        }
 
         return variables;
     }
