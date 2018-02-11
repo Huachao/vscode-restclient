@@ -66,25 +66,6 @@ export class RequestController {
         workspace.onDidCloseTextDocument((params) => this.onDidCloseTextDocument(params));
     }
 
-    private async createHttpRequestFromActiveTextEditor(range: Range) {
-        let editor = window.activeTextEditor;
-        if (!editor || !editor.document) {
-            return;
-        }
-
-        // Get selected text of selected lines or full document
-        let selectedText = new Selector().getSelectedText(editor, range);
-        if (!selectedText) {
-            return;
-        }
-
-        selectedText = await this.parseTextForRequest(selectedText);
-
-        // parse http request
-        return new RequestParserFactory().createRequestParser(selectedText)
-                                         .parseHttpRequest(selectedText, editor.document.fileName);
-    }
-
     private async parseTextForRequest(text: string) {
         if (!text) {
             return text;
@@ -145,7 +126,7 @@ export class RequestController {
             if (WORKSPACES) {
                 const FILES: string[] = [];
                 for (const WS of WORKSPACES) {
-                    const MATCHES = (await glob('**/*.{http,rest}', {
+                    (await glob('**/*.{http,rest}', {
                         absolute: true,
                         nocase: true,
                         nodir: true,
@@ -207,7 +188,7 @@ export class RequestController {
 
             await runRequestScript({
                 buildRequest: async (opts) => {
-                    const VARS = opts.vars || {};                
+                    const VARS = opts.vars || {};
 
                     let parsedRequest = UNPARSED_REQUEST;
                     for (const VAR_NAME in VARS) {
@@ -232,8 +213,7 @@ export class RequestController {
                         responseResolver: (err, resp) => {
                             if (err) {
                                 throw err;
-                            }
-                            else {
+                            } else {
                                 response = resp;
                             }
                         },
@@ -241,13 +221,12 @@ export class RequestController {
                     });
 
                     return response;
-                },                
+                },
                 script: SCRIPT,
                 scriptFile: SCRIPT_FILE,
                 uuid: uuid,
             });
-        }
-        catch (e) {
+        } catch (e) {
             window.showErrorMessage(`Could not execute script: '${e}'`);
         }
     }
@@ -366,14 +345,14 @@ export class RequestController {
 
             if (showErrors) {
                 window.showErrorMessage(error.message);
-            }            
+            }
         } finally {
             RequestStore.complete(<string>requestId);
 
             if (opts.responseResolver) {
                 opts.responseResolver(err, response);
             }
-        }        
+        }
     }
 
     public dispose() {

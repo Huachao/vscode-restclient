@@ -36,8 +36,7 @@ export class VariableProcessor {
         let fileVariables: Map<string, string>;
         if (arguments.length > 1) {
             fileVariables = VariableProcessor.getCustomVariablesFromText(baseText);
-        }
-        else {
+        } else {
             fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
         }
 

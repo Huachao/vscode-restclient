@@ -29,18 +29,20 @@ export interface RunRequestScriptOptions {
 export type VarsFromScript = { [name: string]: any };
 
 
-export async function runRequestScript(
-    // keep sure to have no conflicts with variables
-    // when executing script code
-    _57b252af4b9749f6a793ac3342d748ae_mk_23979_tm_5979: RunRequestScriptOptions
-)
-{
-    const $vscode = require('vscode');    
+// keep sure to have no conflicts with variables
+// when executing script code
+export async function runRequestScript(_57b252af4b9749f6a793ac3342d748ae_mk_23979_tm_5979: RunRequestScriptOptions) {
+    // tslint:disable-next-line:no-unused-variable
+    const $vscode = require('vscode');
+    // tslint:disable-next-line:no-unused-variable
     const $workspaces = $vscode.workspace.workspaceFolders;
 
+    // tslint:disable-next-line:no-unused-variable
     const _ = require('lodash');
+    // tslint:disable-next-line:no-unused-variable
     const $cwd = _57b252af4b9749f6a793ac3342d748ae_mk_23979_tm_5979.cwd;
 
+    // tslint:disable-next-line:no-unused-variable
     const $each = async function(list, action: EachAction) {
         let lastResult: any;
 
@@ -60,18 +62,27 @@ export async function runRequestScript(
         return lastResult;
     };
 
+    // tslint:disable-next-line:no-unused-variable
     const $fs = require('fs-extra');
 
+    // tslint:disable-next-line:no-unused-variable
     const $glob = require('glob');
+    // tslint:disable-next-line:no-unused-variable
     const $linq = require('node-enumerable');
+    // tslint:disable-next-line:no-unused-variable
     const $minimatch = require('minimatch');
+    // tslint:disable-next-line:no-unused-variable
     const $moment = require('moment');
 
+    // tslint:disable-next-line:no-unused-variable
     const $now = () => $moment();
 
+    // tslint:disable-next-line:no-unused-variable
     const $path = require('path');
 
+    // tslint:disable-next-line:no-unused-variable
     let $lastRequest: HttpRequest;
+    // tslint:disable-next-line:no-unused-variable
     let $lastResponse: HttpResponse;
     const $request = async (vars?: VarsFromScript, complete?: RequestCompleteAction) => {
         let httpRequest: HttpRequest;
@@ -92,14 +103,12 @@ export async function runRequestScript(
                     complete(null, httpResponse, httpRequest)
                 );
             }
-        }
-        catch (e) {
+        } catch (e) {
             if (complete) {
                 await Promise.resolve(
                     complete(e, null, httpRequest)
                 );
-            }
-            else {
+            } else {
                 throw e;
             }
         }
@@ -107,10 +116,12 @@ export async function runRequestScript(
         return httpResponse;
     };
 
+    // tslint:disable-next-line:no-unused-variable
     const $require = function(id: string) {
         return require(id);
     };
 
+    // tslint:disable-next-line:no-unused-variable
     const $sleep = function (ms?: number) {
         if (arguments.length < 1) {
             ms = 1000;
@@ -122,16 +133,18 @@ export async function runRequestScript(
                 setTimeout(() => {
                     resolve();
                 }, ms);
-            }
-            catch (e) {
+            } catch (e) {
                 reject(e);
             }
         });
     };
 
+    // tslint:disable-next-line:no-unused-variable
     const $utc = () => $moment.utc();
+    // tslint:disable-next-line:no-unused-variable
     const $uuid = _57b252af4b9749f6a793ac3342d748ae_mk_23979_tm_5979.uuid;
 
+    // tslint:disable-next-line:no-unused-variable
     const $fullPath = function (fullOrRelativePath: string, basePath?: string) {
         if (arguments.length < 2) {
             basePath = $workspaces[0].uri.fsPath;
@@ -157,13 +170,16 @@ export async function runRequestScript(
         // when executing script code
         _5979_tm_23979_mk_b1f2710f140b4581bc8ceeabf7f71d33
     ) => {
+        // tslint:disable-next-line:no-unused-variable
         const $progress = (msg: string) => {
             _5979_tm_23979_mk_b1f2710f140b4581bc8ceeabf7f71d33.report({
                 message: msg,
             });
         };
 
+        // tslint:disable-next-line:no-unused-variable
         const $start = $moment();
+        // tslint:disable-next-line:no-unused-variable
         const $runsSince = function (unitOfTime?, precise?: boolean) {
             if (arguments.length > 1) {
                 precise = !!precise;
@@ -180,6 +196,6 @@ export async function runRequestScript(
 
         return Promise.resolve(
             eval(_57b252af4b9749f6a793ac3342d748ae_mk_23979_tm_5979.script)
-        );    
+        );
     });
 }

@@ -9,13 +9,11 @@ export function glob(pattern: string, opts?: any) {
             Glob(pattern, opts, (err, matches) => {
                 if (err) {
                     reject(err);
-                }
-                else {
+                } else {
                     resolve(matches);
                 }
             });
-        }
-        catch (e) {
+        } catch (e) {
             reject(e);
         }
     });
@@ -29,13 +27,11 @@ export function readFile(filename: string) {
             FS.readFile(filename, (err, data) => {
                 if (err) {
                     reject(err);
-                }
-                else {
+                } else {
                     resolve(data);
                 }
             });
-        }
-        catch (e) {
+        } catch (e) {
             reject(e);
         }
     });
