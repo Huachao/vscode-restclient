@@ -470,6 +470,8 @@ _**NOTE:** Use of Azure AD is not limited to Azure APIs. Inclusion here is for d
 
 ## Scripts
 
+![rest-scripts](images/scripts.gif)
+
 You can run [Node.js](https://nodejs.org/) based scripts to realize batch operations, for example.
 
 If you have a file with a list of user IDs, like `users.txt`, and a request with one or more variables like that:
