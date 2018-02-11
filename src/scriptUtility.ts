@@ -84,6 +84,7 @@ export async function runRequestScript(_57b252af4b9749f6a793ac3342d748ae_mk_2397
     let $lastRequest: HttpRequest;
     // tslint:disable-next-line:no-unused-variable
     let $lastResponse: HttpResponse;
+    // tslint:disable-next-line:no-unused-variable
     const $request = async (vars?: VarsFromScript, complete?: RequestCompleteAction) => {
         let httpRequest: HttpRequest;
         let httpResponse: HttpResponse;
