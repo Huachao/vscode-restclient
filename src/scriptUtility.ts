@@ -150,7 +150,7 @@ export async function runRequestScript(
         return $path.resolve(fullOrRelativePath);
     };
 
-    $vscode.window.withProgress({
+    await $vscode.window.withProgress({
         location: $vscode.ProgressLocation.Window,
     }, async (
         // keep sure to have no conflicts with variables
