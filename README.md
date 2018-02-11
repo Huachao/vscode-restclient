@@ -539,6 +539,7 @@ The following contants and module are provided:
 | `$moment` | [Moment.js](https://momentjs.com/) module |
 | `$now()` | Returns the current time as [Moment.js](https://momentjs.com/) object. |
 | `$path` | [Path](https://nodejs.org/api/path.html) module |
+| `$progress(msg)` | Updates the progress text in the status bar. |
 | `$require(id)` | Includes a module from the extension's context. |
 | `$request([vars, [completedAction]])` | Starts a request for the underlying HTTP file. |
 | `$runsSince([unitOfTime[, precise]])` | The time, the script is running, s. [Moment.diff](https://momentjs.com/docs/#/displaying/difference/). |
