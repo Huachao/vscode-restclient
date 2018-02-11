@@ -2,7 +2,6 @@
 
 import { HttpRequest } from './models/httpRequest';
 import { HttpResponse } from './models/httpResponse';
-import * as m from 'moment';
 
 type EachAction = (item: any, index: number, previousResult: any) => any;
 
@@ -186,7 +185,7 @@ export async function runRequestScript(_57b252af4b9749f6a793ac3342d748ae_mk_2397
                 precise = !!precise;
             }
 
-            return m().diff($start, unitOfTime, precise);
+            return $moment().diff($start, unitOfTime, precise);
         };
 
         $progress(
