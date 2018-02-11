@@ -518,6 +518,8 @@ $each(USER_IDS, (userId) => {
 });
 ```
 
+For executing a script, open it and select `Run As REST Script` from the editor's context menu.
+
 The following contants and module are provided:
 
 | Name   | Description |
