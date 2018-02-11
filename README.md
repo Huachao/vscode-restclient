@@ -543,7 +543,7 @@ The following contants and module are provided:
 | `$require(id)` | Includes a module from the extension's context. |
 | `$request([vars, [completedAction]])` | Starts a request for the underlying HTTP file. |
 | `$runsSince([unitOfTime[, precise]])` | The time, the script is running, s. [Moment.diff](https://momentjs.com/docs/#/displaying/difference/). |
-| `$sleep(ms = 1000)` | Waits a number of milliseconds). |
+| `$sleep(ms = 1000)` | Waits a number of milliseconds. |
 | `$start` | The start time as [Moment.js](https://momentjs.com/) object. |
 | `$utc()` | Returns the current UTC time as [Moment.js](https://momentjs.com/) object. |
 | `$uuid` | [node-uuid](https://github.com/broofa/node-uuid) module |
