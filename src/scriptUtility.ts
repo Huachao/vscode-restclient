@@ -147,11 +147,11 @@ export async function runRequestScript(_57b252af4b9749f6a793ac3342d748ae_mk_2397
     // tslint:disable-next-line:no-unused-variable
     const $fullPath = function (fullOrRelativePath: string, basePath?: string) {
         if (arguments.length < 2) {
-            basePath = $workspaces[0].uri.fsPath;
+            basePath = $cwd;
         }
         basePath = '' + basePath;
         if (!$path.isAbsolute(basePath)) {
-            basePath = $path.join($workspaces[0].uri.fsPath, basePath);
+            basePath = $path.join($cwd, basePath);
         }
         basePath = $path.resolve(basePath);
 
