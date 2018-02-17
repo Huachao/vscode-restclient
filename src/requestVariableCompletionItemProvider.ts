@@ -6,16 +6,42 @@ import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueP
 import { VariableProcessor } from "./variableProcessor";
 import { VariableUtility } from "./variableUtility";
 
+const varStart: RegExp = /^(\w+)\.$/;
+const varSecond: RegExp = /^(\w+)\.(request|response).$/;
+
 export class RequestVariableCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
         if (!VariableUtility.isPartialRequestVariableReference(document, position)) {
             return [];
         }
 
-        const wordRange = document.getWordRangeAtPosition(position);
+        const wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
         let lineRange = document.lineAt(position);
 
-        const fullPath = this.getRequestVariableCompletionPath(wordRange, lineRange, position);
+        let fullPath = this.getRequestVariableCompletionPath(wordRange, lineRange, position);
+
+        if (!fullPath) {
+            return undefined;
+        }
+
+        if (varStart.test(fullPath)) {
+            return [
+                new CompletionItem("request", CompletionItemKind.Field),
+                new CompletionItem("response", CompletionItemKind.Field),
+            ];
+        } else if (varSecond.test(fullPath)) {
+            return [
+                new CompletionItem("body", CompletionItemKind.Field),
+                new CompletionItem("headers", CompletionItemKind.Field),
+            ];
+        }
+
+        // Remove last dot if present
+        fullPath =
+            fullPath.charAt(fullPath.length - 1) === "."
+                ? fullPath.substring(0, fullPath.length - 1)
+                : fullPath;
+
         let completionItems: CompletionItem[] = [];
 
         const fileRequestVariables = VariableProcessor.getRequestVariablesInFile(document);
@@ -42,17 +68,30 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
     }
 
     private getRequestVariableCompletionPath(wordRange: Range, lineRange: TextLine, position: Position) {
-        let index = position.character - 1;
-        // Look behind for start of variable
+        // Look behind for start of variable or first dot
+        let isFirst = false;
+        let index = position.character;
+        let forwardIndex = position.character;
         for (; index >= 0; index--) {
             if (lineRange.text[index - 1] === "{" && lineRange.text[index - 2] === "{") {
+                isFirst = true;
+                // Is first word, find end of word
+                for (; forwardIndex <= wordRange.end.character; forwardIndex++) {
+                    if (lineRange.text[forwardIndex] === ".") {
+                        break;
+                    }
+                }
+                break;
+            }
+            if (lineRange.text[index - 1] === ".") {
                 break;
             }
         }
 
-        const path = lineRange.text.substring(index, wordRange ? wordRange.start.character : position.character - 1);
-        return path && path.substring(path.length - 1) === "."
-            ? path.substring(0, path.length - 1)
-            : path;
+        if (isFirst) {
+            return lineRange.text.substring(index, forwardIndex);
+        } else {
+            return lineRange.text.substring(wordRange.start.character + 2, index);
+        }
     }
 }

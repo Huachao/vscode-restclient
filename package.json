@@ -337,7 +337,9 @@
         },
         "rest-client.environmentVariables": {
           "type": "object",
-          "default": {"$shared": {}},
+          "default": {
+            "$shared": {}
+          },
           "scope": "resource",
           "description": "Sets the environments and custom variables belongs to it, especially the special environment name '$shared' is used to create variables shared across all the individual environments (e.g., {\"$shared\": {\"version\": \"v1\"}, \"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
           "additionalProperties": {
@@ -504,6 +506,7 @@
     "highlight.js": "^9.6.0",
     "httpsnippet": "^1.16.5",
     "iconv-lite": "^0.4.15",
+    "jsonpath": "^1.0.0",
     "mime-types": "^2.1.14",
     "moment": "^2.20.1",
     "node-uuid": "^1.4.7",

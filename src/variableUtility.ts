@@ -24,15 +24,13 @@ export class VariableUtility {
     }
 
     public static isRequestVariableReference(document: TextDocument, position: Position): boolean {
-        let wordRange = document.getWordRangeAtPosition(position, /(\w+)(\.\w+|\[\d+\])+/);
-        let lineRange = document.lineAt(position);
-        return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
+        let wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(response|request)?(\.body(\..*?)?|\.headers(\.[\w-]+)?)?\}\}/);
+        return wordRange && !wordRange.isEmpty;
     }
 
     public static isPartialRequestVariableReference(document: TextDocument, position: Position): boolean {
-        let wordRange = document.getWordRangeAtPosition(position, /(\w+)(\.\w*|\[\d*\]?)+/);
-        let lineRange = document.lineAt(position);
-        return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
+        let wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
+        return wordRange && !wordRange.isEmpty;
     }
 
     private static isVariableReferenceFromLine(wordRange: Range, lineRange: TextLine) {

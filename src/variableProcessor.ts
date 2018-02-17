@@ -62,8 +62,8 @@ export class VariableProcessor {
                     const requestVariable = matches[i].replace('{{', '').replace('}}', '');
                     try {
                         const value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
-                        const escapedVariable = requestVariable.replace("[", "\\[").replace("]", "\\]");
-                        request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), value.toString());
+                        const escapedVariable = VariableProcessor.escapeRegExp(requestVariable);
+                        request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), JSON.stringify(value));
                     } catch {
                         window.showWarningMessage(`Could not merge in request variable. Is ${requestVariable} the correct path?`);
                     }
@@ -78,6 +78,10 @@ export class VariableProcessor {
         }
 
         return request;
+    }
+
+    private static escapeRegExp(str: string): string {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     }
 
     public static clearAadTokenCache() {
@@ -265,7 +269,7 @@ export class VariableProcessor {
                                              * Reason: Anything
                                              * Action: Ignore
                                              */
-                                         }
+                                        }
                                         domain = `${domain} (+${count - 1} more)`;
                                     }
 
@@ -398,7 +402,7 @@ export class VariableProcessor {
     public static getRequestVariablesInCurrentFile(): Map<string, RequestVariableCacheValue> {
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
-            return  new Map<string, RequestVariableCacheValue>();
+            return new Map<string, RequestVariableCacheValue>();
         }
 
         return VariableProcessor.getRequestVariablesInFile(editor.document);
@@ -428,7 +432,7 @@ export class VariableProcessor {
         let definitions = await VariableProcessor.getVariableDefinitionsInFile(document);
 
         return variableNames.map((name) =>
-            ({name, exists: definitions.has(name)})
+            ({ name, exists: definitions.has(name) })
         );
     }
 
@@ -439,14 +443,14 @@ export class VariableProcessor {
 
         let variableDefinitions = new Map<string, VariableType[]>();
         fileVariables.forEach((val, key) => {
-            variableDefinitions.set(key, [ VariableType.Custom ]);
+            variableDefinitions.set(key, [VariableType.Custom]);
         });
 
         environmentVariables.forEach((val, key) => {
             if (variableDefinitions.has(key)) {
                 variableDefinitions.get(key).push(VariableType.Environment);
             } else {
-                variableDefinitions.set(key, [ VariableType.Environment ]);
+                variableDefinitions.set(key, [VariableType.Environment]);
             }
         });
 
@@ -454,7 +458,7 @@ export class VariableProcessor {
             if (variableDefinitions.has(key)) {
                 variableDefinitions.get(key).push(VariableType.Request);
             } else {
-                variableDefinitions.set(key, [ VariableType.Request ]);
+                variableDefinitions.set(key, [VariableType.Request]);
             }
         });
 
