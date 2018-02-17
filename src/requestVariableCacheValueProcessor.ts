@@ -48,11 +48,16 @@ export class RequestVariableCacheValueProcessor {
     public static resolveHttpPart(http: HttpRequest | HttpResponse, httpPart: string, rest?: string): any {
         if (httpPart === "body") {
             const { body } = http;
-            if (!rest) {
-                return body;
+
+            if (!body) {
+                return undefined;
             }
 
             const parsedBody = JSON.parse(body as string);
+
+            if (!rest) {
+                return parsedBody;
+            }
 
             return parsedBody ? RequestVariableCacheValueProcessor.resolveHttpBody(parsedBody, rest) : undefined;
         } else if (httpPart === "headers") {
