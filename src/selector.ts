@@ -46,7 +46,7 @@ export class Selector {
 
     public static getRequestVariableDefinitionName(text: string): string {
         const matched = text.match(Constants.RequestVariableDefinitionRegex);
-        return matched && matched.length >= 2 ? matched[1] : null;
+        return matched && matched[1];
     }
 
     public static isCommentLine(line: string): boolean {
