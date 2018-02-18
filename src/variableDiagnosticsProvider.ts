@@ -72,17 +72,17 @@ export class VariableDiagnosticsProvider {
             let match: RegExpExecArray;
             let currentIndex = 0;
             while (match = pattern.exec(line)) {
+                let variablePath = match[0];
                 let variableName = match[1];
-                let startIndex = match.index + 2;
-                let endIndex = startIndex + variableName.length;
+                let endIndex = match.index + variablePath.length;
                 vars.push(new Variable(
                     variableName,
-                    currentIndex + startIndex,
+                    currentIndex + match.index,
                     currentIndex + endIndex,
                     i
                 ));
-                line = line.substring(endIndex + 2);
-                currentIndex += endIndex + 2;
+                line = line.substring(endIndex);
+                currentIndex += endIndex;
             }
         });
 
