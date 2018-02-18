@@ -6,8 +6,8 @@ import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueP
 import { VariableProcessor } from "./variableProcessor";
 import { VariableUtility } from "./variableUtility";
 
-const varStart: RegExp = /^(\w+)\.$/;
-const varSecond: RegExp = /^(\w+)\.(request|response).$/;
+const firstPartRegex: RegExp = /^(\w+)\.$/;
+const secondPartRegex: RegExp = /^(\w+)\.(request|response)\.$/;
 
 export class RequestVariableCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
@@ -24,30 +24,30 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
             return undefined;
         }
 
-        if (varStart.test(fullPath)) {
+        if (firstPartRegex.test(fullPath)) {
             return [
                 new CompletionItem("request", CompletionItemKind.Field),
                 new CompletionItem("response", CompletionItemKind.Field),
             ];
-        } else if (varSecond.test(fullPath)) {
+        } else if (secondPartRegex.test(fullPath)) {
             return [
                 new CompletionItem("body", CompletionItemKind.Field),
                 new CompletionItem("headers", CompletionItemKind.Field),
             ];
         }
 
-        // Remove last dot if present
-        fullPath =
-            fullPath.charAt(fullPath.length - 1) === "."
-                ? fullPath.substring(0, fullPath.length - 1)
-                : fullPath;
-
         let completionItems: CompletionItem[] = [];
 
         const fileRequestVariables = VariableProcessor.getRequestVariablesInFile(document);
         for (let [variableName, variableValue] of fileRequestVariables) {
-            let regex = new RegExp(`(${variableName})($|\.|\[\d+\])`);
+            let regex = new RegExp(`(${variableName})\.(request|response)\.(body|headers)\..*`);
             if (regex.test(fullPath)) {
+                // Remove last dot if present
+                fullPath =
+                    fullPath.charAt(fullPath.length - 1) === "."
+                        ? fullPath.substring(0, fullPath.length - 1)
+                        : fullPath;
+
                 const valueAtPath = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath);
                 if (valueAtPath) {
                     let props = Object.getOwnPropertyNames(valueAtPath);
