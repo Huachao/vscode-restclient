@@ -37,7 +37,6 @@ export class RequestController {
     private _httpClient: HttpClient;
     private _responseTextProvider: HttpResponseTextDocumentContentProvider;
     private _registration: Disposable;
-    private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
     private _interval: NodeJS.Timer;
 
     public constructor() {
@@ -151,7 +150,7 @@ export class RequestController {
                 RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
             }
 
-            this._responseTextProvider.update(this._previewUri);
+            this._responseTextProvider.update(previewUri);
 
             try {
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
@@ -205,6 +204,7 @@ export class RequestController {
         if (this._restClientSettings.showResponseInDifferentTab) {
             uriString += `/${Date.now()}`;  // just make every uri different
         }
+        uriString += '.html';
         return Uri.parse(uriString);
     }
 
