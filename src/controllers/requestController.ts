@@ -136,7 +136,7 @@ export class RequestController {
             let previewUri = this.generatePreviewUri();
             ResponseStore.add(previewUri.toString(), response);
 
-            this._responseTextProvider.update(this._previewUri);
+            this._responseTextProvider.update(previewUri);
 
             try {
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
@@ -190,6 +190,7 @@ export class RequestController {
         if (this._restClientSettings.showResponseInDifferentTab) {
             uriString += `/${Date.now()}`;  // just make every uri different
         }
+        uriString += '.html';
         return Uri.parse(uriString);
     }
 
