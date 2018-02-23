@@ -60,14 +60,6 @@
     return element.classList.contains('collapsed');
   }
 
-  // function isFoldingRangeStartLine(node) {
-    
-  // }
-
-  // function isTextLine(line) {
-  //   return line.nodeType === 3;
-  // }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', onLoad);
   } else {
