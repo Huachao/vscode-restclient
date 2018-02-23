@@ -63,7 +63,7 @@ export class VariableProcessor {
                     try {
                         const value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
                         const escapedVariable = VariableProcessor.escapeRegExp(requestVariable);
-                        request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), JSON.stringify(value));
+                        request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), typeof value === "string" ? value : JSON.stringify(value));
                     } catch {
                         window.showWarningMessage(`Could not merge in request variable. Is ${requestVariable} the correct path?`);
                     }

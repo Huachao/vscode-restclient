@@ -22,7 +22,7 @@ export class RequestVariableHoverProvider implements HoverProvider {
             let regex = new RegExp(`(${variableName})\.(.*?)?`);
             if (regex.test(fullPath)) {
                 const value = await RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath);
-                let contents: MarkedString[] = [JSON.stringify(value), { language: 'http', value: `Request Variable: ${fullPath}` }];
+                let contents: MarkedString[] = [typeof value === "string" ? value : JSON.stringify(value), { language: 'http', value: `Request Variable: ${fullPath}` }];
                 return new Hover(contents, wordRange);
             }
         }
