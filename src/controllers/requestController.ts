@@ -33,7 +33,6 @@ export class RequestController {
     private _httpClient: HttpClient;
     private _responseTextProvider: HttpResponseTextDocumentContentProvider;
     private _registration: Disposable;
-    private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
     private _interval: NodeJS.Timer;
 
     public constructor() {
