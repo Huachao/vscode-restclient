@@ -5,7 +5,7 @@ import { HttpRequest } from "./models/httpRequest";
 
 const jp = require('jsonpath');
 
-const requestVariablePathRegex: RegExp = /(\w+)(?:\.)?(response|request)?(?:\.)?(body|headers)?(?:\.)?(.*)?/;
+const requestVariablePathRegex: RegExp = /(\w+)(?:\.(request|response)(?:\.(body|headers)(?:\.(.*))?)?)?/;
 
 export class RequestVariableCacheValueProcessor {
     public static getValueAtPath(value: RequestVariableCacheValue, path: string): any {
