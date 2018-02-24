@@ -38,25 +38,20 @@ export class VariableDiagnosticsProvider {
 
         let vars = this.findVariables(document);
 
-        let varNames = vars.map((v) => v.variableName);
-
-        // Distinct varNames
-        varNames = Array.from(new Set(varNames));
+        const varNames = [...new Set(vars.keys())];
 
         let existArray = await VariableProcessor.checkVariableDefinitionExists(document, varNames);
 
         existArray.forEach(({ name, exists }) => {
             if (!exists) {
-                vars.forEach((v) => {
-                    if (v.variableName === name) {
-                        diagnostics.push({
-                            severity: DiagnosticSeverity.Error,
-                            range: new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
-                            message: `${v.variableName} is not loaded in memory`,
-                            source: 'http',
-                            code: 0,
-                        });
-                    }
+                vars.get(name).forEach((v) => {
+                    diagnostics.push({
+                        severity: DiagnosticSeverity.Error,
+                        range: new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
+                        message: `${v.variableName} is not loaded in memory`,
+                        source: 'http',
+                        code: 0,
+                    });
                 });
             }
         });
@@ -64,25 +59,26 @@ export class VariableDiagnosticsProvider {
         this.httpDiagnosticCollection.set(document.uri, diagnostics);
     }
 
-    private findVariables(document: TextDocument): Variable[] {
-        let vars: Variable[] = [];
+    private findVariables(document: TextDocument): Map<string, Variable[]> {
+        let vars: Map<string, Variable[]> = new Map<string, Variable[]>()
         let lines = document.getText().split(/\r?\n/g);
-        let pattern = /\{\{(\w+)(\..*?)*\}\}/;
-        lines.forEach((line, i) => {
+        let pattern = /\{\{(\w+)(\..*?)*\}\}/g;
+        lines.forEach((line, lineNumber) => {
             let match: RegExpExecArray;
-            let currentIndex = 0;
             while (match = pattern.exec(line)) {
                 let variablePath = match[0];
                 let variableName = match[1];
-                let endIndex = match.index + variablePath.length;
-                vars.push(new Variable(
+                const variable = new Variable(
                     variableName,
-                    currentIndex + match.index,
-                    currentIndex + endIndex,
-                    i
-                ));
-                line = line.substring(endIndex);
-                currentIndex += endIndex;
+                    match.index,
+                    match.index + variablePath.length,
+                    lineNumber
+                )
+                if (vars.has(variableName)) {
+                    vars.get(variableName).push(variable)
+                } else {
+                    vars.set(variableName, [variable]);
+                }
             }
         });
 
