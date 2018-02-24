@@ -1,7 +1,7 @@
 "use strict";
 
 export enum VariableType {
-    Custom,
+    File,
     Request,
     Global,
     Environment

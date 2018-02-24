@@ -443,7 +443,7 @@ export class VariableProcessor {
 
         let variableDefinitions = new Map<string, VariableType[]>();
         fileVariables.forEach((val, key) => {
-            variableDefinitions.set(key, [VariableType.Custom]);
+            variableDefinitions.set(key, [VariableType.File]);
         });
 
         environmentVariables.forEach((val, key) => {
