@@ -54,7 +54,7 @@ export class RequestVariableCacheValueProcessor {
                 return undefined;
             }
 
-            const contentType = RequestVariableCacheValueProcessor.getHeaderContentType(http)
+            const contentType = RequestVariableCacheValueProcessor.getHeaderContentType(http);
 
             if (contentType === "application/json") {
                 const parsedBody = JSON.parse(body as string);

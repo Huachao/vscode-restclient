@@ -60,7 +60,7 @@ export class VariableDiagnosticsProvider {
     }
 
     private findVariables(document: TextDocument): Map<string, Variable[]> {
-        let vars: Map<string, Variable[]> = new Map<string, Variable[]>()
+        let vars: Map<string, Variable[]> = new Map<string, Variable[]>();
         let lines = document.getText().split(/\r?\n/g);
         let pattern = /\{\{(\w+)(\..*?)*\}\}/g;
         lines.forEach((line, lineNumber) => {
@@ -73,9 +73,9 @@ export class VariableDiagnosticsProvider {
                     match.index,
                     match.index + variablePath.length,
                     lineNumber
-                )
+                );
                 if (vars.has(variableName)) {
-                    vars.get(variableName).push(variable)
+                    vars.get(variableName).push(variable);
                 } else {
                     vars.set(variableName, [variable]);
                 }
