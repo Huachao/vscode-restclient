@@ -436,7 +436,7 @@ export class VariableProcessor {
         );
     }
 
-    public static async getVariableDefinitionsInFile(document: TextDocument): Promise<Map<string, VariableType[]>> {
+    private static async getVariableDefinitionsInFile(document: TextDocument): Promise<Map<string, VariableType[]>> {
         let fileVariables = VariableProcessor.getCustomVariablesInFile(document);
         let environmentVariables = await EnvironmentController.getCustomVariables();
         let requestVariables = VariableProcessor.getRequestVariablesInFile(document);

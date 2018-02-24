@@ -2,6 +2,7 @@
 import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
 import { HttpResponse } from './models/httpResponse';
 import { HttpRequest } from "./models/httpRequest";
+import { MimeUtility } from './mimeUtility';
 
 const jp = require('jsonpath');
 
@@ -53,13 +54,26 @@ export class RequestVariableCacheValueProcessor {
                 return undefined;
             }
 
-            const parsedBody = JSON.parse(body as string);
+            const contentType = RequestVariableCacheValueProcessor.getHeaderContentType(http)
 
-            if (!rest) {
-                return parsedBody;
+            if (contentType === "application/json") {
+                const parsedBody = JSON.parse(body as string);
+
+                if (!rest) {
+                    return parsedBody;
+                }
+
+                return parsedBody
+                    ? RequestVariableCacheValueProcessor.resolveJsonHttpBody(parsedBody, rest)
+                    : undefined;
+            } else {
+                if (rest) {
+                    console.warn(`Parsing Content-Type "${contentType}" is currently unsupported. Path "${rest}" was ignored.`);
+                }
+
+                return body;
             }
 
-            return parsedBody ? RequestVariableCacheValueProcessor.resolveHttpBody(parsedBody, rest) : undefined;
         } else if (httpPart === "headers") {
             const { headers } = http;
             if (!rest) {
@@ -72,7 +86,28 @@ export class RequestVariableCacheValueProcessor {
         }
     }
 
-    public static resolveHttpBody(body: any, path: string) {
+    private static getHeaderContentType(http: HttpRequest | HttpResponse) {
+        let contentType = RequestVariableCacheValueProcessor.getHeaderValue(http, "content-type");
+        if (!contentType) {
+            return null;
+        }
+        let mime = MimeUtility.parse(contentType);
+        return mime.type;
+    }
+
+    private static getHeaderValue(http: HttpRequest | HttpResponse, name: string) {
+        if (http.headers) {
+            for (let header in http.headers) {
+                if (header.toLowerCase() === name.toLowerCase()) {
+                    return http.headers[header];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static resolveJsonHttpBody(body: any, path: string) {
         try {
             const result = jp.query(body, path);
             return result ? result[0] : null;
