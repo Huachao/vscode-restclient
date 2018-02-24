@@ -5,6 +5,7 @@ import { CompletionItemProvider, TextDocument, Position, CancellationToken, Comp
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { VariableProcessor } from "./variableProcessor";
 import { VariableUtility } from "./variableUtility";
+import * as Constants from "./constants";
 
 const firstPartRegex: RegExp = /^(\w+)\.$/;
 const secondPartRegex: RegExp = /^(\w+)\.(request|response)\.$/;
@@ -15,6 +16,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
             return [];
         }
 
+
         const wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
         let lineRange = document.lineAt(position);
 
@@ -22,6 +24,11 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
 
         if (!fullPath) {
             return undefined;
+        }
+
+        const match = fullPath.match(/(\w+)\.(.*?)?/);
+        if (!match || !this.checkIfRequestVariableDefined(document, match[1])) {
+            return [];
         }
 
         if (firstPartRegex.test(fullPath)) {
@@ -65,6 +72,19 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
         }
 
         return completionItems;
+    }
+
+    private checkIfRequestVariableDefined(document: TextDocument, variableName: string) {
+        const text = document.getText();
+        const regex = new RegExp(Constants.RequestVariableDefinitionRegex, 'mg');
+        let matches;
+        while (matches = regex.exec(text)) {
+            if (matches[1] === variableName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private getRequestVariableCompletionPath(wordRange: Range, lineRange: TextLine, position: Position) {
