@@ -56,13 +56,13 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
                         : fullPath;
 
                 const valueAtPath = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath);
-                if (valueAtPath) {
-                    let props = Object.getOwnPropertyNames(valueAtPath);
+                if (valueAtPath && typeof valueAtPath === "object") {
+                    let props = Object.keys(valueAtPath);
 
                     completionItems = props.map(p => {
                         let item = new CompletionItem(p);
-                        item.detail = `(property) ${p}`;
-                        item.documentation = p;
+                        item.detail = `${p}`;
+                        item.documentation = typeof valueAtPath[p] === "string" ? valueAtPath[p] : JSON.stringify(valueAtPath[p]);
                         item.insertText = p;
                         item.kind = CompletionItemKind.Field;
                         return item;
@@ -76,15 +76,8 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
 
     private checkIfRequestVariableDefined(document: TextDocument, variableName: string) {
         const text = document.getText();
-        const regex = new RegExp(Constants.RequestVariableDefinitionRegex, 'mg');
-        let matches;
-        while (matches = regex.exec(text)) {
-            if (matches[1] === variableName) {
-                return true;
-            }
-        }
-
-        return false;
+        const regex = new RegExp(Constants.RequestVariableDefinitionWithNameRegex(variableName, "m"));
+        return regex.test(text);
     }
 
     private getRequestVariableCompletionPath(wordRange: Range, lineRange: TextLine, position: Position) {
