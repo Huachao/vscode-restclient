@@ -35,5 +35,6 @@ export enum ElementType {
     Authentication,
     SystemVariable,
     EnvironmentCustomVariable,
-    FileCustomVariable
+    FileCustomVariable,
+    RequestCustomVariable
 }
