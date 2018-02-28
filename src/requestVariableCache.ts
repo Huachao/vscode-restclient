@@ -16,6 +16,10 @@ export class RequestVariableCache {
         fireEvent({ cacheKey });
     }
 
+    public static has(cacheKey: RequestVariableCacheKey): boolean {
+        return RequestVariableCache.cache.has(cacheKey.getCacheKey());
+    }
+
     public static get(cacheKey: RequestVariableCacheKey): RequestVariableCacheValue {
         return RequestVariableCache.cache.get(cacheKey.getCacheKey());
     }

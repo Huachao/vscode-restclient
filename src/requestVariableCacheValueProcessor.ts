@@ -6,83 +6,60 @@ import { MimeUtility } from './mimeUtility';
 
 const jp = require('jsonpath');
 
-const requestVariablePathRegex: RegExp = /(\w+)(?:\.(request|response)(?:\.(body|headers)(?:\.(.*))?)?)?/;
+const requestVariablePathRegex: RegExp = /^(\w+)(?:\.(request|response)(?:\.(body|headers)(?:\.(.*))?)?)?$/;
+
+type HttpPart = 'headers' | 'body';
 
 export class RequestVariableCacheValueProcessor {
     public static getValueAtPath(value: RequestVariableCacheValue, path: string): any {
-        if (!value
-            || !path) {
-            return undefined;
+        if (!value || !path) {
+            return;
         }
 
         const matches = path.match(requestVariablePathRegex);
 
         if (!matches) {
-            return undefined;
+            return;
         }
 
-        const [, , type, httpPart, rest] = matches;
+        const [, , type, httpPart, nameOrPath] = matches;
 
         if (!type) {
             return value;
         }
 
-        switch (type) {
-            case "request":
-            case "response":
-                const http = value[type];
+        const httpEntity = value[type];
 
-                if (!http) {
-                    return undefined;
-                }
-
-                if (!httpPart) {
-                    return http;
-                }
-
-                return RequestVariableCacheValueProcessor.resolveHttpPart(http, httpPart, rest);
-            default:
-                return undefined;
+        if (!httpPart) {
+            return httpEntity;
         }
+
+        return RequestVariableCacheValueProcessor.resolveHttpPart(httpEntity, httpPart as HttpPart, nameOrPath);
     }
 
-    public static resolveHttpPart(http: HttpRequest | HttpResponse, httpPart: string, rest?: string): any {
+    private static resolveHttpPart(http: HttpRequest | HttpResponse, httpPart: HttpPart, nameOrPath?: string): any {
         if (httpPart === "body") {
             const { body } = http;
-
-            if (!body) {
-                return undefined;
+            if (!body || !nameOrPath) {
+                return body;
             }
 
             const contentType = RequestVariableCacheValueProcessor.getHeaderContentType(http);
-
             if (contentType === "application/json") {
                 const parsedBody = JSON.parse(body as string);
 
-                if (!rest) {
-                    return parsedBody;
-                }
-
-                return parsedBody
-                    ? RequestVariableCacheValueProcessor.resolveJsonHttpBody(parsedBody, rest)
-                    : undefined;
+                return RequestVariableCacheValueProcessor.resolveJsonHttpBody(parsedBody, nameOrPath);
             } else {
-                if (rest) {
-                    console.warn(`Parsing Content-Type "${contentType}" is currently unsupported. Path "${rest}" was ignored.`);
+                if (nameOrPath) {
+                    console.warn(`Parsing Content-Type "${contentType}" is currently unsupported. Path "${nameOrPath}" was ignored.`);
                 }
 
                 return body;
             }
 
-        } else if (httpPart === "headers") {
-            const { headers } = http;
-            if (!rest) {
-                return headers;
-            }
-
-            return headers ? headers[rest] : undefined;
         } else {
-            return undefined;
+            const { headers } = http;
+            return !nameOrPath || !headers ? headers : headers[nameOrPath];
         }
     }
 
@@ -107,10 +84,10 @@ export class RequestVariableCacheValueProcessor {
         return null;
     }
 
-    public static resolveJsonHttpBody(body: any, path: string) {
+    private static resolveJsonHttpBody(body: any, path: string): string {
         try {
             const result = jp.query(body, path);
-            return result ? result[0] : null;
+            return typeof result[0] === 'string' ? result[0] : JSON.stringify(result[0]);
         } catch (err) {
             console.warn(`The JSONPath query failed, is ${path} correctly formatted?`);
         }

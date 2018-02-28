@@ -4,6 +4,9 @@ import { workspace, languages, Diagnostic, DiagnosticSeverity, DiagnosticCollect
 
 import { OnRequestVariableEvent } from "./events/requestVariableEvent";
 import { VariableProcessor } from "./variableProcessor";
+import { RequestVariableCache } from "./requestVariableCache";
+import { RequestVariableCacheKey } from './models/requestVariableCacheKey';
+import { VariableType } from './models/variableType';
 
 export class VariableDiagnosticsProvider {
     private httpDiagnosticCollection: DiagnosticCollection;
@@ -34,32 +37,48 @@ export class VariableDiagnosticsProvider {
             return;
         }
 
-        let diagnostics: Diagnostic[] = [];
+        const diagnostics: Diagnostic[] = [];
 
-        let vars = this.findVariables(document);
+        const allAvailableVariables = await VariableProcessor.getAllVariablesDefinitions(document);
+        const variableReferences = this.findVariableReferences(document);
 
-        const varNames = [...new Set(vars.keys())];
-
-        let existArray = await VariableProcessor.checkVariableDefinitionExists(document, varNames);
-
-        existArray.forEach(({ name, exists }) => {
-            if (!exists) {
-                vars.get(name).forEach((v) => {
-                    diagnostics.push({
-                        severity: DiagnosticSeverity.Error,
-                        range: new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
-                        message: `${v.variableName} is not loaded in memory`,
-                        source: 'http',
-                        code: 0,
-                    });
+        // Variable not found
+        [...variableReferences.entries()]
+            .filter(([name, _]) => !allAvailableVariables.has(name))
+            .forEach(([name, variables]) => {
+                variables.forEach(v => {
+                    diagnostics.push(
+                        new Diagnostic(
+                            new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
+                            `${v.variableName} is not found`,
+                            DiagnosticSeverity.Error));
                 });
-            }
-        });
+            });
+
+        // Request variable not active
+        [...variableReferences.entries()]
+            .filter(function ([name, _]) {
+                let active = allAvailableVariables.has(name);
+                if (active) {
+                    const types = allAvailableVariables.get(name);
+                    active = types[0] === VariableType.Request && !RequestVariableCache.has(new RequestVariableCacheKey(name, document.uri.toString()));
+                }
+                return active;
+            })
+            .forEach(([name, variables]) => {
+                variables.forEach(v => {
+                    diagnostics.push(
+                        new Diagnostic(
+                            new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
+                            `Request '${v.variableName}' has not been sent`,
+                            DiagnosticSeverity.Error));
+                });
+            });
 
         this.httpDiagnosticCollection.set(document.uri, diagnostics);
     }
 
-    private findVariables(document: TextDocument): Map<string, Variable[]> {
+    private findVariableReferences(document: TextDocument): Map<string, Variable[]> {
         let vars: Map<string, Variable[]> = new Map<string, Variable[]>();
         let lines = document.getText().split(/\r?\n/g);
         let pattern = /\{\{(\w+)(\..*?)*\}\}/g;

@@ -1,10 +1,11 @@
 'use strict';
 
-import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind, Range, TextLine } from 'vscode';
+import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind, Range, TextLine, MarkdownString } from 'vscode';
 
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { VariableProcessor } from "./variableProcessor";
 import { VariableUtility } from "./variableUtility";
+import { ElementType } from "./models/httpElement";
 import * as Constants from "./constants";
 
 const firstPartRegex: RegExp = /^(\w+)\.$/;
@@ -43,26 +44,21 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
             ];
         }
 
-        let completionItems: CompletionItem[] = [];
-
         const fileRequestVariables = VariableProcessor.getRequestVariablesInFile(document);
         for (let [variableName, variableValue] of fileRequestVariables) {
-            let regex = new RegExp(`(${variableName})\.(request|response)\.(body|headers)\..*`);
-            if (regex.test(fullPath)) {
+            // Only add completion items for headers
+            let regex = new RegExp(`^(${variableName})\.(?:request|response)\.headers\.$`);
+            let match: RegExpExecArray;
+            if (match = regex.exec(fullPath)) {
                 // Remove last dot if present
-                fullPath =
-                    fullPath.charAt(fullPath.length - 1) === "."
-                        ? fullPath.substring(0, fullPath.length - 1)
-                        : fullPath;
+                fullPath = fullPath.replace(/\.$/, '');
 
                 const valueAtPath = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath);
                 if (valueAtPath && typeof valueAtPath === "object") {
-                    let props = Object.keys(valueAtPath);
-
-                    completionItems = props.map(p => {
+                    return Object.keys(valueAtPath).map(p => {
                         let item = new CompletionItem(p);
-                        item.detail = `${p}`;
-                        item.documentation = typeof valueAtPath[p] === "string" ? valueAtPath[p] : JSON.stringify(valueAtPath[p]);
+                        item.detail = `HTTP ${ElementType[ElementType.RequestCustomVariable]}`;
+                        item.documentation = new MarkdownString(`Value: \`${valueAtPath[p]}\``);
                         item.insertText = p;
                         item.kind = CompletionItemKind.Field;
                         return item;
@@ -71,12 +67,12 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
             }
         }
 
-        return completionItems;
+        return;
     }
 
     private checkIfRequestVariableDefined(document: TextDocument, variableName: string) {
         const text = document.getText();
-        const regex = new RegExp(Constants.RequestVariableDefinitionWithNameRegex(variableName, "m"));
+        const regex = new RegExp(Constants.RequestVariableDefinitionWithNameRegexFactory(variableName, "m"));
         return regex.test(text);
     }
 

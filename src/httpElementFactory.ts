@@ -1,6 +1,6 @@
 "use strict";
 
-import { SnippetString } from 'vscode';
+import { SnippetString, MarkdownString } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import { HttpElement, ElementType } from './models/httpElement';
 import { PersistUtility } from './persistUtility';
@@ -114,19 +114,20 @@ export class HttpElementFactory {
         // add environment custom variables
         let customVariables = await EnvironmentController.getCustomVariables();
         for (let [variableName, variableValue] of customVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.EnvironmentCustomVariable, null, `Value: ${variableValue}`, new SnippetString(`{{${variableName}}}`)));
+            originalElements.push(new HttpElement(variableName, ElementType.EnvironmentCustomVariable, null, new MarkdownString(`Value: \`${variableValue}\``), new SnippetString(`{{${variableName}}}`)));
         }
 
         // add file custom variables
         let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
         for (let [variableName, variableValue] of fileVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.FileCustomVariable, '^\\s*[^@]', `Value: ${variableValue}`, new SnippetString(`{{${variableName}}}`)));
+            originalElements.push(new HttpElement(variableName, ElementType.FileCustomVariable, '^\\s*[^@]', new MarkdownString(`Value: \`${variableValue}\``), new SnippetString(`{{${variableName}}}`)));
         }
 
         // add request variables
-        let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile();
-        for (let [variableName] of requestVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.RequestCustomVariable, '^\\s*[^@]', `Value: HttpResponse`, new SnippetString(`{{${variableName}}}`)));
+        let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile(false);
+        for (let [variableName, variableValue] of requestVariables) {
+            const value = new MarkdownString(`Value: Request Variable ${variableName}${variableValue ? '' : ' *(Inactive)*'}`)
+            originalElements.push(new HttpElement(variableName, ElementType.RequestCustomVariable, '^\\s*[^@]', value, new SnippetString(`{{${variableName}.\${1|request,response|}.\${2|headers,body|}.\${3:nameOrPath}}}`)));
         }
 
         // add urls from history

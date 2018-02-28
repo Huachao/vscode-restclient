@@ -61,9 +61,12 @@ export class VariableProcessor {
                 for (let i = 0; i < matches.length; i++) {
                     const requestVariable = matches[i].replace('{{', '').replace('}}', '');
                     try {
-                        const value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
+                        let value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
+                        if (value == null || typeof value !== 'string') {
+                            value = `{{${requestVariable}}}`;
+                        }
                         const escapedVariable = VariableProcessor.escapeRegExp(requestVariable);
-                        request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), typeof value === "string" ? value : JSON.stringify(value));
+                        request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), value);
                     } catch {
                         window.showWarningMessage(`Could not merge in request variable. Is ${requestVariable} the correct path?`);
                     }
@@ -399,16 +402,16 @@ export class VariableProcessor {
         return variables;
     }
 
-    public static getRequestVariablesInCurrentFile(): Map<string, RequestVariableCacheValue> {
+    public static getRequestVariablesInCurrentFile(activeOnly: boolean = true): Map<string, RequestVariableCacheValue> {
         let editor = window.activeTextEditor;
         if (!editor || !editor.document) {
             return new Map<string, RequestVariableCacheValue>();
         }
 
-        return VariableProcessor.getRequestVariablesInFile(editor.document);
+        return VariableProcessor.getRequestVariablesInFile(editor.document, activeOnly);
     }
 
-    public static getRequestVariablesInFile(document: TextDocument): Map<string, RequestVariableCacheValue> {
+    public static getRequestVariablesInFile(document: TextDocument, activeOnly: boolean = true): Map<string, RequestVariableCacheValue> {
         let variables = new Map<string, RequestVariableCacheValue>();
 
         let text = document.getText();
@@ -419,7 +422,7 @@ export class VariableProcessor {
             if (match = Constants.RequestVariableDefinitionRegex.exec(line)) {
                 let key = match[1];
                 const response = RequestVariableCache.get(new RequestVariableCacheKey(key, documentUri));
-                if (response) {
+                if (!activeOnly || response) {
                     variables.set(key, response);
                 }
             }
@@ -428,24 +431,28 @@ export class VariableProcessor {
         return variables;
     }
 
-    public static async checkVariableDefinitionExists(document: TextDocument, variableNames: string[]): Promise<{ name: string, exists: boolean }[]> {
-        let definitions = await VariableProcessor.getVariableDefinitionsInFile(document);
+    public static async getAllVariablesDefinitions(document: TextDocument): Promise<Map<string, VariableType[]>> {
+        const requestVariables = VariableProcessor.getRequestVariablesInFile(document, false);
+        const fileVariables = VariableProcessor.getCustomVariablesInFile(document);
+        const environmentVariables = await EnvironmentController.getCustomVariables();
+        
+        const variableDefinitions = new Map<string, VariableType[]>();
 
-        return variableNames.map((name) =>
-            ({ name, exists: definitions.has(name) })
-        );
-    }
+        // Request variables in file
+        requestVariables.forEach((val, key) => {
+            if (variableDefinitions.has(key)) {
+                variableDefinitions.get(key).push(VariableType.Request);
+            } else {
+                variableDefinitions.set(key, [VariableType.Request]);
+            }
+        });
 
-    private static async getVariableDefinitionsInFile(document: TextDocument): Promise<Map<string, VariableType[]>> {
-        let fileVariables = VariableProcessor.getCustomVariablesInFile(document);
-        let environmentVariables = await EnvironmentController.getCustomVariables();
-        let requestVariables = VariableProcessor.getRequestVariablesInFile(document);
-
-        let variableDefinitions = new Map<string, VariableType[]>();
+        // Normal file variables
         fileVariables.forEach((val, key) => {
             variableDefinitions.set(key, [VariableType.File]);
         });
 
+        // Environment variables
         environmentVariables.forEach((val, key) => {
             if (variableDefinitions.has(key)) {
                 variableDefinitions.get(key).push(VariableType.Environment);
@@ -454,13 +461,6 @@ export class VariableProcessor {
             }
         });
 
-        requestVariables.forEach((val, key) => {
-            if (variableDefinitions.has(key)) {
-                variableDefinitions.get(key).push(VariableType.Request);
-            } else {
-                variableDefinitions.set(key, [VariableType.Request]);
-            }
-        });
 
         return variableDefinitions;
     }

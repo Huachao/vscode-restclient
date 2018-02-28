@@ -1,6 +1,6 @@
 'use strict';
 
-import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Position, Range, TextLine } from 'vscode';
+import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Position, Range, TextLine, MarkdownString } from 'vscode';
 
 import { VariableProcessor } from './variableProcessor';
 import { VariableUtility } from './variableUtility';
@@ -21,14 +21,13 @@ export class RequestVariableHoverProvider implements HoverProvider {
         for (let [variableName, variableValue] of fileRequestVariables) {
             let regex = new RegExp(`(${variableName})\.(.*?)?`);
             if (regex.test(fullPath)) {
-                const value = await RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath);
-                let contents: MarkedString[] = [typeof value === "string" ? value : JSON.stringify(value), { language: 'http', value: `Request Variable: ${fullPath}` }];
+                const value = await RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath) || 'No actual value is resolved for given request variable';
+                const contents: MarkedString[] = [typeof value !== "object" ? value : { language: 'json', value: JSON.stringify(value, null, 2) }, new MarkdownString(`*Request Variable* \`${fullPath}\``)];
                 return new Hover(contents, wordRange);
             }
         }
 
-        let contents: MarkedString[] = [{ language: 'http', value: `Warning: Request Variable ${fullPath} is not loaded in memory` }];
-        return new Hover(contents, wordRange);
+        return;
     }
 
     private getRequestVariableHoverPath(wordRange: Range, lineRange: TextLine) {
