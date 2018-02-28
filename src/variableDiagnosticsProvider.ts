@@ -44,8 +44,8 @@ export class VariableDiagnosticsProvider {
 
         // Variable not found
         [...variableReferences.entries()]
-            .filter(([name, _]) => !allAvailableVariables.has(name))
-            .forEach(([name, variables]) => {
+            .filter(([name]) => !allAvailableVariables.has(name))
+            .forEach(([, variables]) => {
                 variables.forEach(v => {
                     diagnostics.push(
                         new Diagnostic(
@@ -57,7 +57,7 @@ export class VariableDiagnosticsProvider {
 
         // Request variable not active
         [...variableReferences.entries()]
-            .filter(function ([name, _]) {
+            .filter(function ([name]) {
                 let active = allAvailableVariables.has(name);
                 if (active) {
                     const types = allAvailableVariables.get(name);
@@ -65,7 +65,7 @@ export class VariableDiagnosticsProvider {
                 }
                 return active;
             })
-            .forEach(([name, variables]) => {
+            .forEach(([, variables]) => {
                 variables.forEach(v => {
                     diagnostics.push(
                         new Diagnostic(

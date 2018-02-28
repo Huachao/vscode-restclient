@@ -62,7 +62,7 @@ export class VariableProcessor {
                     const requestVariable = matches[i].replace('{{', '').replace('}}', '');
                     try {
                         let value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
-                        if (value == null || typeof value !== 'string') {
+                        if (!value || typeof value !== 'string') {
                             value = `{{${requestVariable}}}`;
                         }
                         const escapedVariable = VariableProcessor.escapeRegExp(requestVariable);
@@ -435,7 +435,7 @@ export class VariableProcessor {
         const requestVariables = VariableProcessor.getRequestVariablesInFile(document, false);
         const fileVariables = VariableProcessor.getCustomVariablesInFile(document);
         const environmentVariables = await EnvironmentController.getCustomVariables();
-        
+
         const variableDefinitions = new Map<string, VariableType[]>();
 
         // Request variables in file
