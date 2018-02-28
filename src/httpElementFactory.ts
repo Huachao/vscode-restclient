@@ -127,7 +127,7 @@ export class HttpElementFactory {
         let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile(false);
         for (let [variableName, variableValue] of requestVariables) {
             const value = new MarkdownString(`Value: Request Variable ${variableName}${variableValue ? '' : ' *(Inactive)*'}`);
-            originalElements.push(new HttpElement(variableName, ElementType.RequestCustomVariable, '^\\s*[^@]', value, new SnippetString(`{{${variableName}.\${1|request,response|}.\${2|headers,body|}.\${3:nameOrPath}}}`)));
+            originalElements.push(new HttpElement(variableName, ElementType.RequestCustomVariable, '^\\s*[^@]', value, new SnippetString(`{{${variableName}.\${1|request,response|}.\${2|headers,body|}.\${3:Header Name Or JSONPath}}}`)));
         }
 
         // add urls from history
