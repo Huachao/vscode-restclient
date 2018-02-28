@@ -37,22 +37,6 @@ export class VariableProcessor {
             }
         }
 
-        let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
-        for (let [variableName, variableValue] of fileVariables) {
-            let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
-            if (regex.test(request)) {
-                request = request.replace(regex, variableValue);
-            }
-        }
-
-        let environmentVariables = await EnvironmentController.getCustomVariables();
-        for (let [variableName, variableValue] of environmentVariables) {
-            let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
-            if (regex.test(request)) {
-                request = request.replace(regex, variableValue);
-            }
-        }
-
         let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile();
         for (let [variableName, variableValue] of requestVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variableName}.*\\s*\\}\\}`, 'g');
@@ -74,6 +58,22 @@ export class VariableProcessor {
             }
         }
 
+        let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
+        for (let [variableName, variableValue] of fileVariables) {
+            let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
+            if (regex.test(request)) {
+                request = request.replace(regex, variableValue);
+            }
+        }
+
+        let environmentVariables = await EnvironmentController.getCustomVariables();
+        for (let [variableName, variableValue] of environmentVariables) {
+            let regex = new RegExp(`\\{\\{\\s*${variableName}\\s*\\}\\}`, 'g');
+            if (regex.test(request)) {
+                request = request.replace(regex, variableValue);
+            }
+        }
+
         // any vars that make decisions on the URL (request var) must be last so all vars have been evaluated
         let aadRegex = new RegExp(aadRegexPattern, 'g');
         if (aadRegex.test(request)) {
@@ -81,10 +81,6 @@ export class VariableProcessor {
         }
 
         return request;
-    }
-
-    private static escapeRegExp(str: string): string {
-        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     }
 
     public static clearAadTokenCache() {
@@ -463,5 +459,9 @@ export class VariableProcessor {
 
 
         return variableDefinitions;
+    }
+
+    private static escapeRegExp(str: string): string {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     }
 }
