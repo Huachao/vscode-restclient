@@ -5,7 +5,7 @@ import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Po
 import { VariableProcessor } from './variableProcessor';
 import { VariableUtility } from './variableUtility';
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
-import { ResolveResult, ResolveState } from "./models/requestVariableResolveResult";
+import { ResolveState } from "./models/requestVariableResolveResult";
 
 export class RequestVariableHoverProvider implements HoverProvider {
 
@@ -33,11 +33,11 @@ export class RequestVariableHoverProvider implements HoverProvider {
                     contents.push(typeof value !== "object" ? value : { language: 'json', value: JSON.stringify(value, null, 2) });
                 }
 
-                if (result.state === ResolveState.Warn) {
+                if (result.state === ResolveState.Warning) {
                     contents.push(result.message);
                 }
 
-                contents.push(new MarkdownString(`*Request Variable* \`${fullPath}\``))
+                contents.push(new MarkdownString(`*Request Variable* \`${fullPath}\``));
 
                 return new Hover(contents, wordRange);
             }

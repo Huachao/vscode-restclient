@@ -1,12 +1,12 @@
 "use strict";
 
 export type ResolveResult = { state: ResolveState.Success, value: any }
-                          | { state: ResolveState.Warn, value?: any, message: ResolveWarnMessage }
-                          | { state: ResolveState.Error, message: ResolveErrorMessage }
+                          | { state: ResolveState.Warning, value?: any, message: ResolveWarningMessage }
+                          | { state: ResolveState.Error, message: ResolveErrorMessage };
 
 export const enum ResolveState {
     Success,
-    Warn,
+    Warning,
     Error
 }
 
@@ -15,7 +15,7 @@ export const enum ResolveErrorMessage {
     InvalidRequestVariableReference = 'Incorrect request variable reference syntax, it should be "variableName.(response|request).(headers|body).(headerName|JSONPath)"',
 }
 
-export const enum ResolveWarnMessage {
+export const enum ResolveWarningMessage {
     MissingRequestEntityName = 'Http entity name "response" or "request" should be provided right after the request variable name',
     MissingRequestEntityPart = 'Http entity part "headers" or "body" should be provided right after the http entity name',
     MissingHeaderName = 'Header name should be provided right after "headers"',

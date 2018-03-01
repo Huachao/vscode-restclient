@@ -6,7 +6,7 @@ import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueP
 import { VariableProcessor } from "./variableProcessor";
 import { VariableUtility } from "./variableUtility";
 import { ElementType } from "./models/httpElement";
-import { ResolveResult, ResolveState, ResolveWarnMessage } from "./models/requestVariableResolveResult";
+import { ResolveState, ResolveWarningMessage } from "./models/requestVariableResolveResult";
 import * as Constants from "./constants";
 
 const firstPartRegex: RegExp = /^(\w+)\.$/;
@@ -55,12 +55,12 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
                 fullPath = fullPath.replace(/\.$/, '');
 
                 const result = RequestVariableCacheValueProcessor.resolveRequestVariable(variableValue, fullPath);
-                if (result.state === ResolveState.Warn && result.message === ResolveWarnMessage.MissingHeaderName) {
+                if (result.state === ResolveState.Warning && result.message === ResolveWarningMessage.MissingHeaderName) {
                     const {value} = result;
                     return Object.keys(value).map(p => {
                         let item = new CompletionItem(p);
                         item.detail = `HTTP ${ElementType[ElementType.RequestCustomVariable]}`;
-                        item.documentation = new MarkdownString(`Value: \`${value[p]}\``)
+                        item.documentation = new MarkdownString(`Value: \`${value[p]}\``);
                         item.insertText = p;
                         item.kind = CompletionItemKind.Field;
                         return item;

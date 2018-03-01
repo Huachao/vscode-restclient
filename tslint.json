@@ -12,8 +12,7 @@
         ],
         "no-console": [
             true,
-            "log",
-            "error"
+            "log"
         ],
         "no-duplicate-variable": true,
         "no-trailing-whitespace": true,

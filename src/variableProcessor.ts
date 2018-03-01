@@ -12,7 +12,7 @@ import { HttpRequest } from './models/httpRequest';
 import { RestClientSettings } from './models/configurationSettings';
 import { RequestVariableCacheValue } from "./models/requestVariableCacheValue";
 import { VariableType } from "./models/variableType";
-import { ResolveResult, ResolveState } from "./models/requestVariableResolveResult";
+import { ResolveState } from "./models/requestVariableResolveResult";
 import * as adal from 'adal-node';
 import * as moment from "moment";
 const copyPaste = require('copy-paste');
@@ -50,7 +50,7 @@ export class VariableProcessor {
                     if (result.state !== ResolveState.Success) {
                         const {state, message} = result;
                         value = `{{${requestVariable}}}`;
-                        if (state === ResolveState.Warn) {
+                        if (state === ResolveState.Warning) {
                             console.warn(message);
                         } else {
                             console.error(message);
