@@ -7,6 +7,8 @@ import { VariableProcessor } from "./variableProcessor";
 import { RequestVariableCache } from "./requestVariableCache";
 import { RequestVariableCacheKey } from './models/requestVariableCacheKey';
 import { VariableType } from './models/variableType';
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
+import { ResolveState } from './models/requestVariableResolveResult';
 
 export class VariableDiagnosticsProvider {
     private httpDiagnosticCollection: DiagnosticCollection;
@@ -57,14 +59,10 @@ export class VariableDiagnosticsProvider {
 
         // Request variable not active
         [...variableReferences.entries()]
-            .filter(function ([name]) {
-                let active = allAvailableVariables.has(name);
-                if (active) {
-                    const types = allAvailableVariables.get(name);
-                    active = types[0] === VariableType.Request && !RequestVariableCache.has(new RequestVariableCacheKey(name, document.uri.toString()));
-                }
-                return active;
-            })
+            .filter(([name]) =>
+                allAvailableVariables.has(name)
+                && allAvailableVariables.get(name)[0] === VariableType.Request
+                && !RequestVariableCache.has(new RequestVariableCacheKey(name, document.uri.toString())))
             .forEach(([, variables]) => {
                 variables.forEach(v => {
                     diagnostics.push(
@@ -72,6 +70,27 @@ export class VariableDiagnosticsProvider {
                             new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
                             `Request '${v.variableName}' has not been sent`,
                             DiagnosticSeverity.Error));
+                });
+            });
+
+        // Request variable resolve with warning or error
+        [...variableReferences.entries()]
+            .filter(([name]) =>
+                allAvailableVariables.has(name)
+                && allAvailableVariables.get(name)[0] === VariableType.Request
+                && RequestVariableCache.has(new RequestVariableCacheKey(name, document.uri.toString())))
+            .forEach(([name, variables]) => {
+                const value = RequestVariableCache.get(new RequestVariableCacheKey(name, document.uri.toString()));
+                variables.forEach(v => {
+                    const path = v.variableValue.replace(/^\{{2}\s*/, '').replace(/\s*\}{2}$/, '');
+                    const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value, path);
+                    if (result.state !== ResolveState.Success) {
+                        diagnostics.push(
+                            new Diagnostic(
+                                new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
+                                result.message,
+                                result.state === ResolveState.Error ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning));
+                    }
                 });
             });
 
@@ -85,10 +104,10 @@ export class VariableDiagnosticsProvider {
         lines.forEach((line, lineNumber) => {
             let match: RegExpExecArray;
             while (match = pattern.exec(line)) {
-                let variablePath = match[0];
-                let variableName = match[1];
+                const [variablePath, variableName] = match;
                 const variable = new Variable(
                     variableName,
+                    variablePath,
                     match.index,
                     match.index + variablePath.length,
                     lineNumber
@@ -108,6 +127,7 @@ export class VariableDiagnosticsProvider {
 class Variable {
     constructor(
         public variableName: string,
+        public variableValue: string,
         public startIndex: number,
         public endIndex: number,
         public lineNumber: number) {

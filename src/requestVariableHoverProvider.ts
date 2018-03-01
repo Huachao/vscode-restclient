@@ -23,7 +23,7 @@ export class RequestVariableHoverProvider implements HoverProvider {
             let regex = new RegExp(`(${variableName})\.(.*?)?`);
             if (regex.test(fullPath)) {
                 const result = await RequestVariableCacheValueProcessor.resolveRequestVariable(variableValue, fullPath);
-                if (result.state === ResolveState.Error) {
+                if (result.state !== ResolveState.Success) {
                     continue;
                 }
 
@@ -31,10 +31,6 @@ export class RequestVariableHoverProvider implements HoverProvider {
                 const contents: MarkedString[] = [];
                 if (value) {
                     contents.push(typeof value !== "object" ? value : { language: 'json', value: JSON.stringify(value, null, 2) });
-                }
-
-                if (result.state === ResolveState.Warning) {
-                    contents.push(result.message);
                 }
 
                 contents.push(new MarkdownString(`*Request Variable* \`${fullPath}\``));
