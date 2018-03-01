@@ -5,6 +5,7 @@ import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Po
 import { VariableProcessor } from './variableProcessor';
 import { VariableUtility } from './variableUtility';
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
+import { ResolveResult, ResolveState } from "./models/requestVariableResolveResult";
 
 export class RequestVariableHoverProvider implements HoverProvider {
 
@@ -21,8 +22,23 @@ export class RequestVariableHoverProvider implements HoverProvider {
         for (let [variableName, variableValue] of fileRequestVariables) {
             let regex = new RegExp(`(${variableName})\.(.*?)?`);
             if (regex.test(fullPath)) {
-                const value = await RequestVariableCacheValueProcessor.getValueAtPath(variableValue, fullPath) || 'No actual value is resolved for given request variable';
-                const contents: MarkedString[] = [typeof value !== "object" ? value : { language: 'json', value: JSON.stringify(value, null, 2) }, new MarkdownString(`*Request Variable* \`${fullPath}\``)];
+                const result = await RequestVariableCacheValueProcessor.resolveRequestVariable(variableValue, fullPath);
+                if (result.state === ResolveState.Error) {
+                    continue;
+                }
+
+                const {value} = result;
+                const contents: MarkedString[] = [];
+                if (value) {
+                    contents.push(typeof value !== "object" ? value : { language: 'json', value: JSON.stringify(value, null, 2) });
+                }
+
+                if (result.state === ResolveState.Warn) {
+                    contents.push(result.message);
+                }
+
+                contents.push(new MarkdownString(`*Request Variable* \`${fullPath}\``))
+
                 return new Hover(contents, wordRange);
             }
         }

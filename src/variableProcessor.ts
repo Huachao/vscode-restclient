@@ -12,6 +12,7 @@ import { HttpRequest } from './models/httpRequest';
 import { RestClientSettings } from './models/configurationSettings';
 import { RequestVariableCacheValue } from "./models/requestVariableCacheValue";
 import { VariableType } from "./models/variableType";
+import { ResolveResult, ResolveState } from "./models/requestVariableResolveResult";
 import * as adal from 'adal-node';
 import * as moment from "moment";
 const copyPaste = require('copy-paste');
@@ -44,16 +45,22 @@ export class VariableProcessor {
             if (matches && matches.length > 0) {
                 for (let i = 0; i < matches.length; i++) {
                     const requestVariable = matches[i].replace('{{', '').replace('}}', '');
-                    try {
-                        let value = RequestVariableCacheValueProcessor.getValueAtPath(variableValue, requestVariable);
-                        if (!value || typeof value !== 'string') {
-                            value = `{{${requestVariable}}}`;
+                    let value;
+                    let result = RequestVariableCacheValueProcessor.resolveRequestVariable(variableValue, requestVariable);
+                    if (result.state !== ResolveState.Success) {
+                        const {state, message} = result;
+                        value = `{{${requestVariable}}}`;
+                        if (state === ResolveState.Warn) {
+                            console.warn(message);
+                        } else {
+                            console.error(message);
                         }
-                        const escapedVariable = VariableProcessor.escapeRegExp(requestVariable);
-                        request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), value);
-                    } catch {
-                        window.showWarningMessage(`Could not merge in request variable. Is ${requestVariable} the correct path?`);
+                    } else {
+                        value = result.value;
                     }
+
+                    const escapedVariable = VariableProcessor.escapeRegExp(requestVariable);
+                    request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), value);
                 }
             }
         }
