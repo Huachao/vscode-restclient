@@ -456,6 +456,8 @@ GET https://fabrikam.com/api/foo
 Authorization: {{$aadToken aud:000000000000-0000-0000-0000-00000000}}
 ```
 
+_**NOTE:** Audience (`aud`) must be an allowed value by the target API you are calling. Usually, this is a URL ending in a slash (/), but may also be an app/client id or other value. Contact the app owner to determine valid options._
+
 _**NOTE:** Audience (`aud`) can be used with any other options, as long as it's specified last. Order is important for all options._
 
 Implicit cloud selection (via REST endpoint TLD):
