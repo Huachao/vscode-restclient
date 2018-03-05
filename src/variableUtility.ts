@@ -1,6 +1,6 @@
 'use strict';
 
-import { TextDocument, Position, Range } from 'vscode';
+import { TextDocument, Position, TextLine, Range } from 'vscode';
 import * as Constants from './constants';
 
 export class VariableUtility {
@@ -20,6 +20,20 @@ export class VariableUtility {
     public static isVariableReference(document: TextDocument, position: Position): boolean {
         let wordRange = document.getWordRangeAtPosition(position);
         let lineRange = document.lineAt(position);
+        return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
+    }
+
+    public static isRequestVariableReference(document: TextDocument, position: Position): boolean {
+        let wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(response|request)?(\.body(\..*?)?|\.headers(\.[\w-]+)?)?\}\}/);
+        return wordRange && !wordRange.isEmpty;
+    }
+
+    public static isPartialRequestVariableReference(document: TextDocument, position: Position): boolean {
+        let wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
+        return wordRange && !wordRange.isEmpty;
+    }
+
+    private static isVariableReferenceFromLine(wordRange: Range, lineRange: TextLine) {
         if (!wordRange
             || wordRange.start.character < 2
             || wordRange.end.character > lineRange.range.end.character - 1

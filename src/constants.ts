@@ -4,6 +4,8 @@ export const ExtensionId: string = 'humao.rest-client';
 export const AiKey: string = 'ad746e27-4a36-441c-8b94-5db178f81ae3';
 export const CSSFileName: string = 'rest-client.css';
 export const CSSFolderName: string = 'styles';
+export const ScriptFileName: string = 'main.js';
+export const ScriptsFolderName: string = 'scripts';
 export const ExtensionFolderName: string = '.rest-client';
 export const HistoryFileName: string = 'history.json';
 export const CookieFileName: string = 'cookie.json';
@@ -62,3 +64,8 @@ export const AzureClouds = {
 export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
 export const VariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.+)\s*$/;
+
+export const RequestVariableDefinitionWithNameRegexFactory = (name: string, flags?: string): RegExp =>
+    new RegExp(`^\\s*(?:#{1,}|\\/{2,})\\s+@name\\s+(${name})\\s*$`, flags);
+
+export const RequestVariableDefinitionRegex: RegExp = RequestVariableDefinitionWithNameRegexFactory("\\w+", "m");

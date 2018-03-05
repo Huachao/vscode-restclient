@@ -15,7 +15,10 @@ import { CustomVariableReferencesCodeLensProvider } from './customVariableRefere
 import { HttpCodeLensProvider } from './httpCodeLensProvider';
 import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
 import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
+import { RequestVariableHoverProvider } from './requestVariableHoverProvider';
+import { RequestVariableCompletionItemProvider } from "./requestVariableCompletionItemProvider";
 import { VariableProcessor } from './variableProcessor';
+import { VariableDiagnosticsProvider } from "./variableDiagnosticsProvider";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -47,13 +50,22 @@ export async function activate(context: ExtensionContext) {
         });
     }));
     context.subscriptions.push(languages.registerCompletionItemProvider('http', new HttpCompletionItemProvider()));
+    context.subscriptions.push(languages.registerCompletionItemProvider('http', new RequestVariableCompletionItemProvider(), '.'));
     context.subscriptions.push(languages.registerHoverProvider('http', new CustomVariableHoverProvider()));
+    context.subscriptions.push(languages.registerHoverProvider('http', new RequestVariableHoverProvider()));
     context.subscriptions.push(languages.registerCodeLensProvider('http', new HttpCodeLensProvider()));
     context.subscriptions.push(languages.registerCodeLensProvider('http', new CustomVariableReferencesCodeLensProvider()));
     context.subscriptions.push(languages.registerDocumentLinkProvider('http', new RequestBodyDocumentLinkProvider()));
     context.subscriptions.push(languages.registerDefinitionProvider('http', new CustomVariableDefinitionProvider()));
     context.subscriptions.push(languages.registerReferenceProvider('http', new CustomVariableReferenceProvider()));
     context.subscriptions.push(languages.registerDocumentSymbolProvider('http', new HttpDocumentSymbolProvider()));
+
+    const diagnosticsProviders = new VariableDiagnosticsProvider();
+    workspace.onDidOpenTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
+    workspace.onDidCloseTextDocument((textDocument) => {
+        diagnosticsProviders.deleteDocumentFromDiagnosticCollection(textDocument);
+    }, null, context.subscriptions);
+    workspace.onDidSaveTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
 }
 
 // this method is called when your extension is deactivated

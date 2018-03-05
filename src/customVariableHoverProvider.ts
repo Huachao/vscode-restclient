@@ -1,6 +1,6 @@
 'use strict';
 
-import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Position } from 'vscode';
+import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Position, MarkdownString } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import { VariableProcessor } from './variableProcessor';
 import { VariableUtility } from './variableUtility';
@@ -18,7 +18,7 @@ export class CustomVariableHoverProvider implements HoverProvider {
         let fileCustomVariables = VariableProcessor.getCustomVariablesInCurrentFile();
         for (let [variableName, variableValue] of fileCustomVariables) {
             if (variableName === selectedVariableName) {
-                let contents: MarkedString[] = [variableValue, { language: 'http', value: `File Variable ${variableName}` }];
+                let contents: MarkedString[] = [variableValue, new MarkdownString(`*File Variable* \`${variableName}\``)];
                 return new Hover(contents, wordRange);
             }
         }
@@ -26,7 +26,7 @@ export class CustomVariableHoverProvider implements HoverProvider {
         let environmentCustomVariables = await EnvironmentController.getCustomVariables();
         for (let [variableName, variableValue] of environmentCustomVariables) {
             if (variableName === selectedVariableName) {
-                let contents: MarkedString[] = [variableValue, { language: 'http', value: `Environment Variable ${variableName}` }];
+                let contents: MarkedString[] = [variableValue, new MarkdownString(`*Environment Variable* \`${variableName}\``)];
                 return new Hover(contents, wordRange);
             }
         }

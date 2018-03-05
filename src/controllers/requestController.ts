@@ -17,6 +17,10 @@ import { RequestStore } from '../requestStore';
 import { ResponseStore } from '../responseStore';
 import { Selector } from '../selector';
 import * as Constants from '../constants';
+import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
+import { RequestVariableCache } from "../requestVariableCache";
+import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
+
 import { EOL } from 'os';
 
 const elegantSpinner = require('elegant-spinner');
@@ -33,7 +37,6 @@ export class RequestController {
     private _httpClient: HttpClient;
     private _responseTextProvider: HttpResponseTextDocumentContentProvider;
     private _registration: Disposable;
-    private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
     private _interval: NodeJS.Timer;
 
     public constructor() {
@@ -55,11 +58,15 @@ export class RequestController {
             return;
         }
 
+        const selector = new Selector();
+
         // Get selected text of selected lines or full document
-        let selectedText = new Selector().getSelectedText(editor, range);
+        let selectedText = selector.getSelectedText(editor, range);
         if (!selectedText) {
             return;
         }
+
+        const requestVariable = selector.getRequestVariableForSelectedText(editor, range);
 
         // remove comment lines
         let lines: string[] = selectedText.split(/\r?\n/g);
@@ -79,6 +86,10 @@ export class RequestController {
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
         if (!httpRequest) {
             return;
+        }
+
+        if (requestVariable) {
+            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, editor.document.uri.toString());
         }
 
         await this.runCore(httpRequest);
@@ -135,8 +146,11 @@ export class RequestController {
 
             let previewUri = this.generatePreviewUri();
             ResponseStore.add(previewUri.toString(), response);
+            if (httpRequest.requestVariableCacheKey) {
+                RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
+            }
 
-            this._responseTextProvider.update(this._previewUri);
+            this._responseTextProvider.update(previewUri);
 
             try {
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
@@ -190,6 +204,7 @@ export class RequestController {
         if (this._restClientSettings.showResponseInDifferentTab) {
             uriString += `/${Date.now()}`;  // just make every uri different
         }
+        uriString += '.html';
         return Uri.parse(uriString);
     }
 
