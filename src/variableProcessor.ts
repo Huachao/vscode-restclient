@@ -18,7 +18,7 @@ import * as moment from "moment";
 const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
 
-const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
+const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+aud:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
 const aadTokenCache = {};
 
 export class VariableProcessor {
@@ -125,7 +125,7 @@ export class VariableProcessor {
             cloud = targetApp.substring(targetApp.lastIndexOf(".") + 1, targetApp.length - 1);
         }
 
-        // parse input options -- [new] [public|cn|de|us|ppe] [<domain|tenantId>]
+        // parse input options -- [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]
         let tenantId = Constants.AzureActiveDirectoryDefaultTenantId;
         let forceNewToken = false;
         const groups = new RegExp(aadRegexPattern).exec(url);
@@ -133,6 +133,7 @@ export class VariableProcessor {
             forceNewToken = groups[2] === Constants.AzureActiveDirectoryForceNewOption;
             cloud = groups[4] || cloud;
             tenantId = groups[6] || tenantId;
+            targetApp = groups[8] || targetApp;
         }
 
         // verify cloud (default to public)

@@ -37,11 +37,7 @@ export const AzureActiveDirectoryForceNewOption = "new";
 export const AzureActiveDirectoryDefaultTenantId = "common";
 export const AzureActiveDirectoryDefaultDisplayName = "Default Directory";
 export const AzureClouds = {
-    ppe: {
-        aad: "https://login.windows-ppe.net/",  // for testing purposes only
-        arm: "https://api-dogfood.resources.windows-int.net/",
-        armAudience: "https://management.azure.com/",
-    },
+    // default cloud must be first
     public: {
         aad: "https://login.microsoftonline.com/",
         arm: "https://management.azure.com/",
@@ -57,6 +53,11 @@ export const AzureClouds = {
     us: {
         aad: "https://login.microsoftonline.us/",
         arm: "https://management.usgovcloudapi.net/",
+    },
+    ppe: {
+        aad: "https://login.windows-ppe.net/",  // for testing purposes only
+        arm: "https://api-dogfood.resources.windows-int.net/",
+        armAudience: "https://management.azure.com/",
     },
 };
 

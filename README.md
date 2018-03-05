@@ -23,7 +23,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Support both __environment__ and __file__ custom variables
     - Auto completion and hover support for both environment and file custom variables
     - Go to definition and find all references support _ONLY_ for file custom variables
-    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>]}}`
+    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
     - Easily create/update/delete environments and custom variables in setting file
     - Support environment switch
     - Support shared environment to provide variables that available in all environments
@@ -370,13 +370,15 @@ Content-Type: application/json
 
 ### Global Variables
 Global variables provide a pre-defined set of variables that can be used in any part of the request(Url/Headers/Body) in the format `{{$variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
-* `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
+* `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
 
   `new`: Optional. Specify `new` to force re-authentication and get a new token for the specified directory. Default: Reuse previous token for the specified directory from an in-memory cache. Expired tokens are refreshed automatically. (Use `F1 > Rest Client: Clear Azure AD Token Cache` or restart Visual Studio Code to clear the cache.)
 
   `public|cn|de|us|ppe`: Optional. Specify top-level domain (TLD) to get a token for the specified government cloud, `public` for the public cloud, or `ppe` for internal testing. Default: TLD of the REST endpoint; `public` if not valid.
 
   `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a dropdown or press `Esc` to use the home directory (`common` for Microsoft Account).
+
+  `aud:<domain|tenantId>`: Optional. Target Azure AD app id (aka client id) or domain the token should be created for (aka audience or resource). Default: Domain of the REST endpoint.
 
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
@@ -447,6 +449,17 @@ Authorization: {{$aadToken new contoso.com}}
 _**NOTE:** REST Client uses an in-memory token cache that clears when Visual Studio Code is restarted. You can clear the token cache manually by using `F1 > Rest Client: Clear Azure AD Token Cache`._
 
 _**NOTE:** `new` can be used with any other options, as long as it's specified first. Order is important for all options._
+
+Specify an explicit Azure AD app (aka audience or resource):
+
+```http
+GET https://fabrikam.com/api/foo
+Authorization: {{$aadToken aud:000000000000-0000-0000-0000-00000000}}
+```
+
+_**NOTE:** Audience (`aud`) must be an allowed value by the target API you are calling. Usually, this is a URL ending in a slash (/), but may also be an app/client id or other value. Contact the app owner to determine valid options._
+
+_**NOTE:** Audience (`aud`) can be used with any other options, as long as it's specified last. Order is important for all options._
 
 Implicit cloud selection (via REST endpoint TLD):
 
