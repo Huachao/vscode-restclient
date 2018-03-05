@@ -66,3 +66,7 @@ Authorization: {{$aadToken us}}
 GET {{arm-ppe}}/subscriptions?api-version=2017-08-01
 Authorization: {{$aadToken ppe}}
 ###
+// Explicit audience selection
+GET {{graph}}/me?api-version=1.6
+Authorization: {{$aadToken microsoft.com aud:https://management.core.windows.net/}}
+###

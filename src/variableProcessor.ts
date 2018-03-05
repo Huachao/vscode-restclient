@@ -1,19 +1,25 @@
 'use strict';
 
+import { commands, QuickPickItem, QuickPickOptions, Uri, window, TextDocument } from 'vscode';
 import { isNil } from 'lodash';
-import { commands, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
-import * as Constants from './constants';
+import * as Constants from "./constants";
 import { Func } from './common/delegates';
+import { RequestVariableCache } from "./requestVariableCache";
+import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { HttpClient } from './httpClient';
 import { HttpRequest } from './models/httpRequest';
 import { RestClientSettings } from './models/configurationSettings';
+import { RequestVariableCacheValue } from "./models/requestVariableCacheValue";
+import { VariableType } from "./models/variableType";
+import { ResolveState } from "./models/requestVariableResolveResult";
 import * as adal from 'adal-node';
-import * as moment from 'moment';
+import * as moment from "moment";
 const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
 
-const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
+const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+aud:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
 const aadTokenCache = {};
 
 export class VariableProcessor {
@@ -24,12 +30,46 @@ export class VariableProcessor {
         ['t', '\t']
     ]);
 
-    public static async processRawRequest(request: string, baseText?: string) {
+    public static async processRawRequest(request: string, baseText?: string, documentUri?: Uri) {
         let globalVariables = VariableProcessor.getGlobalVariables();
         for (let variablePattern in globalVariables) {
             let regex = new RegExp(`\\{\\{\\s*${variablePattern}\\s*\\}\\}`, 'g');
             if (regex.test(request)) {
                 request = request.replace(regex, globalVariables[variablePattern]);
+            }
+        }
+
+        let requestVariables: Map<string, RequestVariableCacheValue>;
+
+        if (arguments.length > 1) {
+            VariableProcessor.getRequestVariablesInText(baseText, documentUri);
+        } else {
+            VariableProcessor.getRequestVariablesInCurrentFile();
+        }
+
+        for (let [variableName, variableValue] of requestVariables) {
+            let regex = new RegExp(`\\{\\{\\s*${variableName}.*\\s*\\}\\}`, 'g');
+            let matches = request.match(regex);
+            if (matches && matches.length > 0) {
+                for (let i = 0; i < matches.length; i++) {
+                    const requestVariable = matches[i].replace('{{', '').replace('}}', '');
+                    let value;
+                    let result = RequestVariableCacheValueProcessor.resolveRequestVariable(variableValue, requestVariable);
+                    if (result.state !== ResolveState.Success) {
+                        const {state, message} = result;
+                        value = `{{${requestVariable}}}`;
+                        if (state === ResolveState.Warning) {
+                            console.warn(message);
+                        } else {
+                            console.error(message);
+                        }
+                    } else {
+                        value = result.value;
+                    }
+
+                    const escapedVariable = VariableProcessor.escapeRegExp(requestVariable);
+                    request = request.replace(new RegExp(`\\{\\{\\s*${escapedVariable}\\s*\\}\\}`, 'g'), value);
+                }
             }
         }
 
@@ -99,7 +139,7 @@ export class VariableProcessor {
             cloud = targetApp.substring(targetApp.lastIndexOf(".") + 1, targetApp.length - 1);
         }
 
-        // parse input options -- [new] [public|cn|de|us|ppe] [<domain|tenantId>]
+        // parse input options -- [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]
         let tenantId = Constants.AzureActiveDirectoryDefaultTenantId;
         let forceNewToken = false;
         const groups = new RegExp(aadRegexPattern).exec(url);
@@ -107,6 +147,7 @@ export class VariableProcessor {
             forceNewToken = groups[2] === Constants.AzureActiveDirectoryForceNewOption;
             cloud = groups[4] || cloud;
             tenantId = groups[6] || tenantId;
+            targetApp = groups[8] || targetApp;
         }
 
         // verify cloud (default to public)
@@ -249,7 +290,7 @@ export class VariableProcessor {
                                              * Reason: Anything
                                              * Action: Ignore
                                              */
-                                         }
+                                        }
                                         domain = `${domain} (+${count - 1} more)`;
                                     }
 
@@ -339,14 +380,44 @@ export class VariableProcessor {
     }
 
     public static getCustomVariablesInCurrentFile(): Map<string, string> {
-        let text: string;
-
         let editor = window.activeTextEditor;
-        if (editor && editor.document) {
-            text = editor.document.getText();
+        if (!editor || !editor.document) {
+            return new Map<string, string>();
         }
 
-        return VariableProcessor.getCustomVariablesFromText(text);
+        return VariableProcessor.getCustomVariablesInFile(editor.document);
+    }
+
+    public static getCustomVariablesInFile(document: TextDocument): Map<string, string> {
+        let variables = new Map<string, string>();
+
+        let text = document.getText();
+        let lines: string[] = text.split(/\r?\n/g);
+        lines.forEach(line => {
+            let match: RegExpExecArray;
+            if (match = Constants.VariableDefinitionRegex.exec(line)) {
+                let key = match[1];
+                let originalValue = match[2];
+                let value = "";
+                let isPrevCharEscape = false;
+                for (let index = 0; index < originalValue.length; index++) {
+                    let currentChar = originalValue[index];
+                    if (isPrevCharEscape) {
+                        isPrevCharEscape = false;
+                        value += this.escapee.get(currentChar) || currentChar;
+                    } else {
+                        if (currentChar === "\\") {
+                            isPrevCharEscape = true;
+                            continue;
+                        }
+                        value += currentChar;
+                    }
+                }
+                variables.set(key, value);
+            }
+        });
+
+        return variables;
     }
 
     public static getCustomVariablesFromText(text: string): Map<string, string> {
@@ -381,6 +452,77 @@ export class VariableProcessor {
                 }
             });
         }
+
+        return variables;
+    }
+
+    public static getRequestVariablesInCurrentFile(activeOnly: boolean = true): Map<string, RequestVariableCacheValue> {
+        let editor = window.activeTextEditor;
+        if (!editor || !editor.document) {
+            return new Map<string, RequestVariableCacheValue>();
+        }
+
+        return VariableProcessor.getRequestVariablesInFile(editor.document, activeOnly);
+    }
+
+    public static getRequestVariablesInFile(document: TextDocument, activeOnly: boolean = true): Map<string, RequestVariableCacheValue> {
+        return VariableProcessor.getRequestVariablesInText(document.getText(),
+                                                           document.uri,
+                                                           activeOnly);
+    }
+
+    public static async getAllVariablesDefinitions(document: TextDocument): Promise<Map<string, VariableType[]>> {
+        const requestVariables = VariableProcessor.getRequestVariablesInFile(document, false);
+        const fileVariables = VariableProcessor.getCustomVariablesInFile(document);
+        const environmentVariables = await EnvironmentController.getCustomVariables();
+
+        const variableDefinitions = new Map<string, VariableType[]>();
+
+        // Request variables in file
+        requestVariables.forEach((val, key) => {
+            if (variableDefinitions.has(key)) {
+                variableDefinitions.get(key).push(VariableType.Request);
+            } else {
+                variableDefinitions.set(key, [VariableType.Request]);
+            }
+        });
+
+        // Normal file variables
+        fileVariables.forEach((val, key) => {
+            variableDefinitions.set(key, [VariableType.File]);
+        });
+
+        // Environment variables
+        environmentVariables.forEach((val, key) => {
+            if (variableDefinitions.has(key)) {
+                variableDefinitions.get(key).push(VariableType.Environment);
+            } else {
+                variableDefinitions.set(key, [VariableType.Environment]);
+            }
+        });
+
+
+        return variableDefinitions;
+    }
+
+    private static escapeRegExp(str: string): string {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    }
+
+    public static getRequestVariablesInText(text: string, documentUri: Uri, activeOnly: boolean = true) {
+        let variables = new Map<string, RequestVariableCacheValue>();
+
+        let lines: string[] = text.split(/\r?\n/g);
+        lines.forEach(line => {
+            let match: RegExpExecArray;
+            if (match = Constants.RequestVariableDefinitionRegex.exec(line)) {
+                let key = match[1];
+                const response = RequestVariableCache.get(new RequestVariableCacheKey(key, documentUri.toString()));
+                if (!activeOnly || response) {
+                    variables.set(key, response);
+                }
+            }
+        });
 
         return variables;
     }

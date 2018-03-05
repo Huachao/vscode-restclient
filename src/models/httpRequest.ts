@@ -1,8 +1,10 @@
 "use strict";
 
 import { Stream } from 'stream';
+import { RequestVariableCacheKey } from './requestVariableCacheKey';
 
 export class HttpRequest {
+    public requestVariableCacheKey?: RequestVariableCacheKey;
     public constructor(
         public method: string,
         public url: string,

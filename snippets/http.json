@@ -51,10 +51,17 @@
         "description": "SOAP Request"
     },
     "File level custom variable": {
-        "prefix": "variable",
+        "prefix": "fv",
         "body": [
-            "@${1:name} = ${2:value}"
+            "@${1:Variable_Name} = ${2:Variable_Value}"
         ],
         "description": "Define Custom File Variable"
+    },
+    "Request variable": {
+        "prefix": "rv",
+        "body": [
+            "# @name ${1:Request_Name}"
+        ],
+        "description": "Define Request Variable"
     }
 }

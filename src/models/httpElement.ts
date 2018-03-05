@@ -1,12 +1,12 @@
 "use strict";
 
-import { SnippetString } from 'vscode';
+import { SnippetString, MarkdownString } from 'vscode';
 
 export class HttpElement {
 
     public text: string | SnippetString;
 
-    public constructor(public name: string, public type: ElementType, public prefix: string = null, public description: string = null, text: string | SnippetString = null) {
+    public constructor(public name: string, public type: ElementType, public prefix: string = null, public description: string | MarkdownString = null, text: string | SnippetString = null) {
         this.text = text;
         if (!this.text) {
             this.text = name;
@@ -35,5 +35,6 @@ export enum ElementType {
     Authentication,
     SystemVariable,
     EnvironmentCustomVariable,
-    FileCustomVariable
+    FileCustomVariable,
+    RequestCustomVariable
 }

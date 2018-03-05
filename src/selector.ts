@@ -23,6 +23,17 @@ export class Selector {
         return selectedText;
     }
 
+    public getRequestVariableForSelectedText(editor: TextEditor, range: Range = null): string {
+        if (!editor || !editor.document) {
+            return null;
+        }
+
+        let activeLine = !range ? editor.selection.active.line : range.start.line;
+        const delimitedText = this.getDelimitedText(editor.document.getText(), activeLine);
+
+        return Selector.getRequestVariableDefinitionName(delimitedText);
+    }
+
     public static getDelimiterRows(lines: string[]) {
         let rows: number[] = [];
         for (let index = 0; index < lines.length; index++) {
@@ -31,6 +42,11 @@ export class Selector {
             }
         }
         return rows;
+    }
+
+    public static getRequestVariableDefinitionName(text: string): string {
+        const matched = text.match(Constants.RequestVariableDefinitionRegex);
+        return matched && matched[1];
     }
 
     public static isCommentLine(line: string): boolean {

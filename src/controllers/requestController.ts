@@ -17,6 +17,10 @@ import { RequestStore } from '../requestStore';
 import { ResponseStore } from '../responseStore';
 import { Selector } from '../selector';
 import * as Constants from '../constants';
+import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
+import { RequestVariableCache } from "../requestVariableCache";
+import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
+
 import { EOL } from 'os';
 import * as Path from 'path';
 import { glob, readFile } from "../common/fsUtility";
@@ -65,7 +69,7 @@ export class RequestController {
         workspace.onDidCloseTextDocument((params) => this.onDidCloseTextDocument(params));
     }
 
-    private async parseTextForRequest(text: string) {
+    private async parseTextForRequest(text: string, documentUri: Uri) {
         if (!text) {
             return text;
         }
@@ -84,7 +88,7 @@ export class RequestController {
         text = ArrayUtility.skipWhile(lines, l => Constants.VariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
         // variables replacement
-        return await VariableProcessor.processRawRequest(text, BASE_TEXT);
+        return await VariableProcessor.processRawRequest(text, BASE_TEXT, documentUri);
     }
 
     @trace('Request')
@@ -94,18 +98,26 @@ export class RequestController {
             return;
         }
 
+        const selector = new Selector();
+
+        const requestVariable = selector.getRequestVariableForSelectedText(editor, range);
+
         // Get selected text of selected lines or full document
-        let selectedText = new Selector().getSelectedText(editor, range);
+        let selectedText = selector.getSelectedText(editor, range);
         if (!selectedText) {
             return;
         }
 
-        selectedText = await this.parseTextForRequest(selectedText);
+        selectedText = await this.parseTextForRequest(selectedText, editor.document.uri);
 
         // parse http request
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
         if (!httpRequest) {
             return;
+        }
+
+        if (requestVariable) {
+            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, editor.document.uri.toString());
         }
 
         await this.runCore(httpRequest);
@@ -197,27 +209,40 @@ export class RequestController {
                     }
                     parsedRequest += "\n";
 
-                    parsedRequest = await this.parseTextForRequest(parsedRequest);
+                    const SELECTOR = new Selector();
 
-                    return new RequestParserFactory().createRequestParser(parsedRequest)
-                                                     .parseHttpRequest(parsedRequest, REQUEST_FILE);
+                    const REQUEST_VARIABLE = SELECTOR.getRequestVariableForSelectedText(SCRIPT_EDITOR, range);
+
+                    parsedRequest = await this.parseTextForRequest(parsedRequest, SCRIPT_EDITOR.document.uri);
+
+                    const NEW_REQUEST = new RequestParserFactory().createRequestParser(parsedRequest)
+                                                                  .parseHttpRequest(parsedRequest, REQUEST_FILE);
+
+                    if (NEW_REQUEST && REQUEST_VARIABLE) {
+                        NEW_REQUEST.requestVariableCacheKey = new RequestVariableCacheKey(REQUEST_VARIABLE,
+                                                                                          SCRIPT_EDITOR.document.uri.toString());
+                    }
+
+                    return NEW_REQUEST;
                 },
                 cwd: REQUEST_DIR,
                 requestFile: REQUEST_FILE,
                 run: async (opts) => {
                     let response: HttpResponse;
 
-                    await this.runCore(opts.request, {
-                        openResponse: false,
-                        responseResolver: (err, resp) => {
-                            if (err) {
-                                throw err;
-                            } else {
-                                response = resp;
-                            }
-                        },
-                        showErrors: false,
-                    });
+                    if (opts.request) {
+                        await this.runCore(opts.request, {
+                            openResponse: false,
+                            responseResolver: (err, resp) => {
+                                if (err) {
+                                    throw err;
+                                } else {
+                                    response = resp;
+                                }
+                            },
+                            showErrors: false,
+                        });
+                    }
 
                     return response;
                 },
@@ -293,6 +318,9 @@ export class RequestController {
             let showResponse = true;
             if (!isNil(opts.openResponse)) {
                 showResponse = opts.openResponse;
+            }
+            if (httpRequest.requestVariableCacheKey) {
+                RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
             }
 
             if (showResponse) {

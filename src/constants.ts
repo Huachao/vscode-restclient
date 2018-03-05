@@ -37,11 +37,7 @@ export const AzureActiveDirectoryForceNewOption = "new";
 export const AzureActiveDirectoryDefaultTenantId = "common";
 export const AzureActiveDirectoryDefaultDisplayName = "Default Directory";
 export const AzureClouds = {
-    ppe: {
-        aad: "https://login.windows-ppe.net/",  // for testing purposes only
-        arm: "https://api-dogfood.resources.windows-int.net/",
-        armAudience: "https://management.azure.com/",
-    },
+    // default cloud must be first
     public: {
         aad: "https://login.microsoftonline.com/",
         arm: "https://management.azure.com/",
@@ -58,8 +54,18 @@ export const AzureClouds = {
         aad: "https://login.microsoftonline.us/",
         arm: "https://management.usgovcloudapi.net/",
     },
+    ppe: {
+        aad: "https://login.windows-ppe.net/",  // for testing purposes only
+        arm: "https://api-dogfood.resources.windows-int.net/",
+        armAudience: "https://management.azure.com/",
+    },
 };
 
 export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
 export const VariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.+)\s*$/;
+
+export const RequestVariableDefinitionWithNameRegexFactory = (name: string, flags?: string): RegExp =>
+    new RegExp(`^\\s*(?:#{1,}|\\/{2,})\\s+@name\\s+(${name})\\s*$`, flags);
+
+export const RequestVariableDefinitionRegex: RegExp = RequestVariableDefinitionWithNameRegexFactory("\\w+", "m");
