@@ -28,9 +28,11 @@ export interface RunRequestScriptOptions {
 export type VarsFromScript = { [name: string]: any };
 
 
-// keep sure to have no conflicts with variables
-// when executing script code
-export async function runRequestScript(_57b252af4b9749f6a793ac3342d748ae_mk_23979_tm_5979: RunRequestScriptOptions) {
+export async function runRequestScript(
+    // keep sure to have no conflicts with variables
+    // when executing script code
+    _57b252af4b9749f6a793ac3342d748ae_mk_23979_tm_5979: RunRequestScriptOptions
+) {
     // tslint:disable-next-line:no-unused-variable
     const $vscode = require('vscode');
     // tslint:disable-next-line:no-unused-variable
