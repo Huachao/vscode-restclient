@@ -12,7 +12,7 @@ export const enum ResolveState {
 
 export const enum ResolveErrorMessage {
     NoRequestVariablePath = 'Request variable path is not provided',
-    InvalidRequestVariableReference = 'Incorrect request variable reference syntax, it should be "variableName.(response|request).(headers|body).(headerName|JSONPath)"',
+    InvalidRequestVariableReference = 'Incorrect request variable reference syntax, it should be "variableName.(response|request).(headers|body).(headerName|JSONPath|XPath)"',
 }
 
 export const enum ResolveWarningMessage {
@@ -24,6 +24,8 @@ export const enum ResolveWarningMessage {
     ResponseBodyNotExist = "Response body of given request doesn't exist",
     IncorrectHeaderName = 'No value is resolved for given header name',
     IncorrectJSONPath = 'No value is resolved for given JSONPath',
+    IncorrectXPath = 'No value is resolved for given XPath',
     UnsupportedBodyContentType = 'Only JSON response/request body is supported to query the result',
-    InvalidJSONPath = 'Invalid JSONPath query'
+    InvalidJSONPath = 'Invalid JSONPath query',
+    InvalidXPath = 'Invalid XPath query',
 }
