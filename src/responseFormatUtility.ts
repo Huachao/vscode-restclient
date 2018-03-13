@@ -2,6 +2,8 @@
 
 import { window } from 'vscode';
 import { MimeUtility } from './mimeUtility';
+import { format as JSONFormat } from "jsonc-parser";
+import { EOL } from "os";
 const pd = require('pretty-data').pd;
 
 export class ResponseFormatUtility {
@@ -13,7 +15,10 @@ export class ResponseFormatUtility {
             if (type === 'application/json' ||
                 suffix === '+json') {
                 if (ResponseFormatUtility.IsJsonString(body)) {
-                    body = JSON.stringify(JSON.parse(body), null, 2);
+                    const edits = JSONFormat(body, undefined, { tabSize: 2, insertSpaces: true, eol: EOL });
+                    body = edits.reduceRight((prev, cur) => {
+                        return prev.substring(0, cur.offset) + cur.content + prev.substring(cur.offset + cur.length);
+                    }, body);
                 } else if (!suppressValidation) {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                 }

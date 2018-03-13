@@ -506,6 +506,7 @@
     "highlight.js": "^9.6.0",
     "httpsnippet": "^1.16.5",
     "iconv-lite": "^0.4.15",
+    "jsonc-parser": "^1.0.3",
     "jsonpath": "^1.0.0",
     "mime-types": "^2.1.14",
     "moment": "^2.20.1",
