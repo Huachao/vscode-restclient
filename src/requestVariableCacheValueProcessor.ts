@@ -4,8 +4,11 @@ import { HttpResponse } from './models/httpResponse';
 import { HttpRequest } from "./models/httpRequest";
 import { ResolveResult, ResolveState, ResolveErrorMessage, ResolveWarningMessage } from "./models/requestVariableResolveResult";
 import { MimeUtility } from './mimeUtility';
+import { MIME } from './models/mime';
 
 const jp = require('jsonpath');
+const xpath = require('xpath');
+const { DOMParser } = require('xmldom');
 
 const requestVariablePathRegex: RegExp = /^(\w+)(?:\.(request|response)(?:\.(body|headers)(?:\.(.*))?)?)?$/;
 
@@ -50,11 +53,13 @@ export class RequestVariableCacheValueProcessor {
                 return { state: ResolveState.Warning, value: body, message: ResolveWarningMessage.MissingBodyPath };
             }
 
-            const contentType = RequestVariableCacheValueProcessor.getHeaderContentType(http);
-            if (contentType === "application/json") {
+            const {type, suffix} = RequestVariableCacheValueProcessor.getHeaderMIME(http);
+            if (type === "application/json" || suffix === '+json') {
                 const parsedBody = JSON.parse(body as string);
 
                 return RequestVariableCacheValueProcessor.resolveJsonHttpBody(parsedBody, nameOrPath);
+            } else if (type === 'application/xml' || type === 'text/xml' || suffix === '+xml') {
+                return RequestVariableCacheValueProcessor.resolveXmlHttpBody(body, nameOrPath);
             } else {
                 return { state: ResolveState.Warning, value: body, message: ResolveWarningMessage.UnsupportedBodyContentType };
             }
@@ -74,13 +79,12 @@ export class RequestVariableCacheValueProcessor {
         }
     }
 
-    private static getHeaderContentType(http: HttpRequest | HttpResponse) {
+    private static getHeaderMIME(http: HttpRequest | HttpResponse): MIME {
         let contentType = RequestVariableCacheValueProcessor.getHeaderValue(http, "content-type");
         if (!contentType) {
             return null;
         }
-        let mime = MimeUtility.parse(contentType);
-        return mime.type;
+        return MimeUtility.parse(contentType);
     }
 
     private static getHeaderValue(http: HttpRequest | HttpResponse, name: string) {
@@ -108,4 +112,34 @@ export class RequestVariableCacheValueProcessor {
             return { state: ResolveState.Warning, message: ResolveWarningMessage.InvalidJSONPath };
         }
     }
+
+    private static resolveXmlHttpBody(body: any, path: string): ResolveResult {
+        try {
+            const doc = new DOMParser().parseFromString(body);
+            const results = xpath.select(path, doc);
+            if (typeof results === 'string') {
+                return { state: ResolveState.Success, value: results };
+            } else {
+                if (results.length === 0) {
+                    return { state: ResolveState.Warning, message: ResolveWarningMessage.IncorrectXPath };
+                } else {
+                    const result = results[0];
+                    if (result.nodeType === NodeType.Element) {
+                        // Element
+                        return { state: ResolveState.Success, value: result.childNodes.toString() };
+                    } else {
+                        // Attribute
+                        return { state: ResolveState.Success, value: result.nodeValue };
+                    }
+                }
+            }
+        } catch {
+            return { state: ResolveState.Warning, message: ResolveWarningMessage.InvalidXPath };
+        }
+    }
+}
+
+const enum NodeType {
+    Element = 1,
+    Attribute,
 }
