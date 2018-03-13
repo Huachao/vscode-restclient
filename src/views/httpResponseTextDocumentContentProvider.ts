@@ -124,6 +124,12 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
             `width: ${width}ch;`,
             `margin-left: calc(-${width}ch + -30px );`,
             '}',
+            '.line .icon {',
+            `left: calc(${width}ch + 3px)`,
+            '}',
+            '.line.collapsed .icon {',
+            `left: calc(${width}ch + 3px)`,
+            '}',
             '</style>'].join('\n');
     }
 
