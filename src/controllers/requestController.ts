@@ -159,10 +159,12 @@ export class RequestController {
                         this._restClientSettings.showResponseInDifferentTab,
                         this._restClientSettings.previewResponseSetUntitledDocumentLanguageByContentType,
                         this._restClientSettings.includeAdditionalInfoInResponse,
-                        this._restClientSettings.suppressResponseBodyContentTypeValidationWarning
+                        this._restClientSettings.suppressResponseBodyContentTypeValidationWarning,
+                        this._restClientSettings.previewResponseInActiveColumn
                     );
                 } else {
-                    await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`);
+                    const column = this._restClientSettings.previewResponseInActiveColumn ? ViewColumn.Active : ViewColumn.Two;
+                    await commands.executeCommand('vscode.previewHtml', previewUri, column, `Response(${response.elapsedMillionSeconds}ms)`);
                 }
             } catch (reason) {
                 window.showErrorMessage(reason);

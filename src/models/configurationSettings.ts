@@ -27,6 +27,7 @@ export interface IRestClientSettings {
     disableHighlightResonseBodyForLargeResponse: boolean;
     disableAddingHrefLinkForLargeResponse: boolean;
     largeResponseBodySizeLimitInMB: number;
+    previewResponseInActiveColumn: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -55,6 +56,7 @@ export class RestClientSettings implements IRestClientSettings {
     public disableHighlightResonseBodyForLargeResponse: boolean;
     public disableAddingHrefLinkForLargeResponse: boolean;
     public largeResponseBodySizeLimitInMB: number;
+    public previewResponseInActiveColumn: boolean;
 
     public constructor() {
         workspace.onDidChangeConfiguration(() => {
@@ -84,6 +86,7 @@ export class RestClientSettings implements IRestClientSettings {
 
         this.previewResponseInUntitledDocument = restClientSettings.get<boolean>("previewResponseInUntitledDocument", false);
         this.previewResponseSetUntitledDocumentLanguageByContentType = restClientSettings.get<boolean>("previewResponseSetUntitledDocumentLanguageByContentType", false);
+        this.previewResponseInActiveColumn = restClientSettings.get<boolean>("previewResponseInActiveColumn", false);
         this.includeAdditionalInfoInResponse = restClientSettings.get<boolean>("includeAdditionalInfoInResponse", false);
         this.hostCertificates = restClientSettings.get<Map<string, HostCertificate>>("certificates", new Map<string, HostCertificate>());
         this.useTrunkedTransferEncodingForSendingFileContent = restClientSettings.get<boolean>("useTrunkedTransferEncodingForSendingFileContent", true);

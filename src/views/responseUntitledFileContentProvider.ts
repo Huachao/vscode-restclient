@@ -11,13 +11,15 @@ export class UntitledFileContentProvider {
         createNewFile: boolean,
         autoSetLanguage: boolean,
         additionalInfo: boolean,
-        suppressValidation: boolean
+        suppressValidation: boolean,
+        previewResponseInActiveColumn: boolean
     ) {
 
         const language = autoSetLanguage ? UntitledFileContentProvider.languageFromContentType(response) : 'http';
         const content = UntitledFileContentProvider.formatResponse(response, language, additionalInfo, autoSetLanguage, suppressValidation);
+        const column = previewResponseInActiveColumn ? ViewColumn.Active : ViewColumn.Two;
         workspace.openTextDocument({ 'language': language, 'content': content }).then(document => {
-            window.showTextDocument(document, { viewColumn: ViewColumn.Two, preserveFocus: false, preview: !createNewFile });
+            window.showTextDocument(document, { viewColumn: column, preserveFocus: false, preview: !createNewFile });
         });
     }
 

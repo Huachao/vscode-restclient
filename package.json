@@ -475,6 +475,12 @@
           "exclusiveMinimum": true,
           "scope": "resource",
           "description": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when 'rest-client.disableHighlightResonseBodyForLargeResponse' and/or 'rest-client.disableAddingHrefLinkForLargeResponse' is set to true"
+        },
+        "rest-client.previewResponseInActiveColumn": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "description": "Preview response in current active column"
         }
       }
     }
