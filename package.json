@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "SP REST Client",
   "description": "SharePoint REST Client for Visual Studio Code",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "s-kainet",
   "author": {
     "name": "Huachao Mao",
@@ -337,7 +337,9 @@
         },
         "rest-client.environmentVariables": {
           "type": "object",
-          "default": {"$shared": {}},
+          "default": {
+            "$shared": {}
+          },
           "scope": "resource",
           "description": "Sets the environments and custom variables belongs to it, especially the special environment name '$shared' is used to create variables shared across all the individual environments (e.g., {\"$shared\": {\"version\": \"v1\"}, \"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
           "additionalProperties": {
@@ -507,7 +509,7 @@
     "mime-types": "^2.1.14",
     "moment": "^2.20.1",
     "node-sp-auth": "^2.3.2",
-    "node-sp-auth-config": "^2.4.2",
+    "node-sp-auth-config": "^2.4.5",
     "node-uuid": "^1.4.7",
     "pretty-data": "^0.40.0",
     "request": "^2.81.0",
