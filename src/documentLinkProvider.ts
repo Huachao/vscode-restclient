@@ -11,7 +11,7 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
 
     public provideDocumentLinks(document: TextDocument, _token: CancellationToken): DocumentLink[] {
         const results: DocumentLink[] = [];
-        const base = path.dirname(document.uri.fsPath);
+        const base = path.dirname(document.uri.toString());
         const text = document.getText();
 
         let lines: string[] = text.split(/\r?\n/g);
