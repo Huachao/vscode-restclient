@@ -9,7 +9,7 @@ export function getWorkspaceRootPath(): string {
         let fileUri = window.activeTextEditor.document.uri;
         let workspaceFolder = workspace.getWorkspaceFolder(fileUri);
         if (workspaceFolder) {
-            return workspaceFolder.uri.fsPath;
+            return workspaceFolder.uri.toString();
         }
     }
 }
