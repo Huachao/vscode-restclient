@@ -14,7 +14,7 @@ export class Telemetry {
                 let client = appInsights.getClient(Constants.AiKey);
                 client.trackEvent(eventName, properties);
             }
-        } catch (error) {
+        } catch {
         }
     }
 }

@@ -19,7 +19,7 @@ export class PersistUtility {
             requests.unshift(httpRequest);
             requests = requests.slice(0, Constants.HistoryItemsMaxCount);
             await PersistUtility.serializeToHistoryFile(requests);
-        } catch (error) {
+        } catch {
         }
     }
 
@@ -39,7 +39,7 @@ export class PersistUtility {
     public static createFileIfNotExists(path: string) {
         try {
             fs.statSync(path);
-        } catch (error) {
+        } catch {
             PersistUtility.ensureDirectoryExistence(path);
             fs.writeFileSync(path, '');
         }
@@ -115,7 +115,7 @@ export class PersistUtility {
                         try {
                             resolve(JSON.parse(fileContent));
                             return;
-                        } catch (error) {
+                        } catch {
                         }
                     }
                     resolve(PersistUtility.emptyHttpRequestItems);
@@ -136,7 +136,7 @@ export class PersistUtility {
     private static directoryExists(path) {
         try {
             return fs.statSync(path).isDirectory();
-        } catch (err) {
+        } catch {
             return false;
         }
     }

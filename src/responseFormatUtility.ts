@@ -16,9 +16,9 @@ export class ResponseFormatUtility {
                 suffix === '+json') {
                 if (ResponseFormatUtility.IsJsonString(body)) {
                     const edits = JSONFormat(body, undefined, { tabSize: 2, insertSpaces: true, eol: EOL });
-                    body = edits.reduceRight((prev, cur) => {
-                        return prev.substring(0, cur.offset) + cur.content + prev.substring(cur.offset + cur.length);
-                    }, body);
+                    body = edits.reduceRight(
+                        (prev, cur) => prev.substring(0, cur.offset) + cur.content + prev.substring(cur.offset + cur.length),
+                        body);
                 } else if (!suppressValidation) {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                 }
@@ -38,7 +38,7 @@ export class ResponseFormatUtility {
         try {
             JSON.parse(data);
             return true;
-        } catch (e) {
+        } catch {
             return false;
         }
     }

@@ -270,12 +270,7 @@ export class VariableProcessor {
 
                                             // use the first match in the array of matches
                                             domain = bestMatches.find(m => m) || domain;
-                                        } catch (e) {
-                                            /**
-                                             * Source: Anything
-                                             * Reason: Anything
-                                             * Action: Ignore
-                                             */
+                                        } catch {
                                         }
                                         domain = `${domain} (+${count - 1} more)`;
                                     }
