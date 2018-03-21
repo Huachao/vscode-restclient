@@ -67,7 +67,7 @@ export class RestClientSettings implements IRestClientSettings {
     }
 
     private initializeSettings() {
-        let restClientSettings = this.getWorkspaceConfiguration();
+        let restClientSettings = this.getWorkspaceConfiguration("rest-client");
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultUserAgent = restClientSettings.get<string>("defaultuseragent", "vscode-restclient");
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
@@ -95,20 +95,20 @@ export class RestClientSettings implements IRestClientSettings {
         this.disableAddingHrefLinkForLargeResponse = restClientSettings.get<boolean>("disableAddingHrefLinkForLargeResponse", true);
         this.largeResponseBodySizeLimitInMB = restClientSettings.get<number>("largeResponseBodySizeLimitInMB", 5);
         this.previewOption = ParsePreviewOptionStr(restClientSettings.get<string>("previewOption", "full"));
+        this.enableTelemetry = restClientSettings.get<boolean>('enableTelemetry', true);
+        this.showEnvironmentStatusBarItem = restClientSettings.get<boolean>('showEnvironmentStatusBarItem', true);
 
-        let httpSettings = workspace.getConfiguration('http');
+        let httpSettings = this.getWorkspaceConfiguration("http");
         this.proxy = httpSettings.get<string>('proxy', undefined);
         this.proxyStrictSSL = httpSettings.get<boolean>('proxyStrictSSL', false);
-        this.enableTelemetry = httpSettings.get<boolean>('enableTelemetry', true);
-        this.showEnvironmentStatusBarItem = restClientSettings.get<boolean>('showEnvironmentStatusBarItem', true);
     }
 
-    private getWorkspaceConfiguration(): WorkspaceConfiguration {
+    private getWorkspaceConfiguration(section: string): WorkspaceConfiguration {
         let editor = window.activeTextEditor;
         if (editor && editor.document) {
-            return workspace.getConfiguration("rest-client", editor.document.uri);
+            return workspace.getConfiguration(section, editor.document.uri);
         } else {
-            return workspace.getConfiguration("rest-client");
+            return workspace.getConfiguration(section);
         }
     }
 }
