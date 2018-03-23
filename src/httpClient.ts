@@ -257,7 +257,7 @@ export class HttpClient {
                 // if port specified, match host without port or hostname:port exactly match
                 let [ph, pp] = urlParts;
                 if (ph === hostName && (!pp || pp === port)) {
-                    return true
+                    return true;
                 }
             }
         }
