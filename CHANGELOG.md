@@ -1,3 +1,14 @@
+## 0.18.0 (2018/3/29)
+* __Feature__: [Add request variable support to provide the possibility to extract values from response](https://github.com/Huachao/vscode-restclient/pull/140) ([@cbrevik](https://github.com/cbrevik))
+* __Feature__: [Add indentation based response folding in webview](https://github.com/Huachao/vscode-restclient/issues/157)
+* __Feature__: [Add option to preview response in current active view column](https://github.com/Huachao/vscode-restclient/issues/172)
+* __Bug Fix__: [Fix JSON response zero fractions removed error when formatting](https://github.com/Huachao/vscode-restclient/issues/171)
+* __Bug Fix__: [Fix excluding hosts w/o ports bug](https://github.com/Huachao/vscode-restclient/pull/176)
+* __Bug Fix__: Retrieve `enableTelemetry` setting from `rest-client` section
+* __Improvement__: [Adding Visual Studio Live Share support - Document Link Provider](https://github.com/Huachao/vscode-restclient/pull/174) ([@lostintangent](https://github.com/lostintangent))
+* __Improvement__: [Allow specifying $aadToken audience](https://github.com/Huachao/vscode-restclient/pull/161) ([@flanakin](https://github.com/flanakin/))
+* __Improvement__: Change the preview url suffix to `.html`
+
 ## 0.17.0 (2018/1/30)
 * __Feature__: [Add Azure Active Directory Support](https://github.com/Huachao/vscode-restclient/pulls/150) ([@flanakin](https://github.com/flanakin/))
 * __Feature__: [Highlight JSON/XML request body automatically](https://github.com/Huachao/vscode-restclient/issues/135)

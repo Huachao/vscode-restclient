@@ -18,13 +18,14 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Digest Auth
     - SSL Client Certificates
     - Azure Active Directory
-* Environments and custom/global system variables support
-    - Use custom/global variables in any place of request(_URL_, _Headers_, _Body_)
-    - Support both __environment__ and __file__ custom variables
-    - Auto completion and hover support for both environment and file custom variables
-    - Go to definition and find all references support _ONLY_ for file custom variables
-    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
-    - Easily create/update/delete environments and custom variables in setting file
+* Environments and custom/system variables support
+    - Use variables in any place of request(_URL_, _Headers_, _Body_)
+    - Support both __environment__, __file__ and __request__ custom variables
+    - Auto completion and hover support for both __environment__, __file__ and __request__ custom variables
+    - Diagnostic support for __request__ and __file__ custom variables
+    - Go to definition and find all references support _ONLY_ for __file__ custom variables
+    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}` and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
+    - Easily create/update/delete environments and environment variables in setting file
     - Support environment switch
     - Support shared environment to provide variables that available in all environments
 * Generate code snippets for __HTTP request__ in languages like `Python`, `Javascript` and more!
@@ -34,7 +35,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * `HTTP` language support
     - `.http` and `.rest` file extensions support
     - Syntax highlight (Request and Response)
-    - Auto completion for method, url, header, custom/global variables, mime types and so on
+    - Auto completion for method, url, header, custom/system variables, mime types and so on
     - Comments (line starts with `#` or `//`) support
     - Support `json` and `xml` body indentation, comment shortcut and auto closing brackets
     - Code snippets for operations like `GET` and `POST`
@@ -274,7 +275,7 @@ Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like
 ```
 
 ### Azure Active Directory(Azure AD)
-Azure AD is Microsoft’s multi-tenant, cloud based directory and identity management service. [Michael Flanakin (@flanakin)](https://github.com/flanakin) implemented this feature, and for more details, please refer to the [Global Variables](#global-variables) section for more details.
+Azure AD is Microsoft’s multi-tenant, cloud based directory and identity management service. [Michael Flanakin (@flanakin)](https://github.com/flanakin) implemented this feature, and for more details, please refer to the [System Variables](#system-variables) section for more details.
 
 ## Generate Code Snippet
 ![Generate Code Snippet](images/code-snippet.gif)
@@ -295,8 +296,8 @@ Currently auto completion will be enabled for following seven categories:
 1. HTTP Method
 2. HTTP URL from request history
 3. HTTP Header
-4. Global dynamic variables
-5. Custom variables in current environment/file
+4. System variables
+5. Custom variables in current environment/file/request
 6. MIME Types for `Accept` and `Content-Type` headers
 7. Authentication scheme for `Basic` and `Digest`
 
@@ -305,9 +306,20 @@ A single `http` file may define lots of requests and file level custom variables
 ![Goto Symbols](images/navigate.png)
 
 ## Environments
-Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different product environments, like devbox, sandbox and production. We also support the __shared__ environment(identified by special environment name _$shared_) to provide a set of variables that are available in all environments. And you can define the same name variable in your specified environment to overwrite the value in shared environment.
+Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different web service environments, like devbox, sandbox and production. We also support the __shared__ environment(identified by special environment name _$shared_) to provide a set of variables that are available in all environments. And you can define the same name variable in your specified environment to overwrite the value in shared environment. Currently active environment's name is displayed at the right bottom of `Visual Studio Code`, when you click it, you can switch environment in the pop up list. And you can also switch environment using shortcut `Ctrl+Alt+E`(`Cmd+Alt+E` for macOS), or press `F1` and then select/type `Rest Client: Switch Environment`.
 
-Environments and corresponding variables of `REST Client Extension` are defined in setting file of `Visual Studio Code`, so you can create/update/delete environments and variables at any time you wish. The changes will take effect right away. If you __DO NOT__ want to use any environment, you can choose `No Environment` in the environments list. Currently, if you select `No Environment`, variables defined in shared environment are still available. See [here](#variables) for more details about environment variables usage and other kinds of variables. Below is a sample piece of setting file for custom environments and environment level variables:
+Environments and including variables are defined directly in `Visual Studio Code` setting file, so you can create/update/delete environments and variables at any time you wish. If you __DO NOT__ want to use any environment, you can choose `No Environment` in the environment list. Notice that if you select `No Environment`, variables defined in shared environment are still available. See [Environment Variables](#environment-variables) for more details about environment variables.
+
+## Variables
+We support two types of variables, one is __Custom Variables__ which is defined by user and can be further divided into __Environment Variables__, __File Variables__ and __Request Variables__, the other is  __System Variables__ which is a predefined set of variables out-of-box.
+
+The reference syntax of system and custom variables types has a subtle difference, for the former the syntax is `{{$SystemVariableName}}`, while for the latter the syntax is `{{CustomVariableName}}`, without preceding `$` before variable name. The definition syntax and location for different types of custom variables are obviously different. Notice that when a same name used for custom variable, request variables takes higher resolving precedence over file variables, file variables takes higher precedence over environment variables.
+
+### Custom Variables
+Custom variables can cover different user scenarios with the benefit of environment variables, file variables and request variables. Environment variables are mainly used for storing values that may vary in different environments. Since environment variables are directly defined in Visual Studio Code setting file, they can be referenced across different `http` files. File variables are mainly used for representing values that are constant throughout the `http` file. Request variables are used for the chaining requests scenarios which means a request needs to reference some part(header or body) of another request/response in the _same_ `http` file, imagine we need to retrieve the auth token dynamically from the login response, request variable fits the case well. Both file and request variables are defined in the `http` file and only have __File Scope__.
+
+#### Environment Variables
+For environment variables, each environment comprises a set of key value pairs defined in setting file, key and value are variable name and value respectively. Only variables defined in selected environment and shared environment are available to you. Below is a sample piece of setting file for custom environments and environment level variables:
 ```json
 "rest-client.environmentVariables": {
     "$shared": {
@@ -324,52 +336,86 @@ Environments and corresponding variables of `REST Client Extension` are defined 
     }
 }
 ```
-A sample usage in `http` file for above custom variables is listed below, note that if you switch to _local_ environment, the `version` would be _v2_, if you change to _production_ environment, the `version` would be _v1_ which is inherited from the _$shared_ environment:
+A sample usage in `http` file for above environment variables is listed below, note that if you switch to _local_ environment, the `version` would be _v2_, if you change to _production_ environment, the `version` would be _v1_ which is inherited from the _$shared_ environment:
 ```http
 GET https://{{host}}/api/{{version}comments/1 HTTP/1.1
 Authorization: {{token}}
 ```
 
-## Variables
-We support two types of variables, one is __Global System Variables__ which is a predefined set of variables out-of-box, another is __Custom Variables__ which is defined by user and can even be divided into __Environment Variables__ and __File Variables__.
-
-The usage of these two types of variables also has a little difference, for the former the syntax is `{{$SystemVariableName}}`, while for the latter, no matter environment or file level custom variables, the syntax is `{{CustomVariableName}}`.
-
-### Custom Variables
-Custom variables belong to either the environment or file scope. The environment scope variables are mainly used for storing values that vary in different environments and keep unchanged in an specific environment. And environment variables are defined in vscode setting file which can be used across of different files. The file scope variables are mainly used for variables which are frequently updated variables and not so common across environments. And file variables are directly defined in `http` file, which can be update and share with others much easily.
-
-For environment variables, each environment is a set of key value pairs defined in setting file, key is the variable name, while value is variable value. Only custom variables in selected environment and shared environment are available to you. Current active environment name is displayed in the right bottom of `Visual Studio Code`, when you click it, you can switch environment, current active environment's name will be marked with a check sign in the end. And you can also switch environment using shortcut `Ctrl+Alt+E`(`Cmd+Alt+E` for macOS), or press `F1` and then select/type `Rest Client: Switch Environment`. When you write custom variables in `http` file, auto completion will be available to you, so if you have a variable named `host`, you don't need to type the full word `{{host}}` by yourself, simply type `host` or even less characters, it will prompt you the `host` variable as well as its actual value. After you select it, the value will be autocompleted with `{{host}}`. And if you hover on it, its value will also be displayed.
-
-For file variables, each variable definition follows syntax __`@variableName = variableValue`__. And variable name __MUST NOT__ contains any spaces. As for variable value, it can be consist of any characters, even white spaces are allowed for them (Leading and trailing white spaces will be ignored). If you want to input some special character like line break, you can use the _backslash_ `\` to escape, like `\n`. And variables can be defined in a common block of code which is also separated by `###`. You can also define them before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the variables in the `http` file, they can be referenced in any requests of the file. For file scope variables, you can also benefit from some `Visual Studio Code` features like _Go to definition_ and _Find All References_.
+#### File Variables
+For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contains any spaces. As for variable value, it can be consist of any characters, even whitespaces are allowed for them (Leading and trailing whitespaces will be stripped). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variables can be defined in a separate request block only filled with variable definitions, as well as define request variables before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the file variables in the `http` file, they can be referenced in any requests of whole file. For file variables, you can also benefit from some `Visual Studio Code` features like _Go To Definition_ and _Find All References_. Below is a sample of file variable definitions and references in a `http` file.
 
 ```http
-@name = Huachao Mao
-@id = 313
-@address = Wuxi\nChina
+@host = api.example.com
+@contentType = application/json
 
 ###
 
-@token = Bearer e975b15aa477ee440417ea069e8ef728a22933f0
+@name = hello
 
-GET https://example.com/api/comments/1 HTTP/1.1
-Authorization: {{token}}
+GET https://{{host}}/authors/{{name}} HTTP/1.1
 
 ###
 
-PUT https://example.com/api/comments/{{id}} HTTP/1.1
-Authorization: {{token}}
+PATCH https://{{host}}/authors/{{name}} HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "content": "foo bar"
+}
+
+```
+
+#### Request Variables
+For request variables, they are similar to file variables in some aspects, like scope and definition location. However they have some obvious differences. The definition syntax of request variables is just like a single-line comment, and follows __`// @name requestName`__ or __`# @name requestName`__ just before the desired request url. You can think of request variable as attaching a *name metadata* to the underlying request, and this kind of requests can be called with **Named Request**, while normal requests can be called with **Anonymous Request**. Other requests can use `requestName` as an identifier to reference the expected part of the named request or its latest response. Notice that if you want to refer the response of a named request, you need to manually trigger the named request to retrieve its response first, otherwise the plain text of variable reference like `{{requestName.response.body.$.id}}` will be sent instead.
+
+The reference syntax of a request variable is a bit more complex than other kinds of custom variables. The request variable reference syntax follows `{{requestName.(response|request).(body|headers).(JSONPath|XPath|Header Name)}}`. You have two reference part choices of the response or request: *body* and *headers*. For *body* part, it only works for `JSON` and `XML` responses, you can use [JSONPath](http://goessner.net/articles/JsonPath/) and [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) to extract specific property or attribute. For example, if a JSON response returns body `{"id": "mock"}`, you can set the JSONPath part to `$.id` to reference the id. For *headers* part, you can specify the header name to extract the header value. Additionally, the header name is *case-insensitive*.
+
+> If the *JSONPath* or *XPath* of body, or *Header Name* of headers can't be resolved, the plain text of variable reference will be sent instead. And in this case diagnostic information will be displayed to help you to inspect this. And you can also hover over the request variables to view the actual resolved value.
+
+Below is a sample of request variable definitions and references in a `http` file.
+```http
+
+@baseUrl = https://example.com/api
+
+# @name login
+POST {{baseUrl}}/api/login HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+name=foo&password=bar
+
+###
+
+# @name createComment
+POST {{baseUrl}}/comments HTTP/1.1
+Authorization: {{login.response.headers.X-AuthToken}}
 Content-Type: application/json
 
 {
-    "name": "{{name}}",
-    "address": "{{address}}"
+    "content": "fake content"
 }
+
+###
+
+# @name getCreatedComment
+GET {{baseUrl}}/comments/{{createComment.response.body.$.id}} HTTP/1.1
+Authorization: {{login.response.headers.X-AuthToken}}
+
+###
+
+# @name getReplies
+GET {{baseUrl}}/comments/{{createComment.response.body.$.id}}/replies HTTP/1.1
+Accept: application/xml
+
+###
+
+# @name getFirstReply
+GET {{baseUrl}}/comments/{{createComment.response.body.$.id}}/replies/{{getReplies.response.body.//reply[1]/@id}}
+
 ```
 
-> When same name variable defined in both environment and file scope, file scope variable has precedence over environment scope variable. That means the extension will use the variable value defined in `http` file.
-
-### Global Variables
-Global variables provide a pre-defined set of variables that can be used in any part of the request(Url/Headers/Body) in the format `{{$variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
+### System Variables
+System variables provide a pre-defined set of variables that can be used in any part of the request(Url/Headers/Body) in the format `{{$variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
 * `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
 
   `new`: Optional. Specify `new` to force re-authentication and get a new token for the specified directory. Default: Reuse previous token for the specified directory from an in-memory cache. Expired tokens are refreshed automatically. (Use `F1 > Rest Client: Clear Azure AD Token Cache` or restart Visual Studio Code to clear the cache.)
@@ -379,7 +425,6 @@ Global variables provide a pre-defined set of variables that can be used in any 
   `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a dropdown or press `Esc` to use the home directory (`common` for Microsoft Account).
 
   `aud:<domain|tenantId>`: Optional. Target Azure AD app id (aka client id) or domain the token should be created for (aka audience or resource). Default: Domain of the REST endpoint.
-
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
 * `{{$timestamp}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`. The option string you can specify in timestamp are:
@@ -396,13 +441,10 @@ m | Minute
 s | Second
 ms | Millisecond
 
-### Variables Sample:
+Below is a example using system variables:
 ```http
-@token = Bearer fake token
-
-POST https://{{host}}/comments HTTP/1.1
+POST https://api.example.com/comments HTTP/1.1
 Content-Type: application/xml
-X-Request-Id: {{token}}
 
 {
     "request_id": "{{$guid}}",
@@ -411,75 +453,7 @@ X-Request-Id: {{token}}
     "review_count": "{{$randomInt 5, 200}}"
 }
 ```
-
-#### Azure AD samples
-
-Pick a directory from a list or use the default directory for the account:
-
-```http
-GET https://management.azure.com/subscriptions
-    ?api-version=2017-08-01
-Authorization: {{$aadToken}}
-```
-
-Explicit directory using tenant ID:
-
-```http
-GET https://management.azure.com/subscriptions
-    ?api-version=2017-08-01
-Authorization: {{$aadToken 00000000-0000-0000-0000-000000000000}}
-```
-
-Explicit directory using domain name:
-
-```http
-GET https://management.azure.com/subscriptions
-    ?api-version=2017-08-01
-Authorization: {{$aadToken contoso.com}}
-```
-
-Do not reuse older token -- force re-authentication for current directory (e.g. switch account):
-
-```http
-GET https://management.azure.com/subscriptions
-    ?api-version=2017-08-01
-Authorization: {{$aadToken new contoso.com}}
-```
-
-_**NOTE:** REST Client uses an in-memory token cache that clears when Visual Studio Code is restarted. You can clear the token cache manually by using `F1 > Rest Client: Clear Azure AD Token Cache`._
-
-_**NOTE:** `new` can be used with any other options, as long as it's specified first. Order is important for all options._
-
-Specify an explicit Azure AD app (aka audience or resource):
-
-```http
-GET https://fabrikam.com/api/foo
-Authorization: {{$aadToken aud:000000000000-0000-0000-0000-00000000}}
-```
-
-_**NOTE:** Audience (`aud`) must be an allowed value by the target API you are calling. Usually, this is a URL ending in a slash (/), but may also be an app/client id or other value. Contact the app owner to determine valid options._
-
-_**NOTE:** Audience (`aud`) can be used with any other options, as long as it's specified last. Order is important for all options._
-
-Implicit cloud selection (via REST endpoint TLD):
-
-```http
-GET https://management.microsoftazure.de/subscriptions
-    ?api-version=2017-08-01
-Authorization: {{$aadToken}}
-```
-
-Explicit cloud selection:
-
-```http
-GET https://management.usgovcloudapi.net/subscriptions
-    ?api-version=2017-08-01
-Authorization: {{$aadToken us}}
-```
-
-_**NOTE:** Azure China does not work like the other clouds. Use of Azure China is allowed, but may fail._
-
-_**NOTE:** Use of Azure AD is not limited to Azure APIs. Inclusion here is for demonstration purposes only._
+> More details about `aadToken` (Azure Active Directory Token) can be found on [Wiki](https://github.com/Huachao/vscode-restclient/wiki/Azure-Active-Directory-Authentication-Samples)
 
 ## Customize Response Preview
 REST Client Extension adds the ability to control the font family, size and weight used in the response preview.
@@ -516,6 +490,7 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.disableHighlightResonseBodyForLargeResponse`: Controls whether to highlight response body for response whose size is larger than limit specified by `rest-client.largeResponseSizeLimitInMB`. (Default is __true__)
 * `rest-client.disableAddingHrefLinkForLargeResponse`: Controls whether to add href link in previewed response for response whose size is larger than limit specified by `rest-client.largeResponseSizeLimitInMB`. (Default is __true__)
 * `rest-client.largeResponseBodySizeLimitInMB`: Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when `rest-client.disableHighlightResonseBodyForLargeResponse` and/or `rest-client.disableAddingHrefLinkForLargeResponse` is set to true. (Default is __5__)
+* `rest-client.previewResponseInActiveColumn`: Preview response in current active column. (Default is __false__)
 
 Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
 
