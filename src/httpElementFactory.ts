@@ -152,11 +152,11 @@ export class HttpElementFactory {
 
         if (elements.length === 0) {
             elements = originalElements.filter(e => !e.prefix);
-        } else if (elements.every(e => e.type === ElementType.FileCustomVariable)) {
+        } else if (elements.every(e => e.type === ElementType.FileCustomVariable || e.type === ElementType.RequestCustomVariable)) {
             elements = elements.concat(originalElements.filter(e => !e.prefix));
         } else {
             // add global/custom variables anyway
-            originalElements.filter(e => !e.prefix && (e.type === ElementType.SystemVariable || e.type === ElementType.EnvironmentCustomVariable || e.type === ElementType.FileCustomVariable)).forEach(element => {
+            originalElements.filter(e => !e.prefix && (e.type === ElementType.SystemVariable || e.type === ElementType.EnvironmentCustomVariable || e.type === ElementType.FileCustomVariable || e.type === ElementType.RequestCustomVariable)).forEach(element => {
                 elements.push(element);
             });
         }
