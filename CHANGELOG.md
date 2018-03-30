@@ -1,3 +1,6 @@
+## 0.18.1 (2018/3/30)
+* __Bug Fix__: Fix auto autocompletion not working after introducing request variables
+
 ## 0.18.0 (2018/3/29)
 * __Feature__: [Add request variable support to provide the possibility to extract values from response](https://github.com/Huachao/vscode-restclient/pull/140) ([@cbrevik](https://github.com/cbrevik))
 * __Feature__: [Add indentation based response folding in webview](https://github.com/Huachao/vscode-restclient/issues/157)
