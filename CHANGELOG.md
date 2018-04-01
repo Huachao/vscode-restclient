@@ -6,7 +6,7 @@
 * __Feature__: [Add indentation based response folding in webview](https://github.com/Huachao/vscode-restclient/issues/157)
 * __Feature__: [Add option to preview response in current active view column](https://github.com/Huachao/vscode-restclient/issues/172)
 * __Bug Fix__: [Fix JSON response zero fractions removed error when formatting](https://github.com/Huachao/vscode-restclient/issues/171)
-* __Bug Fix__: [Fix excluding hosts w/o ports bug](https://github.com/Huachao/vscode-restclient/pull/176)
+* __Bug Fix__: [Fix excluding hosts w/o ports bug](https://github.com/Huachao/vscode-restclient/pull/176) ([@realskim](https://github.com/realskim))
 * __Bug Fix__: Retrieve `enableTelemetry` setting from `rest-client` section
 * __Improvement__: [Adding Visual Studio Live Share support - Document Link Provider](https://github.com/Huachao/vscode-restclient/pull/174) ([@lostintangent](https://github.com/lostintangent))
 * __Improvement__: [Allow specifying $aadToken audience](https://github.com/Huachao/vscode-restclient/pull/161) ([@flanakin](https://github.com/flanakin/))
