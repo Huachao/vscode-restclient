@@ -342,8 +342,8 @@ export class VariableProcessor {
                 }
                 return match;
             },
-            [`\\${Constants.DateTimeVariableName}(?:\\s(rfc1322|iso8601)?(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?)?`]: match => {
-                let regex = new RegExp(`\\${Constants.DateTimeVariableName}(?:\\s(rfc1322|iso8601)?(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?)?`);
+            [`\\${Constants.DateTimeVariableName}(?:\\s(rfc1123|iso8601)?(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?)?`]: match => {
+                let regex = new RegExp(`\\${Constants.DateTimeVariableName}(?:\\s(rfc1123|iso8601)?(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?)?`);
                 let groups = regex.exec(match);
                 if (groups !== null && groups.length === 4) {
                     let date: Moment;
@@ -353,7 +353,7 @@ export class VariableProcessor {
                         date = utc();
                     }
 
-                    return groups[1] === 'rfc1322' ? date.toString() : date.toISOString();
+                    return groups[1] === 'rfc1123' ? date.toString() : date.toISOString();
                 }
                 return match;
             },
