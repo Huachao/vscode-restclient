@@ -19,6 +19,8 @@ export const NoEnvironmentSelectedName: string = 'c0cfe680-4fcd-4b71-a4ba-8cfaee
 export const TimeStampVariableName = "$timestamp";
 export const TimeStampVariableDescription = "Add a number of milliseconds between 1970/1/1 UTC Time and now. \
  You can also provide the offset with current time in the format {{$timestamp number string}}";
+export const DateTimeVariableName = "$datetime";
+export const DateTimeVariableNameDescription = "Add a datetime string in either ISO8601 or RFC1322 format";
 export const GuidVariableName = "$guid";
 export const GuidVariableDescription = "Add a RFC 4122 v4 UUID";
 export const RandomInt = "$randomInt";

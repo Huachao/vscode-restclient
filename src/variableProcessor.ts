@@ -14,7 +14,7 @@ import { RequestVariableCacheValue } from "./models/requestVariableCacheValue";
 import { VariableType } from "./models/variableType";
 import { ResolveState } from "./models/requestVariableResolveResult";
 import * as adal from 'adal-node';
-import * as moment from "moment";
+import { Moment, DurationInputArg2, utc } from "moment";
 const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
 
@@ -337,8 +337,23 @@ export class VariableProcessor {
                 let groups = regex.exec(match);
                 if (groups !== null && groups.length === 3) {
                     return groups[1] && groups[2]
-                        ? moment.utc().add(Number(groups[1]), <moment.DurationInputArg2>groups[2]).unix()
-                        : moment.utc().unix();
+                        ? utc().add(Number(groups[1]), <DurationInputArg2>groups[2]).unix()
+                        : utc().unix();
+                }
+                return match;
+            },
+            [`\\${Constants.DateTimeVariableName}(?:\\s(rfc1322|iso8601)?(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?)?`]: match => {
+                let regex = new RegExp(`\\${Constants.DateTimeVariableName}(?:\\s(rfc1322|iso8601)?(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?)?`);
+                let groups = regex.exec(match);
+                if (groups !== null && groups.length === 4) {
+                    let date: Moment;
+                    if (groups[2] && groups[3]) {
+                        date = utc().add(Number(groups[2]), <DurationInputArg2>groups[3]);
+                    } else {
+                        date = utc();
+                    }
+
+                    return groups[1] === 'rfc1322' ? date.toString() : date.toISOString();
                 }
                 return match;
             },

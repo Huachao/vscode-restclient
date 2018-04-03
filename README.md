@@ -275,7 +275,7 @@ Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like
 ```
 
 ### Azure Active Directory(Azure AD)
-Azure AD is Microsoft’s multi-tenant, cloud based directory and identity management service. [Michael Flanakin (@flanakin)](https://github.com/flanakin) implemented this feature, and for more details, please refer to the [System Variables](#system-variables) section for more details.
+Azure AD is Microsoft’s multi-tenant, cloud based directory and identity management service, you can refer to the [System Variables](#system-variables) section for more details.
 
 ## Generate Code Snippet
 ![Generate Code Snippet](images/code-snippet.gif)

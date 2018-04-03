@@ -99,6 +99,12 @@ export class HttpElementFactory {
             Constants.TimeStampVariableDescription,
             new SnippetString(`{{$\${name:${Constants.TimeStampVariableName.slice(1)}}}}`)));
         originalElements.push(new HttpElement(
+            Constants.DateTimeVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.DateTimeVariableNameDescription,
+            new SnippetString(`{{$\${name:${Constants.DateTimeVariableName.slice(1)}} \${1|rfc1322,iso8601|}}}`)));
+        originalElements.push(new HttpElement(
             Constants.RandomInt,
             ElementType.SystemVariable,
             null,
