@@ -69,7 +69,7 @@ export class VariableDiagnosticsProvider {
                         new Diagnostic(
                             new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
                             `Request '${v.variableName}' has not been sent`,
-                            DiagnosticSeverity.Error));
+                            DiagnosticSeverity.Information));
                 });
             });
 
