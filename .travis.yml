@@ -2,7 +2,9 @@ language: node_js
 sudo: false
 node_js:
   - 6
+  - 8
 install:
   - npm install
+  - npm run vscode:prepublish
 script:
   - npm run tslint
