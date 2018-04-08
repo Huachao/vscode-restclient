@@ -501,7 +501,7 @@
   },
   "dependencies": {
     "adal-node": "^0.1.26",
-    "applicationinsights": "^0.18.0",
+    "applicationinsights": "^1.0.2",
     "autolinker": "^1.4.0",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",

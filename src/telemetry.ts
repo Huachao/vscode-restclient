@@ -2,8 +2,9 @@
 
 import { RestClientSettings } from './models/configurationSettings';
 import * as Constants from './constants';
+import * as appInsights from "applicationinsights";
 
-const appInsights = require("applicationinsights");
+appInsights.setup(Constants.AiKey).start();
 
 export class Telemetry {
     private static readonly restClientSettings: RestClientSettings = new RestClientSettings();
@@ -11,8 +12,7 @@ export class Telemetry {
     public static sendEvent(eventName: string, properties?: { [key: string]: string }) {
         try {
             if (Telemetry.restClientSettings.enableTelemetry) {
-                let client = appInsights.getClient(Constants.AiKey);
-                client.trackEvent(eventName, properties);
+                appInsights.defaultClient.trackEvent({name: eventName, properties});
             }
         } catch {
         }
