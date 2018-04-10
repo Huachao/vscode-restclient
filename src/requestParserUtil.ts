@@ -1,10 +1,12 @@
 'use strict';
 
+import { Headers } from "./models/base";
+
 export class RequestParserUtil {
-    public static parseRequestHeaders(headerLines: string[]): { [key: string]: string } {
+    public static parseRequestHeaders(headerLines: string[]): Headers {
         // message-header = field-name ":" [ field-value ]
-        let headers: { [key: string]: string } = {};
-        let headerNames: { [key: string]: string } = {};
+        let headers: Headers = {};
+        let headerNames: Headers = {};
         headerLines.forEach(headerLine => {
             let fieldName: string;
             let fieldValue: string;

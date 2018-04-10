@@ -1,6 +1,7 @@
 "use strict";
 
 import { window } from 'vscode';
+import { Headers } from './models/base';
 import { RestClientSettings } from './models/configurationSettings';
 import { HttpRequest } from './models/httpRequest';
 import { HttpResponse } from './models/httpResponse';
@@ -9,6 +10,7 @@ import { HostCertificate } from './models/hostCertificate';
 import { PersistUtility } from './persistUtility';
 import { MimeUtility } from './mimeUtility';
 import { getWorkspaceRootPath } from './workspaceUtility';
+import { getHeader, hasHeader } from './misc';
 import * as url from 'url';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -48,7 +50,7 @@ export class HttpClient {
         };
 
         // set auth to digest if Authorization header follows: Authorization: Digest username password
-        let authorization = HttpClient.getHeaderValue(options.headers, 'Authorization');
+        let authorization = getHeader(options.headers, 'Authorization');
         if (authorization) {
             let start = authorization.indexOf(' ');
             let scheme = authorization.substr(0, start);
@@ -81,7 +83,7 @@ export class HttpClient {
         }
 
         // add default user agent if not specified
-        if (!HttpClient.getHeaderValue(options.headers, 'User-Agent')) {
+        if (!hasHeader(options.headers, 'User-Agent')) {
             options.headers['User-Agent'] = this._settings.defaultUserAgent;
         }
 
@@ -100,7 +102,7 @@ export class HttpClient {
                     return;
                 }
 
-                let contentType = HttpClient.getHeaderValue(response.headers, 'Content-Type');
+                let contentType = getHeader(response.headers, 'Content-Type');
                 let encoding: string;
                 if (contentType) {
                     encoding = MimeUtility.parse(contentType).charset;
@@ -122,7 +124,7 @@ export class HttpClient {
 
                 // adjust response header case, due to the response headers in request package is in lowercase
                 let headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
-                let adjustedResponseHeaders: { [key: string]: string } = {};
+                let adjustedResponseHeaders: Headers = {};
                 for (let header in response.headers) {
                     let adjustedHeaderName = header;
                     if (headersDic[header]) {
@@ -171,18 +173,6 @@ export class HttpClient {
         });
     }
 
-    public static getHeaderValue(headers: { [key: string]: string }, headerName: string): string {
-        if (headers) {
-            for (let key in headers) {
-                if (key.toLowerCase() === headerName.toLowerCase()) {
-                    return headers[key];
-                }
-            }
-        }
-
-        return null;
-    }
-
     private async convertStreamToBuffer(stream: Stream): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
             const buffers: Buffer[] = [];
@@ -227,8 +217,8 @@ export class HttpClient {
         }
     }
 
-    private static getResponseRawHeaderNames(rawHeaders: string[]): { [key: string]: string } {
-        let result: { [key: string]: string } = {};
+    private static getResponseRawHeaderNames(rawHeaders: string[]): Headers {
+        let result: Headers = {};
         rawHeaders.forEach(header => {
             result[header.toLowerCase()] = header;
         });
@@ -297,7 +287,7 @@ export class HttpClient {
         }
     }
 
-    private static capitalizeHeaderName(headers: { [key: string]: string }): { [key: string]: string } {
+    private static capitalizeHeaderName(headers: Headers): Headers {
         let normalizedHeaders = {};
         if (headers) {
             for (let header in headers) {

@@ -58,7 +58,7 @@ export class ResponseController {
         }
         let response = ResponseStore.get(uri.toString());
         if (response !== undefined) {
-            let contentType = response.getResponseHeaderValue("content-type");
+            let contentType = response.getHeader("content-type");
             let extension = this.getExtension(contentType);
             let fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
             let filePath = path.join(ResponseController.responseBodySaveFolderPath, fileName);

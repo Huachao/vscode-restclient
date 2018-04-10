@@ -1,12 +1,13 @@
 "use strict";
 
 import { ArrayUtility } from './common/arrayUtility';
+import { Headers } from './models/base';
 import { HttpRequest } from './models/httpRequest';
 import { IRequestParser } from './models/IRequestParser';
 import { RequestParserUtil } from './requestParserUtil';
-import { HttpClient } from './httpClient';
 import { MimeUtility } from './mimeUtility';
 import { getWorkspaceRootPath } from './workspaceUtility';
+import { getHeader, hasHeader } from './misc';
 import { EOL } from 'os';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -38,7 +39,7 @@ export class HttpRequestParser implements IRequestParser {
         let requestLine = HttpRequestParser.parseRequestLine(lines[0]);
 
         // get headers range
-        let headers: { [key: string]: string };
+        let headers: Headers;
         let body: string | Stream;
         let bodyLines: string[] = [];
         let headerStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', 1);
@@ -68,7 +69,7 @@ export class HttpRequestParser implements IRequestParser {
                 // get body range
                 let bodyStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
                 if (bodyStartLine !== -1) {
-                    let contentTypeHeader = HttpRequestParser.getContentTypeHeader(headers);
+                    let contentTypeHeader = getHeader(headers, 'content-type');
                     firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
                     let bodyEndLine = MimeUtility.isMultiPartFormData(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                     bodyLines = lines.slice(bodyStartLine, bodyEndLine);
@@ -82,17 +83,17 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // if Host header provided and url is relative path, change to absolute url
-        if (HttpClient.getHeaderValue(headers, 'Host') && requestLine.url[0] === '/') {
-            let host = HttpClient.getHeaderValue(headers, 'Host');
+        if (hasHeader(headers, 'Host') && requestLine.url[0] === '/') {
+            let host = getHeader(headers, 'Host');
             let [, port] = host.split(':');
             let scheme = port === '443' || port === '8443' ? 'https' : 'http';
             requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
         // parse body
-        let contentTypeHeader = HttpRequestParser.getContentTypeHeader(headers);
+        let contentTypeHeader = getHeader(headers, 'content-type');
         body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
-        if (body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(HttpRequestParser.getContentTypeHeader(headers))) {
+        if (body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             body = encodeurl(body);
         }
 
@@ -181,18 +182,6 @@ export class HttpRequestParser implements IRequestParser {
         absolutePath = path.join(path.dirname(httpFilePath), refPath);
         if (fs.existsSync(absolutePath)) {
             return absolutePath;
-        }
-
-        return null;
-    }
-
-    private static getContentTypeHeader(headers: { [key: string]: string }) {
-        if (headers) {
-            for (let header in headers) {
-                if (header.toLowerCase() === 'content-type') {
-                    return headers[header];
-                }
-            }
         }
 
         return null;

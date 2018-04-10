@@ -24,7 +24,7 @@ export class UntitledFileContentProvider {
     }
 
     private static languageFromContentType(response: HttpResponse): string {
-        let contentType = response.getResponseHeaderValue("Content-Type");
+        let contentType = response.getHeader("Content-Type");
         if (!contentType) {
             return 'http';
         };
@@ -80,7 +80,7 @@ export class UntitledFileContentProvider {
                 headers += `${header}: ${value}${EOL}`;
             }
         }
-        let body = ResponseFormatUtility.FormatBody(response.body, response.getResponseHeaderValue("content-type"), suppressValidation);
+        let body = ResponseFormatUtility.FormatBody(response.body, response.getHeader("content-type"), suppressValidation);
         return { responseStatusLine, headers, body };
     }
 

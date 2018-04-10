@@ -1,14 +1,16 @@
 "use strict";
 
+import { Headers } from "./base";
 import { HttpRequest } from "./httpRequest";
 import { HttpResponseTimingPhases } from './httpResponseTimingPhases';
+import { getHeader } from '../misc';
 
 export class HttpResponse {
     public constructor(
         public statusCode: number,
         public statusMessage: string,
         public httpVersion: string,
-        public headers: { [key: string]: string },
+        public headers: Headers,
         public body: string,
         public elapsedMillionSeconds: number,
         public requestUrl: string,
@@ -19,15 +21,7 @@ export class HttpResponse {
         public request: HttpRequest) {
     }
 
-    public getResponseHeaderValue(name: string) {
-        if (this.headers) {
-            for (let header in this.headers) {
-                if (header.toLowerCase() === name.toLowerCase()) {
-                    return this.headers[header];
-                }
-            }
-        }
-
-        return null;
+    public getHeader(name: string) {
+        return getHeader(this.headers, name);
     }
 }

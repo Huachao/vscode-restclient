@@ -1,10 +1,13 @@
 "use strict";
+
+import { Headers } from './models/base';
 import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
 import { HttpResponse } from './models/httpResponse';
 import { HttpRequest } from "./models/httpRequest";
 import { ResolveResult, ResolveState, ResolveErrorMessage, ResolveWarningMessage } from "./models/requestVariableResolveResult";
 import { MimeUtility } from './mimeUtility';
 import { MIME } from './models/mime';
+import { getHeader } from './misc';
 
 const jp = require('jsonpath');
 const xpath = require('xpath');
@@ -43,7 +46,7 @@ export class RequestVariableCacheValueProcessor {
 
     private static resolveHttpPart(http: HttpRequest | HttpResponse, httpPart: HttpPart, nameOrPath?: string): ResolveResult {
         if (httpPart === "body") {
-            const { body } = http;
+            const { body, headers } = http;
             if (!body) {
                 const message = http instanceof HttpRequest ? ResolveWarningMessage.RequestBodyNotExist : ResolveWarningMessage.ResponseBodyNotExist;
                 return { state: ResolveState.Warning, message };
@@ -53,7 +56,7 @@ export class RequestVariableCacheValueProcessor {
                 return { state: ResolveState.Warning, value: body, message: ResolveWarningMessage.MissingBodyPath };
             }
 
-            const {type, suffix} = RequestVariableCacheValueProcessor.getHeaderMIME(http);
+            const {type, suffix} = RequestVariableCacheValueProcessor.getHeaderMIME(headers);
             if (type === "application/json" || suffix === '+json') {
                 const parsedBody = JSON.parse(body as string);
 
@@ -70,7 +73,7 @@ export class RequestVariableCacheValueProcessor {
                 return { state: ResolveState.Warning, value: headers, message: ResolveWarningMessage.MissingHeaderName };
             }
 
-            const value = RequestVariableCacheValueProcessor.getHeaderValue(http, nameOrPath);
+            const value = getHeader(headers, nameOrPath);
             if (!value) {
                 return { state: ResolveState.Warning, message: ResolveWarningMessage.IncorrectHeaderName };
             } else {
@@ -79,24 +82,9 @@ export class RequestVariableCacheValueProcessor {
         }
     }
 
-    private static getHeaderMIME(http: HttpRequest | HttpResponse): MIME {
-        let contentType = RequestVariableCacheValueProcessor.getHeaderValue(http, "content-type");
-        if (!contentType) {
-            return null;
-        }
-        return MimeUtility.parse(contentType);
-    }
-
-    private static getHeaderValue(http: HttpRequest | HttpResponse, name: string) {
-        if (http.headers) {
-            for (let header in http.headers) {
-                if (header.toLowerCase() === name.toLowerCase()) {
-                    return http.headers[header];
-                }
-            }
-        }
-
-        return null;
+    private static getHeaderMIME(headers: Headers): MIME {
+        const contentTypeHeader = getHeader(headers, 'content-type');
+        return contentTypeHeader && MimeUtility.parse(contentTypeHeader);
     }
 
     private static resolveJsonHttpBody(body: any, path: string): ResolveResult {

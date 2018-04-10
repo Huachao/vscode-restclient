@@ -2,6 +2,7 @@
 
 import { Uri, extensions } from 'vscode';
 import { BaseTextDocumentContentProvider } from './baseTextDocumentContentProvider';
+import { Headers } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from "../models/httpResponse";
 import { MimeUtility } from '../mimeUtility';
@@ -28,7 +29,7 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
             if (response) {
                 let innerHtml: string;
                 let width = 2;
-                let contentType = response.getResponseHeaderValue("content-type");
+                let contentType = response.getHeader("content-type");
                 if (contentType) {
                     contentType = contentType.trim();
                 }
@@ -67,7 +68,7 @@ export class HttpResponseTextDocumentContentProvider extends BaseTextDocumentCon
 ${HttpResponseTextDocumentContentProvider.formatHeaders(request.headers)}`;
             code += hljs.highlight('http', requestNonBodyPart + '\r\n').value;
             if (request.body) {
-                let requestContentType = request.getRequestHeaderValue("content-type");
+                let requestContentType = request.getHeader("content-type");
                 if (typeof request.body !== 'string') {
                     request.body = 'NOTE: Request Body From File Not Shown';
                 }
@@ -91,7 +92,7 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
         }
 
         if (previewOption !== PreviewOption.Headers) {
-            let responseContentType = response.getResponseHeaderValue("content-type");
+            let responseContentType = response.getHeader("content-type");
             let responseBodyPart = `${ResponseFormatUtility.FormatBody(response.body, responseContentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
             if (this.settings.disableHighlightResonseBodyForLargeResponse &&
                 response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024) {
@@ -219,7 +220,7 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
         return result;
     }
 
-    private static formatHeaders(headers: { [key: string]: string }): string {
+    private static formatHeaders(headers: Headers): string {
         let headerString = '';
         for (let header in headers) {
             if (headers.hasOwnProperty(header)) {
