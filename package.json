@@ -492,6 +492,7 @@
     "tslint": "tslint --project tsconfig.json"
   },
   "devDependencies": {
+    "@types/fs-extra": "^5.0.1",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
     "mocha": "^3.2.0",
@@ -500,7 +501,6 @@
     "vscode": "^1.0.0"
   },
   "dependencies": {
-    "@types/fs-extra": "^5.0.1",
     "adal-node": "^0.1.26",
     "applicationinsights": "^1.0.2",
     "autolinker": "^1.4.0",
