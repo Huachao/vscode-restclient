@@ -8,7 +8,7 @@ import { PersistUtility } from '../persistUtility';
 import { RestClientSettings } from '../models/configurationSettings';
 import { trace } from "../decorator";
 import * as Constants from '../constants';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
 

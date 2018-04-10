@@ -10,7 +10,7 @@ import { PersistUtility } from './persistUtility';
 import { MimeUtility } from './mimeUtility';
 import { getWorkspaceRootPath } from './workspaceUtility';
 import * as url from 'url';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Stream } from 'stream';
 

@@ -6,7 +6,7 @@ import { SerializedHttpRequest } from '../models/httpRequest';
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { trace } from "../decorator";
 import { EOL } from 'os';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as moment from 'moment';
 
 let tmp = require('tmp');

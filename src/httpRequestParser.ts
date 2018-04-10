@@ -8,7 +8,7 @@ import { HttpClient } from './httpClient';
 import { MimeUtility } from './mimeUtility';
 import { getWorkspaceRootPath } from './workspaceUtility';
 import { EOL } from 'os';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Stream } from 'stream';
 
