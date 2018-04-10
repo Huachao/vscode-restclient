@@ -3,7 +3,7 @@
 import { SerializedHttpRequest } from './models/httpRequest';
 import { EnvironmentPickItem } from './models/environmentPickItem';
 import * as Constants from './constants';
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as os from 'os';
 
@@ -13,131 +13,44 @@ export class PersistUtility {
     public static readonly environmentFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.EnvironmentFileName);
     private static emptyHttpRequestItems: SerializedHttpRequest[] = [];
 
-    public static async saveRequest(httpRequest: SerializedHttpRequest) {
-        try {
-            let requests = await PersistUtility.deserializeFromHistoryFile();
-            requests.unshift(httpRequest);
-            requests = requests.slice(0, Constants.HistoryItemsMaxCount);
-            await PersistUtility.serializeToHistoryFile(requests);
-        } catch {
-        }
+    public static async saveRequest(httpRequest: SerializedHttpRequest): Promise<void> {
+        let requests = await PersistUtility.deserializeFromFileAsync(PersistUtility.historyFilePath, PersistUtility.emptyHttpRequestItems);
+        requests.unshift(httpRequest);
+        requests = requests.slice(0, Constants.HistoryItemsMaxCount);
+        await fs.writeJson(PersistUtility.historyFilePath, requests);
     }
 
     public static loadRequests(): Promise<SerializedHttpRequest[]> {
-        return PersistUtility.deserializeFromHistoryFile();
+        return PersistUtility.deserializeFromFileAsync(PersistUtility.historyFilePath, PersistUtility.emptyHttpRequestItems);
     }
 
-    public static async saveEnvironment(environment: EnvironmentPickItem) {
-        await PersistUtility.createFileIfNotExistsAsync(PersistUtility.environmentFilePath);
-        await PersistUtility.serializeToEnvironmentFile(environment);
+    public static clearRequests(): Promise<void> {
+        return fs.writeJson(PersistUtility.historyFilePath, PersistUtility.emptyHttpRequestItems);
+    }
+
+    public static async saveEnvironment(environment: EnvironmentPickItem): Promise<void> {
+        await PersistUtility.ensureFileAsync(PersistUtility.environmentFilePath);
+        await fs.writeJson(PersistUtility.environmentFilePath, environment);
     }
 
     public static loadEnvironment(): Promise<EnvironmentPickItem> {
-        return PersistUtility.deserializeFromEnvironmentFile();
+        return PersistUtility.deserializeFromFileAsync<EnvironmentPickItem>(PersistUtility.environmentFilePath);
     }
 
-    public static createFileIfNotExists(path: string) {
+    public static ensureCookieFile() {
+        fs.ensureFileSync(PersistUtility.cookieFilePath);
+    }
+
+    public static ensureFileAsync(path: string): Promise<void> {
+        return fs.ensureFile(path);
+    }
+
+    private static async deserializeFromFileAsync<T>(path: string, defaultValue: T = null): Promise<T> {
         try {
-            fs.statSync(path);
+            return await fs.readJson(path);
         } catch {
-            PersistUtility.ensureDirectoryExistence(path);
-            fs.writeFileSync(path, '');
-        }
-    }
-
-    public static createFileIfNotExistsAsync(path: string) {
-        return new Promise<void>((resolve, reject) => {
-            fs.stat(path, err => {
-                if (err === null) {
-                    resolve();
-                }
-
-                new Promise<string>((resolve, reject) => {
-                    PersistUtility.ensureDirectoryExistence(path);
-                    fs.writeFile(path, '', err => err === null ? resolve(path) : reject(err));
-                }).then(_ => resolve());
-            });
-        });
-    }
-
-    public static serializeToEnvironmentFile(environment: EnvironmentPickItem) {
-        return new Promise<void>((resolve, reject) => {
-            fs.writeFile(PersistUtility.environmentFilePath, JSON.stringify(environment), error => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-
-                resolve();
-            });
-        });
-    }
-
-    private static deserializeFromEnvironmentFile(): Promise<EnvironmentPickItem> {
-        return new Promise<EnvironmentPickItem>((resolve, reject) => {
-            fs.readFile(PersistUtility.environmentFilePath, (error, data) => {
-                if (error) {
-                    PersistUtility.createFileIfNotExistsAsync(PersistUtility.environmentFilePath).then(_ => resolve(null));
-                    return;
-                } else {
-                    let fileContent = data.toString();
-                    if (fileContent) {
-                        resolve(JSON.parse(fileContent));
-                        return;
-                    }
-                    resolve(null);
-                }
-            });
-        });
-    }
-
-    public static serializeToHistoryFile(requests: SerializedHttpRequest[]) {
-        return new Promise<void>((resolve, reject) => {
-            fs.writeFile(PersistUtility.historyFilePath, JSON.stringify(requests), error => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-
-                resolve();
-            });
-        });
-    }
-
-    private static deserializeFromHistoryFile(): Promise<SerializedHttpRequest[]> {
-        return new Promise<SerializedHttpRequest[]>((resolve, reject) => {
-            fs.readFile(PersistUtility.historyFilePath, (error, data) => {
-                if (error) {
-                    PersistUtility.createFileIfNotExistsAsync(PersistUtility.historyFilePath).then(_ => resolve(PersistUtility.emptyHttpRequestItems));
-                } else {
-                    let fileContent = data.toString();
-                    if (fileContent) {
-                        try {
-                            resolve(JSON.parse(fileContent));
-                            return;
-                        } catch {
-                        }
-                    }
-                    resolve(PersistUtility.emptyHttpRequestItems);
-                }
-            });
-        });
-    }
-
-    private static ensureDirectoryExistence(filePath: string) {
-        let dirname = path.dirname(filePath);
-        if (PersistUtility.directoryExists(dirname)) {
-            return true;
-        }
-        PersistUtility.ensureDirectoryExistence(dirname);
-        fs.mkdirSync(dirname);
-    }
-
-    private static directoryExists(path) {
-        try {
-            return fs.statSync(path).isDirectory();
-        } catch {
-            return false;
+            await fs.ensureFile(path);
+            return defaultValue;
         }
     }
 }

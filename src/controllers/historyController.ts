@@ -59,7 +59,7 @@ export class HistoryController {
                 .then(async function (btn) {
                     if (btn) {
                         if (btn.title === 'Yes') {
-                            await PersistUtility.serializeToHistoryFile([]);
+                            await PersistUtility.clearRequests();
                             window.showInformationMessage('Request history has been cleared');
                         }
                     }

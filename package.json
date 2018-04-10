@@ -500,6 +500,7 @@
     "vscode": "^1.0.0"
   },
   "dependencies": {
+    "@types/fs-extra": "^5.0.1",
     "adal-node": "^0.1.26",
     "applicationinsights": "^1.0.2",
     "autolinker": "^1.4.0",
@@ -509,6 +510,7 @@
     "elegant-spinner": "^1.0.1",
     "encodeurl": "^1.0.1",
     "filesize": "^3.3.0",
+    "fs-extra": "^5.0.0",
     "highlight.js": "^9.6.0",
     "httpsnippet": "^1.16.5",
     "iconv-lite": "^0.4.15",
