@@ -49,16 +49,22 @@ export async function activate(context: ExtensionContext) {
             window.showErrorMessage(error.message);
         });
     }));
-    context.subscriptions.push(languages.registerCompletionItemProvider('http', new HttpCompletionItemProvider()));
-    context.subscriptions.push(languages.registerCompletionItemProvider('http', new RequestVariableCompletionItemProvider(), '.'));
-    context.subscriptions.push(languages.registerHoverProvider('http', new CustomVariableHoverProvider()));
-    context.subscriptions.push(languages.registerHoverProvider('http', new RequestVariableHoverProvider()));
-    context.subscriptions.push(languages.registerCodeLensProvider('http', new HttpCodeLensProvider()));
-    context.subscriptions.push(languages.registerCodeLensProvider('http', new CustomVariableReferencesCodeLensProvider()));
-    context.subscriptions.push(languages.registerDocumentLinkProvider('http', new RequestBodyDocumentLinkProvider()));
-    context.subscriptions.push(languages.registerDefinitionProvider('http', new CustomVariableDefinitionProvider()));
-    context.subscriptions.push(languages.registerReferenceProvider('http', new CustomVariableReferenceProvider()));
-    context.subscriptions.push(languages.registerDocumentSymbolProvider('http', new HttpDocumentSymbolProvider()));
+
+    const documentSelector = [
+        { language: 'http', scheme: 'file' },
+        { language: 'http', scheme: 'untitled' },
+    ];
+
+    context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new HttpCompletionItemProvider()));
+    context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new RequestVariableCompletionItemProvider(), '.'));
+    context.subscriptions.push(languages.registerHoverProvider(documentSelector, new CustomVariableHoverProvider()));
+    context.subscriptions.push(languages.registerHoverProvider(documentSelector, new RequestVariableHoverProvider()));
+    context.subscriptions.push(languages.registerCodeLensProvider(documentSelector, new HttpCodeLensProvider()));
+    context.subscriptions.push(languages.registerCodeLensProvider(documentSelector, new CustomVariableReferencesCodeLensProvider()));
+    context.subscriptions.push(languages.registerDocumentLinkProvider(documentSelector, new RequestBodyDocumentLinkProvider()));
+    context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new CustomVariableDefinitionProvider()));
+    context.subscriptions.push(languages.registerReferenceProvider(documentSelector, new CustomVariableReferenceProvider()));
+    context.subscriptions.push(languages.registerDocumentSymbolProvider(documentSelector, new HttpDocumentSymbolProvider()));
 
     const diagnosticsProviders = new VariableDiagnosticsProvider();
     workspace.onDidOpenTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
