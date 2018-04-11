@@ -35,7 +35,7 @@ export class ResponseController {
             let filePath = path.join(ResponseController.responseSaveFolderPath, `Response-${Date.now()}.http`);
             try {
                 await PersistUtility.ensureFileAsync(filePath);
-                fs.writeFileSync(filePath, fullResponse);
+                await fs.writeFile(filePath, fullResponse);
                 window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
                     if (btn) {
                         if (btn.title === 'Open') {
@@ -64,7 +64,7 @@ export class ResponseController {
             let filePath = path.join(ResponseController.responseBodySaveFolderPath, fileName);
             try {
                 await PersistUtility.ensureFileAsync(filePath);
-                fs.writeFileSync(filePath, response.bodyStream);
+                await fs.writeFile(filePath, response.bodyStream);
                 window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
                     if (btn) {
                         if (btn.title === 'Open') {
