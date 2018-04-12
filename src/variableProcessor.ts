@@ -40,7 +40,7 @@ export class VariableProcessor {
 
         let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile();
         for (let [variableName, variableValue] of requestVariables) {
-            let regex = new RegExp(`\\{\\{\\s*${variableName}.*\\s*\\}\\}`, 'g');
+            let regex = new RegExp(`\\{\\{\\s*${variableName}.*?\\s*\\}\\}`, 'g');
             let matches = request.match(regex);
             if (matches && matches.length > 0) {
                 for (let i = 0; i < matches.length; i++) {
