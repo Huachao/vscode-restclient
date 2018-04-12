@@ -112,7 +112,10 @@ export class RequestVariableCacheValueProcessor {
                     return { state: ResolveState.Warning, message: ResolveWarningMessage.IncorrectXPath };
                 } else {
                     const result = results[0];
-                    if (result.nodeType === NodeType.Element) {
+                    if (result.nodeType === NodeType.Document) {
+                        // Document
+                        return { state: ResolveState.Success, value: result.documentElement.toString() };
+                    } else if (result.nodeType === NodeType.Element) {
                         // Element
                         return { state: ResolveState.Success, value: result.childNodes.toString() };
                     } else {
@@ -129,5 +132,6 @@ export class RequestVariableCacheValueProcessor {
 
 const enum NodeType {
     Element = 1,
-    Attribute,
+    Attribute = 2,
+    Document = 9,
 }
