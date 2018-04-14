@@ -1,5 +1,6 @@
 "use strict";
 
+import { Uri } from 'vscode';
 import { ArrayUtility } from './common/arrayUtility';
 import { Headers } from './models/base';
 import { HttpRequest } from './models/httpRequest';
@@ -173,7 +174,7 @@ export class HttpRequestParser implements IRequestParser {
         let absolutePath;
         let rootPath = getWorkspaceRootPath();
         if (rootPath) {
-            absolutePath = path.join(rootPath, refPath);
+            absolutePath = path.join(Uri.parse(rootPath).fsPath, refPath);
             if (fs.existsSync(absolutePath)) {
                 return absolutePath;
             }

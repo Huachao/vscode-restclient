@@ -17,8 +17,7 @@ export function getWorkspaceRootPath(): string {
 export function getCurrentHttpFileName(): string {
     let editor = window.activeTextEditor;
     if (editor && editor.document) {
-        let filePath = window.activeTextEditor.document.uri.fsPath;
-        let fileName = path.basename(filePath);
-        return fileName.replace('\.[^\.]+$', '');
+        let filePath = window.activeTextEditor.document.fileName;
+        return path.basename(filePath, path.extname(filePath));
     }
 }

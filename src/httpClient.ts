@@ -1,6 +1,6 @@
 "use strict";
 
-import { window } from 'vscode';
+import { window, Uri } from 'vscode';
 import { Headers } from './models/base';
 import { RestClientSettings } from './models/configurationSettings';
 import { HttpRequest } from './models/httpRequest';
@@ -269,7 +269,7 @@ export class HttpClient {
         let rootPath = getWorkspaceRootPath();
         let absolutePath = '';
         if (rootPath) {
-            absolutePath = path.join(rootPath, absoluteOrRelativePath);
+            absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
             if (fs.existsSync(absolutePath)) {
                 return absolutePath;
             } else {
