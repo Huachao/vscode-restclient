@@ -5,7 +5,9 @@ import { RestClientSettings } from './models/configurationSettings';
 import * as Constants from './constants';
 import * as appInsights from "applicationinsights";
 
-appInsights.setup(Constants.AiKey).start();
+appInsights.setup(Constants.AiKey)
+    .setAutoCollectPerformance(false)
+    .start();
 
 export class Telemetry {
     private static readonly restClientSettings: RestClientSettings = new RestClientSettings();
