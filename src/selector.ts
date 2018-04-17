@@ -73,7 +73,7 @@ export class Selector {
         }
 
         // return null if cursor is in delimiter line
-        if (delimiterLineNumbers.indexOf(currentLine) > -1) {
+        if (delimiterLineNumbers.includes(currentLine)) {
             return null;
         }
 
