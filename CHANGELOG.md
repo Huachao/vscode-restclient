@@ -1,3 +1,11 @@
+## 0.18.2 (2018/4/17)
+* __Feature__: [Add system variable `datetime` to generate a _ISO8601_ or _RFC1123_ format datetime](https://github.com/Huachao/vscode-restclient/issues/180)
+* __Bug Fix__: [Allow request variable resolving whole xml document in response/request body](https://github.com/Huachao/vscode-restclient/issues/188)
+* __Bug Fix__: [Fix only one request is allowed per line](https://github.com/Huachao/vscode-restclient/issues/189)
+* __Bug Fix__: [Relative certificate path resolving not working](https://github.com/Huachao/vscode-restclient/issues/190)
+* __Improvement__: [Restricting language services to local files](https://github.com/Huachao/vscode-restclient/pull/187) ([@lostintangent](https://github.com/lostintangent))
+* __Improvement__: [Modify not sent request variable diagnostic level from Error to Information](https://github.com/Huachao/vscode-restclient/issues/184)
+
 ## 0.18.1 (2018/3/30)
 * __Bug Fix__: Fix auto autocompletion not working after introducing request variables
 

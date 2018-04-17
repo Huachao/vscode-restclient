@@ -24,7 +24,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Auto completion and hover support for both __environment__, __file__ and __request__ custom variables
     - Diagnostic support for __request__ and __file__ custom variables
     - Go to definition and find all references support _ONLY_ for __file__ custom variables
-    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp}}` and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
+    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp [offset option]}}`, `{{$datetime rfc1123|iso8601 [offset option]}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
     - Easily create/update/delete environments and environment variables in setting file
     - Support environment switch
     - Support shared environment to provide variables that available in all environments
@@ -427,7 +427,10 @@ System variables provide a pre-defined set of variables that can be used in any 
   `aud:<domain|tenantId>`: Optional. Target Azure AD app id (aka client id) or domain the token should be created for (aka audience or resource). Default: Domain of the REST endpoint.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
-* `{{$timestamp}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`. The option string you can specify in timestamp are:
+* `{{$timestamp [offset option]}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`.
+* `{{$datetime rfc1123|iso8601 [offset option]}}`: Add a datetime string in either _ISO8601_ or _RFC1322_ format. You can even specify any date time based on current time similar to `timestamp` like: `{{$datetime iso8601 1 y}}` to represent a year later in _ISO8601_ format.
+
+The option option string you can specify in `timestamp` and `datetime` are:
 
 Option | Description
 ------ | -----------
@@ -441,10 +444,11 @@ m | Minute
 s | Second
 ms | Millisecond
 
-Below is a example using system variables:
+Below is a example using system variables:Da
 ```http
 POST https://api.example.com/comments HTTP/1.1
 Content-Type: application/xml
+Date: {{$datetime rfc1123}}
 
 {
     "request_id": "{{$guid}}",
