@@ -5,7 +5,10 @@ import * as Constants from './constants';
 import * as appInsights from "applicationinsights";
 
 appInsights.setup(Constants.AiKey)
+    .setAutoCollectDependencies(false)
     .setAutoCollectPerformance(false)
+    .setAutoCollectRequests(false)
+    .setAutoDependencyCorrelation(false)
     .start();
 
 export class Telemetry {
