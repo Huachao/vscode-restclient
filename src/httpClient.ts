@@ -15,11 +15,11 @@ import * as url from 'url';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Stream } from 'stream';
+import * as iconv from 'iconv-lite';
 
 const encodeUrl = require('encodeurl');
 const request = require('request');
 const cookieStore = require('tough-cookie-file-store-bugfix');
-const iconv = require('iconv-lite');
 
 export class HttpClient {
     private _settings: RestClientSettings;
