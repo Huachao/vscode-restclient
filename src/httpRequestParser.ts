@@ -134,7 +134,14 @@ export class HttpRequestParser implements IRequestParser {
 
         // Check if needed to upload file
         if (lines.every(line => !HttpRequestParser.uploadFromFileSyntax.test(line))) {
-            return lines.join(EOL);
+            if (!MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
+                return lines.join(EOL);
+            } else {
+                return lines.reduce((p, c, i) => {
+                    p += `${(i === 0 || c.startsWith('&') ? '' : EOL)}${c}`;
+                    return p;
+                }, '');
+            }
         } else {
             let combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
             for (const [index, line] of lines.entries()) {
