@@ -12,6 +12,11 @@ body.vscode-high-contrast {
   background-color: inherit;
 }
 
+pre .hljs-comment {
+  color: #57A64A;
+  font-style: italic;
+}
+
 .vscode-light pre .hljs-attribute {
   color: #c82829;
 }
@@ -63,16 +68,36 @@ body.vscode-high-contrast {
   color: #d1f1a9;
 }
 
+.vscode-light pre .hljs-name,
+.vscode-dark pre .hljs-name,
+.vscode-high-contrast pre .hljs-name {
+  color: #007acc;
+}
+
+.vscode-light pre .hljs-meta,
+.vscode-light pre .hljs-tag,
 .vscode-light pre .hljs-keyword {
   color: #8959a8;
 }
 
+.vscode-dark pre .hljs-meta,
+.vscode-dark pre .hljs-tag,
 .vscode-dark pre .hljs-keyword {
   color: #b294bb;
 }
 
+.vscode-high-contrast pre .hljs-meta,
+.vscode-high-contrast pre .hljs-tag,
 .vscode-high-contrast pre .hljs-keyword {
   color: #ebbbff;
+}
+
+pre .hljs-emphasis {
+  font-style: italic;
+}
+
+pre .hljs-strong {
+  font-weight: bold;
 }
 
 code {
