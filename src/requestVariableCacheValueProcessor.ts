@@ -1,12 +1,10 @@
 "use strict";
 
-import { Headers } from './models/base';
 import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
 import { HttpResponse } from './models/httpResponse';
 import { HttpRequest } from "./models/httpRequest";
 import { ResolveResult, ResolveState, ResolveErrorMessage, ResolveWarningMessage } from "./models/requestVariableResolveResult";
 import { MimeUtility } from './mimeUtility';
-import { MIME } from './models/mime';
 import { getHeader } from './misc';
 
 const jp = require('jsonpath');
