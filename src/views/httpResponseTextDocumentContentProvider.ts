@@ -235,20 +235,13 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
     }
 
     private static getHighlightLanguageAlias(contentType: string): string {
-        if (!contentType) {
-            return null;
-        }
-        contentType = contentType.toLowerCase();
-        let mime = MimeUtility.parse(contentType);
-        let type = mime.type;
-        let suffix = mime.suffix;
-        if (type === 'application/json' || suffix === '+json') {
+        if (MimeUtility.isJSON(contentType)) {
             return 'json';
-        } else if (type === 'application/javascript') {
+        } else if (MimeUtility.isJavascript(contentType)) {
             return 'javascript';
-        } else if (type === 'application/xml' || type === 'text/xml' || suffix === '+xml') {
+        } else if (MimeUtility.isXml(contentType)) {
             return 'xml';
-        } else if (type === 'text/html') {
+        } else if (MimeUtility.isHtml(contentType)) {
             return 'html';
         } else {
             return null;

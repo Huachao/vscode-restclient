@@ -9,22 +9,16 @@ const pd = require('pretty-data').pd;
 export class ResponseFormatUtility {
     public static FormatBody(body: string, contentType: string, suppressValidation: boolean): string {
         if (contentType) {
-            let mime = MimeUtility.parse(contentType);
-            let type = mime.type;
-            let suffix = mime.suffix;
-            if (type === 'application/json' ||
-                suffix === '+json') {
+            if (MimeUtility.isJSON(contentType)) {
                 if (ResponseFormatUtility.IsJsonString(body)) {
                     const edits = JSONFormat(body, undefined, { tabSize: 2, insertSpaces: true, eol: EOL });
                     body = applyEdits(body, edits);
                 } else if (!suppressValidation) {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                 }
-            } else if (type === 'application/xml' ||
-                type === 'text/xml' ||
-                (type === 'application/atom' && suffix === '+xml')) {
+            } else if (MimeUtility.isXml(contentType)) {
                 body = pd.xml(body);
-            } else if (type === 'text/css') {
+            } else if (MimeUtility.isCSS(contentType)) {
                 body = pd.css(body);
             }
         }

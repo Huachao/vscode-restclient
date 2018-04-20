@@ -25,7 +25,7 @@ export class MimeUtility {
                 }
             }
         }
-        return new MIME(types[0], types[1] ? `+${types[1]}` : '', contentTypeString, charset);
+        return new MIME(types[0].toLowerCase(), types[1] ? `+${types[1]}`.toLowerCase() : '', contentTypeString, charset);
     }
 
     public static isBrowserSupportedImageFormat(contentTypeString: string): boolean {
@@ -39,13 +39,54 @@ export class MimeUtility {
         return Boolean(~MimeUtility.supportedImagesFormats.indexOf(type));
     }
 
+    public static isJSON(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        const { type, suffix } = MimeUtility.parse(contentTypeString);
+        return type === 'application/json' || suffix === '+json';
+    }
+
+    public static isXml(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        let { type, suffix } = MimeUtility.parse(contentTypeString);
+        return type === 'application/xml' || type === 'text/xml' || suffix === '+xml';
+    }
+
+    public static isHtml(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        return MimeUtility.parse(contentTypeString).type === 'text/html';
+    }
+
+    public static isJavascript(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        return MimeUtility.parse(contentTypeString).type === 'application/javascript';
+    }
+
+    public static isCSS(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        return MimeUtility.parse(contentTypeString).type === 'text/css';
+    }
+
     public static isMultiPartFormData(contentTypeString: string): boolean {
         if (!contentTypeString) {
             return false;
         }
 
-        let type = MimeUtility.parse(contentTypeString).type;
-        return type.toLowerCase() === 'multipart/form-data';
+        return MimeUtility.parse(contentTypeString).type === 'multipart/form-data';
     }
 
     public static isFormUrlEncoded(contentTypeString: string): boolean {
@@ -53,7 +94,6 @@ export class MimeUtility {
             return false;
         }
 
-        let type = MimeUtility.parse(contentTypeString).type;
-        return type.toLowerCase() === 'application/x-www-form-urlencoded';
+        return MimeUtility.parse(contentTypeString).type === 'application/x-www-form-urlencoded';
     }
 }
