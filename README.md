@@ -496,7 +496,7 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.largeResponseBodySizeLimitInMB`: Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when `rest-client.disableHighlightResonseBodyForLargeResponse` and/or `rest-client.disableAddingHrefLinkForLargeResponse` is set to true. (Default is __5__)
 * `rest-client.previewResponseInActiveColumn`: Preview response in current active column. (Default is __false__)
 
-Rest Client respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`).
+Rest Client extension respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`). Only HTTP and HTTPS proxies are supported.
 
 ## License
 [MIT License](LICENSE)
