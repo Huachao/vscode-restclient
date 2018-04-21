@@ -35,7 +35,7 @@ export class VariableDiagnosticsProvider {
     }
 
     public async checkVariables(document: TextDocument) {
-        if (document.languageId !== 'http') {
+        if (document.languageId !== 'http' || document.uri.scheme !== 'file') {
             return;
         }
 
