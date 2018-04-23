@@ -1,3 +1,8 @@
+## 0.18.3 (2018/4/23)
+* __Feature__: [Support multiline x-www-form-urlencoded request body](https://github.com/Huachao/vscode-restclient/issues/169)
+* __Improvement__: [Limiting linting to local files](https://github.com/Huachao/vscode-restclient/pull/196) ([@lostintangent](https://github.com/lostintangent))
+* __Improvement__: Improvement response body syntax highlight
+
 ## 0.18.2 (2018/4/17)
 * __Feature__: [Add system variable `datetime` to generate a _ISO8601_ or _RFC1123_ format datetime](https://github.com/Huachao/vscode-restclient/issues/180)
 * __Bug Fix__: [Allow request variable resolving whole xml document in response/request body](https://github.com/Huachao/vscode-restclient/issues/188)
