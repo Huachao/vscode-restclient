@@ -54,7 +54,7 @@ export class HttpRequestParser implements IRequestParser {
                 let queryString = '';
                 for (; index < headerLines.length; ) {
                     let headerLine = (headerLines[index]).trim();
-                    if (~['?', '&'].indexOf(headerLine[0])) {
+                    if (['?', '&'].includes(headerLine[0])) {
                         queryString += headerLine;
                         index++;
                         continue;

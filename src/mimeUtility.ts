@@ -36,7 +36,7 @@ export class MimeUtility {
         }
 
         let type = MimeUtility.parse(contentTypeString).type;
-        return Boolean(~MimeUtility.supportedImagesFormats.indexOf(type));
+        return MimeUtility.supportedImagesFormats.includes(type);
     }
 
     public static isJSON(contentTypeString: string): boolean {
