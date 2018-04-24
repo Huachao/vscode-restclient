@@ -116,7 +116,7 @@ export class HttpClient {
                 let buffer = new Buffer(body);
                 try {
                     body = iconv.decode(buffer, encoding);
-                } catch (e) {
+                } catch {
                     if (encoding !== 'utf8') {
                         body = iconv.decode(buffer, 'utf8');
                     }

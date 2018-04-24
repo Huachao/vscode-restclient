@@ -45,7 +45,7 @@ export class ResponseController {
                         }
                     }
                 });
-            } catch (error) {
+            } catch {
                 window.showErrorMessage(`Failed to save latest response to ${filePath}`);
             }
         }
@@ -74,7 +74,7 @@ export class ResponseController {
                         }
                     }
                 });
-            } catch (error) {
+            } catch {
                 window.showErrorMessage(`Failed to save latest response body to ${filePath}`);
             }
         }
