@@ -184,10 +184,7 @@ export class HttpClient {
     }
 
     private getRequestCertificate(requestUrl: string): { cert?: string, key?: string, pfx?: string, passphrase?: string } {
-        let resolvedUrl = url.parse(requestUrl);
-        let hostName = resolvedUrl.hostname;
-        let port = resolvedUrl.port;
-        let host = port ? `${hostName}:${port}` : hostName;
+        const host = url.parse(requestUrl).host;
         if (host in this._settings.hostCertificates) {
             let certificate = this._settings.hostCertificates[host];
             let cert = undefined,
