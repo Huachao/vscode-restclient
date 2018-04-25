@@ -6,8 +6,10 @@ import * as appInsights from "applicationinsights";
 
 appInsights.setup(Constants.AiKey)
     .setAutoCollectDependencies(false)
+    .setAutoCollectExceptions(false)
     .setAutoCollectPerformance(false)
     .setAutoCollectRequests(false)
+    .setAutoCollectDependencies(false)
     .setAutoDependencyCorrelation(false)
     .start();
 
