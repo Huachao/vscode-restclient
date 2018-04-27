@@ -17,6 +17,29 @@
         <array>
             <dict>
                 <key>begin</key>
+                <string>^\s*(?=curl)</string>
+                <key>name</key>
+                <string>http.request.curl</string>
+                <key>end</key>
+                <string>^\s*(\#{3,}.*?)?\s*$</string>
+                <key>endCaptures</key>
+                <dict>
+                    <key>0</key>
+                    <dict>
+                        <key>name</key>
+                        <string>comment.source.sharp.http</string>
+                    </dict>
+                </dict>
+                <key>patterns</key>
+                <array>
+                    <dict>
+                        <key>include</key>
+                        <string>source.shell</string>
+                    </dict>
+                </array>
+            </dict>
+            <dict>
+                <key>begin</key>
                 <string>^\s*(?=[\{\[])</string>
                 <key>name</key>
                 <string>http.request.body.json</string>
