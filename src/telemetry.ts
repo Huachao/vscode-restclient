@@ -5,12 +5,13 @@ import * as Constants from './constants';
 import * as appInsights from "applicationinsights";
 
 appInsights.setup(Constants.AiKey)
+    .setAutoCollectConsole(false)
     .setAutoCollectDependencies(false)
     .setAutoCollectExceptions(false)
     .setAutoCollectPerformance(false)
     .setAutoCollectRequests(false)
-    .setAutoCollectDependencies(false)
     .setAutoDependencyCorrelation(false)
+    .setUseDiskRetryCaching(true)
     .start();
 
 export class Telemetry {
