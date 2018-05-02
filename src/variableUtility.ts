@@ -57,18 +57,20 @@ export class VariableUtility {
                 let endPos = startPos + variable.length + 1;
                 locations.push(new Range(index, startPos, index, endPos));
             }
-        };
+        }
         return locations;
     }
 
     public static getReferenceRanges(lines: string[], variable: string): Range[] {
-        let locations: Range[] = [];
+        const locations: Range[] = [];
+        const regex = new RegExp(`\{\{${variable}\}\}`, 'g');
         for (const [index, line] of lines.entries()) {
             if (Constants.CommentIdentifiersRegex.test(line)) {
                 continue;
             }
 
-            let regex = new RegExp(`\{\{${variable}\}\}`, 'g');
+            regex.lastIndex = 0;
+
             let match: RegExpExecArray;
             while (match = regex.exec(line)) {
                 let startPos = match.index + 2;
@@ -76,7 +78,7 @@ export class VariableUtility {
                 locations.push(new Range(index, startPos, index, endPos));
                 regex.lastIndex = match.index + 1;
             }
-        };
+        }
         return locations;
     }
 }

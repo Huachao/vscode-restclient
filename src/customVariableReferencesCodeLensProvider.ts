@@ -6,7 +6,7 @@ import * as Constants from './constants';
 import { VariableUtility } from './variableUtility';
 
 export class CustomVariableReferencesCodeLensProvider implements CodeLensProvider {
-    public async provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {
+    public provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {
         let blocks: CodeLens[] = [];
         let lines: string[] = document.getText().split(/\r?\n/g);
         let delimitedLines: number[] = Selector.getDelimiterRows(lines);
@@ -22,13 +22,11 @@ export class CustomVariableReferencesCodeLensProvider implements CodeLensProvide
             }
         }
 
-        for (const range of requestRange) {
-            let [blockStart, blockEnd] = range;
-
+        for (let [blockStart, blockEnd] of requestRange) {
             while (blockStart <= blockEnd) {
-                if (Selector.isVariableDefinitionLine(lines[blockStart])) {
+                const line = lines[blockStart];
+                if (Selector.isVariableDefinitionLine(line)) {
                     const range = new Range(blockStart, 0, blockEnd, 0);
-                    const line = lines[blockStart];
                     let match: RegExpExecArray;
                     if (match = Constants.VariableDefinitionRegex.exec(line)) {
                         const variableName = match[1];
@@ -41,13 +39,15 @@ export class CustomVariableReferencesCodeLensProvider implements CodeLensProvide
                         blocks.push(new CodeLens(range, cmd));
                     }
                     blockStart++;
+                } else if (!line.trim()) {
+                    blockStart++;
                 } else {
                     break;
                 }
             }
         }
 
-        return blocks;
+        return Promise.resolve(blocks);
     }
 
 }
