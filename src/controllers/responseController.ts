@@ -29,14 +29,16 @@ export class ResponseController {
         if (!uri) {
             return;
         }
-        let response = ResponseStore.get(uri.toString());
-        if (response !== undefined) {
-            let fullResponse = this.getFullResponseString(response);
-            let filePath = path.join(ResponseController.responseSaveFolderPath, `Response-${Date.now()}.http`);
+        const response = ResponseStore.get(uri.toString());
+        if (response) {
+            const fullResponse = this.getFullResponseString(response);
+            const defaultFilePath = path.join(ResponseController.responseSaveFolderPath, `Response-${Date.now()}.http`);
             try {
+                const uri = await window.showSaveDialog({defaultUri: Uri.file(defaultFilePath)});
+                let filePath = uri.fsPath;
                 await PersistUtility.ensureFileAsync(filePath);
                 await fs.writeFile(filePath, fullResponse);
-                window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
+                await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
                     if (btn) {
                         if (btn.title === 'Open') {
                             workspace.openTextDocument(filePath).then(window.showTextDocument);
@@ -46,7 +48,7 @@ export class ResponseController {
                     }
                 });
             } catch {
-                window.showErrorMessage(`Failed to save latest response to ${filePath}`);
+                window.showErrorMessage('Failed to save latest response to disk.');
             }
         }
     }
@@ -56,16 +58,18 @@ export class ResponseController {
         if (!uri) {
             return;
         }
-        let response = ResponseStore.get(uri.toString());
-        if (response !== undefined) {
-            let contentType = response.getHeader("content-type");
-            let extension = this.getExtension(contentType);
-            let fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
-            let filePath = path.join(ResponseController.responseBodySaveFolderPath, fileName);
+        const response = ResponseStore.get(uri.toString());
+        if (response) {
+            const contentType = response.getHeader("content-type");
+            const extension = this.getExtension(contentType);
+            const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
+            const defaultFilePath = path.join(ResponseController.responseBodySaveFolderPath, fileName);
             try {
+                const uri = await window.showSaveDialog({defaultUri: Uri.file(defaultFilePath)});
+                const filePath = uri.fsPath;
                 await PersistUtility.ensureFileAsync(filePath);
                 await fs.writeFile(filePath, response.bodyStream);
-                window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
+                await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
                     if (btn) {
                         if (btn.title === 'Open') {
                             workspace.openTextDocument(filePath).then(window.showTextDocument);
@@ -75,7 +79,7 @@ export class ResponseController {
                     }
                 });
             } catch {
-                window.showErrorMessage(`Failed to save latest response body to ${filePath}`);
+                window.showErrorMessage('Failed to save latest response body to disk');
             }
         }
     }
