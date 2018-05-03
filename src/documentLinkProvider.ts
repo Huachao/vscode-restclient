@@ -3,6 +3,7 @@
 import { DocumentLink, DocumentLinkProvider, TextDocument, Range, Position, Uri, CancellationToken } from 'vscode';
 import { getWorkspaceRootPath } from './workspaceUtility';
 import * as path from 'path';
+import * as url from 'url';
 import * as fs from 'fs-extra';
 
 export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
@@ -34,18 +35,23 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
     }
 
     private normalizeLink(document: TextDocument, link: string, base: string): Uri {
-        let resourcePath;
+        let resourcePath: Uri;
         if (path.isAbsolute(link)) {
-            resourcePath = link;
+            resourcePath = Uri.file(link);
         } else {
             let rootPath = getWorkspaceRootPath();
             if (rootPath) {
-                resourcePath = path.join(rootPath, link);
-                if (!fs.existsSync(resourcePath)) {
-                    resourcePath = path.join(base, link);
+                rootPath = rootPath.replace(/\/?$/, '/');
+                let resourcePathString = url.resolve(rootPath, link);
+                if (!fs.existsSync(resourcePathString)) {
+                    base = base.replace(/\/?$/, '/');
+                    resourcePathString = url.resolve(base, link);
                 }
+
+                resourcePath = Uri.parse(resourcePathString);
             } else {
-                resourcePath = path.join(base, link);
+                base = base.replace(/\/?$/, '/');
+                resourcePath = Uri.parse(url.resolve(base, link));
             }
         }
 
