@@ -113,11 +113,13 @@ ${HttpResponseTextDocumentContentProvider.formatHeaders(response.headers)}`;
     private getSettingsOverrideStyles(width: number): string {
         return [
             '<style>',
-            'code {',
-            this.settings.fontFamily ? `font-family: ${this.settings.fontFamily};` : '',
-            this.settings.fontSize ? `font-size: ${this.settings.fontSize}px;` : '',
-            this.settings.fontWeight ? `font-weight: ${this.settings.fontWeight};` : '',
-            '}',
+            (this.settings.fontFamily || this.settings.fontSize || this.settings.fontWeight ? [
+                'code {',
+                this.settings.fontFamily ? `font-family: ${this.settings.fontFamily};` : '',
+                this.settings.fontSize ? `font-size: ${this.settings.fontSize}px;` : '',
+                this.settings.fontWeight ? `font-weight: ${this.settings.fontWeight};` : '',
+                '}',
+            ] : []).join('\n'),
             'code .line {',
             `padding-left: calc(${width}ch + 20px );`,
             '}',
