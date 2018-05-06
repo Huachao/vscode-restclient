@@ -1,6 +1,6 @@
 "use strict";
 
-import { window, Uri, StatusBarItem, StatusBarAlignment, Range } from 'vscode';
+import { window, StatusBarItem, StatusBarAlignment, Range } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
@@ -13,7 +13,6 @@ import { UntitledFileContentProvider } from '../views/responseUntitledFileConten
 import { trace } from "../decorator";
 import { VariableProcessor } from '../variableProcessor';
 import { RequestStore } from '../requestStore';
-import { ResponseStore } from '../responseStore';
 import { Selector } from '../selector';
 import * as Constants from '../constants';
 import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
@@ -143,8 +142,6 @@ export class RequestController {
             this.formatSizeStatusBar(response);
             this._sizeStatusBarItem.show();
 
-            let previewUri = this.generatePreviewUri();
-            ResponseStore.add(previewUri.toString(), response);
             if (httpRequest.requestVariableCacheKey) {
                 RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
             }
@@ -195,15 +192,6 @@ export class RequestController {
         this._durationStatusBarItem.dispose();
         this._sizeStatusBarItem.dispose();
         this._webview.dispose();
-    }
-
-    private generatePreviewUri(): Uri {
-        let uriString = 'rest-response://authority/response-preview';
-        if (this._restClientSettings.showResponseInDifferentTab) {
-            uriString += `/${Date.now()}`;  // just make every uri different
-        }
-        uriString += '.html';
-        return Uri.parse(uriString);
     }
 
     private setSendingProgressStatusText() {

@@ -207,6 +207,7 @@ export class CodeSnippetController {
     }
 
     public dispose() {
+        this._webview.dispose();
     }
 
     private static normalizeAuthHeader(authHeader) {
