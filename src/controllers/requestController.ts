@@ -1,6 +1,6 @@
 "use strict";
 
-import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument, Range } from 'vscode';
+import { window, Uri, StatusBarItem, StatusBarAlignment, Range } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { HttpClient } from '../httpClient';
@@ -9,7 +9,6 @@ import { HttpResponse } from '../models/httpResponse';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { RestClientSettings } from '../models/configurationSettings';
 import { PersistUtility } from '../persistUtility';
-import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
 import { UntitledFileContentProvider } from '../views/responseUntitledFileContentProvider';
 import { trace } from "../decorator";
 import { VariableProcessor } from '../variableProcessor';
@@ -20,6 +19,7 @@ import * as Constants from '../constants';
 import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
 import { RequestVariableCache } from "../requestVariableCache";
 import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
+import { HttpResponseWebview } from '../views/httpResponseWebview';
 
 import { EOL } from 'os';
 
@@ -35,20 +35,19 @@ export class RequestController {
     private _sizeStatusBarItem: StatusBarItem;
     private _restClientSettings: RestClientSettings;
     private _httpClient: HttpClient;
-    private _responseTextProvider: HttpResponseTextDocumentContentProvider;
-    private _registration: Disposable;
     private _interval: NodeJS.Timer;
+    private _webview: HttpResponseWebview;
 
     public constructor() {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._sizeStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._restClientSettings = new RestClientSettings();
         this._httpClient = new HttpClient(this._restClientSettings);
-
-        this._responseTextProvider = new HttpResponseTextDocumentContentProvider(this._restClientSettings);
-        this._registration = workspace.registerTextDocumentContentProvider('rest-response', this._responseTextProvider);
-
-        workspace.onDidCloseTextDocument((params) => this.onDidCloseTextDocument(params));
+        this._webview = new HttpResponseWebview(this._restClientSettings);
+        this._webview.onDidCloseAllWebviewPanels(() => {
+            this._durationStatusBarItem.hide();
+            this._sizeStatusBarItem.hide();
+        });
     }
 
     @trace('Request')
@@ -150,8 +149,6 @@ export class RequestController {
                 RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
             }
 
-            this._responseTextProvider.update(previewUri);
-
             try {
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
                     UntitledFileContentProvider.createHttpResponseUntitledFile(
@@ -163,8 +160,7 @@ export class RequestController {
                         this._restClientSettings.previewResponseInActiveColumn
                     );
                 } else {
-                    const column = this._restClientSettings.previewResponseInActiveColumn ? ViewColumn.Active : ViewColumn.Two;
-                    await commands.executeCommand('vscode.previewHtml', previewUri, column, `Response(${response.elapsedMillionSeconds}ms)`);
+                    this._webview.render(response);
                 }
             } catch (reason) {
                 window.showErrorMessage(reason);
@@ -198,7 +194,7 @@ export class RequestController {
     public dispose() {
         this._durationStatusBarItem.dispose();
         this._sizeStatusBarItem.dispose();
-        this._registration.dispose();
+        this._webview.dispose();
     }
 
     private generatePreviewUri(): Uri {
@@ -222,18 +218,6 @@ export class RequestController {
     private clearSendProgressStatusText() {
         clearInterval(this._interval);
         this._sizeStatusBarItem.hide();
-    }
-
-    private onDidCloseTextDocument(doc: TextDocument): void {
-        // Remove the status bar associated with the response preview uri
-        if (this._restClientSettings.showResponseInDifferentTab) {
-            return;
-        }
-
-        if (ResponseStore.get(doc.uri.toString())) {
-            this._durationStatusBarItem.hide();
-            this._sizeStatusBarItem.hide();
-        }
     }
 
     private formatDurationStatusBar(response: HttpResponse) {

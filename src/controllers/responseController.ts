@@ -1,11 +1,11 @@
 "use strict";
 
 import { window, Uri, workspace } from 'vscode';
-import { ResponseStore } from '../responseStore';
 import { HttpResponse } from '../models/httpResponse';
 import { MimeUtility } from '../mimeUtility';
 import { PersistUtility } from '../persistUtility';
 import { RestClientSettings } from '../models/configurationSettings';
+import { HttpResponseWebview } from '../views/httpResponseWebview';
 import { trace } from "../decorator";
 import * as Constants from '../constants';
 import * as fs from 'fs-extra';
@@ -25,28 +25,27 @@ export class ResponseController {
     }
 
     @trace('Response-Save')
-    public async save(uri: Uri) {
-        if (!uri) {
-            return;
-        }
-        const response = ResponseStore.get(uri.toString());
+    public async save() {
+        const response = HttpResponseWebview.activePreviewResponse;
         if (response) {
             const fullResponse = this.getFullResponseString(response);
             const defaultFilePath = path.join(ResponseController.responseSaveFolderPath, `Response-${Date.now()}.http`);
             try {
                 const uri = await window.showSaveDialog({defaultUri: Uri.file(defaultFilePath)});
-                let filePath = uri.fsPath;
-                await PersistUtility.ensureFileAsync(filePath);
-                await fs.writeFile(filePath, fullResponse);
-                await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
-                    if (btn) {
-                        if (btn.title === 'Open') {
-                            workspace.openTextDocument(filePath).then(window.showTextDocument);
-                        } else if (btn.title === 'Copy Path') {
-                            cp.copy(filePath);
+                if (uri) {
+                    let filePath = uri.fsPath;
+                    await PersistUtility.ensureFileAsync(filePath);
+                    await fs.writeFile(filePath, fullResponse);
+                    await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
+                        if (btn) {
+                            if (btn.title === 'Open') {
+                                workspace.openTextDocument(filePath).then(window.showTextDocument);
+                            } else if (btn.title === 'Copy Path') {
+                                cp.copy(filePath);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             } catch {
                 window.showErrorMessage('Failed to save latest response to disk.');
             }
@@ -54,11 +53,8 @@ export class ResponseController {
     }
 
     @trace('Response-Save-Body')
-    public async saveBody(uri: Uri) {
-        if (!uri) {
-            return;
-        }
-        const response = ResponseStore.get(uri.toString());
+    public async saveBody() {
+        const response = HttpResponseWebview.activePreviewResponse;
         if (response) {
             const contentType = response.getHeader("content-type");
             const extension = this.getExtension(contentType);
@@ -66,18 +62,20 @@ export class ResponseController {
             const defaultFilePath = path.join(ResponseController.responseBodySaveFolderPath, fileName);
             try {
                 const uri = await window.showSaveDialog({defaultUri: Uri.file(defaultFilePath)});
-                const filePath = uri.fsPath;
-                await PersistUtility.ensureFileAsync(filePath);
-                await fs.writeFile(filePath, response.bodyStream);
-                await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
-                    if (btn) {
-                        if (btn.title === 'Open') {
-                            workspace.openTextDocument(filePath).then(window.showTextDocument);
-                        } else if (btn.title === 'Copy Path') {
-                            cp.copy(filePath);
+                if (uri) {
+                    const filePath = uri.fsPath;
+                    await PersistUtility.ensureFileAsync(filePath);
+                    await fs.writeFile(filePath, response.bodyStream);
+                    await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
+                        if (btn) {
+                            if (btn.title === 'Open') {
+                                workspace.openTextDocument(filePath).then(window.showTextDocument);
+                            } else if (btn.title === 'Copy Path') {
+                                cp.copy(filePath);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             } catch {
                 window.showErrorMessage('Failed to save latest response body to disk');
             }

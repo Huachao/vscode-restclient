@@ -37,8 +37,8 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('rest-client.cancel-request', () => requestController.cancel()));
     context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.save()));
     context.subscriptions.push(commands.registerCommand('rest-client.clear-history', () => historyController.clear()));
-    context.subscriptions.push(commands.registerCommand('rest-client.save-response', uri => responseController.save(uri)));
-    context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', uri => responseController.saveBody(uri)));
+    context.subscriptions.push(commands.registerCommand('rest-client.save-response', () => responseController.save()));
+    context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', () => responseController.saveBody()));
     context.subscriptions.push(commands.registerCommand('rest-client.generate-codesnippet', () => codeSnippetController.run()));
     context.subscriptions.push(commands.registerCommand('rest-client.copy-codesnippet', () => codeSnippetController.copy()));
     context.subscriptions.push(commands.registerCommand('rest-client.copy-request-as-curl', () => codeSnippetController.copyAsCurl()));

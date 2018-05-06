@@ -24,7 +24,7 @@
     "url": "https://github.com/Huachao/vscode-restclient.git"
   },
   "engines": {
-    "vscode": "^1.17.0"
+    "vscode": "^1.23.0"
   },
   "categories": [
     "Other",
@@ -158,17 +158,17 @@
     "menus": {
       "editor/title": [
         {
-          "when": "resourceScheme == rest-response",
+          "when": "httpResponsePreviewFocus",
           "command": "rest-client.save-response",
           "group": "navigation"
         },
         {
-          "when": "resourceScheme == rest-response",
+          "when": "httpResponsePreviewFocus",
           "command": "rest-client.save-response-body",
           "group": "navigation"
         },
         {
-          "when": "resourceScheme == rest-code-snippet",
+          "when": "codeSnippetPreviewFocus",
           "command": "rest-client.copy-codesnippet",
           "group": "navigation"
         }
@@ -220,7 +220,7 @@
         "command": "rest-client.rerun-last-request",
         "key": "ctrl+alt+l",
         "mac": "cmd+alt+l",
-        "when": "resourceScheme == rest-response"
+        "when": "httpResponsePreviewFocus"
       },
       {
         "command": "rest-client.cancel-request",

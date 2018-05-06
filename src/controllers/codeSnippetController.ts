@@ -1,6 +1,6 @@
 "use strict";
 
-import { window, Uri, Disposable, workspace, commands, ViewColumn } from 'vscode';
+import { window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { VariableProcessor } from '../variableProcessor';
@@ -10,7 +10,7 @@ import { CodeSnippetTargetQuickPickItem } from '../models/codeSnippetTargetPickI
 import { CodeSnippetTarget } from '../models/codeSnippetTarget';
 import { CodeSnippetClientQuickPickItem } from '../models/codeSnippetClientPickItem';
 import { CodeSnippetClient } from '../models/codeSnippetClient';
-import { CodeSnippetTextDocumentContentProvider } from '../views/codeSnippetTextDocumentContentProvider';
+import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 import { Selector } from '../selector';
 import { Telemetry } from '../telemetry';
 import { trace } from "../decorator";
@@ -22,15 +22,12 @@ const HTTPSnippet = require('httpsnippet');
 
 export class CodeSnippetController {
     private static _availableTargets = HTTPSnippet.availableTargets();
-    private _previewUri: Uri = Uri.parse('rest-code-snippet://authority/generate-code-snippet');
-    private _codeSnippetTextProvider: CodeSnippetTextDocumentContentProvider;
-    private _registration: Disposable;
     private _selectedText;
     private _convertedResult;
+    private _webview: CodeSnippetWebview;
 
     constructor() {
-        this._codeSnippetTextProvider = new CodeSnippetTextDocumentContentProvider(null, null);
-        this._registration = workspace.registerTextDocumentContentProvider('rest-code-snippet', this._codeSnippetTextProvider);
+        this._webview = new CodeSnippetWebview();
     }
 
     public async run() {
@@ -109,12 +106,9 @@ export class CodeSnippetController {
                     Telemetry.sendEvent('Generate Code Snippet', { 'target': item.rawTarget.key, 'client': client.rawClient.key });
                     let result = snippet.convert(item.rawTarget.key, client.rawClient.key);
                     this._convertedResult = result;
-                    this._codeSnippetTextProvider.convertResult = result;
-                    this._codeSnippetTextProvider.lang = item.rawTarget.key;
-                    this._codeSnippetTextProvider.update(this._previewUri);
 
                     try {
-                        await commands.executeCommand('vscode.previewHtml', this._previewUri, ViewColumn.Two, `${item.rawTarget.title}-${client.rawClient.title}`);
+                        this._webview.render(result, `${item.rawTarget.title}-${client.rawClient.title}`, item.rawTarget.key);
                     } catch (reason) {
                         window.showErrorMessage(reason);
                     }
