@@ -81,9 +81,14 @@ export class HttpClient {
             options.headers = httpRequest.headers = {};
         }
 
-        // add default user agent if not specified
-        if (!hasHeader(options.headers, 'User-Agent')) {
-            options.headers['User-Agent'] = this._settings.defaultUserAgent;
+        // add default headers if not specified
+        for (let header in this._settings.defaultHeaders) {
+            if (!hasHeader(options.headers, header)) {
+                const value = this._settings.defaultHeaders[header];
+                if (value) {
+                    options.headers[header] = value;
+                }
+            }
         }
 
         let size = 0;

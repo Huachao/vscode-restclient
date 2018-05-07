@@ -1,10 +1,11 @@
 import { window, workspace, WorkspaceConfiguration } from 'vscode';
 import { HostCertificate } from '../models/hostCertificate';
+import { Headers } from '../models/base';
 import { PreviewOption, fromString as ParsePreviewOptionStr } from '../models/previewOption';
 
 export interface IRestClientSettings {
     followRedirect: boolean;
-    defaultUserAgent: string;
+    defaultHeaders: Headers;
     timeoutInMilliseconds: number;
     showResponseInDifferentTab: boolean;
     proxy: string;
@@ -32,7 +33,7 @@ export interface IRestClientSettings {
 
 export class RestClientSettings implements IRestClientSettings {
     public followRedirect: boolean;
-    public defaultUserAgent: string;
+    public defaultHeaders: Headers;
     public timeoutInMilliseconds: number;
     public showResponseInDifferentTab: boolean;
     public proxy: string;
@@ -79,7 +80,7 @@ export class RestClientSettings implements IRestClientSettings {
     private initializeSettings() {
         let restClientSettings = this.getWorkspaceConfiguration("rest-client");
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
-        this.defaultUserAgent = restClientSettings.get<string>("defaultuseragent", "vscode-restclient");
+        this.defaultHeaders = restClientSettings.get<Headers>("defaultHeaders", {"User-Agent": "vscode-restclient"});
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
         this.rememberCookiesForSubsequentRequests = restClientSettings.get<boolean>("rememberCookiesForSubsequentRequests", true);
         this.timeoutInMilliseconds = restClientSettings.get<number>("timeoutinmilliseconds", 0);
