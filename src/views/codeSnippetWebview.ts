@@ -1,9 +1,7 @@
 'use strict';
 
-import { window, WebviewPanel, ViewColumn, Uri, commands } from 'vscode';
+import { window, WebviewPanel, ViewColumn, commands } from 'vscode';
 import { BaseWebview } from './baseWebview';
-import * as Constants from '../constants';
-import * as path from 'path';
 
 const hljs = require('highlight.js');
 const codeHighlightLinenums = require('code-highlight-linenums');
@@ -30,9 +28,7 @@ export class CodeSnippetWebview extends BaseWebview {
                 {
                     enableFindWidget: true,
                     retainContextWhenHidden: true,
-                    localResourceRoots: [
-                        Uri.file(path.join(this.extensionPath, 'styles'))
-                    ]
+                    localResourceRoots: [ this.styleFolderPath ]
                 });
 
                 panel.onDidDispose(() => {
@@ -62,10 +58,9 @@ export class CodeSnippetWebview extends BaseWebview {
     }
 
     private getHtmlForWebview(convertResult: string, lang: string): string {
-        const styleFilePath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName, Constants.CSSFileName)).with({ scheme: 'vscode-resource' });
         return `
             <head>
-                <link rel="stylesheet" href="${styleFilePath}">
+                <link rel="stylesheet" href="${this.styleFilePath}">
             </head>
             <body>
                 <div>

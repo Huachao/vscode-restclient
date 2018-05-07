@@ -1,15 +1,13 @@
 'use strict';
 
-import { window, WebviewPanel, ViewColumn, Uri, commands } from 'vscode';
+import { window, WebviewPanel, ViewColumn, commands } from 'vscode';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
-import * as Constants from '../constants';
 import { MimeUtility } from '../mimeUtility';
 import { Headers } from '../models/base';
 import { PreviewOption } from '../models/previewOption';
 import { ResponseFormatUtility } from '../responseFormatUtility';
 import { BaseWebview } from './baseWebview';
-import * as path from 'path';
 
 const autoLinker = require('autolinker');
 const hljs = require('highlight.js');
@@ -29,6 +27,7 @@ export class HttpResponseWebview extends BaseWebview {
     public constructor(settings: RestClientSettings) {
         super(settings);
 
+        // Init response webview map
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();
     }
 
@@ -44,10 +43,7 @@ export class HttpResponseWebview extends BaseWebview {
                     enableFindWidget: true,
                     enableScripts: true,
                     retainContextWhenHidden: true,
-                    localResourceRoots: [
-                        Uri.file(path.join(this.extensionPath, 'scripts')),
-                        Uri.file(path.join(this.extensionPath, 'styles'))
-                    ]
+                    localResourceRoots: [ this.styleFolderPath, this.scriptFolderPath ]
                 });
 
                 panel.onDidDispose(() => {
@@ -100,11 +96,9 @@ export class HttpResponseWebview extends BaseWebview {
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
             innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
         }
-        const styleFilePath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName, Constants.CSSFileName)).with({ scheme: 'vscode-resource' });
-        const scriptFilePath = Uri.file(path.join(this.extensionPath, Constants.ScriptsFolderName, Constants.ScriptFileName)).with({ scheme: 'vscode-resource' });
         return `
     <head>
-        <link rel="stylesheet" type="text/css" href="${styleFilePath}">
+        <link rel="stylesheet" type="text/css" href="${this.styleFilePath}">
         ${this.getSettingsOverrideStyles(width)}
     </head>
     <body>
@@ -114,7 +108,7 @@ export class HttpResponseWebview extends BaseWebview {
                 : this.addUrlLinks(innerHtml)}
             <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="scroll(0,0)"><span class="icon"></span></a>
         </div>
-        <script type="text/javascript" src="${scriptFilePath}" charset="UTF-8"></script>
+        <script type="text/javascript" src="${this.scriptFilePath}" charset="UTF-8"></script>
     </body>`;
     }
 
