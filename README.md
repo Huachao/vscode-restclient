@@ -44,11 +44,11 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Fold/Unfold for request block
 
 ## Usage
-In editor, type a HTTP request as simple as below:
+In editor, type an HTTP request as simple as below:
 ```http
 https://example.com/comments/1
 ```
-Or, you can follow the standard [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html) that including request method, headers and body.
+Or, you can follow the standard [RFC 2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html) that including request method, headers, and body.
 ```http
 POST https://example.com/comments HTTP/1.1
 content-type: application/json
@@ -58,7 +58,7 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, click the `Send Request` link above the request, or use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate __webview__ panel of Visual Studio Code. If you'd like to use the full power of searching, selecting or manipulating in Visual Studio Code, you can also preview response in __an untitled document__ by setting `rest-client.previewResponseInUntitledDocument` to `true`, by default the value is `false`. When a request is issued, ![cloud upload](images/loading.gif) will be displayed in the status bar, after receiving the response, the icon will be changed to the duration and response size.
+Once you prepared a request, click the `Send Request` link above the request, or use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right-click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate __webview__ panel of Visual Studio Code. If you'd like to use the full power of searching, selecting or manipulating in Visual Studio Code, you can also preview response in __an untitled document__ by setting `rest-client.previewResponseInUntitledDocument` to `true`, by default the value is `false`. When a request is issued, ![cloud upload](images/loading.gif) will be displayed in the status bar, after receiving the response, the icon will be changed to the duration and response size.
 
 You can view the breakdown of the response time when hovering over the duration status bar, you could view the duration details of _Socket_, _DNS_, _TCP_, _First Byte_ and _Download_.
 
@@ -160,7 +160,7 @@ Authorization: token xxx
 < ./demo.xml
 ```
 
-When content type of request body is `multipart/form-data`, you may have the mixed format of the request body like following:
+When content type of request body is `multipart/form-data`, you may have the mixed format of the request body as follows:
 ```http
 POST https://api.example.com/user/upload
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -203,7 +203,7 @@ We add the capability to directly run [curl request](https://curl.haxx.se/) in R
 * -d, --data, --data-ascii,--data-binary
 
 ## Copy Request As cURL
-Sometimes you may want to get the curl format of a http request quickly and save it to clipboard, just pressing `F1` and then selecting/typing `Rest Client: Copy Request As cURL` or simply right click in the editor, and select `Copy Request As cURL`.
+Sometimes you may want to get the curl format of an http request quickly and save it to clipboard, just pressing `F1` and then selecting/typing `Rest Client: Copy Request As cURL` or simply right-click in the editor, and select `Copy Request As cURL`.
 
 ## Cancel Request
 Once you want to cancel a processing request, use shortcut `Ctrl+Alt+K`(`Cmd+Alt+K` for macOS), or press `F1` and then select/type `Rest Client: Cancel Request`.
@@ -213,13 +213,13 @@ Sometimes you may want to refresh the API response, now you could do it simply u
 
 ## Request History
 ![request-history](images/request-history.png)
-Each time we sent a http request, the request details(method, url, headers and body) would be persisted into file. By using shortcut `Ctrl+Alt+H`(`Cmd+Alt+H` for macOS), or press `F1` and then select/type `Rest Client: Request History`, you can view the last __50__ request items(method, url and request time) in the time reversing order, you can select any request you wish to trigger again. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
+Each time we sent an http request, the request details(method, url, headers, and body) would be persisted into file. By using shortcut `Ctrl+Alt+H`(`Cmd+Alt+H` for macOS), or press `F1` and then select/type `Rest Client: Request History`, you can view the last __50__ request items(method, url and request time) in the time reversing order, you can select any request you wish to trigger again. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
 
 You can also clear request history by pressing `F1` and then selecting/typing `Rest Client: Clear Request History`.
 
 ## Save Full Response
 ![Save Response](images/response.gif)
-In the upper right corner of the response preview tab, we add a new icon to save the latest response to local file system. After you click the `Save Full Response` icon, it will prompt the window with the saved response file path. You can click the `Open` button to open the saved response file in current workspace, or click `Copy Path` to copy the saved response path to clipboard.
+In the upper right corner of the response preview tab, we add a new icon to save the latest response to local file system. After you click the `Save Full Response` icon, it will prompt the window with the saved response file path. You can click the `Open` button to open the saved response file in current workspace or click `Copy Path` to copy the saved response path to clipboard.
 
 ## Save Response Body
 Another icon in the upper right corner of the response preview tab is the `Save Response Body` button, it will only save the response body __ONLY__ to local file system. The extension of saved file is set according to the response `MIME` type, like if the `Content-Type` value in response header is `application/json`, the saved file will have extension `.json`. You can also overwrite the `MIME` type and extension mapping according to your requirement with the `rest-client.mimeAndFileExtensionMapping` setting.
@@ -237,7 +237,7 @@ HTTP Basic Auth is a widely used protocol for simple username/password authentic
 1. Add the value of Authorization header in the base64 encoding of `username:password`.
 2. Add the value of Authorization header in the raw value of `username` and `password`, which is separated by space.
 
-The corresponding examples are as following:
+The corresponding examples are as follows:
 ```http
 GET https://httpbin.org//basic-auth/user/passwd HTTP/1.1
 Authorization: Basic dXNlcjpwYXNzd2Q=
@@ -285,11 +285,11 @@ Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like
 ```
 
 ### Azure Active Directory(Azure AD)
-Azure AD is Microsoft’s multi-tenant, cloud based directory and identity management service, you can refer to the [System Variables](#system-variables) section for more details.
+Azure AD is Microsoft’s multi-tenant, cloud-based directory and identity management service, you can refer to the [System Variables](#system-variables) section for more details.
 
 ## Generate Code Snippet
 ![Generate Code Snippet](images/code-snippet.gif)
-Once you’ve finalized your request in REST Client extension, you might want to make the same request from your own source code. We allow you to generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as previously, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or right click in the editor and then select `Generate Code Snippet` in the menu, or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, as well as library list. After you selected the code snippet language/library you want, the generated code snippet will be previewed in a separate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
+Once you’ve finalized your request in REST Client extension, you might want to make the same request from your own source code. We allow you to generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as previously, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or right-click in the editor and then select `Generate Code Snippet` in the menu, or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, as well as library list. After you selected the code snippet language/library you want, the generated code snippet will be previewed in a separate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
 
 ## HTTP Language
 Add language support for HTTP request, with features like __syntax highlight__, __auto completion__, __code lens__ and __comment support__, when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:
@@ -301,7 +301,7 @@ If you want to enable language association in other cases, just change the langu
 
 ![HTTP Language](images/http.png)
 ### Auto Completion
-Currently auto completion will be enabled for following seven categories:
+Currently, auto completion will be enabled for following seven categories:
 
 1. HTTP Method
 2. HTTP URL from request history
@@ -316,17 +316,17 @@ A single `http` file may define lots of requests and file level custom variables
 ![Goto Symbols](images/navigate.png)
 
 ## Environments
-Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different web service environments, like devbox, sandbox and production. We also support the __shared__ environment(identified by special environment name _$shared_) to provide a set of variables that are available in all environments. And you can define the same name variable in your specified environment to overwrite the value in shared environment. Currently active environment's name is displayed at the right bottom of `Visual Studio Code`, when you click it, you can switch environment in the pop up list. And you can also switch environment using shortcut `Ctrl+Alt+E`(`Cmd+Alt+E` for macOS), or press `F1` and then select/type `Rest Client: Switch Environment`.
+Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different web service environments, like devbox, sandbox, and production. We also support the __shared__ environment(identified by special environment name _$shared_) to provide a set of variables that are available in all environments. And you can define the same name variable in your specified environment to overwrite the value in shared environment. Currently, active environment's name is displayed at the right bottom of `Visual Studio Code`, when you click it, you can switch environment in the pop-up list. And you can also switch environment using shortcut `Ctrl+Alt+E`(`Cmd+Alt+E` for macOS), or press `F1` and then select/type `Rest Client: Switch Environment`.
 
 Environments and including variables are defined directly in `Visual Studio Code` setting file, so you can create/update/delete environments and variables at any time you wish. If you __DO NOT__ want to use any environment, you can choose `No Environment` in the environment list. Notice that if you select `No Environment`, variables defined in shared environment are still available. See [Environment Variables](#environment-variables) for more details about environment variables.
 
 ## Variables
 We support two types of variables, one is __Custom Variables__ which is defined by user and can be further divided into __Environment Variables__, __File Variables__ and __Request Variables__, the other is  __System Variables__ which is a predefined set of variables out-of-box.
 
-The reference syntax of system and custom variables types has a subtle difference, for the former the syntax is `{{$SystemVariableName}}`, while for the latter the syntax is `{{CustomVariableName}}`, without preceding `$` before variable name. The definition syntax and location for different types of custom variables are obviously different. Notice that when a same name used for custom variable, request variables takes higher resolving precedence over file variables, file variables takes higher precedence over environment variables.
+The reference syntax of system and custom variables types has a subtle difference, for the former the syntax is `{{$SystemVariableName}}`, while for the latter the syntax is `{{CustomVariableName}}`, without preceding `$` before variable name. The definition syntax and location for different types of custom variables are obviously different. Notice that when the same name used for custom variable, request variables takes higher resolving precedence over file variables, file variables takes higher precedence over environment variables.
 
 ### Custom Variables
-Custom variables can cover different user scenarios with the benefit of environment variables, file variables and request variables. Environment variables are mainly used for storing values that may vary in different environments. Since environment variables are directly defined in Visual Studio Code setting file, they can be referenced across different `http` files. File variables are mainly used for representing values that are constant throughout the `http` file. Request variables are used for the chaining requests scenarios which means a request needs to reference some part(header or body) of another request/response in the _same_ `http` file, imagine we need to retrieve the auth token dynamically from the login response, request variable fits the case well. Both file and request variables are defined in the `http` file and only have __File Scope__.
+Custom variables can cover different user scenarios with the benefit of environment variables, file variables, and request variables. Environment variables are mainly used for storing values that may vary in different environments. Since environment variables are directly defined in Visual Studio Code setting file, they can be referenced across different `http` files. File variables are mainly used for representing values that are constant throughout the `http` file. Request variables are used for the chaining requests scenarios which means a request needs to reference some part(header or body) of another request/response in the _same_ `http` file, imagine we need to retrieve the auth token dynamically from the login response, request variable fits the case well. Both file and request variables are defined in the `http` file and only have __File Scope__.
 
 #### Environment Variables
 For environment variables, each environment comprises a set of key value pairs defined in setting file, key and value are variable name and value respectively. Only variables defined in selected environment and shared environment are available to you. Below is a sample piece of setting file for custom environments and environment level variables:
@@ -353,7 +353,7 @@ Authorization: {{token}}
 ```
 
 #### File Variables
-For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contains any spaces. As for variable value, it can be consist of any characters, even whitespaces are allowed for them (Leading and trailing whitespaces will be stripped). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variables can be defined in a separate request block only filled with variable definitions, as well as define request variables before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the file variables in the `http` file, they can be referenced in any requests of whole file. For file variables, you can also benefit from some `Visual Studio Code` features like _Go To Definition_ and _Find All References_. Below is a sample of file variable definitions and references in a `http` file.
+For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contains any spaces. As for variable value, it can be consist of any characters, even whitespaces are allowed for them (Leading and trailing whitespaces will be stripped). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variables can be defined in a separate request block only filled with variable definitions, as well as define request variables before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the file variables in the `http` file, they can be referenced in any requests of whole file. For file variables, you can also benefit from some `Visual Studio Code` features like _Go To Definition_ and _Find All References_. Below is a sample of file variable definitions and references in an `http` file.
 
 ```http
 @host = api.example.com
@@ -377,13 +377,13 @@ Content-Type: {{contentType}}
 ```
 
 #### Request Variables
-For request variables, they are similar to file variables in some aspects, like scope and definition location. However they have some obvious differences. The definition syntax of request variables is just like a single-line comment, and follows __`// @name requestName`__ or __`# @name requestName`__ just before the desired request url. You can think of request variable as attaching a *name metadata* to the underlying request, and this kind of requests can be called with **Named Request**, while normal requests can be called with **Anonymous Request**. Other requests can use `requestName` as an identifier to reference the expected part of the named request or its latest response. Notice that if you want to refer the response of a named request, you need to manually trigger the named request to retrieve its response first, otherwise the plain text of variable reference like `{{requestName.response.body.$.id}}` will be sent instead.
+For request variables, they are similar to file variables in some aspects, like scope and definition location. However, they have some obvious differences. The definition syntax of request variables is just like a single-line comment, and follows __`// @name requestName`__ or __`# @name requestName`__ just before the desired request url. You can think of request variable as attaching a *name metadata* to the underlying request, and this kind of requests can be called with **Named Request**, while normal requests can be called with **Anonymous Request**. Other requests can use `requestName` as an identifier to reference the expected part of the named request or its latest response. Notice that if you want to refer the response of a named request, you need to manually trigger the named request to retrieve its response first, otherwise the plain text of variable reference like `{{requestName.response.body.$.id}}` will be sent instead.
 
 The reference syntax of a request variable is a bit more complex than other kinds of custom variables. The request variable reference syntax follows `{{requestName.(response|request).(body|headers).(JSONPath|XPath|Header Name)}}`. You have two reference part choices of the response or request: *body* and *headers*. For *body* part, it only works for `JSON` and `XML` responses, you can use [JSONPath](http://goessner.net/articles/JsonPath/) and [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) to extract specific property or attribute. For example, if a JSON response returns body `{"id": "mock"}`, you can set the JSONPath part to `$.id` to reference the id. For *headers* part, you can specify the header name to extract the header value. Additionally, the header name is *case-insensitive*.
 
-> If the *JSONPath* or *XPath* of body, or *Header Name* of headers can't be resolved, the plain text of variable reference will be sent instead. And in this case diagnostic information will be displayed to help you to inspect this. And you can also hover over the request variables to view the actual resolved value.
+> If the *JSONPath* or *XPath* of body, or *Header Name* of headers can't be resolved, the plain text of variable reference will be sent instead. And in this case, diagnostic information will be displayed to help you to inspect this. And you can also hover over the request variables to view the actual resolved value.
 
-Below is a sample of request variable definitions and references in a `http` file.
+Below is a sample of request variable definitions and references in an `http` file.
 ```http
 
 @baseUrl = https://example.com/api
@@ -432,7 +432,7 @@ System variables provide a pre-defined set of variables that can be used in any 
 
   `public|cn|de|us|ppe`: Optional. Specify top-level domain (TLD) to get a token for the specified government cloud, `public` for the public cloud, or `ppe` for internal testing. Default: TLD of the REST endpoint; `public` if not valid.
 
-  `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a dropdown or press `Esc` to use the home directory (`common` for Microsoft Account).
+  `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a drop-down or press `Esc` to use the home directory (`common` for Microsoft Account).
 
   `aud:<domain|tenantId>`: Optional. Target Azure AD app id (aka client id) or domain the token should be created for (aka audience or resource). Default: Domain of the REST endpoint.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
@@ -440,7 +440,7 @@ System variables provide a pre-defined set of variables that can be used in any 
 * `{{$timestamp [offset option]}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`.
 * `{{$datetime rfc1123|iso8601 [offset option]}}`: Add a datetime string in either _ISO8601_ or _RFC1322_ format. You can even specify any date time based on current time similar to `timestamp` like: `{{$datetime iso8601 1 y}}` to represent a year later in _ISO8601_ format.
 
-The option option string you can specify in `timestamp` and `datetime` are:
+The option string you can specify in `timestamp` and `datetime` are:
 
 Option | Description
 ------ | -----------
