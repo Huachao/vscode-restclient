@@ -58,7 +58,17 @@ export class RestClientSettings implements IRestClientSettings {
     public largeResponseBodySizeLimitInMB: number;
     public previewResponseInActiveColumn: boolean;
 
-    public constructor() {
+    private static _instance: RestClientSettings;
+
+    public static get Instance(): RestClientSettings {
+        if (!RestClientSettings._instance) {
+            RestClientSettings._instance = new RestClientSettings();
+        }
+
+        return RestClientSettings._instance;
+    }
+
+    private constructor() {
         workspace.onDidChangeConfiguration(() => {
             this.initializeSettings();
         });

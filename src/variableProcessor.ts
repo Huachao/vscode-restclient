@@ -9,7 +9,6 @@ import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { HttpClient } from './httpClient';
 import { HttpRequest } from './models/httpRequest';
-import { RestClientSettings } from './models/configurationSettings';
 import { RequestVariableCacheValue } from "./models/requestVariableCacheValue";
 import { VariableType } from "./models/variableType";
 import { ResolveState } from "./models/requestVariableResolveResult";
@@ -223,8 +222,7 @@ export class VariableProcessor {
 
                         // if no directory chosen, pick one (otherwise, the token is likely useless :P)
                         if (tenantId === Constants.AzureActiveDirectoryDefaultTenantId) {
-                            const settings = new RestClientSettings();
-                            const client = new HttpClient(settings);
+                            const client = new HttpClient();
                             const request = new HttpRequest(
                                 "GET", `${Constants.AzureClouds[cloud].arm}/tenants?api-version=2017-08-01`,
                                 { Authorization: this._getTokenString(tokenResponse) }, null, null);

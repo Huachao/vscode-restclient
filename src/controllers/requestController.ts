@@ -30,9 +30,9 @@ const filesize = require('filesize');
 const uuid = require('node-uuid');
 
 export class RequestController {
+    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private _durationStatusBarItem: StatusBarItem;
     private _sizeStatusBarItem: StatusBarItem;
-    private _restClientSettings: RestClientSettings;
     private _httpClient: HttpClient;
     private _interval: NodeJS.Timer;
     private _webview: HttpResponseWebview;
@@ -40,9 +40,8 @@ export class RequestController {
     public constructor() {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._sizeStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
-        this._restClientSettings = new RestClientSettings();
-        this._httpClient = new HttpClient(this._restClientSettings);
-        this._webview = new HttpResponseWebview(this._restClientSettings);
+        this._httpClient = new HttpClient();
+        this._webview = new HttpResponseWebview();
         this._webview.onDidCloseAllWebviewPanels(() => {
             this._durationStatusBarItem.hide();
             this._sizeStatusBarItem.hide();

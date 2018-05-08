@@ -15,7 +15,7 @@ appInsights.setup(Constants.AiKey)
     .start();
 
 export class Telemetry {
-    private static readonly restClientSettings: RestClientSettings = new RestClientSettings();
+    private static readonly restClientSettings: RestClientSettings = RestClientSettings.Instance;
 
     public static sendEvent(eventName: string, properties?: { [key: string]: string }) {
         try {

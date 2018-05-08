@@ -9,6 +9,8 @@ export abstract class BaseWebview {
 
     protected _onDidCloseAllWebviewPanels = new EventEmitter<void>();
 
+    protected readonly settings: RestClientSettings = RestClientSettings.Instance;
+
     protected readonly styleFolderPath: Uri;
 
     protected readonly styleFilePath: Uri;
@@ -19,7 +21,7 @@ export abstract class BaseWebview {
 
     protected panels: WebviewPanel[];
 
-    protected constructor(protected settings?: RestClientSettings) {
+    protected constructor() {
         const extensionPath = extensions.getExtension(Constants.ExtensionId).extensionPath;
         this.panels = [];
         this.styleFilePath = Uri.file(path.join(extensionPath, Constants.CSSFolderName, Constants.CSSFileName))

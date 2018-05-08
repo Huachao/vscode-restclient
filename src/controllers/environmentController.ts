@@ -12,14 +12,12 @@ export class EnvironmentController {
         'No Environment', Constants.NoEnvironmentSelectedName, 'You Can Still Use Variables Defined In $shared Environment');
 
     private static readonly sharedEnvironmentName: string = '$shared';
+    private static readonly settings: RestClientSettings = RestClientSettings.Instance;
 
     private _environmentStatusBarItem: StatusBarItem;
-    private _restClientSettings: RestClientSettings;
 
     public constructor(initEnvironment: EnvironmentPickItem) {
-        this._restClientSettings = new RestClientSettings();
-
-        if (this._restClientSettings.showEnvironmentStatusBarItem) {
+        if (EnvironmentController.settings.showEnvironmentStatusBarItem) {
             this._environmentStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
             this._environmentStatusBarItem.command = 'rest-client.switch-environment';
             this._environmentStatusBarItem.text = initEnvironment.label;
@@ -33,7 +31,7 @@ export class EnvironmentController {
         let currentEnvironment = await EnvironmentController.getCurrentEnvironment();
         let itemPickList: EnvironmentPickItem[] = [];
         itemPickList.push(EnvironmentController.noEnvironmentPickItem);
-        for (let name in this._restClientSettings.environmentVariables) {
+        for (let name in EnvironmentController.settings.environmentVariables) {
             if (name === EnvironmentController.sharedEnvironmentName) {
                 continue;
             }
@@ -49,7 +47,7 @@ export class EnvironmentController {
             return;
         }
 
-        if (this._restClientSettings.showEnvironmentStatusBarItem) {
+        if (EnvironmentController.settings.showEnvironmentStatusBarItem) {
             this._environmentStatusBarItem.text = item.label;
         }
 
@@ -70,8 +68,7 @@ export class EnvironmentController {
             environment = await EnvironmentController.getCurrentEnvironment();
         }
 
-        let settings = new RestClientSettings();
-        let environments = settings.environmentVariables;
+        let environments = EnvironmentController.settings.environmentVariables;
         let variables = {};
         Object.assign(
             variables,

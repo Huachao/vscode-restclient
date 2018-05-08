@@ -1,7 +1,6 @@
 'use strict';
 
 import { window, WebviewPanel, ViewColumn, commands } from 'vscode';
-import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { MimeUtility } from '../mimeUtility';
 import { Headers } from '../models/base';
@@ -24,8 +23,8 @@ export class HttpResponseWebview extends BaseWebview {
 
     public static activePreviewResponse: HttpResponse | undefined;
 
-    public constructor(settings: RestClientSettings) {
-        super(settings);
+    public constructor() {
+        super();
 
         // Init response webview map
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();

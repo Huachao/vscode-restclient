@@ -16,12 +16,11 @@ let cp = require('copy-paste');
 let mime = require('mime-types');
 
 export class ResponseController {
-    private _restClientSettings: RestClientSettings;
+    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     public static responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
     public static responseBodySaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseBodyDownloadFolerName);
 
     public constructor() {
-        this._restClientSettings = new RestClientSettings();
     }
 
     @trace('Response-Save')

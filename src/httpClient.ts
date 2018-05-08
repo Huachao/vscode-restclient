@@ -22,10 +22,9 @@ const request = require('request');
 const cookieStore = require('tough-cookie-file-store-bugfix');
 
 export class HttpClient {
-    private _settings: RestClientSettings;
+    private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
-    public constructor(settings: RestClientSettings) {
-        this._settings = settings;
+    public constructor() {
         PersistUtility.ensureCookieFile();
     }
 
