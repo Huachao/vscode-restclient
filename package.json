@@ -267,11 +267,13 @@
           "scope": "resource",
           "description": "Follow HTTP 3xx responses as redirects."
         },
-        "rest-client.defaultuseragent": {
-          "type": "string",
-          "default": "vscode-restclient",
+        "rest-client.defaultHeaders": {
+          "type": "object",
+          "default": {
+            "User-Agent": "vscode-restclient"
+          },
           "scope": "resource",
-          "description": "If User-Agent header is omitted in request header, this value will be added as user agent for each request."
+          "description": "If particular headers are omitted in request header, these will be added as headers for each request."
         },
         "rest-client.timeoutinmilliseconds": {
           "type": "integer",

@@ -6,9 +6,10 @@ import { Headers } from './models/base';
 import { HttpRequest } from './models/httpRequest';
 import { IRequestParser } from './models/IRequestParser';
 import { RequestParserUtil } from './requestParserUtil';
+import { RestClientSettings } from './models/configurationSettings';
 import { MimeUtility } from './mimeUtility';
 import { getWorkspaceRootPath } from './workspaceUtility';
-import { getHeader, hasHeader } from './misc';
+import { getHeader } from './misc';
 import { EOL } from 'os';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -18,6 +19,7 @@ const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');
 
 export class HttpRequestParser implements IRequestParser {
+    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax = /^<\s+([\S]*)\s*$/;
 
@@ -70,7 +72,7 @@ export class HttpRequestParser implements IRequestParser {
                 // get body range
                 let bodyStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
                 if (bodyStartLine !== -1) {
-                    let contentTypeHeader = getHeader(headers, 'content-type');
+                    let contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
                     firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
                     let bodyEndLine = MimeUtility.isMultiPartFormData(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                     bodyLines = lines.slice(bodyStartLine, bodyEndLine);
@@ -84,15 +86,15 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // if Host header provided and url is relative path, change to absolute url
-        if (hasHeader(headers, 'Host') && requestLine.url[0] === '/') {
-            let host = getHeader(headers, 'Host');
+        let host = getHeader(headers, 'Host') || getHeader(this._restClientSettings.defaultHeaders, 'host');
+        if (host && requestLine.url[0] === '/') {
             let [, port] = host.split(':');
             let scheme = port === '443' || port === '8443' ? 'https' : 'http';
             requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
         // parse body
-        let contentTypeHeader = getHeader(headers, 'content-type');
+        let contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
         body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
         if (body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             body = encodeurl(body);
