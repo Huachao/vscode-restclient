@@ -1,26 +1,25 @@
 "use strict";
 
-import { window, StatusBarItem, StatusBarAlignment, Range } from 'vscode';
-import { ArrayUtility } from "../common/arrayUtility";
-import { RequestParserFactory } from '../models/requestParserFactory';
-import { HttpClient } from '../httpClient';
-import { HttpRequest } from '../models/httpRequest';
-import { HttpResponse } from '../models/httpResponse';
-import { SerializedHttpRequest } from '../models/httpRequest';
-import { RestClientSettings } from '../models/configurationSettings';
-import { PersistUtility } from '../persistUtility';
-import { UntitledFileContentProvider } from '../views/responseUntitledFileContentProvider';
-import { trace } from "../decorator";
-import { VariableProcessor } from '../variableProcessor';
-import { RequestStore } from '../requestStore';
-import { Selector } from '../selector';
-import * as Constants from '../constants';
-import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
-import { RequestVariableCache } from "../requestVariableCache";
-import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
-import { HttpResponseWebview } from '../views/httpResponseWebview';
-
 import { EOL } from 'os';
+import { Range, StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import { ArrayUtility } from "../common/arrayUtility";
+import * as Constants from '../constants';
+import { trace } from "../decorator";
+import { HttpClient } from '../httpClient';
+import { RestClientSettings } from '../models/configurationSettings';
+import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
+import { HttpResponse } from '../models/httpResponse';
+import { RequestParserFactory } from '../models/requestParserFactory';
+import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
+import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
+import { PersistUtility } from '../persistUtility';
+import { RequestStore } from '../requestStore';
+import { RequestVariableCache } from "../requestVariableCache";
+import { Selector } from '../selector';
+import { VariableProcessor } from '../variableProcessor';
+import { HttpResponseWebview } from '../views/httpResponseWebview';
+import { UntitledFileContentProvider } from '../views/responseUntitledFileContentProvider';
+
 
 const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();

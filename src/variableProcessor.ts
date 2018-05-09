@@ -1,19 +1,19 @@
 'use strict';
 
-import { commands, QuickPickItem, QuickPickOptions, Uri, window, TextDocument } from 'vscode';
-import { EnvironmentController } from './controllers/environmentController';
-import * as Constants from "./constants";
+import * as adal from 'adal-node';
+import { DurationInputArg2, Moment, utc } from "moment";
+import { QuickPickItem, QuickPickOptions, TextDocument, Uri, commands, window } from 'vscode';
 import { Func } from './common/delegates';
-import { RequestVariableCache } from "./requestVariableCache";
-import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
-import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
+import * as Constants from "./constants";
+import { EnvironmentController } from './controllers/environmentController';
 import { HttpClient } from './httpClient';
 import { HttpRequest } from './models/httpRequest';
+import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
 import { RequestVariableCacheValue } from "./models/requestVariableCacheValue";
-import { VariableType } from "./models/variableType";
 import { ResolveState } from "./models/requestVariableResolveResult";
-import * as adal from 'adal-node';
-import { Moment, DurationInputArg2, utc } from "moment";
+import { VariableType } from "./models/variableType";
+import { RequestVariableCache } from "./requestVariableCache";
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
 

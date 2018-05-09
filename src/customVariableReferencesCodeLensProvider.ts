@@ -1,8 +1,8 @@
 'use strict';
 
-import { CodeLensProvider, TextDocument, CancellationToken, CodeLens, Command, Range, Location } from 'vscode';
-import { Selector } from './selector';
+import { CancellationToken, CodeLens, CodeLensProvider, Command, Location, Range, TextDocument } from 'vscode';
 import * as Constants from './constants';
+import { Selector } from './selector';
 import { VariableUtility } from './variableUtility';
 
 export class CustomVariableReferencesCodeLensProvider implements CodeLensProvider {

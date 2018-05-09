@@ -1,11 +1,11 @@
 "use strict";
 
-import { StatusBarItem, StatusBarAlignment, window } from 'vscode';
+import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import * as Constants from '../constants';
+import { trace } from "../decorator";
 import { RestClientSettings } from '../models/configurationSettings';
 import { EnvironmentPickItem } from '../models/environmentPickItem';
 import { PersistUtility } from '../persistUtility';
-import * as Constants from '../constants';
-import { trace } from "../decorator";
 
 export class EnvironmentController {
     private static readonly noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(

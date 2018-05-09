@@ -1,6 +1,6 @@
 'use strict';
 
-import { ReferenceProvider, ReferenceContext, Location, TextDocument, Position, Range, CancellationToken } from 'vscode';
+import { CancellationToken, Location, Position, Range, ReferenceContext, ReferenceProvider, TextDocument } from 'vscode';
 import { VariableUtility } from './variableUtility';
 
 export class CustomVariableReferenceProvider implements ReferenceProvider {

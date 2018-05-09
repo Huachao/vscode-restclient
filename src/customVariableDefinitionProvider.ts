@@ -1,6 +1,6 @@
 'use strict';
 
-import { DefinitionProvider, Definition, TextDocument, CancellationToken, Position, Location } from 'vscode';
+import { CancellationToken, Definition, DefinitionProvider, Location, Position, TextDocument } from 'vscode';
 import { VariableUtility } from './variableUtility';
 
 export class CustomVariableDefinitionProvider implements DefinitionProvider {

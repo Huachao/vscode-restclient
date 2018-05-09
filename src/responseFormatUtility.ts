@@ -1,9 +1,9 @@
 'use strict';
 
+import { applyEdits, format as JSONFormat } from "jsonc-parser";
+import { EOL } from "os";
 import { window } from 'vscode';
 import { MimeUtility } from './mimeUtility';
-import { format as JSONFormat, applyEdits } from "jsonc-parser";
-import { EOL } from "os";
 const pd = require('pretty-data').pd;
 
 export class ResponseFormatUtility {

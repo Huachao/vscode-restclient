@@ -1,6 +1,6 @@
 'use strict';
 
-import { TextDocument, Position, TextLine, Range } from 'vscode';
+import { Position, Range, TextDocument, TextLine } from 'vscode';
 import * as Constants from './constants';
 
 export class VariableUtility {

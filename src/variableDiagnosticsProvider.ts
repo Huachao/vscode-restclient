@@ -1,14 +1,14 @@
 'use strict';
 
-import { workspace, languages, Diagnostic, DiagnosticSeverity, DiagnosticCollection, TextDocument, Range, Position } from 'vscode';
-
+import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Position, Range, TextDocument, languages, workspace } from 'vscode';
 import { OnRequestVariableEvent } from "./events/requestVariableEvent";
-import { VariableProcessor } from "./variableProcessor";
-import { RequestVariableCache } from "./requestVariableCache";
 import { RequestVariableCacheKey } from './models/requestVariableCacheKey';
-import { VariableType } from './models/variableType';
-import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { ResolveState } from './models/requestVariableResolveResult';
+import { VariableType } from './models/variableType';
+import { RequestVariableCache } from "./requestVariableCache";
+import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
+import { VariableProcessor } from "./variableProcessor";
+
 
 export class VariableDiagnosticsProvider {
     private httpDiagnosticCollection: DiagnosticCollection;

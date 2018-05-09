@@ -1,8 +1,8 @@
 "use strict";
 
+import { fireEvent } from "./events/requestVariableEvent";
 import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
 import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
-import { fireEvent } from "./events/requestVariableEvent";
 
 export class RequestVariableCache {
     private static cache: Map<string, RequestVariableCacheValue> = new Map<string, RequestVariableCacheValue>();

@@ -1,9 +1,9 @@
 'use strict';
 
-import { WebviewPanel, extensions, EventEmitter, Event, Uri } from 'vscode';
-import { RestClientSettings } from '../models/configurationSettings';
-import * as Constants from '../constants';
 import * as path from 'path';
+import { Event, EventEmitter, Uri, WebviewPanel, extensions } from 'vscode';
+import * as Constants from '../constants';
+import { RestClientSettings } from '../models/configurationSettings';
 
 export abstract class BaseWebview {
 

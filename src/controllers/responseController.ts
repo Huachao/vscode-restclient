@@ -1,16 +1,16 @@
 "use strict";
 
-import { window, Uri, workspace } from 'vscode';
-import { HttpResponse } from '../models/httpResponse';
-import { MimeUtility } from '../mimeUtility';
-import { PersistUtility } from '../persistUtility';
-import { RestClientSettings } from '../models/configurationSettings';
-import { HttpResponseWebview } from '../views/httpResponseWebview';
-import { trace } from "../decorator";
-import * as Constants from '../constants';
 import * as fs from 'fs-extra';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import { Uri, window, workspace } from 'vscode';
+import * as Constants from '../constants';
+import { trace } from "../decorator";
+import { MimeUtility } from '../mimeUtility';
+import { RestClientSettings } from '../models/configurationSettings';
+import { HttpResponse } from '../models/httpResponse';
+import { PersistUtility } from '../persistUtility';
+import { HttpResponseWebview } from '../views/httpResponseWebview';
 
 let cp = require('copy-paste');
 let mime = require('mime-types');

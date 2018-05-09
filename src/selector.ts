@@ -1,7 +1,7 @@
 "use strict";
 
-import { TextEditor, Range } from 'vscode';
 import { EOL } from 'os';
+import { Range, TextEditor } from 'vscode';
 import * as Constants from './constants';
 
 export class Selector {

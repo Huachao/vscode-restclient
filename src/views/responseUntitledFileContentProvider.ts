@@ -1,9 +1,9 @@
 'use strict';
 
-import { window, workspace, ViewColumn } from 'vscode';
+import { EOL } from 'os';
+import { ViewColumn, window, workspace } from 'vscode';
 import { HttpResponse } from '../models/httpResponse';
 import { ResponseFormatUtility } from '../responseFormatUtility';
-import { EOL } from 'os';
 
 export class UntitledFileContentProvider {
     public static createHttpResponseUntitledFile(

@@ -1,24 +1,24 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext, commands, languages, TextDocument, Range, Uri, workspace, window } from 'vscode';
-import { RequestController } from './controllers/requestController';
-import { HistoryController } from './controllers/historyController';
-import { ResponseController } from './controllers/responseController';
+import { ExtensionContext, Range, TextDocument, Uri, commands, languages, window, workspace } from 'vscode';
 import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
-import { HttpCompletionItemProvider } from './httpCompletionItemProvider';
-import { CustomVariableHoverProvider } from './customVariableHoverProvider';
+import { HistoryController } from './controllers/historyController';
+import { RequestController } from './controllers/requestController';
+import { ResponseController } from './controllers/responseController';
 import { CustomVariableDefinitionProvider } from './customVariableDefinitionProvider';
+import { CustomVariableHoverProvider } from './customVariableHoverProvider';
 import { CustomVariableReferenceProvider } from './customVariableReferenceProvider';
 import { CustomVariableReferencesCodeLensProvider } from './customVariableReferencesCodeLensProvider';
-import { HttpCodeLensProvider } from './httpCodeLensProvider';
 import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
+import { HttpCodeLensProvider } from './httpCodeLensProvider';
+import { HttpCompletionItemProvider } from './httpCompletionItemProvider';
 import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
-import { RequestVariableHoverProvider } from './requestVariableHoverProvider';
 import { RequestVariableCompletionItemProvider } from "./requestVariableCompletionItemProvider";
-import { VariableProcessor } from './variableProcessor';
+import { RequestVariableHoverProvider } from './requestVariableHoverProvider';
 import { VariableDiagnosticsProvider } from "./variableDiagnosticsProvider";
+import { VariableProcessor } from './variableProcessor';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

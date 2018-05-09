@@ -1,12 +1,12 @@
 "use strict";
 
-import { SnippetString, MarkdownString } from 'vscode';
+import * as url from 'url';
+import { MarkdownString, SnippetString } from 'vscode';
+import * as Constants from './constants';
 import { EnvironmentController } from './controllers/environmentController';
-import { HttpElement, ElementType } from './models/httpElement';
+import { ElementType, HttpElement } from './models/httpElement';
 import { PersistUtility } from './persistUtility';
 import { VariableProcessor } from './variableProcessor';
-import * as Constants from './constants';
-import * as url from 'url';
 
 export class HttpElementFactory {
     public static async getHttpElements(line: string): Promise<HttpElement[]> {

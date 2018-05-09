@@ -1,9 +1,9 @@
 'use strict';
 
-import { window, WebviewPanel, ViewColumn, commands } from 'vscode';
-import { HttpResponse } from '../models/httpResponse';
+import { ViewColumn, WebviewPanel, commands, window } from 'vscode';
 import { MimeUtility } from '../mimeUtility';
 import { Headers } from '../models/base';
+import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
 import { ResponseFormatUtility } from '../responseFormatUtility';
 import { BaseWebview } from './baseWebview';

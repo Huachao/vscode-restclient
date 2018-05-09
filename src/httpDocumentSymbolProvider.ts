@@ -1,13 +1,13 @@
 'use strict';
 
-import { DocumentSymbolProvider, SymbolInformation, SymbolKind, TextDocument, Location, CancellationToken, Range, window } from 'vscode';
-import { Selector } from './selector';
-import { getCurrentHttpFileName } from './workspaceUtility';
-import { RequestParserFactory } from './models/requestParserFactory';
-import { VariableProcessor } from './variableProcessor';
-import { ArrayUtility } from "./common/arrayUtility";
-import * as url from 'url';
 import { EOL } from 'os';
+import * as url from 'url';
+import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument, window } from 'vscode';
+import { ArrayUtility } from "./common/arrayUtility";
+import { RequestParserFactory } from './models/requestParserFactory';
+import { Selector } from './selector';
+import { VariableProcessor } from './variableProcessor';
+import { getCurrentHttpFileName } from './workspaceUtility';
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     private static requestParserFactory = new RequestParserFactory();

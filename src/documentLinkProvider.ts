@@ -1,10 +1,10 @@
 'use strict';
 
-import { DocumentLink, DocumentLinkProvider, TextDocument, Range, Position, Uri, CancellationToken } from 'vscode';
-import { getWorkspaceRootPath } from './workspaceUtility';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as url from 'url';
-import * as fs from 'fs-extra';
+import { CancellationToken, DocumentLink, DocumentLinkProvider, Position, Range, TextDocument, Uri } from 'vscode';
+import { getWorkspaceRootPath } from './workspaceUtility';
 
 export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
 

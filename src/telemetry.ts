@@ -1,8 +1,8 @@
 'use strict';
 
-import { RestClientSettings } from './models/configurationSettings';
-import * as Constants from './constants';
 import * as appInsights from "applicationinsights";
+import * as Constants from './constants';
+import { RestClientSettings } from './models/configurationSettings';
 
 appInsights.setup(Constants.AiKey)
     .setAutoCollectConsole(false)

@@ -1,21 +1,21 @@
 "use strict";
 
-import { window, Uri } from 'vscode';
+import * as fs from 'fs-extra';
+import * as iconv from 'iconv-lite';
+import * as path from 'path';
+import { Stream } from 'stream';
+import * as url from 'url';
+import { Uri, window } from 'vscode';
+import { MimeUtility } from './mimeUtility';
+import { getHeader, hasHeader } from './misc';
 import { Headers } from './models/base';
 import { RestClientSettings } from './models/configurationSettings';
+import { HostCertificate } from './models/hostCertificate';
 import { HttpRequest } from './models/httpRequest';
 import { HttpResponse } from './models/httpResponse';
 import { HttpResponseTimingPhases } from './models/httpResponseTimingPhases';
-import { HostCertificate } from './models/hostCertificate';
 import { PersistUtility } from './persistUtility';
-import { MimeUtility } from './mimeUtility';
 import { getWorkspaceRootPath } from './workspaceUtility';
-import { getHeader, hasHeader } from './misc';
-import * as url from 'url';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { Stream } from 'stream';
-import * as iconv from 'iconv-lite';
 
 const encodeUrl = require('encodeurl');
 const request = require('request');

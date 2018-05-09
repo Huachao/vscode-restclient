@@ -1,7 +1,7 @@
 "use strict";
 
-import { window, workspace } from 'vscode';
 import * as path from 'path';
+import { window, workspace } from 'vscode';
 
 export function getWorkspaceRootPath(): string {
     let editor = window.activeTextEditor;

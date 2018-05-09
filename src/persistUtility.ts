@@ -1,11 +1,11 @@
 'use strict';
 
-import { SerializedHttpRequest } from './models/httpRequest';
-import { EnvironmentPickItem } from './models/environmentPickItem';
-import * as Constants from './constants';
 import * as fs from 'fs-extra';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import * as Constants from './constants';
+import { EnvironmentPickItem } from './models/environmentPickItem';
+import { SerializedHttpRequest } from './models/httpRequest';
 
 export class PersistUtility {
     public static readonly historyFilePath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.HistoryFileName);

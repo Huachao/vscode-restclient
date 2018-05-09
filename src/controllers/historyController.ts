@@ -1,13 +1,13 @@
 "use strict";
 
-import { window, workspace, OutputChannel } from 'vscode';
-import { PersistUtility } from '../persistUtility';
-import { SerializedHttpRequest } from '../models/httpRequest';
-import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
-import { trace } from "../decorator";
-import { EOL } from 'os';
 import * as fs from 'fs-extra';
 import * as moment from 'moment';
+import { EOL } from 'os';
+import { OutputChannel, window, workspace } from 'vscode';
+import { trace } from "../decorator";
+import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
+import { SerializedHttpRequest } from '../models/httpRequest';
+import { PersistUtility } from '../persistUtility';
 
 let tmp = require('tmp');
 

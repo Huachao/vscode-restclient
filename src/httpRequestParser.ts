@@ -1,19 +1,19 @@
 "use strict";
 
-import { Uri } from 'vscode';
-import { ArrayUtility } from './common/arrayUtility';
-import { Headers } from './models/base';
-import { HttpRequest } from './models/httpRequest';
-import { IRequestParser } from './models/IRequestParser';
-import { RequestParserUtil } from './requestParserUtil';
-import { RestClientSettings } from './models/configurationSettings';
-import { MimeUtility } from './mimeUtility';
-import { getWorkspaceRootPath } from './workspaceUtility';
-import { getHeader } from './misc';
-import { EOL } from 'os';
 import * as fs from 'fs-extra';
+import { EOL } from 'os';
 import * as path from 'path';
 import { Stream } from 'stream';
+import { Uri } from 'vscode';
+import { ArrayUtility } from './common/arrayUtility';
+import { MimeUtility } from './mimeUtility';
+import { getHeader } from './misc';
+import { IRequestParser } from './models/IRequestParser';
+import { Headers } from './models/base';
+import { RestClientSettings } from './models/configurationSettings';
+import { HttpRequest } from './models/httpRequest';
+import { RequestParserUtil } from './requestParserUtil';
+import { getWorkspaceRootPath } from './workspaceUtility';
 
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');

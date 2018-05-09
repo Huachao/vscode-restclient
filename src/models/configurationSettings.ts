@@ -1,6 +1,6 @@
-import { window, workspace, WorkspaceConfiguration } from 'vscode';
-import { HostCertificate } from '../models/hostCertificate';
+import { WorkspaceConfiguration, window, workspace } from 'vscode';
 import { Headers } from '../models/base';
+import { HostCertificate } from '../models/hostCertificate';
 import { PreviewOption, fromString as ParsePreviewOptionStr } from '../models/previewOption';
 
 export interface IRestClientSettings {

@@ -1,21 +1,21 @@
 "use strict";
 
+import { EOL } from 'os';
 import { window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
-import { RequestParserFactory } from '../models/requestParserFactory';
-import { VariableProcessor } from '../variableProcessor';
-import { HttpRequest } from '../models/httpRequest';
-import { HARHttpRequest, HARHeader, HARCookie, HARPostData } from '../models/harHttpRequest';
-import { CodeSnippetTargetQuickPickItem } from '../models/codeSnippetTargetPickItem';
-import { CodeSnippetTarget } from '../models/codeSnippetTarget';
-import { CodeSnippetClientQuickPickItem } from '../models/codeSnippetClientPickItem';
+import * as Constants from '../constants';
+import { trace } from "../decorator";
 import { CodeSnippetClient } from '../models/codeSnippetClient';
-import { CodeSnippetWebview } from '../views/codeSnippetWebview';
+import { CodeSnippetClientQuickPickItem } from '../models/codeSnippetClientPickItem';
+import { CodeSnippetTarget } from '../models/codeSnippetTarget';
+import { CodeSnippetTargetQuickPickItem } from '../models/codeSnippetTargetPickItem';
+import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
+import { HttpRequest } from '../models/httpRequest';
+import { RequestParserFactory } from '../models/requestParserFactory';
 import { Selector } from '../selector';
 import { Telemetry } from '../telemetry';
-import { trace } from "../decorator";
-import * as Constants from '../constants';
-import { EOL } from 'os';
+import { VariableProcessor } from '../variableProcessor';
+import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
 const cp = require('copy-paste');
 const HTTPSnippet = require('httpsnippet');

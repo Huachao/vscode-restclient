@@ -1,11 +1,11 @@
 "use strict";
 
-import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
-import { HttpResponse } from './models/httpResponse';
-import { HttpRequest } from "./models/httpRequest";
-import { ResolveResult, ResolveState, ResolveErrorMessage, ResolveWarningMessage } from "./models/requestVariableResolveResult";
 import { MimeUtility } from './mimeUtility';
 import { getHeader } from './misc';
+import { HttpRequest } from "./models/httpRequest";
+import { HttpResponse } from './models/httpResponse';
+import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
+import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from "./models/requestVariableResolveResult";
 
 const jp = require('jsonpath');
 const xpath = require('xpath');

@@ -1,6 +1,6 @@
 'use strict';
 
-import { HoverProvider, Hover, MarkedString, TextDocument, CancellationToken, Position, MarkdownString } from 'vscode';
+import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, TextDocument } from 'vscode';
 import { EnvironmentController } from './controllers/environmentController';
 import { VariableProcessor } from './variableProcessor';
 import { VariableUtility } from './variableUtility';

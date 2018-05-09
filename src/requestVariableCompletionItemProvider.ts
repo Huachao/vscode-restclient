@@ -1,13 +1,13 @@
 'use strict';
 
-import { CompletionItemProvider, TextDocument, Position, CancellationToken, CompletionItem, CompletionItemKind, Range, TextLine, MarkdownString } from 'vscode';
-
+import { CancellationToken, CompletionItem, CompletionItemKind, CompletionItemProvider, MarkdownString, Position, Range, TextDocument, TextLine } from 'vscode';
+import * as Constants from "./constants";
+import { ElementType } from "./models/httpElement";
+import { ResolveState, ResolveWarningMessage } from "./models/requestVariableResolveResult";
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 import { VariableProcessor } from "./variableProcessor";
 import { VariableUtility } from "./variableUtility";
-import { ElementType } from "./models/httpElement";
-import { ResolveState, ResolveWarningMessage } from "./models/requestVariableResolveResult";
-import * as Constants from "./constants";
+
 
 const firstPartRegex: RegExp = /^(\w+)\.$/;
 const secondPartRegex: RegExp = /^(\w+)\.(request|response)\.$/;

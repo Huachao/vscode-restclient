@@ -1,9 +1,9 @@
 "use strict";
 
 import { Stream } from 'stream';
+import { getHeader } from '../misc';
 import { Headers } from './base';
 import { RequestVariableCacheKey } from './requestVariableCacheKey';
-import { getHeader } from '../misc';
 
 export class HttpRequest {
     public requestVariableCacheKey?: RequestVariableCacheKey;
