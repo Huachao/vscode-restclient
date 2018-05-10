@@ -1,9 +1,9 @@
 'use strict';
 
 import { CancellationToken, CompletionItem, CompletionItemKind, CompletionItemProvider, Position, TextDocument } from 'vscode';
-import { HttpElementFactory } from './httpElementFactory';
-import { ElementType } from './models/httpElement';
-import { VariableUtility } from "./variableUtility";
+import { HttpElementFactory } from '../httpElementFactory';
+import { ElementType } from '../models/httpElement';
+import { VariableUtility } from "../utils/variableUtility";
 
 export class HttpCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {

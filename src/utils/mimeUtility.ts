@@ -1,6 +1,6 @@
 "use strict";
 
-import { MIME } from './models/mime';
+import { MIME } from '../models/mime';
 
 export class MimeUtility {
     private static readonly supportedImagesFormats = [

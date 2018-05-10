@@ -1,6 +1,6 @@
 "use strict";
 
-import { getHeader } from '../misc';
+import { getHeader } from '../utils/misc';
 import { Headers } from "./base";
 import { HttpRequest } from "./httpRequest";
 import { HttpResponseTimingPhases } from './httpResponseTimingPhases';

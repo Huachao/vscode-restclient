@@ -3,8 +3,8 @@
 import * as adal from 'adal-node';
 import { DurationInputArg2, Moment, utc } from "moment";
 import { QuickPickItem, QuickPickOptions, TextDocument, Uri, commands, window } from 'vscode';
+import * as Constants from "./common/constants";
 import { Func } from './common/delegates';
-import * as Constants from "./constants";
 import { EnvironmentController } from './controllers/environmentController';
 import { HttpClient } from './httpClient';
 import { HttpRequest } from './models/httpRequest';

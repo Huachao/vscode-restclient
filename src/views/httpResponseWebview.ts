@@ -1,11 +1,11 @@
 'use strict';
 
 import { ViewColumn, WebviewPanel, commands, window } from 'vscode';
-import { MimeUtility } from '../mimeUtility';
 import { Headers } from '../models/base';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
-import { ResponseFormatUtility } from '../responseFormatUtility';
+import { MimeUtility } from '../utils/mimeUtility';
+import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 import { BaseWebview } from './baseWebview';
 
 const autoLinker = require('autolinker');

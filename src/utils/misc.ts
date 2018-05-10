@@ -1,6 +1,6 @@
 "use strict";
 
-import { Headers } from './models/base';
+import { Headers } from '../models/base';
 
 export function getHeader(headers: Headers, name: string): string {
     if (!headers) {

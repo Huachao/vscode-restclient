@@ -6,14 +6,14 @@ import * as path from 'path';
 import { Stream } from 'stream';
 import { Uri } from 'vscode';
 import { ArrayUtility } from './common/arrayUtility';
-import { MimeUtility } from './mimeUtility';
-import { getHeader } from './misc';
 import { IRequestParser } from './models/IRequestParser';
 import { Headers } from './models/base';
 import { RestClientSettings } from './models/configurationSettings';
 import { HttpRequest } from './models/httpRequest';
-import { RequestParserUtil } from './requestParserUtil';
-import { getWorkspaceRootPath } from './workspaceUtility';
+import { MimeUtility } from './utils/mimeUtility';
+import { getHeader } from './utils/misc';
+import { RequestParserUtil } from './utils/requestParserUtil';
+import { getWorkspaceRootPath } from './utils/workspaceUtility';
 
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');

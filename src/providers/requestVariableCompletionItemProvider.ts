@@ -1,12 +1,12 @@
 'use strict';
 
 import { CancellationToken, CompletionItem, CompletionItemKind, CompletionItemProvider, MarkdownString, Position, Range, TextDocument, TextLine } from 'vscode';
-import * as Constants from "./constants";
-import { ElementType } from "./models/httpElement";
-import { ResolveState, ResolveWarningMessage } from "./models/requestVariableResolveResult";
-import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
-import { VariableProcessor } from "./variableProcessor";
-import { VariableUtility } from "./variableUtility";
+import * as Constants from "../common/constants";
+import { ElementType } from "../models/httpElement";
+import { ResolveState, ResolveWarningMessage } from "../models/requestVariableResolveResult";
+import { RequestVariableCacheValueProcessor } from "../requestVariableCacheValueProcessor";
+import { VariableUtility } from "../utils/variableUtility";
+import { VariableProcessor } from "../variableProcessor";
 
 
 const firstPartRegex: RegExp = /^(\w+)\.$/;

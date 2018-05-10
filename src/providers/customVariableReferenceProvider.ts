@@ -1,7 +1,7 @@
 'use strict';
 
 import { CancellationToken, Location, Position, Range, ReferenceContext, ReferenceProvider, TextDocument } from 'vscode';
-import { VariableUtility } from './variableUtility';
+import { VariableUtility } from '../utils/variableUtility';
 
 export class CustomVariableReferenceProvider implements ReferenceProvider {
     public async provideReferences(document: TextDocument, position: Position, context: ReferenceContext, token: CancellationToken): Promise<Location[]> {

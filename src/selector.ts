@@ -2,7 +2,7 @@
 
 import { EOL } from 'os';
 import { Range, TextEditor } from 'vscode';
-import * as Constants from './constants';
+import * as Constants from './common/constants';
 
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;

@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 import { Event, EventEmitter, Uri, WebviewPanel, extensions } from 'vscode';
-import * as Constants from '../constants';
+import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
 
 export abstract class BaseWebview {

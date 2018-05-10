@@ -1,6 +1,6 @@
 'use strict';
 
-import { Headers } from "./models/base";
+import { Headers } from "../models/base";
 
 export class RequestParserUtil {
     public static parseRequestHeaders(headerLines: string[]): Headers {

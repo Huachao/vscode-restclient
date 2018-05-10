@@ -4,12 +4,12 @@ import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
 import { Uri, window, workspace } from 'vscode';
-import * as Constants from '../constants';
+import * as Constants from '../common/constants';
 import { trace } from "../decorator";
-import { MimeUtility } from '../mimeUtility';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
-import { PersistUtility } from '../persistUtility';
+import { MimeUtility } from '../utils/mimeUtility';
+import { PersistUtility } from '../utils/persistUtility';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
 let cp = require('copy-paste');

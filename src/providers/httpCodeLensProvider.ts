@@ -1,7 +1,7 @@
 'use strict';
 
 import { CancellationToken, CodeLens, CodeLensProvider, Command, Range, TextDocument } from 'vscode';
-import { Selector } from './selector';
+import { Selector } from '../selector';
 
 export class HttpCodeLensProvider implements CodeLensProvider {
     public provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {

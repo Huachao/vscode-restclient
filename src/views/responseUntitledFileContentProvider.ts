@@ -3,7 +3,7 @@
 import { EOL } from 'os';
 import { ViewColumn, window, workspace } from 'vscode';
 import { HttpResponse } from '../models/httpResponse';
-import { ResponseFormatUtility } from '../responseFormatUtility';
+import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 
 export class UntitledFileContentProvider {
     public static createHttpResponseUntitledFile(

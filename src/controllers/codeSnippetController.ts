@@ -3,7 +3,7 @@
 import { EOL } from 'os';
 import { window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
-import * as Constants from '../constants';
+import * as Constants from '../common/constants';
 import { trace } from "../decorator";
 import { CodeSnippetClient } from '../models/codeSnippetClient';
 import { CodeSnippetClientQuickPickItem } from '../models/codeSnippetClientPickItem';

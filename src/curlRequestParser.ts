@@ -3,12 +3,12 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Uri } from 'vscode';
-import { hasHeader } from './misc';
 import { IRequestParser } from './models/IRequestParser';
 import { Headers } from './models/base';
 import { HttpRequest } from './models/httpRequest';
-import { RequestParserUtil } from './requestParserUtil';
-import { getWorkspaceRootPath } from './workspaceUtility';
+import { hasHeader } from './utils/misc';
+import { RequestParserUtil } from './utils/requestParserUtil';
+import { getWorkspaceRootPath } from './utils/workspaceUtility';
 
 const yargs = require('yargs');
 

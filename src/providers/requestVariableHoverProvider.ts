@@ -1,11 +1,10 @@
 'use strict';
 
 import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, Range, TextDocument, TextLine } from 'vscode';
-import { ResolveState } from "./models/requestVariableResolveResult";
-import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
-import { VariableProcessor } from './variableProcessor';
-import { VariableUtility } from './variableUtility';
-
+import { ResolveState } from "../models/requestVariableResolveResult";
+import { RequestVariableCacheValueProcessor } from "../requestVariableCacheValueProcessor";
+import { VariableUtility } from '../utils/variableUtility';
+import { VariableProcessor } from '../variableProcessor';
 
 export class RequestVariableHoverProvider implements HoverProvider {
 

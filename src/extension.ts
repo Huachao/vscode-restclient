@@ -7,17 +7,17 @@ import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
 import { RequestController } from './controllers/requestController';
 import { ResponseController } from './controllers/responseController';
-import { CustomVariableDefinitionProvider } from './customVariableDefinitionProvider';
-import { CustomVariableHoverProvider } from './customVariableHoverProvider';
-import { CustomVariableReferenceProvider } from './customVariableReferenceProvider';
-import { CustomVariableReferencesCodeLensProvider } from './customVariableReferencesCodeLensProvider';
-import { RequestBodyDocumentLinkProvider } from './documentLinkProvider';
-import { HttpCodeLensProvider } from './httpCodeLensProvider';
-import { HttpCompletionItemProvider } from './httpCompletionItemProvider';
-import { HttpDocumentSymbolProvider } from './httpDocumentSymbolProvider';
-import { RequestVariableCompletionItemProvider } from "./requestVariableCompletionItemProvider";
-import { RequestVariableHoverProvider } from './requestVariableHoverProvider';
-import { VariableDiagnosticsProvider } from "./variableDiagnosticsProvider";
+import { CustomVariableDefinitionProvider } from './providers/customVariableDefinitionProvider';
+import { CustomVariableHoverProvider } from './providers/customVariableHoverProvider';
+import { CustomVariableReferenceProvider } from './providers/customVariableReferenceProvider';
+import { CustomVariableReferencesCodeLensProvider } from './providers/customVariableReferencesCodeLensProvider';
+import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
+import { HttpCodeLensProvider } from './providers/httpCodeLensProvider';
+import { HttpCompletionItemProvider } from './providers/httpCompletionItemProvider';
+import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvider';
+import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
+import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
+import { VariableDiagnosticsProvider } from "./providers/variableDiagnosticsProvider";
 import { VariableProcessor } from './variableProcessor';
 
 // this method is called when your extension is activated

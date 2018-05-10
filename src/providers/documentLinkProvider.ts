@@ -4,7 +4,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as url from 'url';
 import { CancellationToken, DocumentLink, DocumentLinkProvider, Position, Range, TextDocument, Uri } from 'vscode';
-import { getWorkspaceRootPath } from './workspaceUtility';
+import { getWorkspaceRootPath } from '../utils/workspaceUtility';
 
 export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
 

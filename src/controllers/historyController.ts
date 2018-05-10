@@ -7,7 +7,7 @@ import { OutputChannel, window, workspace } from 'vscode';
 import { trace } from "../decorator";
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { SerializedHttpRequest } from '../models/httpRequest';
-import { PersistUtility } from '../persistUtility';
+import { PersistUtility } from '../utils/persistUtility';
 
 let tmp = require('tmp');
 

@@ -1,7 +1,7 @@
 'use strict';
 
 import { CancellationToken, Definition, DefinitionProvider, Location, Position, TextDocument } from 'vscode';
-import { VariableUtility } from './variableUtility';
+import { VariableUtility } from '../utils/variableUtility';
 
 export class CustomVariableDefinitionProvider implements DefinitionProvider {
     public async provideDefinition(document: TextDocument, position: Position, token: CancellationToken): Promise<Definition> {

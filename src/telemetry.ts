@@ -1,7 +1,7 @@
 'use strict';
 
 import * as appInsights from "applicationinsights";
-import * as Constants from './constants';
+import * as Constants from './common/constants';
 import { RestClientSettings } from './models/configurationSettings';
 
 appInsights.setup(Constants.AiKey)

@@ -1,7 +1,7 @@
 'use strict';
 
 import { Position, Range, TextDocument, TextLine } from 'vscode';
-import * as Constants from './constants';
+import * as Constants from '../common/constants';
 
 export class VariableUtility {
     public static isVariableDefinition(document: TextDocument, position: Position): boolean {
