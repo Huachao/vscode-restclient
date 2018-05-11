@@ -4,7 +4,7 @@ import * as fs from 'fs-extra';
 import * as moment from 'moment';
 import { EOL } from 'os';
 import { OutputChannel, window, workspace } from 'vscode';
-import { trace } from "../decorator";
+import { trace } from "../utils/decorator";
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { PersistUtility } from '../utils/persistUtility';

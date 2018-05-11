@@ -1,11 +1,18 @@
 "use strict";
 
-import { fireEvent } from "./events/requestVariableEvent";
+import { Event, EventEmitter } from "vscode";
 import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
 import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
+import { RequestVariableEvent } from './models/requestVariableEvent';
 
 export class RequestVariableCache {
     private static cache: Map<string, RequestVariableCacheValue> = new Map<string, RequestVariableCacheValue>();
+
+    private static readonly eventEmitter = new EventEmitter<RequestVariableEvent>();
+
+    public static get onDidCreateNewRequestVariable(): Event<RequestVariableEvent> {
+        return RequestVariableCache.eventEmitter.event;
+    }
 
     public static get size(): number {
         return RequestVariableCache.cache.size;
@@ -13,7 +20,7 @@ export class RequestVariableCache {
 
     public static add(cacheKey: RequestVariableCacheKey, value: RequestVariableCacheValue) {
         RequestVariableCache.cache.set(cacheKey.getCacheKey(), value);
-        fireEvent({ cacheKey });
+        RequestVariableCache.eventEmitter.fire({ cacheKey });
     }
 
     public static has(cacheKey: RequestVariableCacheKey): boolean {
@@ -25,8 +32,6 @@ export class RequestVariableCache {
     }
 
     public static remove(cacheKey: RequestVariableCacheKey) {
-        if (RequestVariableCache.cache.has(cacheKey.getCacheKey())) {
-            RequestVariableCache.cache.delete(cacheKey.getCacheKey());
-        }
+        RequestVariableCache.cache.delete(cacheKey.getCacheKey());
     }
 }

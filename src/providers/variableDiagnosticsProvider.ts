@@ -1,7 +1,6 @@
 'use strict';
 
 import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Position, Range, TextDocument, languages, workspace } from 'vscode';
-import { OnRequestVariableEvent } from "../events/requestVariableEvent";
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { ResolveState } from '../models/requestVariableResolveResult';
 import { VariableType } from '../models/variableType';
@@ -17,7 +16,7 @@ export class VariableDiagnosticsProvider {
 
         this.checkVariablesInAllTextDocuments();
 
-        OnRequestVariableEvent(() => this.checkVariablesInAllTextDocuments());
+        RequestVariableCache.onDidCreateNewRequestVariable(() => this.checkVariablesInAllTextDocuments());
     }
 
     public dispose(): void {

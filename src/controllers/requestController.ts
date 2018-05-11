@@ -4,7 +4,6 @@ import { EOL } from 'os';
 import { Range, StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
-import { trace } from "../decorator";
 import { HttpClient } from '../httpClient';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
@@ -15,11 +14,11 @@ import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
 import { RequestStore } from '../requestStore';
 import { RequestVariableCache } from "../requestVariableCache";
 import { Selector } from '../selector';
+import { trace } from "../utils/decorator";
 import { PersistUtility } from '../utils/persistUtility';
 import { VariableProcessor } from '../variableProcessor';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 import { UntitledFileContentProvider } from '../views/responseUntitledFileContentProvider';
-
 
 const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();
@@ -30,6 +29,7 @@ const uuid = require('node-uuid');
 
 export class RequestController {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
+    private readonly _requestStore: RequestStore = RequestStore.Instance;
     private _durationStatusBarItem: StatusBarItem;
     private _sizeStatusBarItem: StatusBarItem;
     private _httpClient: HttpClient;
@@ -93,7 +93,7 @@ export class RequestController {
 
     @trace('Rerun Request')
     public async rerun() {
-        let httpRequest = RequestStore.getLatest();
+        let httpRequest = this._requestStore.getLatest();
         if (!httpRequest) {
             return;
         }
@@ -104,14 +104,14 @@ export class RequestController {
     @trace('Cancel Request')
     public async cancel() {
 
-        if (RequestStore.isCompleted()) {
+        if (this._requestStore.isCompleted()) {
             return;
         }
 
         this.clearSendProgressStatusText();
 
         // cancel current request
-        RequestStore.cancel();
+        this._requestStore.cancel();
 
         this._durationStatusBarItem.command = null;
         this._durationStatusBarItem.text = 'Cancelled $(circle-slash)';
@@ -120,7 +120,7 @@ export class RequestController {
 
     private async runCore(httpRequest: HttpRequest) {
         let requestId = uuid.v4();
-        RequestStore.add(<string>requestId, httpRequest);
+        this._requestStore.add(<string>requestId, httpRequest);
 
         // clear status bar
         this.setSendingProgressStatusText();
@@ -130,7 +130,7 @@ export class RequestController {
             let response = await this._httpClient.send(httpRequest);
 
             // check cancel
-            if (RequestStore.isCancelled(<string>requestId)) {
+            if (this._requestStore.isCancelled(<string>requestId)) {
                 return;
             }
 
@@ -166,7 +166,7 @@ export class RequestController {
             await PersistUtility.saveRequest(serializedRequest);
         } catch (error) {
             // check cancel
-            if (RequestStore.isCancelled(<string>requestId)) {
+            if (this._requestStore.isCancelled(<string>requestId)) {
                 return;
             }
 
@@ -182,7 +182,7 @@ export class RequestController {
             this._durationStatusBarItem.text = '';
             window.showErrorMessage(error.message);
         } finally {
-            RequestStore.complete(<string>requestId);
+            this._requestStore.complete(<string>requestId);
         }
     }
 

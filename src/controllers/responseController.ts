@@ -5,7 +5,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { Uri, window, workspace } from 'vscode';
 import * as Constants from '../common/constants';
-import { trace } from "../decorator";
+import { trace } from "../utils/decorator";
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { MimeUtility } from '../utils/mimeUtility';
