@@ -6,14 +6,15 @@ import { QuickPickItem, QuickPickOptions, TextDocument, Uri, commands, window } 
 import * as Constants from "../common/constants";
 import { Func } from '../common/delegates';
 import { EnvironmentController } from '../controllers/environmentController';
-import { HttpClient } from './httpClient';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
 import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
 import { ResolveState } from "../models/requestVariableResolveResult";
 import { VariableType } from "../models/variableType";
+import { HttpClient } from './httpClient';
 import { RequestVariableCache } from "./requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
+
 const copyPaste = require('copy-paste');
 const uuid = require('node-uuid');
 

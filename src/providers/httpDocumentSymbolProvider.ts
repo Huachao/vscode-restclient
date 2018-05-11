@@ -6,8 +6,8 @@ import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInfor
 import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { Selector } from '../utils/selector';
-import { getCurrentHttpFileName } from '../utils/workspaceUtility';
 import { VariableProcessor } from '../utils/variableProcessor';
+import { getCurrentHttpFileName } from '../utils/workspaceUtility';
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     private static requestParserFactory = new RequestParserFactory();

@@ -5,8 +5,8 @@ import * as Constants from "../common/constants";
 import { ElementType } from "../models/httpElement";
 import { ResolveState, ResolveWarningMessage } from "../models/requestVariableResolveResult";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
-import { VariableUtility } from "../utils/variableUtility";
 import { VariableProcessor } from "../utils/variableProcessor";
+import { VariableUtility } from "../utils/variableUtility";
 
 
 const firstPartRegex: RegExp = /^(\w+)\.$/;
