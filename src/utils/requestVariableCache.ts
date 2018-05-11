@@ -1,9 +1,9 @@
 "use strict";
 
 import { Event, EventEmitter } from "vscode";
-import { RequestVariableCacheKey } from "./models/requestVariableCacheKey";
-import { RequestVariableCacheValue } from './models/requestVariableCacheValue';
-import { RequestVariableEvent } from './models/requestVariableEvent';
+import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
+import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
+import { RequestVariableEvent } from '../models/requestVariableEvent';
 
 export class RequestVariableCache {
     private static cache: Map<string, RequestVariableCacheValue> = new Map<string, RequestVariableCacheValue>();

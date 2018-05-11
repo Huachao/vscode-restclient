@@ -2,10 +2,10 @@
 
 import * as url from 'url';
 import { MarkdownString, SnippetString } from 'vscode';
-import * as Constants from './common/constants';
-import { EnvironmentController } from './controllers/environmentController';
-import { ElementType, HttpElement } from './models/httpElement';
-import { PersistUtility } from './utils/persistUtility';
+import * as Constants from '../common/constants';
+import { EnvironmentController } from '../controllers/environmentController';
+import { ElementType, HttpElement } from '../models/httpElement';
+import { PersistUtility } from './persistUtility';
 import { VariableProcessor } from './variableProcessor';
 
 export class HttpElementFactory {

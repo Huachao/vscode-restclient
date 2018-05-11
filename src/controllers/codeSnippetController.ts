@@ -11,10 +11,10 @@ import { CodeSnippetTargetQuickPickItem } from '../models/codeSnippetTargetPickI
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
-import { Selector } from '../selector';
+import { Selector } from '../utils/selector';
 import { trace } from "../utils/decorator";
 import { Telemetry } from '../utils/telemetry';
-import { VariableProcessor } from '../variableProcessor';
+import { VariableProcessor } from '../utils/variableProcessor';
 import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
 const cp = require('copy-paste');

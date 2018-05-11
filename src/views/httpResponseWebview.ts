@@ -4,6 +4,7 @@ import { ViewColumn, WebviewPanel, commands, window } from 'vscode';
 import { Headers } from '../models/base';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
+import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 import { BaseWebview } from './baseWebview';
@@ -78,7 +79,7 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     public dispose() {
-        this.panels.forEach(p => p.dispose());
+        disposeAll(this.panels);
     }
 
     private getHtmlForWebview(response: HttpResponse): string {

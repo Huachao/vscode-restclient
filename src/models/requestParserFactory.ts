@@ -1,7 +1,7 @@
 "use strict";
 
-import { CurlRequestParser } from '../curlRequestParser';
-import { HttpRequestParser } from '../httpRequestParser';
+import { CurlRequestParser } from '../utils/curlRequestParser';
+import { HttpRequestParser } from '../utils/httpRequestParser';
 import { IRequestParser } from '../models/IRequestParser';
 
 export interface IRequestParserFactory {

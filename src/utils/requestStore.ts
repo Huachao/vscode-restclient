@@ -1,6 +1,6 @@
 "use strict";
 
-import { HttpRequest } from './models/httpRequest';
+import { HttpRequest } from '../models/httpRequest';
 
 export class RequestStore {
     private readonly cache: Map<string, HttpRequest> = new Map<string, HttpRequest>();

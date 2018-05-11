@@ -4,9 +4,9 @@ import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Position, Range, 
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { ResolveState } from '../models/requestVariableResolveResult';
 import { VariableType } from '../models/variableType';
-import { RequestVariableCache } from "../requestVariableCache";
-import { RequestVariableCacheValueProcessor } from "../requestVariableCacheValueProcessor";
-import { VariableProcessor } from "../variableProcessor";
+import { RequestVariableCache } from "../utils/requestVariableCache";
+import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
+import { VariableProcessor } from "../utils/variableProcessor";
 
 export class VariableDiagnosticsProvider {
     private httpDiagnosticCollection: DiagnosticCollection;

@@ -3,7 +3,7 @@
 import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, TextDocument } from 'vscode';
 import { EnvironmentController } from '../controllers/environmentController';
 import { VariableUtility } from '../utils/variableUtility';
-import { VariableProcessor } from '../variableProcessor';
+import { VariableProcessor } from '../utils/variableProcessor';
 
 export class CustomVariableHoverProvider implements HoverProvider {
 

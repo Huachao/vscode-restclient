@@ -4,9 +4,9 @@ import { CancellationToken, CompletionItem, CompletionItemKind, CompletionItemPr
 import * as Constants from "../common/constants";
 import { ElementType } from "../models/httpElement";
 import { ResolveState, ResolveWarningMessage } from "../models/requestVariableResolveResult";
-import { RequestVariableCacheValueProcessor } from "../requestVariableCacheValueProcessor";
+import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { VariableUtility } from "../utils/variableUtility";
-import { VariableProcessor } from "../variableProcessor";
+import { VariableProcessor } from "../utils/variableProcessor";
 
 
 const firstPartRegex: RegExp = /^(\w+)\.$/;

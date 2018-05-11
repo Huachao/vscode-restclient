@@ -5,9 +5,9 @@ import * as url from 'url';
 import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import { RequestParserFactory } from '../models/requestParserFactory';
-import { Selector } from '../selector';
+import { Selector } from '../utils/selector';
 import { getCurrentHttpFileName } from '../utils/workspaceUtility';
-import { VariableProcessor } from '../variableProcessor';
+import { VariableProcessor } from '../utils/variableProcessor';
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     private static requestParserFactory = new RequestParserFactory();

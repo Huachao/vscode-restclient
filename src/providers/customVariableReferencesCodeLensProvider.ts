@@ -2,7 +2,7 @@
 
 import { CancellationToken, CodeLens, CodeLensProvider, Command, Location, Range, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
-import { Selector } from '../selector';
+import { Selector } from '../utils/selector';
 import { VariableUtility } from '../utils/variableUtility';
 
 export class CustomVariableReferencesCodeLensProvider implements CodeLensProvider {

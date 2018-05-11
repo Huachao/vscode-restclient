@@ -18,7 +18,7 @@ import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvid
 import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
 import { VariableDiagnosticsProvider } from "./providers/variableDiagnosticsProvider";
-import { VariableProcessor } from './variableProcessor';
+import { VariableProcessor } from './utils/variableProcessor';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
