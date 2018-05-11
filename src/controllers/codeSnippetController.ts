@@ -4,7 +4,6 @@ import { EOL } from 'os';
 import { window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
-import { trace } from "../utils/decorator";
 import { CodeSnippetClient } from '../models/codeSnippetClient';
 import { CodeSnippetClientQuickPickItem } from '../models/codeSnippetClientPickItem';
 import { CodeSnippetTarget } from '../models/codeSnippetTarget';
@@ -13,6 +12,7 @@ import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/har
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { Selector } from '../selector';
+import { trace } from "../utils/decorator";
 import { Telemetry } from '../utils/telemetry';
 import { VariableProcessor } from '../variableProcessor';
 import { CodeSnippetWebview } from '../views/codeSnippetWebview';

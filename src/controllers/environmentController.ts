@@ -2,9 +2,9 @@
 
 import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import * as Constants from '../common/constants';
-import { trace } from "../utils/decorator";
 import { RestClientSettings } from '../models/configurationSettings';
 import { EnvironmentPickItem } from '../models/environmentPickItem';
+import { trace } from "../utils/decorator";
 import { PersistUtility } from '../utils/persistUtility';
 
 export class EnvironmentController {
