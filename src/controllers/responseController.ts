@@ -5,7 +5,6 @@ import * as os from 'os';
 import * as path from 'path';
 import { Uri, window, workspace } from 'vscode';
 import * as Constants from '../common/constants';
-import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { trace } from "../utils/decorator";
 import { MimeUtility } from '../utils/mimeUtility';
@@ -13,10 +12,8 @@ import { PersistUtility } from '../utils/persistUtility';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
 let cp = require('copy-paste');
-let mime = require('mime-types');
 
 export class ResponseController {
-    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     public static responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
     public static responseBodySaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseBodyDownloadFolerName);
 
@@ -56,7 +53,7 @@ export class ResponseController {
         const response = HttpResponseWebview.activePreviewResponse;
         if (response) {
             const contentType = response.getHeader("content-type");
-            const extension = this.getExtension(contentType);
+            const extension = MimeUtility.getExtension(contentType, '');
             const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
             const defaultFilePath = path.join(ResponseController.responseBodySaveFolderPath, fileName);
             try {
@@ -97,20 +94,5 @@ export class ResponseController {
             body = `${os.EOL}${response.body}`;
         }
         return `${statusLine}${headerString}${body}`;
-    }
-
-    private getExtension(contentType: string): string | boolean {
-        let mimeType = MimeUtility.parse(contentType);
-        let contentTypeWithoutCharsets = `${mimeType.type}${mimeType.suffix}`;
-
-        // Check if user has custom mapping for this content type first
-        if (contentTypeWithoutCharsets in this._restClientSettings.mimeAndFileExtensionMapping) {
-            let ext = this._restClientSettings.mimeAndFileExtensionMapping[contentTypeWithoutCharsets];
-            ext = ext.replace(/^(\.)+/, "");
-            if (ext) {
-                return ext;
-            }
-        }
-        return mime.extension(contentType);
     }
 }

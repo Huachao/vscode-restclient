@@ -1,6 +1,9 @@
 "use strict";
 
+import { RestClientSettings } from '../models/configurationSettings';
 import { MIME } from '../models/mime';
+
+const mime = require('mime-types');
 
 export class MimeUtility {
     private static readonly supportedImagesFormats = [
@@ -26,6 +29,22 @@ export class MimeUtility {
             }
         }
         return new MIME(types[0].toLowerCase(), types[1] ? `+${types[1]}`.toLowerCase() : '', contentTypeString, charset);
+    }
+
+    public static getExtension(contentTypeString: string, defaultExtension: string = 'http'): string {
+        const mimeType = MimeUtility.parse(contentTypeString);
+        const contentTypeWithoutCharsets = `${mimeType.type}${mimeType.suffix}`;
+        const restClientSettings = RestClientSettings.Instance;
+
+        // Check if user has custom mapping for this content type first
+        if (contentTypeWithoutCharsets in restClientSettings.mimeAndFileExtensionMapping) {
+            let ext = restClientSettings.mimeAndFileExtensionMapping[contentTypeWithoutCharsets];
+            ext = ext.replace(/^(\.)+/, "");
+            if (ext) {
+                return ext;
+            }
+        }
+        return mime.extension(contentTypeString) || defaultExtension;
     }
 
     public static isBrowserSupportedImageFormat(contentTypeString: string): boolean {
