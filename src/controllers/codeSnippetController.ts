@@ -17,7 +17,7 @@ import { Telemetry } from '../utils/telemetry';
 import { VariableProcessor } from '../utils/variableProcessor';
 import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
-const cp = require('copy-paste');
+const clipboardy = require('clipboardy');
 const HTTPSnippet = require('httpsnippet');
 
 export class CodeSnippetController {
@@ -122,7 +122,7 @@ export class CodeSnippetController {
     @trace('Copy Code Snippet')
     public async copy() {
         if (this._convertedResult) {
-            cp.copy(this._convertedResult);
+            clipboardy.writeSync(this._convertedResult);
         }
     }
 
@@ -163,7 +163,7 @@ export class CodeSnippetController {
         let harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         let snippet = new HTTPSnippet(harHttpRequest);
         let result = snippet.convert('shell', 'curl');
-        cp.copy(result);
+        clipboardy.writeSync(result);
     }
 
     private convertToHARHttpRequest(request: HttpRequest): HARHttpRequest {

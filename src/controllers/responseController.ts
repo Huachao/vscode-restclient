@@ -11,7 +11,7 @@ import { MimeUtility } from '../utils/mimeUtility';
 import { PersistUtility } from '../utils/persistUtility';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
-let cp = require('copy-paste');
+const clipboardy = require('clipboardy');
 
 export class ResponseController {
     public static responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
@@ -37,7 +37,7 @@ export class ResponseController {
                             if (btn.title === 'Open') {
                                 workspace.openTextDocument(filePath).then(window.showTextDocument);
                             } else if (btn.title === 'Copy Path') {
-                                cp.copy(filePath);
+                                clipboardy.writeSync(filePath);
                             }
                         }
                     });
@@ -67,7 +67,7 @@ export class ResponseController {
                             if (btn.title === 'Open') {
                                 workspace.openTextDocument(filePath).then(window.showTextDocument);
                             } else if (btn.title === 'Copy Path') {
-                                cp.copy(filePath);
+                                clipboardy.writeSync(filePath);
                             }
                         }
                     });

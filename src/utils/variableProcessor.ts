@@ -15,7 +15,7 @@ import { HttpClient } from './httpClient';
 import { RequestVariableCache } from "./requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 
-const copyPaste = require('copy-paste');
+const clipboardy = require('clipboardy');
 const uuid = require('node-uuid');
 
 const aadRegexPattern = `\\{\\{\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+aud:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*\\}\\}`;
@@ -155,7 +155,7 @@ export class VariableProcessor {
                 const tokenString = token ? `${token.tokenType} ${token.accessToken}` : null;
                 if (copy && tokenString) {
                     // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
-                    copyPaste.copy(tokenString);
+                    clipboardy.writeSync(tokenString);
                 }
 
                 resolve(tokenString);
@@ -211,7 +211,7 @@ export class VariableProcessor {
             const done = "Done";
             const signInPrompt = value => {
                 if (value === signIn || value === tryAgain) {
-                    copyPaste.copy(codeResponse.userCode);
+                    clipboardy.writeSync(codeResponse.userCode);
                     commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
                     window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
                 } else if (value === done) {
