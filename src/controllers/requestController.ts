@@ -17,14 +17,13 @@ import { RequestStore } from '../utils/requestStore';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
 import { VariableProcessor } from '../utils/variableProcessor';
+import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
-import { UntitledFileContentProvider } from '../views/responseUntitledFileContentProvider';
 
 const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();
 
 const filesize = require('filesize');
-
 const uuid = require('node-uuid');
 
 export class RequestController {
@@ -35,6 +34,7 @@ export class RequestController {
     private _httpClient: HttpClient;
     private _interval: NodeJS.Timer;
     private _webview: HttpResponseWebview;
+    private _textDocumentView: HttpResponseTextDocumentView;
 
     public constructor() {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
@@ -45,6 +45,7 @@ export class RequestController {
             this._durationStatusBarItem.hide();
             this._sizeStatusBarItem.hide();
         });
+        this._textDocumentView = new HttpResponseTextDocumentView();
     }
 
     @trace('Request')
@@ -146,14 +147,7 @@ export class RequestController {
 
             try {
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
-                    UntitledFileContentProvider.createHttpResponseUntitledFile(
-                        response,
-                        this._restClientSettings.showResponseInDifferentTab,
-                        this._restClientSettings.previewResponseSetUntitledDocumentLanguageByContentType,
-                        this._restClientSettings.includeAdditionalInfoInResponse,
-                        this._restClientSettings.suppressResponseBodyContentTypeValidationWarning,
-                        this._restClientSettings.previewResponseInActiveColumn
-                    );
+                    this._textDocumentView.render(response);
                 } else {
                     this._webview.render(response);
                 }
@@ -221,6 +215,10 @@ export class RequestController {
 
     private formatSizeStatusBar(response: HttpResponse) {
         this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
-        this._sizeStatusBarItem.tooltip = `Breakdown of Response Size:${EOL}Headers: ${filesize(response.headersSizeInBytes)}${EOL}Body: ${filesize(response.bodySizeInBytes)}`;
+        this._sizeStatusBarItem.tooltip = [
+            'Breakdown of Response Size:',
+            `Headers: ${filesize(response.headersSizeInBytes)}`,
+            `Body: ${filesize(response.bodySizeInBytes)}`
+        ].join(EOL);
     }
 }
