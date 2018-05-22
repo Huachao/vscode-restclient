@@ -84,7 +84,7 @@ export class MimeUtility {
         return MimeUtility.parse(contentTypeString).type === 'text/html';
     }
 
-    public static isJavascript(contentTypeString: string): boolean {
+    public static isJavaScript(contentTypeString: string): boolean {
         if (!contentTypeString) {
             return false;
         }

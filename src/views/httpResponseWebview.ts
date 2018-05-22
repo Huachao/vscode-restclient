@@ -293,7 +293,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     private static getHighlightLanguageAlias(contentType: string): string {
         if (MimeUtility.isJSON(contentType)) {
             return 'json';
-        } else if (MimeUtility.isJavascript(contentType)) {
+        } else if (MimeUtility.isJavaScript(contentType)) {
             return 'javascript';
         } else if (MimeUtility.isXml(contentType)) {
             return 'xml';

@@ -462,7 +462,11 @@ export class VariableProcessor {
 
         // Normal file variables
         fileVariables.forEach((val, key) => {
-            variableDefinitions.set(key, [VariableType.File]);
+            if (variableDefinitions.has(key)) {
+                variableDefinitions.get(key).push(VariableType.File);
+            } else {
+                variableDefinitions.set(key, [VariableType.File]);
+            }
         });
 
         // Environment variables
@@ -473,7 +477,6 @@ export class VariableProcessor {
                 variableDefinitions.set(key, [VariableType.Environment]);
             }
         });
-
 
         return variableDefinitions;
     }
