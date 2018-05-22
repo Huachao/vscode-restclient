@@ -17,6 +17,8 @@ export class VariableDiagnosticsProvider {
         this.checkVariablesInAllTextDocuments();
 
         RequestVariableCache.onDidCreateNewRequestVariable(() => this.checkVariablesInAllTextDocuments());
+
+        workspace.onDidChangeConfiguration(e => e.affectsConfiguration('rest-client') && this.checkVariablesInAllTextDocuments())
     }
 
     public dispose(): void {
