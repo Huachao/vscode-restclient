@@ -6,20 +6,19 @@ import { Headers } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
+import { MimeUtility } from '../utils/mimeUtility';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 
 export class HttpResponseTextDocumentView {
 
     private readonly settings: RestClientSettings = RestClientSettings.Instance;
 
-    private readonly knownLanguageIds = ['xml', 'json', 'html', 'css'];
-
     public constructor() {
     }
 
     public render(response: HttpResponse) {
         const content = this.getTextDocumentContent(response);
-        const language = this.getDocumentLanguage(response);
+        const language = this.getVSCodeDocumentLanguageId(response);
         const column = this.settings.previewResponseInActiveColumn ? ViewColumn.Active : ViewColumn.Two;
         workspace.openTextDocument({ language, content }).then(document => {
             window.showTextDocument(document, { viewColumn: column, preserveFocus: false, preview: !this.settings.showResponseInDifferentTab });
@@ -68,14 +67,19 @@ export class HttpResponseTextDocumentView {
         return headerString;
     }
 
-    private getDocumentLanguage(response: HttpResponse) {
+    private getVSCodeDocumentLanguageId(response: HttpResponse) {
         if (this.settings.previewOption === PreviewOption.Body) {
             const contentType = response.getHeader('content-type');
-            if (contentType) {
-                const type = this.knownLanguageIds.find(t => contentType.includes(t));
-                if (type) {
-                    return type;
-                }
+            if (MimeUtility.isJSON(contentType)) {
+                return 'json';
+            } else if (MimeUtility.isJavaScript(contentType)) {
+                return 'javascript';
+            } else if (MimeUtility.isXml(contentType)) {
+                return 'xml';
+            } else if (MimeUtility.isHtml(contentType)) {
+                return 'html';
+            } else if (MimeUtility.isCSS(contentType)) {
+                return 'css';
             }
         }
 

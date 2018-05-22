@@ -299,6 +299,8 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             return 'xml';
         } else if (MimeUtility.isHtml(contentType)) {
             return 'html';
+        } else if (MimeUtility.isCSS(contentType)) {
+            return 'css';
         } else {
             return null;
         }
