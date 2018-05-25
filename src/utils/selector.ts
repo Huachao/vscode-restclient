@@ -58,7 +58,7 @@ export class Selector {
     }
 
     public static isVariableDefinitionLine(line: string): boolean {
-        return Constants.VariableDefinitionRegex.test(line);
+        return Constants.FileVariableDefinitionRegex.test(line);
     }
 
     public static isResponseStatusLine(line: string): boolean {

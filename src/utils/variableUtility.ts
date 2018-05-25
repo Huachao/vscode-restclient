@@ -52,7 +52,7 @@ export class VariableUtility {
         let locations: Range[] = [];
         for (const [index, line] of lines.entries()) {
             let match: RegExpExecArray;
-            if ((match = Constants.VariableDefinitionRegex.exec(line)) && match[1] === variable) {
+            if ((match = Constants.FileVariableDefinitionRegex.exec(line)) && match[1] === variable) {
                 let startPos = line.indexOf(`@${variable}`);
                 let endPos = startPos + variable.length + 1;
                 locations.push(new Range(index, startPos, index, endPos));

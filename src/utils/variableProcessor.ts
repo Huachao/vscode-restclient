@@ -7,12 +7,12 @@ import * as Constants from "../common/constants";
 import { Func } from '../common/delegates';
 import { EnvironmentController } from '../controllers/environmentController';
 import { HttpRequest } from '../models/httpRequest';
-import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
+import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
 import { ResolveState } from "../models/requestVariableResolveResult";
 import { VariableType } from "../models/variableType";
 import { HttpClient } from './httpClient';
-import { RequestVariableCache } from "./requestVariableCache";
+import { RequestVariableCache } from './requestVariableCache';
 import { RequestVariableCacheValueProcessor } from "./requestVariableCacheValueProcessor";
 
 const clipboardy = require('clipboardy');
@@ -384,33 +384,31 @@ export class VariableProcessor {
     }
 
     public static getCustomVariablesInFile(document: TextDocument): Map<string, string> {
-        let variables = new Map<string, string>();
+        const variables = new Map<string, string>();
 
-        let text = document.getText();
-        let lines: string[] = text.split(/\r?\n/g);
-        lines.forEach(line => {
-            let match: RegExpExecArray;
-            if (match = Constants.VariableDefinitionRegex.exec(line)) {
-                let key = match[1];
-                let originalValue = match[2];
-                let value = "";
-                let isPrevCharEscape = false;
-                for (let index = 0; index < originalValue.length; index++) {
-                    let currentChar = originalValue[index];
-                    if (isPrevCharEscape) {
-                        isPrevCharEscape = false;
-                        value += this.escapee.get(currentChar) || currentChar;
-                    } else {
-                        if (currentChar === "\\") {
-                            isPrevCharEscape = true;
-                            continue;
-                        }
-                        value += currentChar;
+        const text = document.getText();
+        const regex = new RegExp(Constants.FileVariableDefinitionRegex, 'mg');
+
+        let match: RegExpExecArray;
+        while (match = regex.exec(text)) {
+            let key = match[1];
+            let originalValue = match[2];
+            let value = "";
+            let isPrevCharEscape = false;
+            for (const currentChar of originalValue) {
+                if (isPrevCharEscape) {
+                    isPrevCharEscape = false;
+                    value += this.escapee.get(currentChar) || currentChar;
+                } else {
+                    if (currentChar === "\\") {
+                        isPrevCharEscape = true;
+                        continue;
                     }
+                    value += currentChar;
                 }
-                variables.set(key, value);
             }
-        });
+            variables.set(key, value);
+        }
 
         return variables;
     }
@@ -425,21 +423,20 @@ export class VariableProcessor {
     }
 
     public static getRequestVariablesInFile(document: TextDocument, activeOnly: boolean = true): Map<string, RequestVariableCacheValue> {
-        let variables = new Map<string, RequestVariableCacheValue>();
+        const variables = new Map<string, RequestVariableCacheValue>();
 
-        let text = document.getText();
-        let lines: string[] = text.split(/\r?\n/g);
-        let documentUri = document.uri.toString();
-        lines.forEach(line => {
-            let match: RegExpExecArray;
-            if (match = Constants.RequestVariableDefinitionRegex.exec(line)) {
-                let key = match[1];
-                const response = RequestVariableCache.get(new RequestVariableCacheKey(key, documentUri));
-                if (!activeOnly || response) {
-                    variables.set(key, response);
-                }
+        const documentUri = document.uri.toString();
+        const text = document.getText();
+        const requestVariableRefenceRegex = new RegExp(Constants.RequestVariableDefinitionWithNameRegexFactory('\\w+'), 'mg');
+
+        let match: RegExpExecArray;
+        while (match = requestVariableRefenceRegex.exec(text)) {
+            const key = match[1];
+            const response = RequestVariableCache.get(new RequestVariableCacheKey(key, documentUri));
+            if (!activeOnly || response) {
+                variables.set(key, response);
             }
-        });
+        }
 
         return variables;
     }

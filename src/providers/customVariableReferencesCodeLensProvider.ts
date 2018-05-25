@@ -28,7 +28,7 @@ export class CustomVariableReferencesCodeLensProvider implements CodeLensProvide
                 if (Selector.isVariableDefinitionLine(line)) {
                     const range = new Range(blockStart, 0, blockEnd, 0);
                     let match: RegExpExecArray;
-                    if (match = Constants.VariableDefinitionRegex.exec(line)) {
+                    if (match = Constants.FileVariableDefinitionRegex.exec(line)) {
                         const variableName = match[1];
                         const locations = VariableUtility.getReferenceRanges(lines, variableName);
                         const cmd: Command = {
