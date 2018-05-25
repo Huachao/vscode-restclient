@@ -9,8 +9,11 @@ export interface IRequestParserFactory {
 }
 
 export class RequestParserFactory implements IRequestParserFactory {
+
+    private static readonly curlRegex: RegExp = /^\s*curl/i;
+
     public createRequestParser(rawHttpRequest: string): IRequestParser {
-        if (rawHttpRequest.trim().toLowerCase().startsWith('curl'.toLowerCase())) {
+        if (RequestParserFactory.curlRegex.test(rawHttpRequest)) {
             return new CurlRequestParser();
         } else {
             return new HttpRequestParser();
