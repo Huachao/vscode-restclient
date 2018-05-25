@@ -13,7 +13,7 @@ export class Selector {
         }
 
         let selectedText: string;
-        if (editor.selection.isEmpty) {
+        if (editor.selection.isEmpty || range) {
             let activeLine = !range ? editor.selection.active.line : range.start.line;
             selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
         } else {
