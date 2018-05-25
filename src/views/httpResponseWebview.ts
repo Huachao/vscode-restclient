@@ -47,6 +47,12 @@ export class HttpResponseWebview extends BaseWebview {
                 });
 
                 panel.onDidDispose(() => {
+                    const response = this.panelResponses.get(panel);
+                    if (response === HttpResponseWebview.activePreviewResponse) {
+                        commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, false);
+                        HttpResponseWebview.activePreviewResponse = undefined;
+                    }
+
                     const index = this.panels.findIndex(v => v === panel);
                     if (index !== -1) {
                         this.panels.splice(index, 1);

@@ -32,6 +32,7 @@ export class CodeSnippetWebview extends BaseWebview {
                 });
 
                 panel.onDidDispose(() => {
+                    commands.executeCommand('setContext', this.codeSnippetPreviewActiveContextKey, false);
                     this.panels.pop();
                     this._onDidCloseAllWebviewPanels.fire();
                 });
