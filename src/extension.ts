@@ -68,9 +68,7 @@ export async function activate(context: ExtensionContext) {
 
     const diagnosticsProviders = new VariableDiagnosticsProvider();
     workspace.onDidOpenTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
-    workspace.onDidCloseTextDocument((textDocument) => {
-        diagnosticsProviders.deleteDocumentFromDiagnosticCollection(textDocument);
-    }, null, context.subscriptions);
+    workspace.onDidCloseTextDocument(diagnosticsProviders.deleteDocumentFromDiagnosticCollection, diagnosticsProviders, context.subscriptions);
     workspace.onDidSaveTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
 }
 

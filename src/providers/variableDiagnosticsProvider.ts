@@ -27,7 +27,9 @@ export class VariableDiagnosticsProvider {
     }
 
     public deleteDocumentFromDiagnosticCollection(textDocument: TextDocument) {
-        this.httpDiagnosticCollection.delete(textDocument.uri);
+        if (this.httpDiagnosticCollection.has(textDocument.uri)) {
+            this.httpDiagnosticCollection.delete(textDocument.uri);
+        }
     }
 
     public checkVariablesInAllTextDocuments() {
