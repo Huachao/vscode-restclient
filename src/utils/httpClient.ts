@@ -83,7 +83,7 @@ export class HttpClient {
 
         // add default headers if not specified
         for (let header in this._settings.defaultHeaders) {
-            if (!hasHeader(options.headers, header)) {
+            if (!hasHeader(options.headers, header) && (header.toLowerCase() !== 'host' || httpRequest.url[0] === '/')) {
                 const value = this._settings.defaultHeaders[header];
                 if (value) {
                     options.headers[header] = value;
