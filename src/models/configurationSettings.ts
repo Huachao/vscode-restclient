@@ -1,4 +1,4 @@
-import { WorkspaceConfiguration, window, workspace } from 'vscode';
+import { ViewColumn, WorkspaceConfiguration, window, workspace } from 'vscode';
 import { Headers } from '../models/base';
 import { HostCertificate } from '../models/hostCertificate';
 import { PreviewOption, fromString as ParsePreviewOptionStr } from '../models/previewOption';
@@ -28,7 +28,7 @@ export interface IRestClientSettings {
     disableHighlightResonseBodyForLargeResponse: boolean;
     disableAddingHrefLinkForLargeResponse: boolean;
     largeResponseBodySizeLimitInMB: number;
-    previewResponseInActiveColumn: boolean;
+    previewColumn: ViewColumn;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -57,7 +57,7 @@ export class RestClientSettings implements IRestClientSettings {
     public disableHighlightResonseBodyForLargeResponse: boolean;
     public disableAddingHrefLinkForLargeResponse: boolean;
     public largeResponseBodySizeLimitInMB: number;
-    public previewResponseInActiveColumn: boolean;
+    public previewColumn: ViewColumn;
 
     private static _instance: RestClientSettings;
 
@@ -97,7 +97,7 @@ export class RestClientSettings implements IRestClientSettings {
 
         this.previewResponseInUntitledDocument = restClientSettings.get<boolean>("previewResponseInUntitledDocument", false);
         this.previewResponseSetUntitledDocumentLanguageByContentType = restClientSettings.get<boolean>("previewResponseSetUntitledDocumentLanguageByContentType", false);
-        this.previewResponseInActiveColumn = restClientSettings.get<boolean>("previewResponseInActiveColumn", false);
+        this.previewColumn = this.parseColumn(restClientSettings.get<string>("previewColumn", "two"));
         this.includeAdditionalInfoInResponse = restClientSettings.get<boolean>("includeAdditionalInfoInResponse", false);
         this.hostCertificates = restClientSettings.get<Map<string, HostCertificate>>("certificates", new Map<string, HostCertificate>());
         this.useTrunkedTransferEncodingForSendingFileContent = restClientSettings.get<boolean>("useTrunkedTransferEncodingForSendingFileContent", true);
@@ -120,6 +120,20 @@ export class RestClientSettings implements IRestClientSettings {
             return workspace.getConfiguration(section, editor.document.uri);
         } else {
             return workspace.getConfiguration(section);
+        }
+    }
+
+    private parseColumn(value: string): ViewColumn {
+        value = value.toLowerCase();
+        switch (value) {
+            case 'left':
+                return ViewColumn.One;
+            case 'center':
+                return ViewColumn.Two;
+            case 'right':
+                return ViewColumn.Three;
+            default:
+                return ViewColumn.Active;
         }
     }
 }

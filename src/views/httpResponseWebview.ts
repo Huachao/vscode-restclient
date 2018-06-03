@@ -1,6 +1,6 @@
 'use strict';
 
-import { ViewColumn, WebviewPanel, commands, window } from 'vscode';
+import { WebviewPanel, commands, window } from 'vscode';
 import { Headers } from '../models/base';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
@@ -32,13 +32,12 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     public render(response: HttpResponse) {
-        const column = this.settings.previewResponseInActiveColumn ? ViewColumn.Active : ViewColumn.Two;
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
                 this.viewType,
                 `Response(${response.elapsedMillionSeconds}ms)`,
-                column,
+                this.settings.previewColumn,
                 {
                     enableFindWidget: true,
                     enableScripts: true,
@@ -78,7 +77,7 @@ export class HttpResponseWebview extends BaseWebview {
 
         commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, true);
 
-        panel.reveal(column);
+        panel.reveal(this.settings.previewColumn);
 
         this.panelResponses.set(panel, response);
         HttpResponseWebview.activePreviewResponse = response;

@@ -483,6 +483,18 @@
           "default": false,
           "scope": "resource",
           "description": "Preview response in current active column"
+        },
+        "rest-client.previewColumn": {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right",
+            "current"
+          ],
+          "default": "center",
+          "scope": "resource",
+          "description": "Response preview column option. 'left' for previewing in the left most editor column. 'center' for previewing in the center editor column. 'right' for previewing in the right most editor column. 'current' for previewing in the column of current request file."
         }
       }
     }
