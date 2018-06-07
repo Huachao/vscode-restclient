@@ -1,6 +1,6 @@
 'use strict';
 
-import { WebviewPanel, commands, window } from 'vscode';
+import { commands, WebviewPanel, window } from 'vscode';
 import { Headers } from '../models/base';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
@@ -37,7 +37,7 @@ export class HttpResponseWebview extends BaseWebview {
             panel = window.createWebviewPanel(
                 this.viewType,
                 `Response(${response.elapsedMillionSeconds}ms)`,
-                this.settings.previewColumn,
+                { viewColumn: this.settings.previewColumn, preserveFocus: !this.settings.previewResponsePanelTakeFocus },
                 {
                     enableFindWidget: true,
                     enableScripts: true,
@@ -77,7 +77,7 @@ export class HttpResponseWebview extends BaseWebview {
 
         commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, true);
 
-        panel.reveal(this.settings.previewColumn);
+        panel.reveal(this.settings.previewColumn, !this.settings.previewResponsePanelTakeFocus);
 
         this.panelResponses.set(panel, response);
         HttpResponseWebview.activePreviewResponse = response;

@@ -20,7 +20,7 @@ export class HttpResponseTextDocumentView {
         const content = this.getTextDocumentContent(response);
         const language = this.getVSCodeDocumentLanguageId(response);
         workspace.openTextDocument({ language, content }).then(document => {
-            window.showTextDocument(document, { viewColumn: this.settings.previewColumn, preserveFocus: false, preview: !this.settings.showResponseInDifferentTab });
+            window.showTextDocument(document, { viewColumn: this.settings.previewColumn, preserveFocus: !this.settings.previewResponsePanelTakeFocus, preview: !this.settings.showResponseInDifferentTab });
         });
     }
 

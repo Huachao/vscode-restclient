@@ -24,7 +24,7 @@
     "url": "https://github.com/Huachao/vscode-restclient.git"
   },
   "engines": {
-    "vscode": "^1.23.0"
+    "vscode": "^1.24.0"
   },
   "categories": [
     "Other",
@@ -495,6 +495,12 @@
           "default": "center",
           "scope": "resource",
           "description": "Response preview column option. 'left' for previewing in the left most editor column. 'center' for previewing in the center editor column. 'right' for previewing in the right most editor column. 'current' for previewing in the column of current request file."
+        },
+        "rest-client.previewResponsePanelTakeFocus": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Preview response panel will take focus after receiving response."
         }
       }
     },
