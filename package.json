@@ -497,6 +497,15 @@
           "description": "Response preview column option. 'left' for previewing in the left most editor column. 'center' for previewing in the center editor column. 'right' for previewing in the right most editor column. 'current' for previewing in the column of current request file."
         }
       }
+    },
+    "configurationDefaults": {
+      "[http]": {
+        "editor.quickSuggestions": {
+          "other": true,
+          "comments": false,
+          "strings": true
+        }
+      }
     }
   },
   "scripts": {
