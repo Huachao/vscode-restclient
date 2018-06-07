@@ -1,7 +1,7 @@
 'use strict';
 
 import * as path from 'path';
-import { Event, EventEmitter, Uri, WebviewPanel, extensions } from 'vscode';
+import { Event, EventEmitter, extensions, Uri, WebviewPanel } from 'vscode';
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
 

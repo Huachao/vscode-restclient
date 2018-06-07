@@ -1,6 +1,6 @@
 'use strict';
 
-import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, Position, Range, TextDocument, languages, workspace } from 'vscode';
+import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, languages, Position, Range, TextDocument, workspace } from 'vscode';
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { ResolveState } from '../models/requestVariableResolveResult';
 import { VariableType } from '../models/variableType';

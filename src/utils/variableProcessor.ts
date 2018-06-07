@@ -2,7 +2,7 @@
 
 import * as adal from 'adal-node';
 import { DurationInputArg2, Moment, utc } from "moment";
-import { QuickPickItem, QuickPickOptions, TextDocument, Uri, commands, window } from 'vscode';
+import { commands, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from "../common/constants";
 import { Func } from '../common/delegates';
 import { EnvironmentController } from '../controllers/environmentController';

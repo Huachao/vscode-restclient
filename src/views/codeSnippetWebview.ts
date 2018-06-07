@@ -1,6 +1,6 @@
 'use strict';
 
-import { ViewColumn, WebviewPanel, commands, window } from 'vscode';
+import { commands, ViewColumn, WebviewPanel, window } from 'vscode';
 import { BaseWebview } from './baseWebview';
 
 const hljs = require('highlight.js');

@@ -3,9 +3,9 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Uri } from 'vscode';
-import { IRequestParser } from '../models/IRequestParser';
 import { Headers } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
+import { IRequestParser } from '../models/IRequestParser';
 import { hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
