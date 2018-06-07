@@ -30,8 +30,8 @@
         "ordered-imports": [
             true,
             {
-                "import-sources-order": "lowercase-last",
-                "named-imports-order": "lowercase-last"
+                "import-sources-order": "case-insensitive",
+                "named-imports-order": "case-insensitive"
             }
         ],
         "semicolon": [
