@@ -114,7 +114,6 @@ export class RequestController {
         // cancel current request
         this._requestStore.cancel();
 
-        this._durationStatusBarItem.command = null;
         this._durationStatusBarItem.text = 'Cancelled $(circle-slash)';
         this._durationStatusBarItem.tooltip = null;
     }
@@ -172,7 +171,6 @@ export class RequestController {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
             this.clearSendProgressStatusText();
-            this._durationStatusBarItem.command = null;
             this._durationStatusBarItem.text = '';
             window.showErrorMessage(error.message);
         } finally {

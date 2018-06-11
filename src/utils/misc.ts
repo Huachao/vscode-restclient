@@ -3,7 +3,7 @@
 import { Headers } from '../models/base';
 
 export function getHeader(headers: Headers, name: string): string {
-    if (!headers) {
+    if (!headers || !name) {
         return null;
     }
 
@@ -12,5 +12,5 @@ export function getHeader(headers: Headers, name: string): string {
 }
 
 export function hasHeader(headers: Headers, name: string): boolean {
-    return !!(headers && Object.keys(headers).some(h => h.toLowerCase() === name.toLowerCase()));
+    return !!(headers && name && Object.keys(headers).some(h => h.toLowerCase() === name.toLowerCase()));
 }
