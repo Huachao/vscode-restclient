@@ -199,7 +199,6 @@ export class RequestController {
     }
 
     private formatDurationStatusBar(response: HttpResponse) {
-        this._durationStatusBarItem.command = null;
         this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
         this._durationStatusBarItem.tooltip = [
             'Breakdown of Duration:',

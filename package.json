@@ -521,7 +521,7 @@
     "tslint": "tslint --project tsconfig.json"
   },
   "devDependencies": {
-    "@types/fs-extra": "^5.0.1",
+    "@types/fs-extra": "5.0.2",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.40",
     "mocha": "^3.2.0",
