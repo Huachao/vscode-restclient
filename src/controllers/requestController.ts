@@ -1,7 +1,7 @@
 "use strict";
 
 import { EOL } from 'os';
-import { Range, StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import { OutputChannel, Range, StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
@@ -35,6 +35,7 @@ export class RequestController {
     private _interval: NodeJS.Timer;
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
+    private _outputChannel: OutputChannel;
 
     public constructor() {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
@@ -46,6 +47,7 @@ export class RequestController {
             this._sizeStatusBarItem.hide();
         });
         this._textDocumentView = new HttpResponseTextDocumentView();
+        this._outputChannel = window.createOutputChannel('REST');
     }
 
     @trace('Request')
@@ -151,6 +153,9 @@ export class RequestController {
                     this._webview.render(response);
                 }
             } catch (reason) {
+                this._outputChannel.appendLine(reason);
+                this._outputChannel.appendLine(reason.stack);
+                this._outputChannel.show();
                 window.showErrorMessage(reason);
             }
 
@@ -172,6 +177,9 @@ export class RequestController {
             }
             this.clearSendProgressStatusText();
             this._durationStatusBarItem.text = '';
+            this._outputChannel.appendLine(error);
+            this._outputChannel.appendLine(error.stack);
+            this._outputChannel.show();
             window.showErrorMessage(error.message);
         } finally {
             this._requestStore.complete(<string>requestId);
