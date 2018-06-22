@@ -2,8 +2,8 @@
 
 import { TextDocument } from 'vscode';
 import * as Constants from '../../common/constants';
+import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { RequestVariableCacheKey } from '../../models/requestVariableCacheKey';
-import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from '../../models/requestVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { calculateMD5Hash } from '../misc';
 import { RequestVariableCache } from '../requestVariableCache';

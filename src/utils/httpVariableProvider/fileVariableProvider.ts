@@ -2,7 +2,7 @@
 
 import { TextDocument } from 'vscode';
 import * as Constants from "../../common/constants";
-import { ResolveErrorMessage } from '../../models/requestVariableResolveResult';
+import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { calculateMD5Hash } from '../misc';
 import { HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';

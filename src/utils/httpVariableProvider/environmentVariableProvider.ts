@@ -3,7 +3,7 @@
 import { TextDocument } from 'vscode';
 import { EnvironmentController } from '../../controllers/environmentController';
 import { RestClientSettings } from '../../models/configurationSettings';
-import { ResolveErrorMessage } from '../../models/requestVariableResolveResult';
+import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
 

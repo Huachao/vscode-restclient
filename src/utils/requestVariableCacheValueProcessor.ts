@@ -2,8 +2,8 @@
 
 import { HttpRequest } from "../models/httpRequest";
 import { HttpResponse } from '../models/httpResponse';
+import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from "../models/httpVariableResolveResult";
 import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
-import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from "../models/requestVariableResolveResult";
 import { MimeUtility } from './mimeUtility';
 import { getHeader } from './misc';
 

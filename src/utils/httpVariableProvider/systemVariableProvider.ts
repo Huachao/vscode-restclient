@@ -5,7 +5,7 @@ import { DurationInputArg2, Moment, utc } from 'moment';
 import { commands, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
 import { HttpRequest } from '../../models/httpRequest';
-import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/requestVariableResolveResult';
+import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { AadTokenCache } from '../aadTokenCache';
 import { HttpClient } from '../httpClient';

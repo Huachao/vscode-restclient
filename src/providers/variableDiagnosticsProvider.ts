@@ -1,8 +1,8 @@
 'use strict';
 
 import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, languages, Position, Range, TextDocument, workspace } from 'vscode';
+import { ResolveState } from '../models/httpVariableResolveResult';
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
-import { ResolveState } from '../models/requestVariableResolveResult';
 import { VariableType } from '../models/variableType';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
