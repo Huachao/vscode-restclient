@@ -15,20 +15,24 @@ export class CustomVariableHoverProvider implements HoverProvider {
         let wordRange = document.getWordRangeAtPosition(position);
         let selectedVariableName = document.getText(wordRange);
 
-        const fileVariables = await FileVariableProvider.Instance.getAll(document);
-        for (const { name, value } of fileVariables) {
-            if (name === selectedVariableName) {
+        if (await FileVariableProvider.Instance.has(document, selectedVariableName)) {
+            const { name, value, error, warning } = await FileVariableProvider.Instance.get(document, selectedVariableName);
+            if (!warning && !error) {
                 const contents: MarkedString[] = [value as string, new MarkdownString(`*File Variable* \`${name}\``)];
                 return new Hover(contents, wordRange);
             }
+
+            return;
         }
 
-        const environmentVariables = await EnvironmentVariableProvider.Instance.getAll(document);
-        for (const { name, value } of environmentVariables) {
-            if (name === selectedVariableName) {
-                let contents: MarkedString[] = [value as string, new MarkdownString(`*Environment Variable* \`${name}\``)];
+        if (await EnvironmentVariableProvider.Instance.has(document, selectedVariableName)) {
+            const { name, value, error, warning } = await EnvironmentVariableProvider.Instance.get(document, selectedVariableName);
+            if (!warning && !error) {
+                const contents: MarkedString[] = [value as string, new MarkdownString(`*Environment Variable* \`${name}\``)];
                 return new Hover(contents, wordRange);
             }
+
+            return;
         }
 
         return;
