@@ -3,9 +3,10 @@
 import { CancellationToken, CompletionItem, CompletionItemKind, CompletionItemProvider, MarkdownString, Position, Range, TextDocument, TextLine } from 'vscode';
 import * as Constants from "../common/constants";
 import { ElementType } from "../models/httpElement";
+import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
 import { ResolveState, ResolveWarningMessage } from "../models/requestVariableResolveResult";
+import { RequestVariableProvider } from '../utils/httpVariableProvider/requestVariableProvider';
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
-import { VariableProcessor } from "../utils/variableProcessor";
 import { VariableUtility } from "../utils/variableUtility";
 
 
@@ -45,16 +46,16 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
             ];
         }
 
-        const fileRequestVariables = VariableProcessor.getRequestVariablesInFile(document);
-        for (let [variableName, variableValue] of fileRequestVariables) {
+        const requestVariables = await RequestVariableProvider.Instance.getAll(document);
+        for (const { name, value } of requestVariables) {
             // Only add completion items for headers
-            let regex = new RegExp(`^(${variableName})\.(?:request|response)\.headers\.$`);
+            let regex = new RegExp(`^(${name})\.(?:request|response)\.headers\.$`);
             let match: RegExpExecArray;
             if (match = regex.exec(fullPath)) {
                 // Remove last dot if present
                 fullPath = fullPath.replace(/\.$/, '');
 
-                const result = RequestVariableCacheValueProcessor.resolveRequestVariable(variableValue, fullPath);
+                const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value as RequestVariableCacheValue, fullPath);
                 if (result.state === ResolveState.Warning && result.message === ResolveWarningMessage.MissingHeaderName) {
                     const {value} = result;
                     return Object.keys(value).map(p => {

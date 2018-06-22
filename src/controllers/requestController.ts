@@ -17,6 +17,7 @@ import { RequestStore } from '../utils/requestStore';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
 import { VariableProcessor } from '../utils/variableProcessor';
+import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
@@ -52,8 +53,9 @@ export class RequestController {
 
     @trace('Request')
     public async run(range: Range) {
-        let editor = window.activeTextEditor;
-        if (!editor || !editor.document) {
+        const editor = window.activeTextEditor;
+        const document = getCurrentTextDocument();
+        if (!editor || !document) {
             return;
         }
 
@@ -82,13 +84,13 @@ export class RequestController {
         selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
             return;
         }
 
         if (requestVariable) {
-            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, editor.document.uri.toString());
+            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, document.uri.toString());
         }
 
         await this.runCore(httpRequest);

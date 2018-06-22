@@ -1,15 +1,16 @@
 "use strict";
 
 import * as url from 'url';
-import { MarkdownString, SnippetString } from 'vscode';
+import { MarkdownString, SnippetString, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
-import { EnvironmentController } from '../controllers/environmentController';
 import { ElementType, HttpElement } from '../models/httpElement';
+import { EnvironmentVariableProvider } from './httpVariableProvider/environmentVariableProvider';
+import { FileVariableProvider } from './httpVariableProvider/fileVariableProvider';
+import { RequestVariableProvider } from './httpVariableProvider/requestVariableProvider';
 import { PersistUtility } from './persistUtility';
-import { VariableProcessor } from './variableProcessor';
 
 export class HttpElementFactory {
-    public static async getHttpElements(line: string): Promise<HttpElement[]> {
+    public static async getHttpElements(document: TextDocument, line: string): Promise<HttpElement[]> {
         let originalElements: HttpElement[] = [];
 
         // add http methods
@@ -105,35 +106,53 @@ export class HttpElementFactory {
             Constants.DateTimeVariableNameDescription,
             new SnippetString(`{{$\${name:${Constants.DateTimeVariableName.slice(1)}} \${1|rfc1123,iso8601|}}}`)));
         originalElements.push(new HttpElement(
-            Constants.RandomInt,
+            Constants.RandomIntVariableName,
             ElementType.SystemVariable,
             null,
             Constants.RandomIntDescription,
-            new SnippetString(`{{$\${name:${Constants.RandomInt.slice(1)}} \${1:min} \${2:max}}}`)));
+            new SnippetString(`{{$\${name:${Constants.RandomIntVariableName.slice(1)}} \${1:min} \${2:max}}}`)));
         originalElements.push(new HttpElement(
             Constants.AzureActiveDirectoryVariableName,
-            ElementType.SystemVariable,
+        ElementType.SystemVariable,
             null,
             Constants.AzureActiveDirectoryDescription,
             new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryVariableName.slice(1)}}}}`)));
 
         // add environment custom variables
-        let customVariables = await EnvironmentController.getCustomVariables();
-        for (let [variableName, variableValue] of customVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.EnvironmentCustomVariable, null, new MarkdownString(`Value: \`${variableValue}\``), new SnippetString(`{{${variableName}}}`)));
+        const environmentVariables = await EnvironmentVariableProvider.Instance.getAll(document);
+        for (const { name, value } of environmentVariables) {
+            originalElements.push(
+                new HttpElement(
+                    name,
+                    ElementType.EnvironmentCustomVariable,
+                    null,
+                    new MarkdownString(`Value: \`${value}\``),
+                    new SnippetString(`{{${name}}}`)));
         }
 
         // add file custom variables
-        let fileVariables = VariableProcessor.getCustomVariablesInCurrentFile();
-        for (let [variableName, variableValue] of fileVariables) {
-            originalElements.push(new HttpElement(variableName, ElementType.FileCustomVariable, '^\\s*[^@]', new MarkdownString(`Value: \`${variableValue}\``), new SnippetString(`{{${variableName}}}`)));
+        const fileVariables = await FileVariableProvider.Instance.getAll(document);
+        for (const { name, value } of fileVariables) {
+            originalElements.push(
+                new HttpElement(
+                    name,
+                    ElementType.FileCustomVariable,
+                    '^\\s*[^@]',
+                    new MarkdownString(`Value: \`${value}\``),
+                    new SnippetString(`{{${name}}}`)));
         }
 
         // add request variables
-        let requestVariables = VariableProcessor.getRequestVariablesInCurrentFile(false);
-        for (let [variableName, variableValue] of requestVariables) {
-            const value = new MarkdownString(`Value: Request Variable ${variableName}${variableValue ? '' : ' *(Inactive)*'}`);
-            originalElements.push(new HttpElement(variableName, ElementType.RequestCustomVariable, '^\\s*[^@]', value, new SnippetString(`{{${variableName}.\${1|request,response|}.\${2|headers,body|}.\${3:Header Name, JSONPath or XPath}}}`)));
+        const requestVariables = await RequestVariableProvider.Instance.getAll(document);
+        for (const { name, value } of requestVariables) {
+            const v = new MarkdownString(`Value: Request Variable ${name}${value ? '' : ' *(Inactive)*'}`);
+            originalElements.push(
+                new HttpElement(
+                    name,
+                    ElementType.RequestCustomVariable,
+                    '^\\s*[^@]',
+                    v,
+                    new SnippetString(`{{${name}.\${1|request,response|}.\${2|headers,body|}.\${3:Header Name, JSONPath or XPath}}}`)));
         }
 
         // add urls from history

@@ -23,7 +23,7 @@ export const DateTimeVariableName = "$datetime";
 export const DateTimeVariableNameDescription = "Add a datetime string in either ISO8601 or RFC1322 format";
 export const GuidVariableName = "$guid";
 export const GuidVariableDescription = "Add a RFC 4122 v4 UUID";
-export const RandomInt = "$randomInt";
+export const RandomIntVariableName = "$randomInt";
 export const RandomIntDescription = "Returns a random integer between min (included) and max (excluded)";
 
 export const AzureActiveDirectoryVariableName = "$aadToken";
@@ -38,7 +38,7 @@ export const AzureActiveDirectoryClientId = "aebc6443-996d-45c2-90f0-388ff96faa5
 export const AzureActiveDirectoryForceNewOption = "new";
 export const AzureActiveDirectoryDefaultTenantId = "common";
 export const AzureActiveDirectoryDefaultDisplayName = "Default Directory";
-export const AzureClouds = {
+export const AzureClouds: { [key: string]: { aad: string, arm: string, armAudience?: string } } = {
     // default cloud must be first
     public: {
         aad: "https://login.microsoftonline.com/",

@@ -1,7 +1,8 @@
-import { ViewColumn, window, workspace, WorkspaceConfiguration } from 'vscode';
+import { ViewColumn, workspace, WorkspaceConfiguration } from 'vscode';
 import { Headers } from '../models/base';
 import { HostCertificate } from '../models/hostCertificate';
 import { fromString as ParsePreviewOptionStr, PreviewOption } from '../models/previewOption';
+import { getCurrentTextDocument } from '../utils/workspaceUtility';
 
 export interface IRestClientSettings {
     followRedirect: boolean;
@@ -118,9 +119,9 @@ export class RestClientSettings implements IRestClientSettings {
     }
 
     private getWorkspaceConfiguration(section: string): WorkspaceConfiguration {
-        let editor = window.activeTextEditor;
-        if (editor && editor.document) {
-            return workspace.getConfiguration(section, editor.document.uri);
+        const document = getCurrentTextDocument();
+        if (document) {
+            return workspace.getConfiguration(section, document.uri);
         } else {
             return workspace.getConfiguration(section);
         }

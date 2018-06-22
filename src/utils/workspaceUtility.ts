@@ -1,12 +1,12 @@
 "use strict";
 
 import * as path from 'path';
-import { window, workspace } from 'vscode';
+import { TextDocument, window, workspace } from 'vscode';
 
 export function getWorkspaceRootPath(): string {
-    let editor = window.activeTextEditor;
-    if (editor && editor.document) {
-        let fileUri = window.activeTextEditor.document.uri;
+    const document = getCurrentTextDocument();
+    if (document) {
+        let fileUri = document.uri;
         let workspaceFolder = workspace.getWorkspaceFolder(fileUri);
         if (workspaceFolder) {
             return workspaceFolder.uri.toString();
@@ -15,9 +15,14 @@ export function getWorkspaceRootPath(): string {
 }
 
 export function getCurrentHttpFileName(): string {
-    let editor = window.activeTextEditor;
-    if (editor && editor.document) {
-        let filePath = window.activeTextEditor.document.fileName;
+    const document = getCurrentTextDocument();
+    if (document) {
+        let filePath = document.fileName;
         return path.basename(filePath, path.extname(filePath));
     }
+}
+
+export function getCurrentTextDocument(): TextDocument {
+    const editor = window.activeTextEditor;
+    return editor && editor.document;
 }

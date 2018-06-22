@@ -11,7 +11,7 @@ export class EnvironmentController {
     private static readonly noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
         'No Environment', Constants.NoEnvironmentSelectedName, 'You Can Still Use Variables Defined In $shared Environment');
 
-    private static readonly sharedEnvironmentName: string = '$shared';
+    public static readonly sharedEnvironmentName: string = '$shared';
     private static readonly settings: RestClientSettings = RestClientSettings.Instance;
 
     private _environmentStatusBarItem: StatusBarItem;

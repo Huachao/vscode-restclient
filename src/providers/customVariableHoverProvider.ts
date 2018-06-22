@@ -1,8 +1,8 @@
 'use strict';
 
 import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, TextDocument } from 'vscode';
-import { EnvironmentController } from '../controllers/environmentController';
-import { VariableProcessor } from '../utils/variableProcessor';
+import { EnvironmentVariableProvider } from '../utils/httpVariableProvider/environmentVariableProvider';
+import { FileVariableProvider } from '../utils/httpVariableProvider/fileVariableProvider';
 import { VariableUtility } from '../utils/variableUtility';
 
 export class CustomVariableHoverProvider implements HoverProvider {
@@ -15,18 +15,18 @@ export class CustomVariableHoverProvider implements HoverProvider {
         let wordRange = document.getWordRangeAtPosition(position);
         let selectedVariableName = document.getText(wordRange);
 
-        let fileCustomVariables = VariableProcessor.getCustomVariablesInCurrentFile();
-        for (let [variableName, variableValue] of fileCustomVariables) {
-            if (variableName === selectedVariableName) {
-                let contents: MarkedString[] = [variableValue, new MarkdownString(`*File Variable* \`${variableName}\``)];
+        const fileVariables = await FileVariableProvider.Instance.getAll(document);
+        for (const { name, value } of fileVariables) {
+            if (name === selectedVariableName) {
+                const contents: MarkedString[] = [value as string, new MarkdownString(`*File Variable* \`${name}\``)];
                 return new Hover(contents, wordRange);
             }
         }
 
-        let environmentCustomVariables = await EnvironmentController.getCustomVariables();
-        for (let [variableName, variableValue] of environmentCustomVariables) {
-            if (variableName === selectedVariableName) {
-                let contents: MarkedString[] = [variableValue, new MarkdownString(`*Environment Variable* \`${variableName}\``)];
+        const environmentVariables = await EnvironmentVariableProvider.Instance.getAll(document);
+        for (const { name, value } of environmentVariables) {
+            if (name === selectedVariableName) {
+                let contents: MarkedString[] = [value as string, new MarkdownString(`*Environment Variable* \`${name}\``)];
                 return new Hover(contents, wordRange);
             }
         }

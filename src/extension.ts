@@ -18,7 +18,7 @@ import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvid
 import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
 import { VariableDiagnosticsProvider } from "./providers/variableDiagnosticsProvider";
-import { VariableProcessor } from './utils/variableProcessor';
+import { AadTokenCache } from './utils/aadTokenCache';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -43,7 +43,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('rest-client.copy-codesnippet', () => codeSnippetController.copy()));
     context.subscriptions.push(commands.registerCommand('rest-client.copy-request-as-curl', () => codeSnippetController.copyAsCurl()));
     context.subscriptions.push(commands.registerCommand('rest-client.switch-environment', () => environmentController.switchEnvironment()));
-    context.subscriptions.push(commands.registerCommand('rest-client.clear-aad-token-cache', () => VariableProcessor.clearAadTokenCache()));
+    context.subscriptions.push(commands.registerCommand('rest-client.clear-aad-token-cache', () => AadTokenCache.clear()));
     context.subscriptions.push(commands.registerCommand('rest-client._openDocumentLink', args => {
         workspace.openTextDocument(Uri.parse(args.path)).then(window.showTextDocument, error => {
             window.showErrorMessage(error.message);

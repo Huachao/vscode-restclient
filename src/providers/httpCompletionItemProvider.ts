@@ -11,7 +11,7 @@ export class HttpCompletionItemProvider implements CompletionItemProvider {
             return;
         }
 
-        let elements = await HttpElementFactory.getHttpElements(document.lineAt(position).text);
+        let elements = await HttpElementFactory.getHttpElements(document, document.lineAt(position).text);
         return elements.map(e => {
             let item = new CompletionItem(e.name);
             item.detail = `HTTP ${ElementType[e.type]}`;

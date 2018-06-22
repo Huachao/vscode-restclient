@@ -15,6 +15,7 @@ import { trace } from "../utils/decorator";
 import { Selector } from '../utils/selector';
 import { Telemetry } from '../utils/telemetry';
 import { VariableProcessor } from '../utils/variableProcessor';
+import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
 const clipboardy = require('clipboardy');
@@ -31,8 +32,9 @@ export class CodeSnippetController {
     }
 
     public async run() {
-        let editor = window.activeTextEditor;
-        if (!editor || !editor.document) {
+        const editor = window.activeTextEditor;
+        const document = getCurrentTextDocument();
+        if (!editor || !document) {
             return;
         }
 
@@ -58,7 +60,7 @@ export class CodeSnippetController {
         this._selectedText = selectedText;
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
             return;
         }
@@ -128,8 +130,9 @@ export class CodeSnippetController {
 
     @trace('Copy Request As cURL')
     public async copyAsCurl() {
-        let editor = window.activeTextEditor;
-        if (!editor || !editor.document) {
+        const editor = window.activeTextEditor;
+        const document = getCurrentTextDocument();
+        if (!editor || !document) {
             return;
         }
 
@@ -155,7 +158,7 @@ export class CodeSnippetController {
         this._selectedText = selectedText;
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
             return;
         }

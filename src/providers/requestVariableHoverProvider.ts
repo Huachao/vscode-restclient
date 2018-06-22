@@ -1,9 +1,10 @@
 'use strict';
 
 import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, Range, TextDocument, TextLine } from 'vscode';
+import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
 import { ResolveState } from "../models/requestVariableResolveResult";
+import { RequestVariableProvider } from '../utils/httpVariableProvider/requestVariableProvider';
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
-import { VariableProcessor } from '../utils/variableProcessor';
 import { VariableUtility } from '../utils/variableUtility';
 
 export class RequestVariableHoverProvider implements HoverProvider {
@@ -17,16 +18,16 @@ export class RequestVariableHoverProvider implements HoverProvider {
         let lineRange = document.lineAt(position);
 
         const fullPath = this.getRequestVariableHoverPath(wordRange, lineRange);
-        const fileRequestVariables = VariableProcessor.getRequestVariablesInFile(document);
-        for (let [variableName, variableValue] of fileRequestVariables) {
-            let regex = new RegExp(`(${variableName})\.(.*?)?`);
+        const requestVariables = await RequestVariableProvider.Instance.getAll(document);
+        for (let { name, value: v } of requestVariables) {
+            let regex = new RegExp(`(${name})\.(.*?)?`);
             if (regex.test(fullPath)) {
-                const result = await RequestVariableCacheValueProcessor.resolveRequestVariable(variableValue, fullPath);
+                const result = await RequestVariableCacheValueProcessor.resolveRequestVariable(v as RequestVariableCacheValue, fullPath);
                 if (result.state !== ResolveState.Success) {
                     continue;
                 }
 
-                const {value} = result;
+                const { value } = result;
                 const contents: MarkedString[] = [];
                 if (value) {
                     contents.push(typeof value !== "object" ? value : { language: 'json', value: JSON.stringify(value, null, 2) });
