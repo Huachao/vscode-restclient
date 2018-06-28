@@ -99,7 +99,6 @@ export class HistoryController {
 
     private errorHandler(error: any) {
         this._outputChannel.appendLine(error);
-        this._outputChannel.show();
         window.showErrorMessage("There was an error, please view details in output log");
     }
 

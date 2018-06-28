@@ -1,3 +1,16 @@
+## 0.19.0 (2018/6/28)
+* __Breaking Change__: Remove support for setting `rest-client.defaultuseragent`, replace this with `rest-client.defaultHeaders` which has more capability to add other default request headers
+* __Breaking Change__: Remove support for setting `rest-client.previewResponseInActiveColumn`, replace this with `rest-client.previewColumn` which has more capability to specify which column to preview, not just currently active one
+* __Feature__: [Add support for default headers](https://github.com/Huachao/vscode-restclient/pull/206) ([@Kronuz](https://github.com/Kronuz))
+* __Feature__: [Show response preview in right editor](https://github.com/Huachao/vscode-restclient/issues/216)
+* __Feature__: [Preserve focus of the http editor](https://github.com/Huachao/vscode-restclient/issues/167)
+* __Bug Fix__: [Setting: 'previewOption' does not work in combination with 'previewResponseInUntitledDocument'](https://github.com/Huachao/vscode-restclient/issues/183)
+* __Bug Fix__: Fix Chinese encoding not copied to clipboard
+* __Improvement__: [Retina icon](https://github.com/Huachao/vscode-restclient/pull/217) ([@pluwen](https://github.com/pluwen))
+* __Improvement__: Add http language default configuration `editor.quickSuggestions`
+* __Improvement__: Refactor resolving http variables logic
+* __Improvement__: Leverage new Webview API to render response and code snippet
+
 ## 0.18.4 (2018/5/4)
 * __Feature__: [Open a saving dialogue when saving response and response body](https://github.com/Huachao/vscode-restclient/issues/186)
 * __Bug Fix__: [Do not empty rulesets](https://github.com/Huachao/vscode-restclient/pull/203) ([@mtxr](https://github.com/mtxr))

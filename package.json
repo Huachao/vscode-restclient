@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.18.4",
+  "version": "0.19.0",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -478,12 +478,6 @@
           "scope": "resource",
           "description": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when 'rest-client.disableHighlightResonseBodyForLargeResponse' and/or 'rest-client.disableAddingHrefLinkForLargeResponse' is set to true"
         },
-        "rest-client.previewResponseInActiveColumn": {
-          "type": "boolean",
-          "default": false,
-          "scope": "resource",
-          "description": "Preview response in current active column"
-        },
         "rest-client.previewColumn": {
           "type": "string",
           "enum": [
@@ -494,7 +488,7 @@
           ],
           "default": "center",
           "scope": "resource",
-          "description": "Response preview column option. 'left' for previewing in the left most editor column. 'center' for previewing in the center editor column. 'right' for previewing in the right most editor column. 'current' for previewing in the column of current request file."
+          "description": "Response preview column option. 'left' for previewing in the left most editor column. 'center' for previewing in the center editor column(three columns layout) or right most editor column(two columns layout). 'right' for previewing in the right most editor column. 'current' for previewing in the column of current request file."
         },
         "rest-client.previewResponsePanelTakeFocus": {
           "type": "boolean",

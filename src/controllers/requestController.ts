@@ -157,7 +157,6 @@ export class RequestController {
             } catch (reason) {
                 this._outputChannel.appendLine(reason);
                 this._outputChannel.appendLine(reason.stack);
-                this._outputChannel.show();
                 window.showErrorMessage(reason);
             }
 
@@ -181,7 +180,6 @@ export class RequestController {
             this._durationStatusBarItem.text = '';
             this._outputChannel.appendLine(error);
             this._outputChannel.appendLine(error.stack);
-            this._outputChannel.show();
             window.showErrorMessage(error.message);
         } finally {
             this._requestStore.complete(<string>requestId);

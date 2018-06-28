@@ -184,6 +184,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                     } else {
                         resolveToken(cachedToken, false);
                     }
+                    return;
                 }
 
                 acquireToken();

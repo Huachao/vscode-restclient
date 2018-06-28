@@ -75,7 +75,7 @@ export class HttpResponseWebview extends BaseWebview {
 
         panel.webview.html = this.getHtmlForWebview(response);
 
-        commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, true);
+        commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, this.settings.previewResponsePanelTakeFocus);
 
         panel.reveal(this.settings.previewColumn, !this.settings.previewResponsePanelTakeFocus);
 

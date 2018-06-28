@@ -26,7 +26,7 @@ export class VariableProcessor {
         while (match = variableRefercenceRegex.exec(request)) {
             result += request.substring(lastIndex, match.index);
             lastIndex = variableRefercenceRegex.lastIndex;
-            const name = match[1];
+            const name = match[1].trim();
             const document = window.activeTextEditor.document;
             const context = { rawRequest: request, parsedRequest: result };
             for (const provider of VariableProcessor.providers) {
