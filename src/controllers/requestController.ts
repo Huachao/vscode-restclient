@@ -67,17 +67,13 @@ export class RequestController {
             return;
         }
 
-        const requestVariable = selector.getRequestVariableForSelectedText(editor, range);
-
         // remove comment lines
-        let lines: string[] = selectedText.split(/\r?\n/g);
-        selectedText = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
-        if (selectedText === '') {
+        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        if (lines.length === 0 || lines.every(line => line === '')) {
             return;
         }
 
-        // remove file variables definition lines
-        lines = selectedText.split(/\r?\n/g);
+        // remove file variables definition lines and leading empty lines
         selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
         // variables replacement
@@ -89,6 +85,7 @@ export class RequestController {
             return;
         }
 
+        const requestVariable = selector.getRequestVariableForSelectedText(editor, range);
         if (requestVariable) {
             httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, document.uri.toString());
         }

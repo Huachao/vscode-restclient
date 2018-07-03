@@ -4,6 +4,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as url from 'url';
 import { CancellationToken, DocumentLink, DocumentLinkProvider, Position, Range, TextDocument, Uri } from 'vscode';
+import * as Constants from '../common/constants';
 import { getWorkspaceRootPath } from '../utils/workspaceUtility';
 
 export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
@@ -15,7 +16,7 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
         const base = path.dirname(document.uri.toString());
         const text = document.getText();
 
-        let lines: string[] = text.split(/\r?\n/g);
+        let lines: string[] = text.split(Constants.LineSplitterRegex);
         for (let index = 0; index < lines.length; index++) {
             let line = lines[index];
             let match: RegExpMatchArray;

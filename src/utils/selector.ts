@@ -66,7 +66,7 @@ export class Selector {
     }
 
     private getDelimitedText(fullText: string, currentLine: number): string {
-        let lines: string[] = fullText.split(/\r?\n/g);
+        let lines: string[] = fullText.split(Constants.LineSplitterRegex);
         let delimiterLineNumbers: number[] = Selector.getDelimiterRows(lines);
         if (delimiterLineNumbers.length === 0) {
             return fullText;

@@ -8,7 +8,7 @@ import { VariableUtility } from '../utils/variableUtility';
 export class CustomVariableReferencesCodeLensProvider implements CodeLensProvider {
     public provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {
         let blocks: CodeLens[] = [];
-        let lines: string[] = document.getText().split(/\r?\n/g);
+        let lines: string[] = document.getText().split(Constants.LineSplitterRegex);
         let delimitedLines: number[] = Selector.getDelimiterRows(lines);
         delimitedLines.push(lines.length);
 

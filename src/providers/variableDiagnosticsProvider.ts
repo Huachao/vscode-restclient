@@ -1,6 +1,7 @@
 'use strict';
 
 import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, languages, Position, Range, TextDocument, workspace } from 'vscode';
+import * as Constants from '../common/constants';
 import { ResolveState } from '../models/httpVariableResolveResult';
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { VariableType } from '../models/variableType';
@@ -101,7 +102,7 @@ export class VariableDiagnosticsProvider {
 
     private findVariableReferences(document: TextDocument): Map<string, Variable[]> {
         let vars: Map<string, Variable[]> = new Map<string, Variable[]>();
-        let lines = document.getText().split(/\r?\n/g);
+        let lines = document.getText().split(Constants.LineSplitterRegex);
         let pattern = /\{\{(\w+)(\..*?)*\}\}/g;
         lines.forEach((line, lineNumber) => {
             let match: RegExpExecArray;

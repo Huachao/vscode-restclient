@@ -1,6 +1,7 @@
 'use strict';
 
 import { CancellationToken, Location, Position, Range, ReferenceContext, ReferenceProvider, TextDocument } from 'vscode';
+import * as Constants from '../common/constants';
 import { VariableUtility } from '../utils/variableUtility';
 
 export class CustomVariableReferenceProvider implements ReferenceProvider {
@@ -8,7 +9,7 @@ export class CustomVariableReferenceProvider implements ReferenceProvider {
         if (!VariableUtility.isVariableDefinition(document, position) && !VariableUtility.isVariableReference(document, position)) {
             return;
         }
-        let documentLines = document.getText().split(/\r?\n/g);
+        let documentLines = document.getText().split(Constants.LineSplitterRegex);
         let wordRange = document.getWordRangeAtPosition(position);
         let selectedVariableName = document.getText(wordRange);
         let locations: Range[] = [];

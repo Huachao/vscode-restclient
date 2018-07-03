@@ -4,6 +4,7 @@ import { EOL } from 'os';
 import * as url from 'url';
 import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
+import * as Constants from '../common/constants';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { Selector } from '../utils/selector';
 import { VariableProcessor } from '../utils/variableProcessor';
@@ -14,7 +15,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
 
     public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
         let symbols: SymbolInformation[] = [];
-        let lines: string[] = document.getText().split(/\r?\n/g);
+        let lines: string[] = document.getText().split(Constants.LineSplitterRegex);
         let delimitedLines: number[] = Selector.getDelimiterRows(lines);
         delimitedLines.push(lines.length);
 

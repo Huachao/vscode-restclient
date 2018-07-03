@@ -71,3 +71,5 @@ export const RequestVariableDefinitionWithNameRegexFactory = (name: string, flag
     new RegExp(`^\\s*(?:#{1,}|\\/{2,})\\s+@name\\s+(${name})\\s*$`, flags);
 
 export const RequestVariableDefinitionRegex: RegExp = RequestVariableDefinitionWithNameRegexFactory("\\w+", "m");
+
+export const LineSplitterRegex: RegExp = /\r?\n/g;

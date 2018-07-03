@@ -1,6 +1,7 @@
 'use strict';
 
 import { CancellationToken, Definition, DefinitionProvider, Location, Position, TextDocument } from 'vscode';
+import * as Constants from '../common/constants';
 import { VariableUtility } from '../utils/variableUtility';
 
 export class CustomVariableDefinitionProvider implements DefinitionProvider {
@@ -9,7 +10,7 @@ export class CustomVariableDefinitionProvider implements DefinitionProvider {
             return;
         }
 
-        let documentLines = document.getText().split(/\r?\n/g);
+        let documentLines = document.getText().split(Constants.LineSplitterRegex);
 
         let wordRange = document.getWordRangeAtPosition(position);
         let selectedVariableName = document.getText(wordRange);

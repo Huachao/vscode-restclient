@@ -23,7 +23,6 @@ const HTTPSnippet = require('httpsnippet');
 
 export class CodeSnippetController {
     private static _availableTargets = HTTPSnippet.availableTargets();
-    private _selectedText;
     private _convertedResult;
     private _webview: CodeSnippetWebview;
 
@@ -45,19 +44,17 @@ export class CodeSnippetController {
         }
 
         // remove comment lines
-        let lines: string[] = selectedText.split(/\r?\n/g);
-        selectedText = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
-        if (selectedText === '') {
+        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        if (lines.length === 0 || lines.every(line => line === '')) {
             return;
         }
 
-        // remove file variables definition lines
-        lines = selectedText.split(/\r?\n/g);
-        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l)).join(EOL);
+        // remove file variables definition lines and leading empty lines
+        lines = selectedText.split(Constants.LineSplitterRegex);
+        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
         // variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
-        this._selectedText = selectedText;
 
         // parse http request
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
@@ -143,19 +140,17 @@ export class CodeSnippetController {
         }
 
         // remove comment lines
-        let lines: string[] = selectedText.split(/\r?\n/g);
-        selectedText = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
-        if (selectedText === '') {
+        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        if (lines.length === 0 || lines.every(line => line === '')) {
             return;
         }
 
         // remove file variables definition lines
-        lines = selectedText.split(/\r?\n/g);
+        lines = selectedText.split(Constants.LineSplitterRegex);
         selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
         // environment variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
-        this._selectedText = selectedText;
 
         // parse http request
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);

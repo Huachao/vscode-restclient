@@ -1,12 +1,13 @@
 'use strict';
 
 import { CancellationToken, CodeLens, CodeLensProvider, Command, Range, TextDocument } from 'vscode';
+import * as Constants from '../common/constants';
 import { Selector } from '../utils/selector';
 
 export class HttpCodeLensProvider implements CodeLensProvider {
     public provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {
         let blocks: CodeLens[] = [];
-        let lines: string[] = document.getText().split(/\r?\n/g);
+        let lines: string[] = document.getText().split(Constants.LineSplitterRegex);
         let delimitedLines: number[] = Selector.getDelimiterRows(lines);
         delimitedLines.push(lines.length);
 
