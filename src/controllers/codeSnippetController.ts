@@ -151,7 +151,7 @@ export class CodeSnippetController {
 
         // remove file variables definition lines
         lines = selectedText.split(/\r?\n/g);
-        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l)).join(EOL);
+        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
         // environment variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
