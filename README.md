@@ -235,9 +235,9 @@ We have supported some most common authentication schemes like _Basic Auth_, _Di
 ### Basic Auth
 HTTP Basic Auth is a widely used protocol for simple username/password authentication. We support __two__ formats of Authorization header to use Basic Auth.
 1. Add the value of Authorization header in the base64 encoding of `username:password`.
-2. Add the value of Authorization header in the raw value of `username` and `password`, which is separated by space.
+2. Add the value of Authorization header in the raw value of `username` and `password`, which is separated by space. REST Client extension will do the base64 encoding automatically.
 
-The corresponding examples are as follows:
+The corresponding examples are as follows, they are totally equivalent:
 ```http
 GET https://httpbin.org//basic-auth/user/passwd HTTP/1.1
 Authorization: Basic dXNlcjpwYXNzd2Q=
