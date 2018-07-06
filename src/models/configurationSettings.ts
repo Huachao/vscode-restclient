@@ -130,14 +130,10 @@ export class RestClientSettings implements IRestClientSettings {
     private parseColumn(value: string): ViewColumn {
         value = value.toLowerCase();
         switch (value) {
-            case 'left':
-                return ViewColumn.One;
-            case 'center':
-                return ViewColumn.Two;
-            case 'right':
-                return ViewColumn.Three;
-            default:
+            case 'current':
                 return ViewColumn.Active;
+            default:
+                return ViewColumn.Beside;
         }
     }
 }
