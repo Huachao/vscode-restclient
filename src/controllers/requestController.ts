@@ -1,7 +1,7 @@
 "use strict";
 
 import { EOL } from 'os';
-import { OutputChannel, Range, StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import { OutputChannel, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
@@ -146,10 +146,14 @@ export class RequestController {
             }
 
             try {
+                const activeColumn = window.activeTextEditor.viewColumn;
+                const previewColumn = activeColumn === ViewColumn.Active || !activeColumn
+                    ? activeColumn
+                    : ((activeColumn as number) + 1) as ViewColumn;
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
-                    this._textDocumentView.render(response);
+                    this._textDocumentView.render(response, previewColumn);
                 } else {
-                    this._webview.render(response);
+                    this._webview.render(response, previewColumn);
                 }
             } catch (reason) {
                 this._outputChannel.appendLine(reason);

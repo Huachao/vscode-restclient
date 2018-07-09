@@ -1,6 +1,6 @@
 'use strict';
 
-import { commands, WebviewPanel, window } from 'vscode';
+import { commands, ViewColumn, WebviewPanel, window } from 'vscode';
 import { Headers } from '../models/base';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
@@ -31,13 +31,13 @@ export class HttpResponseWebview extends BaseWebview {
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();
     }
 
-    public render(response: HttpResponse) {
+    public render(response: HttpResponse, column: ViewColumn) {
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
                 this.viewType,
                 `Response(${response.elapsedMillionSeconds}ms)`,
-                { viewColumn: this.settings.previewColumn, preserveFocus: !this.settings.previewResponsePanelTakeFocus },
+                { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus },
                 {
                     enableFindWidget: true,
                     enableScripts: true,
@@ -63,8 +63,8 @@ export class HttpResponseWebview extends BaseWebview {
                 });
 
                 panel.onDidChangeViewState(({ webviewPanel }) => {
-                    commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, webviewPanel.visible);
-                    HttpResponseWebview.activePreviewResponse = webviewPanel.visible ? this.panelResponses.get(webviewPanel) : undefined;
+                    commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, webviewPanel.active);
+                    HttpResponseWebview.activePreviewResponse = webviewPanel.active ? this.panelResponses.get(webviewPanel) : undefined;
                 });
 
                 this.panels.push(panel);
@@ -77,7 +77,7 @@ export class HttpResponseWebview extends BaseWebview {
 
         commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, this.settings.previewResponsePanelTakeFocus);
 
-        panel.reveal(this.settings.previewColumn, !this.settings.previewResponsePanelTakeFocus);
+        panel.reveal(column, !this.settings.previewResponsePanelTakeFocus);
 
         this.panelResponses.set(panel, response);
         HttpResponseWebview.activePreviewResponse = response;

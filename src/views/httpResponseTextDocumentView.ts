@@ -1,7 +1,7 @@
 'use strict';
 
 import { EOL } from 'os';
-import { window, workspace } from 'vscode';
+import { ViewColumn, window, workspace } from 'vscode';
 import { Headers } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
@@ -16,11 +16,11 @@ export class HttpResponseTextDocumentView {
     public constructor() {
     }
 
-    public render(response: HttpResponse) {
+    public render(response: HttpResponse, column: ViewColumn) {
         const content = this.getTextDocumentContent(response);
         const language = this.getVSCodeDocumentLanguageId(response);
         workspace.openTextDocument({ language, content }).then(document => {
-            window.showTextDocument(document, { viewColumn: this.settings.previewColumn, preserveFocus: !this.settings.previewResponsePanelTakeFocus, preview: !this.settings.showResponseInDifferentTab });
+            window.showTextDocument(document, { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus, preview: !this.settings.showResponseInDifferentTab });
         });
     }
 
