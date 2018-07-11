@@ -1,8 +1,8 @@
 import { ViewColumn, workspace, WorkspaceConfiguration } from 'vscode';
-import { Headers } from '../models/base';
-import { HostCertificate } from '../models/hostCertificate';
-import { fromString as ParsePreviewOptionStr, PreviewOption } from '../models/previewOption';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
+import { Headers } from './base';
+import { HostCertificate } from './hostCertificate';
+import { fromString as ParsePreviewOptionStr, PreviewOption } from './previewOption';
 
 export interface IRestClientSettings {
     followRedirect: boolean;

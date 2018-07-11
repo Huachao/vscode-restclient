@@ -1,7 +1,7 @@
 'use strict';
 
 import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, Range, TextDocument, TextLine } from 'vscode';
-import { RequestVariableProvider } from '../utils/httpVariableProvider/requestVariableProvider';
+import { RequestVariableProvider } from '../utils/httpVariableProviders/requestVariableProvider';
 import { VariableUtility } from '../utils/variableUtility';
 
 export class RequestVariableHoverProvider implements HoverProvider {

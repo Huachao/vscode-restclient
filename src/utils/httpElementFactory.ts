@@ -4,9 +4,9 @@ import * as url from 'url';
 import { MarkdownString, SnippetString, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { ElementType, HttpElement } from '../models/httpElement';
-import { EnvironmentVariableProvider } from './httpVariableProvider/environmentVariableProvider';
-import { FileVariableProvider } from './httpVariableProvider/fileVariableProvider';
-import { RequestVariableProvider } from './httpVariableProvider/requestVariableProvider';
+import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
+import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
+import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
 import { PersistUtility } from './persistUtility';
 
 export class HttpElementFactory {

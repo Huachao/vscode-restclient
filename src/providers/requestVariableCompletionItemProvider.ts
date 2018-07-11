@@ -5,7 +5,7 @@ import * as Constants from "../common/constants";
 import { ElementType } from "../models/httpElement";
 import { ResolveState, ResolveWarningMessage } from "../models/httpVariableResolveResult";
 import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
-import { RequestVariableProvider } from '../utils/httpVariableProvider/requestVariableProvider';
+import { RequestVariableProvider } from '../utils/httpVariableProviders/requestVariableProvider';
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { VariableUtility } from "../utils/variableUtility";
 

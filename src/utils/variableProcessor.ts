@@ -2,11 +2,11 @@
 
 import { TextDocument, window } from 'vscode';
 import { VariableType } from "../models/variableType";
-import { EnvironmentVariableProvider } from './httpVariableProvider/environmentVariableProvider';
-import { FileVariableProvider } from './httpVariableProvider/fileVariableProvider';
-import { HttpVariableProvider } from './httpVariableProvider/httpVariableProvider';
-import { RequestVariableProvider } from './httpVariableProvider/requestVariableProvider';
-import { SystemVariableProvider } from './httpVariableProvider/systemVariableProvider';
+import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
+import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
+import { HttpVariableProvider } from './httpVariableProviders/httpVariableProvider';
+import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
+import { SystemVariableProvider } from './httpVariableProviders/systemVariableProvider';
 
 export class VariableProcessor {
 

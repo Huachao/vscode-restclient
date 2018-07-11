@@ -1,7 +1,7 @@
 "use strict";
 
 import { QuickPickItem } from 'vscode';
-import { SerializedHttpRequest } from '../models/httpRequest';
+import { SerializedHttpRequest } from './httpRequest';
 
 export class HistoryQuickPickItem implements QuickPickItem {
     public label: string;

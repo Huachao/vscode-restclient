@@ -1,8 +1,8 @@
 'use strict';
 
 import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, TextDocument } from 'vscode';
-import { EnvironmentVariableProvider } from '../utils/httpVariableProvider/environmentVariableProvider';
-import { FileVariableProvider } from '../utils/httpVariableProvider/fileVariableProvider';
+import { EnvironmentVariableProvider } from '../utils/httpVariableProviders/environmentVariableProvider';
+import { FileVariableProvider } from '../utils/httpVariableProviders/fileVariableProvider';
 import { VariableUtility } from '../utils/variableUtility';
 
 export class CustomVariableHoverProvider implements HoverProvider {
