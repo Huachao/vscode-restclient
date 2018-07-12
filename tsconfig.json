@@ -8,6 +8,8 @@
             "es2016"
         ],
         "sourceMap": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "rootDir": "."
     },
     "exclude": [

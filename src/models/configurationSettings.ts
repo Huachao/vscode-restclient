@@ -1,4 +1,5 @@
-import { ViewColumn, workspace, WorkspaceConfiguration } from 'vscode';
+import { CharacterPair, languages, ViewColumn, workspace, WorkspaceConfiguration } from 'vscode';
+import configuration from '../../language-configuration.json';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { Headers } from './base';
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
@@ -33,6 +34,7 @@ export interface IRestClientSettings {
     previewColumn: ViewColumn;
     previewResponsePanelTakeFocus: boolean;
     formParamEncodingStrategy: FormParamEncodingStrategy;
+    addRequestBodyLineIndentationAroundBrackets: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -64,6 +66,9 @@ export class RestClientSettings implements IRestClientSettings {
     public previewColumn: ViewColumn;
     public previewResponsePanelTakeFocus: boolean;
     public formParamEncodingStrategy: FormParamEncodingStrategy;
+    public addRequestBodyLineIndentationAroundBrackets: boolean;
+
+    private readonly brackets: CharacterPair[];
 
     private static _instance: RestClientSettings;
 
@@ -76,6 +81,7 @@ export class RestClientSettings implements IRestClientSettings {
     }
 
     private constructor() {
+        this.brackets = configuration.brackets as CharacterPair[];
         workspace.onDidChangeConfiguration(() => {
             this.initializeSettings();
         });
@@ -116,6 +122,8 @@ export class RestClientSettings implements IRestClientSettings {
         this.formParamEncodingStrategy = ParseFormParamEncodingStr(restClientSettings.get<string>("formParamEncodingStrategy", "automatic"));
         this.enableTelemetry = restClientSettings.get<boolean>('enableTelemetry', true);
         this.showEnvironmentStatusBarItem = restClientSettings.get<boolean>('showEnvironmentStatusBarItem', true);
+        this.addRequestBodyLineIndentationAroundBrackets = restClientSettings.get<boolean>('addRequestBodyLineIndentationAroundBrackets', true);
+        languages.setLanguageConfiguration('http', { brackets: this.addRequestBodyLineIndentationAroundBrackets ? this.brackets : [] });
 
         let httpSettings = this.getWorkspaceConfiguration("http");
         this.proxy = httpSettings.get<string>('proxy', undefined);

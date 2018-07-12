@@ -504,6 +504,12 @@
           "default": "automatic",
           "scope": "resource",
           "description": "Form param encoding strategy for request body of x-www-form-urlencoded. 'automatic' for detecting encoding or not automatically and do the encoding job if necessary. 'never' for treating provided request body as is, no encoding job will be applied. 'always' for only use for the scenario that 'automatic' option not working properly, e.g., some special characters('+') are not encoded correctly."
+        },
+        "rest-client.addRequestBodyLineIndentationAroundBrackets": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Add line indentation around brackets('{}', '<>', '[]') in request body when pressing enter."
         }
       }
     },
@@ -529,7 +535,7 @@
     "@types/node": "^6.0.40",
     "mocha": "^3.2.0",
     "tslint": "^4.2.0",
-    "typescript": "^2.8.3",
+    "typescript": "^2.9.2",
     "vscode": "^1.0.0"
   },
   "dependencies": {
