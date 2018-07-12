@@ -1,7 +1,7 @@
 "use strict";
 
 import * as fs from 'fs-extra';
-import * as moment from 'moment';
+import moment from 'moment';
 import { EOL } from 'os';
 import { OutputChannel, window, workspace } from 'vscode';
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
