@@ -243,7 +243,7 @@ export class HttpClient {
                 // if no port specified in request url, host name must exactly match
                 if (urlParts.length === 1 && urlParts[0] === hostName) {
                     return true;
-                };
+                }
             } else {
                 // if port specified, match host without port or hostname:port exactly match
                 let [ph, pp] = urlParts;
