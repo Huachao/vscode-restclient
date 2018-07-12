@@ -13,6 +13,7 @@ export function fromString(value: string): FormParamEncodingStrategy {
             return FormParamEncodingStrategy.Never;
         case 'always':
             return FormParamEncodingStrategy.Always;
+        case 'automatic':
         default:
             return FormParamEncodingStrategy.Automatic;
     }

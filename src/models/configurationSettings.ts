@@ -136,6 +136,7 @@ export class RestClientSettings implements IRestClientSettings {
         switch (value) {
             case 'current':
                 return ViewColumn.Active;
+            case 'beside':
             default:
                 return ViewColumn.Beside;
         }
