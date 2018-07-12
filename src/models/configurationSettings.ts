@@ -1,6 +1,7 @@
 import { ViewColumn, workspace, WorkspaceConfiguration } from 'vscode';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { Headers } from './base';
+import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
 import { HostCertificate } from './hostCertificate';
 import { fromString as ParsePreviewOptionStr, PreviewOption } from './previewOption';
 
@@ -31,6 +32,7 @@ export interface IRestClientSettings {
     largeResponseBodySizeLimitInMB: number;
     previewColumn: ViewColumn;
     previewResponsePanelTakeFocus: boolean;
+    formParamEncodingStrategy: FormParamEncodingStrategy;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -61,6 +63,7 @@ export class RestClientSettings implements IRestClientSettings {
     public largeResponseBodySizeLimitInMB: number;
     public previewColumn: ViewColumn;
     public previewResponsePanelTakeFocus: boolean;
+    public formParamEncodingStrategy: FormParamEncodingStrategy;
 
     private static _instance: RestClientSettings;
 
@@ -110,6 +113,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.disableAddingHrefLinkForLargeResponse = restClientSettings.get<boolean>("disableAddingHrefLinkForLargeResponse", true);
         this.largeResponseBodySizeLimitInMB = restClientSettings.get<number>("largeResponseBodySizeLimitInMB", 5);
         this.previewOption = ParsePreviewOptionStr(restClientSettings.get<string>("previewOption", "full"));
+        this.formParamEncodingStrategy = ParseFormParamEncodingStr(restClientSettings.get<string>("formParamEncodingStrategy", "automatic"));
         this.enableTelemetry = restClientSettings.get<boolean>('enableTelemetry', true);
         this.showEnvironmentStatusBarItem = restClientSettings.get<boolean>('showEnvironmentStatusBarItem', true);
 

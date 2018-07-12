@@ -19,6 +19,7 @@ import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
 const clipboardy = require('clipboardy');
+const encodeUrl = require('encodeurl');
 const HTTPSnippet = require('httpsnippet');
 
 export class CodeSnippetController {
@@ -50,7 +51,6 @@ export class CodeSnippetController {
         }
 
         // remove file variables definition lines and leading empty lines
-        lines = selectedText.split(Constants.LineSplitterRegex);
         selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
         // variables replacement
@@ -146,10 +146,9 @@ export class CodeSnippetController {
         }
 
         // remove file variables definition lines
-        lines = selectedText.split(Constants.LineSplitterRegex);
         selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
-        // environment variables replacement
+        // variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         // parse http request
@@ -201,7 +200,7 @@ export class CodeSnippetController {
             }
         }
 
-        return new HARHttpRequest(request.method, request.url, headers, cookies, body);
+        return new HARHttpRequest(request.method, encodeUrl(request.url), headers, cookies, body);
     }
 
     public dispose() {

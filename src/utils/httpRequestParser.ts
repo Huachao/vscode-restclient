@@ -8,6 +8,7 @@ import { Uri } from 'vscode';
 import { ArrayUtility } from '../common/arrayUtility';
 import { Headers } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
+import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
 import { IRequestParser } from '../models/IRequestParser';
 import { MimeUtility } from './mimeUtility';
@@ -96,8 +97,19 @@ export class HttpRequestParser implements IRequestParser {
         // parse body
         let contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
         body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
-        if (body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
-            body = encodeurl(body);
+        if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
+            if (this._restClientSettings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
+                const stringPairs = body.split('&');
+                const encodedStringParis = [];
+                for (const stringPair of stringPairs) {
+                    const [name, ...values] = stringPair.split('=');
+                    let value = values.join('=');
+                    encodedStringParis.push(`${encodeURIComponent(name)}=${encodeURIComponent(value)}`);
+                }
+                body = encodedStringParis.join('&');
+            } else {
+                body = encodeurl(body);
+            }
         }
 
         return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL));

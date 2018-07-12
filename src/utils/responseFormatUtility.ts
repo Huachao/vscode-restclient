@@ -1,6 +1,6 @@
 'use strict';
 
-import { applyEdits, format as JSONFormat } from "jsonc-parser";
+import { applyEdits, format as JSONFormat } from "jsonc-parser/lib/umd/main";
 import { EOL } from "os";
 import { window } from 'vscode';
 import { MimeUtility } from './mimeUtility';

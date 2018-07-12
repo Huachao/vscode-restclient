@@ -25,13 +25,12 @@ export class HARPostData {
     public constructor(public mimeType: string, public text: string) {
         if (mimeType === 'application/x-www-form-urlencoded') {
             if (text) {
-                text = decodeURIComponent(text.replace('+', '%20'));
+                text = decodeURIComponent(text.replace(/\+/g, '%20'));
                 this.params = [];
                 let pairs = text.split('&');
                 pairs.forEach(pair => {
-                    let key: string, value: string;
-                    [key, value] = pair.split('=');
-                    this.params.push(new HARParam(key, value));
+                    let [key, ...values] = pair.split('=');
+                    this.params.push(new HARParam(key, values.join('=')));
                 });
             }
         }
