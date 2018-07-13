@@ -159,7 +159,7 @@ export class CodeSnippetController {
 
         let harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         let snippet = new HTTPSnippet(harHttpRequest);
-        let result = snippet.convert('shell', 'curl');
+        let result = snippet.convert('shell', 'curl', process.platform === 'win32' ? { indent: false } : {});
         clipboardy.writeSync(result);
     }
 
