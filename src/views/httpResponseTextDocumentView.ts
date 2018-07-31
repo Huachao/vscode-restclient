@@ -37,7 +37,7 @@ export class HttpResponseTextDocumentView {
                 if (typeof request.body !== 'string') {
                     request.body = 'NOTE: Request Body From File Not Shown';
                 }
-                content += `${EOL}${ResponseFormatUtility.FormatBody(request.body.toString(), requestContentType, true)}${EOL}`;
+                content += `${EOL}${ResponseFormatUtility.formatBody(request.body.toString(), requestContentType, true)}${EOL}`;
             }
 
             content += EOL.repeat(2);
@@ -51,7 +51,7 @@ export class HttpResponseTextDocumentView {
         if (previewOption !== PreviewOption.Headers) {
             const responseContentType = response.getHeader('content-type');
             const prefix = previewOption === PreviewOption.Body ? '' : EOL;
-            content += `${prefix}${ResponseFormatUtility.FormatBody(response.body, responseContentType, true)}`;
+            content += `${prefix}${ResponseFormatUtility.formatBody(response.body, responseContentType, true)}`;
         }
 
         return content;

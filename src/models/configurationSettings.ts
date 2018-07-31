@@ -35,6 +35,7 @@ export interface IRestClientSettings {
     previewResponsePanelTakeFocus: boolean;
     formParamEncodingStrategy: FormParamEncodingStrategy;
     addRequestBodyLineIndentationAroundBrackets: boolean;
+    decodeEscapedUnicodeCharacters: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -67,6 +68,7 @@ export class RestClientSettings implements IRestClientSettings {
     public previewResponsePanelTakeFocus: boolean;
     public formParamEncodingStrategy: FormParamEncodingStrategy;
     public addRequestBodyLineIndentationAroundBrackets: boolean;
+    public decodeEscapedUnicodeCharacters: boolean;
 
     private readonly brackets: CharacterPair[];
 
@@ -123,6 +125,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.enableTelemetry = restClientSettings.get<boolean>('enableTelemetry', true);
         this.showEnvironmentStatusBarItem = restClientSettings.get<boolean>('showEnvironmentStatusBarItem', true);
         this.addRequestBodyLineIndentationAroundBrackets = restClientSettings.get<boolean>('addRequestBodyLineIndentationAroundBrackets', true);
+        this.decodeEscapedUnicodeCharacters = restClientSettings.get<boolean>('decodeEscapedUnicodeCharacters', false);
         languages.setLanguageConfiguration('http', { brackets: this.addRequestBodyLineIndentationAroundBrackets ? this.brackets : [] });
 
         let httpSettings = this.getWorkspaceConfiguration("http");

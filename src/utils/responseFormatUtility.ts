@@ -7,7 +7,7 @@ import { MimeUtility } from './mimeUtility';
 const pd = require('pretty-data').pd;
 
 export class ResponseFormatUtility {
-    public static FormatBody(body: string, contentType: string, suppressValidation: boolean): string {
+    public static formatBody(body: string, contentType: string, suppressValidation: boolean): string {
         if (contentType) {
             if (MimeUtility.isJSON(contentType)) {
                 if (ResponseFormatUtility.IsJsonString(body)) {

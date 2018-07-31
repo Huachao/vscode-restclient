@@ -94,6 +94,7 @@ export class HttpClient {
         let size = 0;
         let headersSize = 0;
         return new Promise<HttpResponse>((resolve, reject) => {
+            const that = this;
             request(options, function (error, response, body) {
                 if (error) {
                     if (error.message) {
@@ -124,6 +125,10 @@ export class HttpClient {
                     if (encoding !== 'utf8') {
                         body = iconv.decode(buffer, 'utf8');
                     }
+                }
+
+                if (that._settings.decodeEscapedUnicodeCharacters) {
+                    body = that.decodeEscapedUnicodeCharacters(body);
                 }
 
                 // adjust response header case, due to the response headers in request package is in lowercase
@@ -185,6 +190,10 @@ export class HttpClient {
             stream.on('error', error => reject(error));
             (<any>stream).resume();
         });
+    }
+
+    private decodeEscapedUnicodeCharacters(body: string): string {
+        return body.replace(/\\u([\d\w]{4})/gi, (_, g) => String.fromCharCode(parseInt(g, 16)));
     }
 
     private getRequestCertificate(requestUrl: string): { cert?: string, key?: string, pfx?: string, passphrase?: string } {

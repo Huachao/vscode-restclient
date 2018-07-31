@@ -131,7 +131,7 @@ ${HttpResponseWebview.formatHeaders(request.headers)}`;
                 if (typeof request.body !== 'string') {
                     request.body = 'NOTE: Request Body From File Not Shown';
                 }
-                let requestBodyPart = `${ResponseFormatUtility.FormatBody(request.body.toString(), requestContentType, true)}`;
+                let requestBodyPart = `${ResponseFormatUtility.formatBody(request.body.toString(), requestContentType, true)}`;
                 let bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(requestContentType);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, requestBodyPart).value;
@@ -152,7 +152,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
 
         if (previewOption !== PreviewOption.Headers) {
             let responseContentType = response.getHeader("content-type");
-            let responseBodyPart = `${ResponseFormatUtility.FormatBody(response.body, responseContentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
+            let responseBodyPart = `${ResponseFormatUtility.formatBody(response.body, responseContentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
             if (this.settings.disableHighlightResonseBodyForLargeResponse &&
                 response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024) {
                 code += responseBodyPart;
