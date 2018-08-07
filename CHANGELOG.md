@@ -1,3 +1,12 @@
+## 0.19.1 (2018/8/7)
+* __Bug Fix__: [Make Azure AAD Auth respect the audience](https://github.com/Huachao/vscode-restclient/issues/225)
+* __Bug Fix__: [Fix curl command can't be run on Windows](https://github.com/Huachao/vscode-restclient/issues/227)
+* __Bug Fix__: [Add setting `decodeEscapedUnicodeCharacters` to decode escaped characters in response body](https://github.com/Huachao/vscode-restclient/issues/230)
+* __Bug Fix__: Fix copy request as curl issue when request block leads with blank lines
+* __Improvement__: [Show response in the right editor](https://github.com/Huachao/vscode-restclient/issues/216)
+* __Improvement__: [Add `formParamEncodingStrategy` setting to control the form param encoding behavior](https://github.com/Huachao/vscode-restclient/issues/222)
+* __Improvement__: [Add `addRequestBodyLineIndentationAroundBrackets` setting to control the request body indent behavior](https://github.com/Huachao/vscode-restclient/issues/226)
+
 ## 0.19.0 (2018/6/28)
 * __Breaking Change__: Remove support for setting `rest-client.defaultuseragent`, replace this with `rest-client.defaultHeaders` which has more capability to add other default request headers
 * __Breaking Change__: Remove support for setting `rest-client.previewResponseInActiveColumn`, replace this with `rest-client.previewColumn` which has more capability to specify which column to preview, not just currently active one

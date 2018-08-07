@@ -147,7 +147,7 @@ export class RequestController {
 
             try {
                 const activeColumn = window.activeTextEditor.viewColumn;
-                const previewColumn = activeColumn === ViewColumn.Active || !activeColumn
+                const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
                     ? activeColumn
                     : ((activeColumn as number) + 1) as ViewColumn;
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
