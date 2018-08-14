@@ -11,6 +11,8 @@ export abstract class BaseWebview {
 
     protected readonly settings: RestClientSettings = RestClientSettings.Instance;
 
+    protected readonly extensionPath: string;
+
     protected readonly styleFolderPath: Uri;
 
     protected readonly styleFilePath: Uri;
@@ -22,14 +24,14 @@ export abstract class BaseWebview {
     protected panels: WebviewPanel[];
 
     protected constructor() {
-        const extensionPath = extensions.getExtension(Constants.ExtensionId).extensionPath;
+        this.extensionPath = extensions.getExtension(Constants.ExtensionId).extensionPath;
         this.panels = [];
-        this.styleFilePath = Uri.file(path.join(extensionPath, Constants.CSSFolderName, Constants.CSSFileName))
+        this.styleFilePath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName, Constants.CSSFileName))
             .with({ scheme: 'vscode-resource' });
-        this.styleFolderPath = Uri.file(path.join(extensionPath, Constants.CSSFolderName));
-        this.scriptFilePath = Uri.file(path.join(extensionPath, Constants.ScriptsFolderName, Constants.ScriptFileName))
+        this.styleFolderPath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName));
+        this.scriptFilePath = Uri.file(path.join(this.extensionPath, Constants.ScriptsFolderName, Constants.ScriptFileName))
             .with({ scheme: 'vscode-resource' });
-        this.scriptFolderPath = Uri.file(path.join(extensionPath, Constants.ScriptsFolderName));
+        this.scriptFolderPath = Uri.file(path.join(this.extensionPath, Constants.ScriptsFolderName));
     }
 
     public get onDidCloseAllWebviewPanels(): Event<void> {

@@ -1,6 +1,8 @@
 'use strict';
 
-import { commands, ViewColumn, WebviewPanel, window } from 'vscode';
+import * as path from 'path';
+import { commands, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
+import * as Constants from '../common/constants';
 import { Headers } from '../models/base';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
@@ -18,6 +20,8 @@ export class HttpResponseWebview extends BaseWebview {
 
     private readonly panelResponses: Map<WebviewPanel, HttpResponse>;
 
+    private readonly iconFilePath: Uri;
+
     protected get viewType(): string {
         return 'rest-response';
     }
@@ -29,6 +33,7 @@ export class HttpResponseWebview extends BaseWebview {
 
         // Init response webview map
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();
+        this.iconFilePath = Uri.file(path.join(this.extensionPath, Constants.ImagesFolderName, Constants.IconFileName));
     }
 
     public render(response: HttpResponse, column: ViewColumn) {
@@ -61,6 +66,8 @@ export class HttpResponseWebview extends BaseWebview {
                         this._onDidCloseAllWebviewPanels.fire();
                     }
                 });
+
+                panel.iconPath = this.iconFilePath;
 
                 panel.onDidChangeViewState(({ webviewPanel }) => {
                     commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, webviewPanel.active);
