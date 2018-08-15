@@ -558,6 +558,7 @@
     "highlight.js": "^9.6.0",
     "httpsnippet": "^1.16.5",
     "iconv-lite": "^0.4.15",
+    "js-beautify": "^1.7.5",
     "jsonc-parser": "^1.0.3",
     "jsonpath": "^1.0.0",
     "mime-types": "^2.1.14",
