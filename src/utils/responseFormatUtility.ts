@@ -10,7 +10,7 @@ export class ResponseFormatUtility {
         if (contentType) {
             if (MimeUtility.isJSON(contentType)) {
                 if (ResponseFormatUtility.IsJsonString(body)) {
-                    body = beautify(body, { indent_size: 4 });
+                    body = beautify(body, { indent_size: 2 });
                 } else if (!suppressValidation) {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                 }
