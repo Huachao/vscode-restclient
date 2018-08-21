@@ -8,6 +8,7 @@ import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
 import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
+import { isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 import { BaseWebview } from './baseWebview';
 
@@ -139,7 +140,7 @@ ${HttpResponseWebview.formatHeaders(request.headers)}`;
                     request.body = 'NOTE: Request Body From File Not Shown';
                 }
                 let requestBodyPart = `${ResponseFormatUtility.formatBody(request.body.toString(), requestContentType, true)}`;
-                let bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(requestContentType);
+                let bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(requestContentType, request.body.toString());
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, requestBodyPart).value;
                 } else {
@@ -164,7 +165,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
                 response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024) {
                 code += responseBodyPart;
             } else {
-                let bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(responseContentType);
+                let bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(responseContentType, responseBodyPart);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, responseBodyPart).value;
                 } else {
@@ -302,7 +303,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         return headerString;
     }
 
-    private static getHighlightLanguageAlias(contentType: string): string {
+    private static getHighlightLanguageAlias(contentType: string, content: string = null): string {
         if (MimeUtility.isJSON(contentType)) {
             return 'json';
         } else if (MimeUtility.isJavaScript(contentType)) {
@@ -314,6 +315,12 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         } else if (MimeUtility.isCSS(contentType)) {
             return 'css';
         } else {
+            // If content is provided, guess from content if not content type is matched
+            if (content) {
+                if (isJSONString(content)) {
+                    return 'json';
+                }
+            }
             return null;
         }
     }

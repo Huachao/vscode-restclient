@@ -19,3 +19,12 @@ export function hasHeader(headers: Headers, name: string): boolean {
 export function calculateMD5Hash(text: string | Buffer): string {
     return crypto.createHash('md5').update(text).digest('hex');
 }
+
+export function isJSONString(text: string): boolean {
+    try {
+        JSON.parse(text);
+        return true;
+    } catch {
+        return false;
+    }
+}
