@@ -37,9 +37,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             }
         }
 
-        for (let index = 0; index < requestRange.length; index++) {
-            let [blockStart, blockEnd] = requestRange[index];
-
+        for (let [blockStart, blockEnd] of requestRange) {
             // get real start for current requestRange
             while (blockStart <= blockEnd) {
                 let line = lines[blockStart];
@@ -67,8 +65,8 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             }
 
             if (blockStart <= blockEnd) {
-                let text = await VariableProcessor.processRawRequest(this.getRequestLines(lines.slice(blockStart, blockEnd + 1)).join(EOL));
-                let [name, container] = this.getRequestSymbolInfo(text);
+                const text = await VariableProcessor.processRawRequest(this.getRequestLines(lines, blockStart, blockEnd).join(EOL));
+                const [name, container] = this.getRequestSymbolInfo(text);
                 symbols.push(
                     new SymbolInformation(
                         name,
@@ -76,7 +74,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
                         container,
                         new Location(
                             document.uri,
-                            new Range(blockStart, 0, blockEnd, 0))));
+                            new Range(blockStart, 0, blockEnd, lines[blockEnd].length))));
             }
         }
         return symbols;
@@ -95,13 +93,13 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
         return [`${request.method} ${parsedUrl.path}`, parsedUrl.host];
     }
 
-    private getRequestLines(lines: string[]): string[] {
-        if (lines.length <= 1) {
-            return lines;
+    private getRequestLines(lines: string[], start: number, end: number): string[] {
+        if (start === end) {
+            return [lines[start]];
         }
 
-        let end = ArrayUtility.firstIndexOf(lines, val => val.trim()[0] !== '?' && val.trim()[0] !== '&', 1);
-        return lines.slice(0, end);
+        end = ArrayUtility.firstIndexOf(lines, line => /^(?!\s*[\&\?])/.test(line), start + 1);
+        return lines.slice(start, end);
     }
 
 }
