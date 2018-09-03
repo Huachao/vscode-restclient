@@ -54,6 +54,11 @@ export class RequestVariableCacheValueProcessor {
                 return { state: ResolveState.Warning, value: body, message: ResolveWarningMessage.MissingBodyPath };
             }
 
+            // Make '*' as the wildcard to fetch the whole body regardless of the content-type
+            if (nameOrPath === '*') {
+                return { state: ResolveState.Success, value: body };
+            }
+
             const contentTypeHeader = getHeader(headers, 'content-type');
             if (MimeUtility.isJSON(contentTypeHeader)) {
                 const parsedBody = JSON.parse(body as string);
