@@ -3,6 +3,8 @@
         "module": "commonjs",
         "target": "es6",
         "outDir": "out",
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
         "experimentalDecorators": true,
         "lib": [
             "es2016"
