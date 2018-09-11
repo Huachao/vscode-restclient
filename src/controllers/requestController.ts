@@ -8,7 +8,7 @@ import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { RequestParserFactory } from '../models/requestParserFactory';
-import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
+import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
@@ -67,6 +67,9 @@ export class RequestController {
             return;
         }
 
+        // parse request variable definition name
+        const requestVariable = Selector.getRequestVariableDefinitionName(selectedText);
+
         // remove comment lines
         let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
         if (lines.length === 0 || lines.every(line => line === '')) {
@@ -85,7 +88,6 @@ export class RequestController {
             return;
         }
 
-        const requestVariable = selector.getRequestVariableForSelectedText(editor, range);
         if (requestVariable) {
             httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, document.uri.toString());
         }
