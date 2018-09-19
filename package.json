@@ -374,18 +374,6 @@
           "scope": "resource",
           "description": "Preview response in untitled document if set to true, otherwise displayed in html view"
         },
-        "rest-client.previewResponseSetUntitledDocumentLanguageByContentType": {
-          "type": "boolean",
-          "default": false,
-          "scope": "resource",
-          "description": "Attempt to automatically set document language based on Content-Type header when showing each response in new tab"
-        },
-        "rest-client.includeAdditionalInfoInResponse": {
-          "type": "boolean",
-          "default": false,
-          "scope": "resource",
-          "description": "Include additional information such as request URL and response time when preview is set to use untitled document"
-        },
         "rest-client.certificates": {
           "type": "object",
           "default": {},
@@ -427,12 +415,6 @@
               }
             ]
           }
-        },
-        "rest-client.useTrunkedTransferEncodingForSendingFileContent": {
-          "type": "boolean",
-          "default": true,
-          "scope": "resource",
-          "description": "Use trunked transfer encoding for sending file content as request body"
         },
         "rest-client.suppressResponseBodyContentTypeValidationWarning": {
           "type": "boolean",

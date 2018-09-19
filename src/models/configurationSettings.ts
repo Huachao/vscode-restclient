@@ -22,10 +22,7 @@ export interface IRestClientSettings {
     environmentVariables: Map<string, Map<string, string>>;
     mimeAndFileExtensionMapping: Map<string, string>;
     previewResponseInUntitledDocument: boolean;
-    previewResponseSetUntitledDocumentLanguageByContentType: boolean;
-    includeAdditionalInfoInResponse: boolean;
     hostCertificates: Map<string, HostCertificate>;
-    useTrunkedTransferEncodingForSendingFileContent: boolean;
     suppressResponseBodyContentTypeValidationWarning: boolean;
     previewOption: PreviewOption;
     disableHighlightResonseBodyForLargeResponse: boolean;
@@ -55,10 +52,7 @@ export class RestClientSettings implements IRestClientSettings {
     public environmentVariables: Map<string, Map<string, string>>;
     public mimeAndFileExtensionMapping: Map<string, string>;
     public previewResponseInUntitledDocument: boolean;
-    public previewResponseSetUntitledDocumentLanguageByContentType: boolean;
-    public includeAdditionalInfoInResponse: boolean;
     public hostCertificates: Map<string, HostCertificate>;
-    public useTrunkedTransferEncodingForSendingFileContent: boolean;
     public suppressResponseBodyContentTypeValidationWarning: boolean;
     public previewOption: PreviewOption;
     public disableHighlightResonseBodyForLargeResponse: boolean;
@@ -110,13 +104,9 @@ export class RestClientSettings implements IRestClientSettings {
         this.mimeAndFileExtensionMapping = restClientSettings.get<Map<string, string>>("mimeAndFileExtensionMapping", new Map<string, string>());
 
         this.previewResponseInUntitledDocument = restClientSettings.get<boolean>("previewResponseInUntitledDocument", false);
-        this.previewResponseSetUntitledDocumentLanguageByContentType = restClientSettings.get<boolean>("previewResponseSetUntitledDocumentLanguageByContentType", false);
         this.previewColumn = this.parseColumn(restClientSettings.get<string>("previewColumn", "two"));
         this.previewResponsePanelTakeFocus = restClientSettings.get<boolean>("previewResponsePanelTakeFocus", true);
-        this.includeAdditionalInfoInResponse = restClientSettings.get<boolean>("includeAdditionalInfoInResponse", false);
         this.hostCertificates = restClientSettings.get<Map<string, HostCertificate>>("certificates", new Map<string, HostCertificate>());
-        this.useTrunkedTransferEncodingForSendingFileContent = restClientSettings.get<boolean>("useTrunkedTransferEncodingForSendingFileContent", true);
-        this.suppressResponseBodyContentTypeValidationWarning = restClientSettings.get<boolean>("suppressResponseBodyContentTypeValidationWarning", false);
         this.disableHighlightResonseBodyForLargeResponse = restClientSettings.get<boolean>("disableHighlightResonseBodyForLargeResponse", true);
         this.disableAddingHrefLinkForLargeResponse = restClientSettings.get<boolean>("disableAddingHrefLinkForLargeResponse", true);
         this.largeResponseBodySizeLimitInMB = restClientSettings.get<number>("largeResponseBodySizeLimitInMB", 5);
