@@ -214,7 +214,7 @@ export class CodeSnippetController {
             if (scheme && scheme.toLowerCase() === 'basic') {
                 let params = authHeader.substr(start).trim().split(' ');
                 if (params.length === 2) {
-                    return 'Basic ' + new Buffer(`${params[0]}:${params[1]}`).toString('base64');
+                    return 'Basic ' + Buffer.from(`${params[0]}:${params[1]}`).toString('base64');
                 }
             }
         }

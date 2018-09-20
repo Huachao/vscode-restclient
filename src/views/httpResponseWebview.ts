@@ -103,7 +103,7 @@ export class HttpResponseWebview extends BaseWebview {
             contentType = contentType.trim();
         }
         if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType)) {
-            innerHtml = `<img src="data:${contentType};base64,${new Buffer(response.bodyStream).toString('base64')}">`;
+            innerHtml = `<img src="data:${contentType};base64,${response.bodyBuffer.toString('base64')}">`;
         } else {
             let code = this.highlightResponse(response);
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
@@ -127,7 +127,7 @@ export class HttpResponseWebview extends BaseWebview {
 
     private highlightResponse(response: HttpResponse): string {
         let code = '';
-        let previewOption = this.settings.previewOption;
+        const previewOption = this.settings.previewOption;
         if (previewOption === PreviewOption.Exchange) {
             // for add request details
             let request = response.request;
@@ -137,10 +137,10 @@ ${HttpResponseWebview.formatHeaders(request.headers)}`;
             if (request.body) {
                 let requestContentType = request.getHeader("content-type");
                 if (typeof request.body !== 'string') {
-                    request.body = 'NOTE: Request Body From File Not Shown';
+                    request.body = 'NOTE: Request Body From File Is Not Shown';
                 }
-                let requestBodyPart = `${ResponseFormatUtility.formatBody(request.body.toString(), requestContentType, true)}`;
-                let bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(requestContentType, request.body.toString());
+                let requestBodyPart = `${ResponseFormatUtility.formatBody(request.body, requestContentType, true)}`;
+                let bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(requestContentType, request.body);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, requestBodyPart).value;
                 } else {

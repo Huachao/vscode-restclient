@@ -29,16 +29,21 @@ export class HttpClient {
     }
 
     public async send(httpRequest: HttpRequest): Promise<HttpResponse> {
-        let body: string | Stream | Buffer = httpRequest.body;
-        if (body && typeof body !== 'string') {
-            body = await this.convertStreamToBuffer(body);
+        const originalRequestBody = httpRequest.body;
+        let requestBody: string | Buffer;
+        if (originalRequestBody) {
+            if (typeof originalRequestBody !== 'string') {
+                requestBody = await this.convertStreamToBuffer(originalRequestBody);
+            } else {
+                requestBody = originalRequestBody;
+            }
         }
 
         let options: any = {
             url: encodeUrl(httpRequest.url),
             headers: httpRequest.headers,
             method: httpRequest.method,
-            body,
+            body: requestBody,
             encoding: null,
             time: true,
             timeout: this._settings.timeoutInMilliseconds,
@@ -117,18 +122,18 @@ export class HttpClient {
                     encoding = "utf8";
                 }
 
-                let bodyStream = body;
-                let buffer = new Buffer(body);
+                const bodyBuffer: Buffer = Buffer.isBuffer(body) ? body : Buffer.from(body);
+                let bodyString: string;
                 try {
-                    body = iconv.decode(buffer, encoding);
+                    bodyString = iconv.decode(bodyBuffer, encoding);
                 } catch {
                     if (encoding !== 'utf8') {
-                        body = iconv.decode(buffer, 'utf8');
+                        bodyString = iconv.decode(bodyBuffer, 'utf8');
                     }
                 }
 
                 if (that._settings.decodeEscapedUnicodeCharacters) {
-                    body = that.decodeEscapedUnicodeCharacters(body);
+                    bodyString = that.decodeEscapedUnicodeCharacters(bodyString);
                 }
 
                 // adjust response header case, due to the response headers in request package is in lowercase
@@ -148,12 +153,11 @@ export class HttpClient {
                     response.statusMessage,
                     response.httpVersion,
                     adjustedResponseHeaders,
-                    body,
+                    bodyString,
                     response.elapsedTime,
-                    httpRequest.url,
                     size,
                     headersSize,
-                    bodyStream,
+                    bodyBuffer,
                     new HttpResponseTimingPhases(
                         response.timingPhases.total,
                         response.timingPhases.wait,
@@ -166,7 +170,7 @@ export class HttpClient {
                         options.method,
                         options.url,
                         HttpClient.capitalizeHeaderName(response.toJSON().request.headers),
-                        httpRequest.body instanceof Buffer ? fs.createReadStream(httpRequest.body) : httpRequest.body,
+                        Buffer.isBuffer(requestBody) ? fs.createReadStream(requestBody) : requestBody,
                         httpRequest.rawBody
                     )));
             })

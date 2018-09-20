@@ -18,6 +18,8 @@ export class ResponseController {
     public static responseBodySaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseBodyDownloadFolerName);
 
     public constructor() {
+        fs.ensureDir(ResponseController.responseSaveFolderPath);
+        fs.ensureDir(ResponseController.responseBodySaveFolderPath);
     }
 
     @trace('Response-Save')
@@ -27,7 +29,7 @@ export class ResponseController {
             const fullResponse = this.getFullResponseString(response);
             const defaultFilePath = path.join(ResponseController.responseSaveFolderPath, `Response-${Date.now()}.http`);
             try {
-                const uri = await window.showSaveDialog({defaultUri: Uri.file(defaultFilePath)});
+                const uri = await window.showSaveDialog({ defaultUri: Uri.file(defaultFilePath) });
                 if (uri) {
                     let filePath = uri.fsPath;
                     await PersistUtility.ensureFileAsync(filePath);
@@ -57,11 +59,11 @@ export class ResponseController {
             const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
             const defaultFilePath = path.join(ResponseController.responseBodySaveFolderPath, fileName);
             try {
-                const uri = await window.showSaveDialog({defaultUri: Uri.file(defaultFilePath)});
+                const uri = await window.showSaveDialog({ defaultUri: Uri.file(defaultFilePath) });
                 if (uri) {
                     const filePath = uri.fsPath;
                     await PersistUtility.ensureFileAsync(filePath);
-                    await fs.writeFile(filePath, response.bodyStream);
+                    await fs.writeFile(filePath, response.bodyBuffer);
                     await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
                         if (btn) {
                             if (btn.title === 'Open') {

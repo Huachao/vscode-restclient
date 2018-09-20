@@ -50,7 +50,7 @@ export class CurlRequestParser implements IRequestParser {
 
         let user = parsedArguments.u || parsedArguments.user;
         if (user) {
-            headers['Authorization'] = `Basic ${new Buffer(user).toString('base64')}`;
+            headers['Authorization'] = `Basic ${Buffer.from(user).toString('base64')}`;
         }
 
         // parse body

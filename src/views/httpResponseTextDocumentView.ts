@@ -35,7 +35,7 @@ export class HttpResponseTextDocumentView {
             if (request.body) {
                 const requestContentType = request.getHeader('content-type');
                 if (typeof request.body !== 'string') {
-                    request.body = 'NOTE: Request Body From File Not Shown';
+                    request.body = 'NOTE: Request Body From Is File Not Shown';
                 }
                 content += `${EOL}${ResponseFormatUtility.formatBody(request.body.toString(), requestContentType, true)}${EOL}`;
             }
