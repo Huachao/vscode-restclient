@@ -150,7 +150,7 @@ export class HttpElementFactory {
                 new HttpElement(
                     name,
                     ElementType.RequestCustomVariable,
-                    '^\\s*[^@]',
+                    null,
                     v,
                     new SnippetString(`{{${name}.\${1|request,response|}.\${2|headers,body|}.\${3:Header Name, JSONPath or XPath}}}`)));
         }
