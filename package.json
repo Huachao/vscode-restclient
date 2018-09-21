@@ -538,6 +538,8 @@
     "filesize": "^3.3.0",
     "fs-extra": "^5.0.0",
     "highlight.js": "^9.6.0",
+    "http-proxy-agent": "^2.1.0",
+    "https-proxy-agent": "^2.2.1",
     "httpsnippet": "^1.16.5",
     "iconv-lite": "^0.4.15",
     "js-beautify": "^1.7.5",
