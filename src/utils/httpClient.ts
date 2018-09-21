@@ -31,84 +31,7 @@ export class HttpClient {
     }
 
     public async send(httpRequest: HttpRequest): Promise<HttpResponse> {
-        const originalRequestBody = httpRequest.body;
-        let requestBody: string | Buffer;
-        if (originalRequestBody) {
-            if (typeof originalRequestBody !== 'string') {
-                requestBody = await this.convertStreamToBuffer(originalRequestBody);
-            } else {
-                requestBody = originalRequestBody;
-            }
-        }
-
-        let options: any = {
-            url: encodeUrl(httpRequest.url),
-            headers: httpRequest.headers,
-            method: httpRequest.method,
-            body: requestBody,
-            encoding: null,
-            time: true,
-            timeout: this._settings.timeoutInMilliseconds,
-            gzip: true,
-            followRedirect: this._settings.followRedirect,
-            jar: this._settings.rememberCookiesForSubsequentRequests ? request.jar(new cookieStore(PersistUtility.cookieFilePath)) : false,
-            forever: true
-        };
-
-        // set auth to digest if Authorization header follows: Authorization: Digest username password
-        let authorization = getHeader(options.headers, 'Authorization');
-        if (authorization) {
-            let start = authorization.indexOf(' ');
-            let scheme = authorization.substr(0, start);
-            if (scheme === 'Digest' || scheme === 'Basic') {
-                let params = authorization.substr(start).trim().split(' ');
-                let [user, pass] = params;
-                if (user && pass) {
-                    options.auth = {
-                        user,
-                        pass,
-                        sendImmediately: scheme === 'Basic'
-                    };
-                }
-            }
-        }
-
-        // set certificate
-        let certificate = this.getRequestCertificate(httpRequest.url);
-        options.cert = certificate.cert;
-        options.key = certificate.key;
-        options.pfx = certificate.pfx;
-        options.passphrase = certificate.passphrase;
-
-        // set proxy
-        if (this._settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, this._settings.excludeHostsForProxy)) {
-            const proxyEndpoint = url.parse(this._settings.proxy);
-            if (/^https?:$/.test(proxyEndpoint.protocol)) {
-                const proxyOptions = {
-                    host: proxyEndpoint.hostname,
-                    port: +proxyEndpoint.port,
-                    rejectUnauthorized: this._settings.proxyStrictSSL
-                };
-
-                options.agent = httpRequest.url.startsWith('http:')
-                    ? new HttpProxyAgent(proxyOptions)
-                    : new HttpsProxyAgent(proxyOptions);
-            }
-        }
-
-        if (!options.headers) {
-            options.headers = httpRequest.headers = {};
-        }
-
-        // add default headers if not specified
-        for (let header in this._settings.defaultHeaders) {
-            if (!hasHeader(options.headers, header) && (header.toLowerCase() !== 'host' || httpRequest.url[0] === '/')) {
-                const value = this._settings.defaultHeaders[header];
-                if (value) {
-                    options.headers[header] = value;
-                }
-            }
-        }
+        const options = await this.prepareOptions(httpRequest);
 
         let size = 0;
         let headersSize = 0;
@@ -162,6 +85,8 @@ export class HttpClient {
                     adjustedResponseHeaders[adjustedHeaderName] = response.headers[header];
                 }
 
+                const requestBody = options.body;
+
                 resolve(new HttpResponse(
                     response.statusCode,
                     response.statusMessage,
@@ -198,6 +123,91 @@ export class HttpClient {
                     }
                 });
         });
+    }
+
+    private async prepareOptions(httpRequest: HttpRequest): Promise<{ [key: string]: any }> {
+        const originalRequestBody = httpRequest.body;
+        let requestBody: string | Buffer;
+        if (originalRequestBody) {
+            if (typeof originalRequestBody !== 'string') {
+                requestBody = await this.convertStreamToBuffer(originalRequestBody);
+            } else {
+                requestBody = originalRequestBody;
+            }
+        }
+
+        let options: any = {
+            url: encodeUrl(httpRequest.url),
+            headers: httpRequest.headers,
+            method: httpRequest.method,
+            body: requestBody,
+            encoding: null,
+            time: true,
+            timeout: this._settings.timeoutInMilliseconds,
+            gzip: true,
+            followRedirect: this._settings.followRedirect,
+            jar: this._settings.rememberCookiesForSubsequentRequests ? request.jar(new cookieStore(PersistUtility.cookieFilePath)) : false,
+            forever: true
+        };
+
+        // set auth to digest if Authorization header follows: Authorization: Digest username password
+        let authorization = getHeader(options.headers, 'Authorization');
+        if (authorization) {
+            let start = authorization.indexOf(' ');
+            let scheme = authorization.substr(0, start);
+            if (scheme === 'Digest' || scheme === 'Basic') {
+                let params = authorization.substr(start).trim().split(' ');
+                let [user, pass] = params;
+                if (user && pass) {
+                    options.auth = {
+                        user,
+                        pass,
+                        sendImmediately: scheme === 'Basic'
+                    };
+                }
+            }
+        }
+
+        // set certificate
+        let certificate = this.getRequestCertificate(httpRequest.url);
+        if (certificate) {
+            options.cert = certificate.cert;
+            options.key = certificate.key;
+            options.pfx = certificate.pfx;
+            options.passphrase = certificate.passphrase;
+        }
+
+        // set proxy
+        if (this._settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, this._settings.excludeHostsForProxy)) {
+            const proxyEndpoint = url.parse(this._settings.proxy);
+            if (/^https?:$/.test(proxyEndpoint.protocol)) {
+                const proxyOptions = {
+                    host: proxyEndpoint.hostname,
+                    port: +proxyEndpoint.port,
+                    rejectUnauthorized: this._settings.proxyStrictSSL
+                };
+
+                options.agent = httpRequest.url.startsWith('http:')
+                    ? new HttpProxyAgent(proxyOptions)
+                    : new HttpsProxyAgent(proxyOptions);
+            }
+        }
+
+        if (!options.headers) {
+            options.headers = httpRequest.headers = {};
+        }
+
+        // add default headers if not specified
+        for (let header in this._settings.defaultHeaders) {
+            if (!hasHeader(options.headers, header) && (header.toLowerCase() !== 'host' || httpRequest.url[0] === '/')) {
+                const value = this._settings.defaultHeaders[header];
+                if (value) {
+                    options.headers[header] = value;
+                }
+            }
+        }
+
+        return options;
     }
 
     private async convertStreamToBuffer(stream: Stream): Promise<Buffer> {
@@ -240,8 +250,6 @@ export class HttpClient {
                 }
             }
             return new HostCertificate(cert, key, pfx, certificate.passphrase);
-        } else {
-            return new HostCertificate();
         }
     }
 
