@@ -1,4 +1,4 @@
-import { CharacterPair, languages, ViewColumn, workspace, WorkspaceConfiguration } from 'vscode';
+import { CharacterPair, languages, ViewColumn, workspace } from 'vscode';
 import configuration from '../../language-configuration.json';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { Headers } from './base';
@@ -86,7 +86,8 @@ export class RestClientSettings implements IRestClientSettings {
     }
 
     private initializeSettings() {
-        let restClientSettings = this.getWorkspaceConfiguration("rest-client");
+        const document = getCurrentTextDocument();
+        const restClientSettings = workspace.getConfiguration("rest-client", document ? document.uri : null);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultHeaders = restClientSettings.get<Headers>("defaultHeaders", {"User-Agent": "vscode-restclient"});
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
@@ -118,18 +119,9 @@ export class RestClientSettings implements IRestClientSettings {
         this.decodeEscapedUnicodeCharacters = restClientSettings.get<boolean>('decodeEscapedUnicodeCharacters', false);
         languages.setLanguageConfiguration('http', { brackets: this.addRequestBodyLineIndentationAroundBrackets ? this.brackets : [] });
 
-        let httpSettings = this.getWorkspaceConfiguration("http");
+        const httpSettings = workspace.getConfiguration("http");
         this.proxy = httpSettings.get<string>('proxy', undefined);
         this.proxyStrictSSL = httpSettings.get<boolean>('proxyStrictSSL', false);
-    }
-
-    private getWorkspaceConfiguration(section: string): WorkspaceConfiguration {
-        const document = getCurrentTextDocument();
-        if (document) {
-            return workspace.getConfiguration(section, document.uri);
-        } else {
-            return workspace.getConfiguration(section);
-        }
     }
 
     private parseColumn(value: string): ViewColumn {
