@@ -144,7 +144,6 @@ export class HttpClient {
             encoding: null,
             time: true,
             timeout: this._settings.timeoutInMilliseconds,
-            gzip: true,
             followRedirect: this._settings.followRedirect,
             jar: this._settings.rememberCookiesForSubsequentRequests ? request.jar(new cookieStore(PersistUtility.cookieFilePath)) : false,
             forever: true
