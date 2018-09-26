@@ -30,6 +30,7 @@ export async function activate(context: ExtensionContext) {
     let environmentController = new EnvironmentController(await EnvironmentController.getCurrentEnvironment());
     context.subscriptions.push(requestController);
     context.subscriptions.push(historyController);
+    context.subscriptions.push(responseController);
     context.subscriptions.push(codeSnippetController);
     context.subscriptions.push(environmentController);
     context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, range: Range) => requestController.run(range))));
