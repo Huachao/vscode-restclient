@@ -1,4 +1,4 @@
-import { CharacterPair, languages, ViewColumn, workspace } from 'vscode';
+import { CharacterPair, languages, ViewColumn, window, workspace } from 'vscode';
 import configuration from '../../language-configuration.json';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { Headers } from './base';
@@ -80,6 +80,11 @@ export class RestClientSettings implements IRestClientSettings {
         this.brackets = configuration.brackets as CharacterPair[];
         workspace.onDidChangeConfiguration(() => {
             this.initializeSettings();
+        });
+        window.onDidChangeActiveTextEditor((e) => {
+            if (e) {
+                this.initializeSettings();
+            }
         });
 
         this.initializeSettings();
