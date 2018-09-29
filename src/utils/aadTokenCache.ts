@@ -16,4 +16,4 @@ export class AadTokenCache {
     public static clear(): void {
         AadTokenCache.cache.clear();
     }
- }
+}
