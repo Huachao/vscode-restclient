@@ -1,7 +1,7 @@
 "use strict";
 
 import { EOL } from 'os';
-import { QuickInputButtons, window } from 'vscode';
+import { QuickInputButtons, window, QuickPickItem } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
@@ -17,6 +17,25 @@ import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 const clipboardy = require('clipboardy');
 const encodeUrl = require('encodeurl');
 const HTTPSnippet = require('httpsnippet');
+
+interface CodeSnippetTargetQuickPickItem extends QuickPickItem {
+    target: {
+        key: string;
+        title: string;
+        clients: [{
+            title: string;
+            link: string,
+            description: string
+        }]
+    };
+}
+
+interface CodeSnippetClientQuickPickItem extends CodeSnippetTargetQuickPickItem {
+    client: {
+        key: string;
+        title: string;
+    };
+}
 
 export class CodeSnippetController {
     private static _availableTargets = HTTPSnippet.availableTargets();
@@ -63,7 +82,7 @@ export class CodeSnippetController {
 
         if (CodeSnippetController._availableTargets) {
             const quickPick = window.createQuickPick();
-            const targetQuickPickItems = CodeSnippetController._availableTargets.map(target => ({ label: target.title, target }));
+            const targetQuickPickItems: CodeSnippetTargetQuickPickItem[] = CodeSnippetController._availableTargets.map(target => ({ label: target.title, target }));
             quickPick.title = 'Generate Code Snippet';
             quickPick.step = 1;
             quickPick.totalSteps = 2;
@@ -81,18 +100,18 @@ export class CodeSnippetController {
                     if (quickPick.step === 1) {
                         quickPick.step++;
                         quickPick.buttons = [QuickInputButtons.Back];
-                        quickPick.items = (selection[0] as any).target.clients.map(
+                        const targetItem = selection[0] as CodeSnippetTargetQuickPickItem;
+                        quickPick.items = targetItem.target.clients.map(
                             client => ({
                                 label: client.title,
                                 description: client.description,
                                 detail: client.link,
-                                target: (selection[0] as any).target,
+                                target: targetItem.target,
                                 client
                             })
                         );
-                        console.error(quickPick);
                     } else if (quickPick.step === 2) {
-                        const { target: { key: tk, title: tt }, client: { key: ck, title: ct } } = (selection[0] as any);
+                        const { target: { key: tk, title: tt }, client: { key: ck, title: ct } } = (selection[0] as CodeSnippetClientQuickPickItem);
                         Telemetry.sendEvent('Generate Code Snippet', { 'target': tk, 'client': ck });
                         let result = snippet.convert(tk, ck);
                         this._convertedResult = result;
