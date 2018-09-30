@@ -1,7 +1,7 @@
 "use strict";
 
 import { EOL } from 'os';
-import { QuickInputButtons, window, QuickPickItem } from 'vscode';
+import { QuickInputButtons, QuickPickItem, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
