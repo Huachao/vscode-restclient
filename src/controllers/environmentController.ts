@@ -63,25 +63,6 @@ export class EnvironmentController {
         return currentEnvironment;
     }
 
-    public static async getCustomVariables(environment: EnvironmentPickItem = null): Promise<Map<string, string>> {
-        if (!environment) {
-            environment = await EnvironmentController.getCurrentEnvironment();
-        }
-
-        let environments = EnvironmentController.settings.environmentVariables;
-        let variables = {};
-        Object.assign(
-            variables,
-            environments[EnvironmentController.sharedEnvironmentName] || {},
-            environments[environment.name] || {});
-
-        const map = new Map<string, string>();
-        Object.keys(variables).forEach(key => {
-            map.set(key, variables[key]);
-        });
-        return map;
-    }
-
     public dispose() {
     }
 }

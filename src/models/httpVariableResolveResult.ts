@@ -14,7 +14,7 @@ export const enum ResolveErrorMessage {
     NoRequestVariablePath = 'Request variable path is not provided',
     InvalidRequestVariableReference = 'Incorrect request variable reference syntax, it should be "variableName.(response|request).(headers|body).(headerName|JSONPath|XPath)"',
     SystemVariableNotExist = 'System variable does not exist',
-    EnviornmentVariableNotExist = 'Environment variable does not exist',
+    EnvironmentVariableNotExist = 'Environment variable does not exist',
     FileVariableNotExist = 'File variable does not exist',
     RequestVariableNotExist =  'Request variable does not exist',
 }

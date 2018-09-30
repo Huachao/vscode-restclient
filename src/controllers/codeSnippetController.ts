@@ -1,13 +1,9 @@
 "use strict";
 
 import { EOL } from 'os';
-import { window } from 'vscode';
+import { QuickInputButtons, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
-import { CodeSnippetClient } from '../models/codeSnippetClient';
-import { CodeSnippetClientQuickPickItem } from '../models/codeSnippetClientPickItem';
-import { CodeSnippetTarget } from '../models/codeSnippetTarget';
-import { CodeSnippetTargetQuickPickItem } from '../models/codeSnippetTargetPickItem';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -66,53 +62,50 @@ export class CodeSnippetController {
         let snippet = new HTTPSnippet(harHttpRequest);
 
         if (CodeSnippetController._availableTargets) {
-            let targetsPickList: CodeSnippetTargetQuickPickItem[] = CodeSnippetController._availableTargets.map(target => {
-                let item = new CodeSnippetTargetQuickPickItem();
-                item.label = target.title;
-                item.rawTarget = new CodeSnippetTarget();
-                item.rawTarget.default = target.default;
-                item.rawTarget.extname = target.extname;
-                item.rawTarget.key = target.key;
-                item.rawTarget.title = target.title;
-                item.rawTarget.clients = target.clients.map(client => {
-                    let clientItem = new CodeSnippetClient();
-                    clientItem.key = client.key;
-                    clientItem.link = client.link;
-                    clientItem.title = client.title;
-                    clientItem.description = client.description;
-
-                    return clientItem;
-                });
-
-                return item;
+            const quickPick = window.createQuickPick();
+            const targetQuickPickItems = CodeSnippetController._availableTargets.map(target => ({ label: target.title, target }));
+            quickPick.title = 'Generate Code Snippet';
+            quickPick.step = 1;
+            quickPick.totalSteps = 2;
+            quickPick.items = targetQuickPickItems;
+            quickPick.matchOnDescription = true;
+            quickPick.matchOnDetail = true;
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.onDidTriggerButton(() => {
+                quickPick.step--;
+                quickPick.buttons = [];
+                quickPick.items = targetQuickPickItems;
             });
+            quickPick.onDidChangeSelection(selection => {
+                if (selection[0]) {
+                    if (quickPick.step === 1) {
+                        quickPick.step++;
+                        quickPick.buttons = [QuickInputButtons.Back];
+                        quickPick.items = (selection[0] as any).target.clients.map(
+                            client => ({
+                                label: client.title,
+                                description: client.description,
+                                detail: client.link,
+                                target: (selection[0] as any).target,
+                                client
+                            })
+                        );
+                        console.error(quickPick);
+                    } else if (quickPick.step === 2) {
+                        const { target: { key: tk, title: tt }, client: { key: ck, title: ct } } = (selection[0] as any);
+                        Telemetry.sendEvent('Generate Code Snippet', { 'target': tk, 'client': ck });
+                        let result = snippet.convert(tk, ck);
+                        this._convertedResult = result;
 
-            let item = await window.showQuickPick(targetsPickList, { placeHolder: "" });
-            if (!item) {
-                return;
-            } else {
-                let clientsPickList: CodeSnippetClientQuickPickItem[] = item.rawTarget.clients.map(client => {
-                    let item = new CodeSnippetClientQuickPickItem();
-                    item.label = client.title;
-                    item.description = client.description;
-                    item.detail = client.link;
-                    item.rawClient = client;
-                    return item;
-                });
-
-                let client = await window.showQuickPick(clientsPickList, { placeHolder: "" });
-                if (client) {
-                    Telemetry.sendEvent('Generate Code Snippet', { 'target': item.rawTarget.key, 'client': client.rawClient.key });
-                    let result = snippet.convert(item.rawTarget.key, client.rawClient.key);
-                    this._convertedResult = result;
-
-                    try {
-                        this._webview.render(result, `${item.rawTarget.title}-${client.rawClient.title}`, item.rawTarget.key);
-                    } catch (reason) {
-                        window.showErrorMessage(reason);
+                        try {
+                            this._webview.render(result, `${tt}-${ct}`, tk);
+                        } catch (reason) {
+                            window.showErrorMessage(reason);
+                        }
                     }
                 }
-            }
+            });
+            quickPick.show();
         } else {
             window.showInformationMessage('No available code snippet convert targets');
         }
