@@ -30,7 +30,7 @@ export const enum ResolveWarningMessage {
     IncorrectDateTimeVariableFormat = 'Datetime system variable should follow format "{{$datetime rfc1123|iso8601 [integer y|Q|M|w|d|h|m|s|ms]}}"',
     IncorrectHeaderName = 'No value is resolved for given header name',
     IncorrectJSONPath = 'No value is resolved for given JSONPath',
-    IncorrectRandomIntegerVariableFormat = 'RandomInt sytem variable should follow format "{{$randomInt minInteger maxInteger}}"',
+    IncorrectRandomIntegerVariableFormat = 'RandomInt system variable should follow format "{{$randomInt minInteger maxInteger}}"',
     IncorrectTimestampVariableFormat = 'Timestamp system variable should follow format "{{$timestamp [integer y|Q|M|w|d|h|m|s|ms]}}"',
     IncorrectXPath = 'No value is resolved for given XPath',
     UnsupportedBodyContentType = 'Only JSON response/request body is supported to query the result',

@@ -25,7 +25,7 @@
 * __Bug Fix__: [Do not empty rulesets](https://github.com/Huachao/vscode-restclient/pull/203) ([@mtxr](https://github.com/mtxr))
 * __Bug Fix__: Fix document link broken
 * __Improvement__: Add syntax highlight for curl requests in http file
-* __Improvement__: Improve cpu usage to eliminate unncessary allocation for Regex inside loop
+* __Improvement__: Improve cpu usage to eliminate unnecessary allocation for Regex inside loop
 
 ## 0.18.3 (2018/4/23)
 * __Feature__: [Support multiline x-www-form-urlencoded request body](https://github.com/Huachao/vscode-restclient/issues/169)

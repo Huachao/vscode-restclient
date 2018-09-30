@@ -18,14 +18,14 @@ export class VariableProcessor {
     ];
 
     public static async processRawRequest(request: string) {
-        const variableRefercenceRegex = /\{{2}(.+?)\}{2}/g;
+        const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;
         let result = '';
         let match: RegExpExecArray;
         let lastIndex = 0;
         variable:
-        while (match = variableRefercenceRegex.exec(request)) {
+        while (match = variableReferenceRegex.exec(request)) {
             result += request.substring(lastIndex, match.index);
-            lastIndex = variableRefercenceRegex.lastIndex;
+            lastIndex = variableReferenceRegex.lastIndex;
             const name = match[1].trim();
             const document = window.activeTextEditor.document;
             const context = { rawRequest: request, parsedRequest: result };

@@ -83,14 +83,14 @@ export class FileVariableProvider implements HttpVariableProvider {
     }
 
     private async processFileVariableValue(document: TextDocument, value: string): Promise<string> {
-        const variableRefercenceRegex = /\{{2}(.+?)\}{2}/g;
+        const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;
         let result = '';
         let match: RegExpExecArray;
         let lastIndex = 0;
         variable:
-        while (match = variableRefercenceRegex.exec(value)) {
+        while (match = variableReferenceRegex.exec(value)) {
             result += value.substring(lastIndex, match.index);
-            lastIndex = variableRefercenceRegex.lastIndex;
+            lastIndex = variableReferenceRegex.lastIndex;
             const name = match[1].trim();
             const context = { rawRequest: value, parsedRequest: result };
             for (const provider of this.innerVariableProviders) {

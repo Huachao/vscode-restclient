@@ -10,7 +10,7 @@ import { HttpVariableProvider, HttpVariableValue } from './httpVariableProvider'
 export class EnvironmentVariableProvider implements HttpVariableProvider {
     private static _instance: EnvironmentVariableProvider;
 
-    private readonly _setttings: RestClientSettings = RestClientSettings.Instance;
+    private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
     public static get Instance(): EnvironmentVariableProvider {
         if (!EnvironmentVariableProvider._instance) {
@@ -46,7 +46,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
 
     private async getAvailableVariables(): Promise<{ [key: string]: string }> {
         const { name: environmentName } = await EnvironmentController.getCurrentEnvironment();
-        const variables = this._setttings.environmentVariables;
+        const variables = this._settings.environmentVariables;
         const currentEnvironmentVariables = variables[environmentName];
         const sharedEnvironmentVariables = variables[EnvironmentController.sharedEnvironmentName];
         return Object.assign({}, sharedEnvironmentVariables, currentEnvironmentVariables);

@@ -15,7 +15,7 @@ const clipboardy = require('clipboardy');
 
 export class ResponseController {
     public static responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
-    public static responseBodySaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseBodyDownloadFolerName);
+    public static responseBodySaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseBodyDownloadFolderName);
 
     public constructor() {
         fs.ensureDir(ResponseController.responseSaveFolderPath);

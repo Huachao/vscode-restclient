@@ -61,11 +61,11 @@ export class RequestVariableProvider implements HttpVariableProvider {
         const fileContent = document.getText();
         const fileHash = calculateMD5Hash(fileContent);
         if (!this.cache.has(file) || fileHash !== this.fileMD5Hash.get(file)) {
-            const requestVariableRefenceRegex = new RegExp(Constants.RequestVariableDefinitionWithNameRegexFactory('\\w+'), 'mg');
+            const requestVariableReferenceRegex = new RegExp(Constants.RequestVariableDefinitionWithNameRegexFactory('\\w+'), 'mg');
 
             const variableNames = new Set<string>();
             let match: RegExpExecArray;
-            while (match = requestVariableRefenceRegex.exec(fileContent)) {
+            while (match = requestVariableReferenceRegex.exec(fileContent)) {
                 const name = match[1];
                 variableNames.add(name);
             }
