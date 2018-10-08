@@ -1,3 +1,17 @@
+## 0.20.0 (2018/10/8)
+* __Feature__: [Support file variables reference request variables](https://github.com/Huachao/vscode-restclient/issues/181)
+* __Feature__: [Support resolve the full response body regardless of the response content type](https://github.com/Huachao/vscode-restclient/issues/188)
+* __Bug Fix__: [Fix Https proxy issue](https://github.com/Huachao/vscode-restclient/issues/255)
+* __Bug Fix__: [Reload configuration when switching active text editor](https://github.com/Huachao/vscode-restclient/issues/245)
+* __Bug Fix__: Fix incorrect http symbol range
+* __Bug Fix__: Ensure response saving directory existence before saving
+* __Improvement__: Add icon for response webview tab
+* __Improvement__: [Switch JSON formatting library from `jsonc-parser` to `js-beautify`](https://github.com/Huachao/vscode-restclient/pull/233) ([@ygraber](https://github.com/ygraber))
+* __Improvement__: [Treat the mime type of response body is `application/json` if the body itself is a `JSON` string](https://github.com/Huachao/vscode-restclient/issues/239)
+* __Improvement__: [Unset gzip setting to avoid adding `Accept-Encoding` header automatically](https://github.com/Huachao/vscode-restclient/issues/256)
+* __Improvement__: [Upgrade applicationinsights to latest version to avoid monkey patching](https://github.com/Huachao/vscode-restclient/issues/260)
+
+
 ## 0.19.1 (2018/8/7)
 * __Bug Fix__: [Make Azure AAD Auth respect the audience](https://github.com/Huachao/vscode-restclient/issues/225)
 * __Bug Fix__: [Fix curl command can't be run on Windows](https://github.com/Huachao/vscode-restclient/issues/227)

@@ -323,7 +323,7 @@ Environments and including variables are defined directly in `Visual Studio Code
 ## Variables
 We support two types of variables, one is __Custom Variables__ which is defined by user and can be further divided into __Environment Variables__, __File Variables__ and __Request Variables__, the other is __System Variables__ which is a predefined set of variables out-of-box.
 
-The reference syntax of system and custom variables types has a subtle difference, for the former the syntax is `{{$SystemVariableName}}`, while for the latter the syntax is `{{CustomVariableName}}`, without preceding `$` before variable name. The definition syntax and location for different types of custom variables are obviously different. Notice that when the same name used for custom variable, request variables takes higher resolving precedence over file variables, file variables takes higher precedence over environment variables.
+The reference syntax of system and custom variables types has a subtle difference, for the former the syntax is `{{$SystemVariableName}}`, while for the latter the syntax is `{{CustomVariableName}}`, without preceding `$` before variable name. The definition syntax and location for different types of custom variables are obviously different. Notice that when the same name used for custom variables, request variables takes higher resolving precedence over file variables, file variables takes higher precedence over environment variables.
 
 ### Custom Variables
 Custom variables can cover different user scenarios with the benefit of environment variables, file variables, and request variables. Environment variables are mainly used for storing values that may vary in different environments. Since environment variables are directly defined in Visual Studio Code setting file, they can be referenced across different `http` files. File variables are mainly used for representing values that are constant throughout the `http` file. Request variables are used for the chaining requests scenarios which means a request needs to reference some part(header or body) of another request/response in the _same_ `http` file, imagine we need to retrieve the auth token dynamically from the login response, request variable fits the case well. Both file and request variables are defined in the `http` file and only have __File Scope__.
@@ -353,7 +353,9 @@ Authorization: {{token}}
 ```
 
 #### File Variables
-For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contains any spaces. As for variable value, it can be consist of any characters, even whitespaces are allowed for them (Leading and trailing whitespaces will be stripped). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variables can be defined in a separate request block only filled with variable definitions, as well as define request variables before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the file variables in the `http` file, they can be referenced in any requests of whole file. For file variables, you can also benefit from some `Visual Studio Code` features like _Go To Definition_ and _Find All References_. Below is a sample of file variable definitions and references in an `http` file.
+For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contains any spaces. As for variable value, it can be consist of any characters, even whitespaces are allowed for them (Leading and trailing whitespaces will be stripped). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variable value can even contain references to the [request variables](#request-variables) like `@token = {{loginAPI.response.body.token}}`.
+
+File variables can be defined in a separate request block only filled with variable definitions, as well as define request variables before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the file variables in the `http` file, they can be referenced in any requests of whole file. For file variables, you can also benefit from some `Visual Studio Code` features like _Go To Definition_ and _Find All References_. Below is a sample of file variable definitions and references in an `http` file.
 
 ```http
 @host = api.example.com
@@ -379,7 +381,7 @@ Content-Type: {{contentType}}
 #### Request Variables
 For request variables, they are similar to file variables in some aspects, like scope and definition location. However, they have some obvious differences. The definition syntax of request variables is just like a single-line comment, and follows __`// @name requestName`__ or __`# @name requestName`__ just before the desired request url. You can think of request variable as attaching a *name metadata* to the underlying request, and this kind of requests can be called with **Named Request**, while normal requests can be called with **Anonymous Request**. Other requests can use `requestName` as an identifier to reference the expected part of the named request or its latest response. Notice that if you want to refer the response of a named request, you need to manually trigger the named request to retrieve its response first, otherwise the plain text of variable reference like `{{requestName.response.body.$.id}}` will be sent instead.
 
-The reference syntax of a request variable is a bit more complex than other kinds of custom variables. The request variable reference syntax follows `{{requestName.(response|request).(body|headers).(JSONPath|XPath|Header Name)}}`. You have two reference part choices of the response or request: *body* and *headers*. For *body* part, it only works for `JSON` and `XML` responses, you can use [JSONPath](http://goessner.net/articles/JsonPath/) and [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) to extract specific property or attribute. For example, if a JSON response returns body `{"id": "mock"}`, you can set the JSONPath part to `$.id` to reference the id. For *headers* part, you can specify the header name to extract the header value. Additionally, the header name is *case-insensitive*.
+The reference syntax of a request variable is a bit more complex than other kinds of custom variables. The request variable reference syntax follows `{{requestName.(response|request).(body|headers).(*|JSONPath|XPath|Header Name)}}`. You have two reference part choices of the response or request: *body* and *headers*. For *body* part, you can use `*` to reference the full response body, and for `JSON` and `XML` responses, you can use [JSONPath](http://goessner.net/articles/JsonPath/) and [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) to extract specific property or attribute. For example, if a JSON response returns body `{"id": "mock"}`, you can set the JSONPath part to `$.id` to reference the id. For *headers* part, you can specify the header name to extract the header value. Additionally, the header name is *case-insensitive*.
 
 > If the *JSONPath* or *XPath* of body, or *Header Name* of headers can't be resolved, the plain text of variable reference will be sent instead. And in this case, diagnostic information will be displayed to help you to inspect this. And you can also hover over the request variables to view the actual resolved value.
 
@@ -396,9 +398,11 @@ name=foo&password=bar
 
 ###
 
+@authToken = {{login.response.headers.X-AuthToken}}
+
 # @name createComment
 POST {{baseUrl}}/comments HTTP/1.1
-Authorization: {{login.response.headers.X-AuthToken}}
+Authorization: {{authToken}}
 Content-Type: application/json
 
 {
@@ -407,20 +411,22 @@ Content-Type: application/json
 
 ###
 
+@commentId = {{createComment.response.body.$.id}}
+
 # @name getCreatedComment
-GET {{baseUrl}}/comments/{{createComment.response.body.$.id}} HTTP/1.1
-Authorization: {{login.response.headers.X-AuthToken}}
+GET {{baseUrl}}/comments/{{commentId}} HTTP/1.1
+Authorization: {{authToken}}
 
 ###
 
 # @name getReplies
-GET {{baseUrl}}/comments/{{createComment.response.body.$.id}}/replies HTTP/1.1
+GET {{baseUrl}}/comments/{{commentId}}/replies HTTP/1.1
 Accept: application/xml
 
 ###
 
 # @name getFirstReply
-GET {{baseUrl}}/comments/{{createComment.response.body.$.id}}/replies/{{getReplies.response.body.//reply[1]/@id}}
+GET {{baseUrl}}/comments/{{commentId}}/replies/{{getReplies.response.body.//reply[1]/@id}}
 
 ```
 

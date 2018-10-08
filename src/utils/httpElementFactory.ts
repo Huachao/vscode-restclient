@@ -152,7 +152,7 @@ export class HttpElementFactory {
                     ElementType.RequestCustomVariable,
                     null,
                     v,
-                    new SnippetString(`{{${name}.\${1|request,response|}.\${2|headers,body|}.\${3:Header Name, JSONPath or XPath}}}`)));
+                    new SnippetString(`{{${name}.\${1|request,response|}.\${2|headers,body|}.\${3:Header Name, *(Full Body), JSONPath or XPath}}}`)));
         }
 
         // add urls from history
