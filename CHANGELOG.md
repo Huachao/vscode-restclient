@@ -1,3 +1,6 @@
+## 0.20.1 (2018/10/9)
+* __Bug Fix__: [Broken works with certificates](https://github.com/Huachao/vscode-restclient/issues/263)
+
 ## 0.20.0 (2018/10/8)
 * __Feature__: [Support file variables reference request variables](https://github.com/Huachao/vscode-restclient/issues/181)
 * __Feature__: [Support resolve the full response body regardless of the response content type](https://github.com/Huachao/vscode-restclient/issues/188)
