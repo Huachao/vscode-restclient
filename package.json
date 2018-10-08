@@ -518,7 +518,7 @@
     "tslint": "tslint --project tsconfig.json -e 'language-configuration.json'"
   },
   "devDependencies": {
-    "@types/fs-extra": "5.0.2",
+    "@types/fs-extra": "^5.0.4",
     "@types/mocha": "^2.2.32",
     "@types/node": "^8.10.25",
     "mocha": "^3.2.0",
