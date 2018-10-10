@@ -12,7 +12,7 @@ import { HttpClient } from '../httpClient';
 import { HttpVariableContext, HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
 
 const clipboardy = require('clipboardy');
-const uuid = require('node-uuid');
+const uuidv4 = require('uuid/v4');
 
 type systemVariableValue = Pick<HttpVariableValue, Exclude<keyof HttpVariableValue, 'name'>>;
 type resolveSystemVariableFunc = (name: string, context: HttpVariableContext) => Promise<systemVariableValue>;
@@ -103,7 +103,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     }
 
     private registerGuidVariable() {
-        this.resolveFuncs.set(Constants.GuidVariableName, async name => ({ value: uuid.v4() }));
+        this.resolveFuncs.set(Constants.GuidVariableName, async name => ({ value: uuidv4() }));
     }
 
     private registerRandomIntVariable() {

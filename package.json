@@ -546,11 +546,11 @@
     "jsonpath": "^1.0.0",
     "mime-types": "^2.1.14",
     "moment": "^2.20.1",
-    "node-uuid": "^1.4.7",
     "pretty-data": "^0.40.0",
     "request": "^2.81.0",
     "tmp": "^0.0.31",
     "tough-cookie-file-store-bugfix": "Huachao/tough-cookie-file-store-bugfix",
+    "uuid": "^3.3.2",
     "xmldom": "^0.1.27",
     "xpath": "0.0.27",
     "yargs": "^6.0.0"

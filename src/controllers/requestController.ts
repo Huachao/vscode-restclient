@@ -25,7 +25,7 @@ const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();
 
 const filesize = require('filesize');
-const uuid = require('node-uuid');
+const uuidv4 = require('uuid/v4');
 
 export class RequestController {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
@@ -122,7 +122,7 @@ export class RequestController {
     }
 
     private async runCore(httpRequest: HttpRequest) {
-        let requestId = uuid.v4();
+        let requestId = uuidv4();
         this._requestStore.add(<string>requestId, httpRequest);
 
         // clear status bar
