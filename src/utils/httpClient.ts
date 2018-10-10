@@ -18,8 +18,6 @@ import { PersistUtility } from './persistUtility';
 import { getWorkspaceRootPath } from './workspaceUtility';
 
 const encodeUrl = require('encodeurl');
-const HttpProxyAgent = require('http-proxy-agent');
-const HttpsProxyAgent = require('https-proxy-agent');
 const request = require('request');
 const cookieStore = require('tough-cookie-file-store-bugfix');
 
@@ -187,9 +185,11 @@ export class HttpClient {
                     rejectUnauthorized: this._settings.proxyStrictSSL
                 };
 
-                options.agent = httpRequest.url.startsWith('http:')
-                    ? new HttpProxyAgent(proxyOptions)
-                    : new HttpsProxyAgent(proxyOptions);
+                const ctor = (httpRequest.url.startsWith('http:')
+                    ? await import('http-proxy-agent')
+                    : await import('https-proxy-agent')).default;
+
+                options.agent = new ctor(proxyOptions);
             }
         }
 
