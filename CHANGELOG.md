@@ -1,3 +1,6 @@
+## 0.20.2 (2018/10/10)
+* __Bug Fix__: [Recognize file variable value contains whitespaces](https://github.com/Huachao/vscode-restclient/issues/264)
+
 ## 0.20.1 (2018/10/9)
 * __Bug Fix__: [Broken works with certificates](https://github.com/Huachao/vscode-restclient/issues/263)
 
