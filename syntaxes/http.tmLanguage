@@ -40,7 +40,7 @@
             </dict>
             <dict>
                 <key>begin</key>
-                <string>^\s*(?=[\{\[])</string>
+                <string>\s*(?=(\[|{[^{]))</string>
                 <key>name</key>
                 <string>http.request.body.json</string>
                 <key>end</key>
