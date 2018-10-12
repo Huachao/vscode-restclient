@@ -267,7 +267,7 @@ export class HttpClient {
         }
 
         let resolvedUrl = url.parse(requestUrl);
-        let hostName = resolvedUrl.hostname.toLowerCase();
+        let hostName = resolvedUrl.hostname && resolvedUrl.hostname.toLowerCase();
         let port = resolvedUrl.port;
         let excludeHostsProxyList = Array.from(new Set(excludeHostsForProxy.map(eh => eh.toLowerCase())));
 
