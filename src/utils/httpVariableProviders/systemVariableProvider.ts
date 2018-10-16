@@ -14,12 +14,12 @@ import { HttpVariableContext, HttpVariableProvider, HttpVariableValue } from './
 const clipboardy = require('clipboardy');
 const uuidv4 = require('uuid/v4');
 
-type systemVariableValue = Pick<HttpVariableValue, Exclude<keyof HttpVariableValue, 'name'>>;
-type resolveSystemVariableFunc = (name: string, context: HttpVariableContext) => Promise<systemVariableValue>;
+type SystemVariableValue = Pick<HttpVariableValue, Exclude<keyof HttpVariableValue, 'name'>>;
+type ResolveSystemVariableFunc = (name: string, context: HttpVariableContext) => Promise<SystemVariableValue>;
 
 export class SystemVariableProvider implements HttpVariableProvider {
 
-    private readonly resolveFuncs: Map<string, resolveSystemVariableFunc> = new Map<string, resolveSystemVariableFunc>();
+    private readonly resolveFuncs: Map<string, ResolveSystemVariableFunc> = new Map<string, ResolveSystemVariableFunc>();
 
     private readonly timestampRegex: RegExp = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly datetimeRegex: RegExp = new RegExp(`\\${Constants.DateTimeVariableName}\\s(rfc1123|iso8601)(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
