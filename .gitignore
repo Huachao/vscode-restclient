@@ -1,5 +1,6 @@
 out
 node_modules
+.vscode-test
 
 # Logs
 npm-debug.log*
