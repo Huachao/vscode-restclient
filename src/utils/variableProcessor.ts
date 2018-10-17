@@ -2,6 +2,7 @@
 
 import { TextDocument, window } from 'vscode';
 import { VariableType } from "../models/variableType";
+import { AadTokenVariableProvider } from './httpVariableProviders/aadTokenVariableProvider';
 import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
 import { HttpVariableProvider } from './httpVariableProviders/httpVariableProvider';
@@ -11,6 +12,7 @@ import { SystemVariableProvider } from './httpVariableProviders/systemVariablePr
 export class VariableProcessor {
 
     private static readonly providers: HttpVariableProvider[] = [
+        AadTokenVariableProvider.Instance,
         SystemVariableProvider.Instance,
         RequestVariableProvider.Instance,
         FileVariableProvider.Instance,
