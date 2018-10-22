@@ -250,7 +250,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     }
 
     private addUrlLinks(innerHtml: string) {
-        return innerHtml = autoLinker.link(innerHtml, {
+        return autoLinker.link(innerHtml, {
             urls: {
                 schemeMatches: true,
                 wwwMatches: true,
@@ -259,7 +259,8 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             email: false,
             phone: false,
             stripPrefix: false,
-            stripTrailingSlash: false
+            stripTrailingSlash: false,
+            decodePercentEncoding: false
         });
     }
 
