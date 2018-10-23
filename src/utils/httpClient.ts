@@ -193,6 +193,10 @@ export class HttpClient {
             }
         }
 
+        if (this._settings.proxy && !options.agent) {
+            options.proxy = null;
+        }
+
         if (!options.headers) {
             options.headers = httpRequest.headers = {};
         }
