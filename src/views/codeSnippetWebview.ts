@@ -18,7 +18,7 @@ export class CodeSnippetWebview extends BaseWebview {
         super();
     }
 
-    public render(convertResult: string, title: string, lang: string) {
+    public async render(convertResult: string, title: string, lang: string) {
         let panel: WebviewPanel;
         if (this.panels.length === 0) {
             panel = window.createWebviewPanel(
