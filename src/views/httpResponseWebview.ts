@@ -37,7 +37,7 @@ export class HttpResponseWebview extends BaseWebview {
         this.iconFilePath = Uri.file(path.join(this.extensionPath, Constants.ImagesFolderName, Constants.IconFileName));
     }
 
-    public render(response: HttpResponse, column: ViewColumn) {
+    public async render(response: HttpResponse, column: ViewColumn) {
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
@@ -250,7 +250,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     }
 
     private addUrlLinks(innerHtml: string) {
-        return innerHtml = autoLinker.link(innerHtml, {
+        return autoLinker.link(innerHtml, {
             urls: {
                 schemeMatches: true,
                 wwwMatches: true,
@@ -259,7 +259,8 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             email: false,
             phone: false,
             stripPrefix: false,
-            stripTrailingSlash: false
+            stripTrailingSlash: false,
+            decodePercentEncoding: false
         });
     }
 
