@@ -28,7 +28,7 @@ export class AadTokenVariableProvider implements HttpVariableProvider {
         return AadTokenVariableProvider._instance;
     }
 
-    public readonly type: VariableType = VariableType.AadToken;
+    public readonly type: VariableType = VariableType.System;
 
     public async has(document: TextDocument, name: string, context: HttpVariableContext): Promise<boolean> {
         const [variableName] = name.split(' ').filter(Boolean);
