@@ -94,7 +94,11 @@ export class RestClientSettings implements IRestClientSettings {
         const document = getCurrentTextDocument();
         const restClientSettings = workspace.getConfiguration("rest-client", document ? document.uri : null);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
-        this.defaultHeaders = restClientSettings.get<Headers>("defaultHeaders", {"User-Agent": "vscode-restclient"});
+        this.defaultHeaders = restClientSettings.get<Headers>("defaultHeaders",
+                                                              {
+                                                                  "User-Agent": "vscode-restclient",
+                                                                  "Accept-Encoding": "gzip"
+                                                              });
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
         this.rememberCookiesForSubsequentRequests = restClientSettings.get<boolean>("rememberCookiesForSubsequentRequests", true);
         this.timeoutInMilliseconds = restClientSettings.get<number>("timeoutinmilliseconds", 0);

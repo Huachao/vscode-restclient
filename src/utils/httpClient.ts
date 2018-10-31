@@ -211,6 +211,11 @@ export class HttpClient {
             }
         }
 
+        const acceptEncoding = getHeader(options.headers, 'Accept-Encoding');
+        if (acceptEncoding && acceptEncoding.includes('gzip')) {
+            options.gzip = true;
+        }
+
         return options;
     }
 
