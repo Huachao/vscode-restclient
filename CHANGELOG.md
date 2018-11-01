@@ -1,3 +1,11 @@
+## 0.20.3 (2018/11/1)
+* __Bug Fix__: [Cannot read property 'toLowerCase' of null](https://github.com/Huachao/vscode-restclient/issues/219)
+* __Bug Fix__: [Fix incorrect JSON body rendering for variable reference syntax](https://github.com/Huachao/vscode-restclient/issues/264)
+* __Bug Fix__: [Do not decode percent encoding in response body](https://github.com/Huachao/vscode-restclient/issues/280)
+* __Bug Fix__: [Do not use system environment variables if proxy setting already set](https://github.com/Huachao/vscode-restclient/issues/273)
+* __Bug Fix__: [Handle compressed responses](https://github.com/Huachao/vscode-restclient/issues/282)
+* __Improvement__: Use new `setTextDocumentLanguage` API to refacotr text document view rendering
+
 ## 0.20.2 (2018/10/10)
 * __Bug Fix__: [Recognize file variable value contains whitespaces](https://github.com/Huachao/vscode-restclient/issues/264)
 
