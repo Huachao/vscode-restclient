@@ -86,20 +86,20 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*#{1,}\s*(((@)name)\s+(\S+))?.*$</string>
+                <string>^\s*#{1,}\s*(?:((@)name)\s+(\S+))?.*$</string>
                 <key>captures</key>
                 <dict>
-                    <key>2</key>
+                    <key>1</key>
                     <dict>
                         <key>name</key>
                         <string>storage.type.class.metadata</string>
                     </dict>
-                    <key>3</key>
+                    <key>2</key>
                     <dict>
                         <key>name</key>
                         <string>punctuation.definition.block.tag.metadata</string>
                     </dict>
-                    <key>4</key>
+                    <key>3</key>
                     <dict>
                         <key>name</key>
                         <string>entity.name.type.instance.metadata</string>
@@ -110,20 +110,20 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*/{2,}\s*(((@)name)\s+(\S+))?.*$</string>
+                <string>^\s*/{2,}\s*(?:((@)name)\s+(\S+))?.*$</string>
                 <key>captures</key>
                 <dict>
-                    <key>2</key>
+                    <key>1</key>
                     <dict>
                         <key>name</key>
                         <string>storage.type.class.metadata</string>
                     </dict>
-                    <key>3</key>
+                    <key>2</key>
                     <dict>
                         <key>name</key>
                         <string>punctuation.definition.block.tag.metadata</string>
                     </dict>
-                    <key>4</key>
+                    <key>3</key>
                     <dict>
                         <key>name</key>
                         <string>entity.name.type.instance.metadata</string>
@@ -164,24 +164,24 @@
                         <key>name</key>
                         <string>keyword.control.http</string>
                     </dict>
-                    <key>3</key>
+                    <key>2</key>
                     <dict>
                         <key>name</key>
                         <string>const.language.http</string>
                     </dict>
-                    <key>5</key>
+                    <key>3</key>
                     <dict>
                         <key>name</key>
                         <string>keyword.other.http</string>
                     </dict>
-                    <key>7</key>
+                    <key>4</key>
                     <dict>
                         <key>name</key>
                         <string>constant.numeric.http</string>
                     </dict>
                 </dict>
                 <key>match</key>
-                <string>^(?:((?i)get|post|put|delete|patch|head|options|connect|trace(-?))\s+)?\s*(\S+)(?:\s+(((?i)HTTP(-?))\/(\S+)))?$</string>
+                <string>(?i)^(?:(get|post|put|delete|patch|head|options|connect|trace)\s+)?\s*(\S+)(?:\s+(HTTP)\/(\S+))?$</string>
                 <key>name</key>
                 <string>http.requestline</string>
             </dict>
@@ -212,6 +212,11 @@
                         <key>name</key>
                         <string>keyword.other.http</string>
                     </dict>
+                    <key>2</key>
+                    <dict>
+                        <key>name</key>
+                        <string>constant.numeric.http</string>
+                    </dict>
                     <key>3</key>
                     <dict>
                         <key>name</key>
@@ -220,16 +225,11 @@
                     <key>4</key>
                     <dict>
                         <key>name</key>
-                        <string>constant.numeric.http</string>
-                    </dict>
-                    <key>5</key>
-                    <dict>
-                        <key>name</key>
                         <string>keyword.other.http</string>
                     </dict>
                 </dict>
                 <key>match</key>
-                <string>^\s*((?i)HTTP(-?))\/(\S+)\s([1-5][0-9][0-9])\s(.*)$</string>
+                <string>(?i)^\s*(HTTP)\/(\S+)\s([1-5][0-9][0-9])\s(.*)$</string>
                 <key>name</key>
                 <string>http.responseLine</string>
             </dict>
