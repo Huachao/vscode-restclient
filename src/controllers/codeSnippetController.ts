@@ -95,12 +95,13 @@ export class CodeSnippetController {
                 quickPick.buttons = [];
                 quickPick.items = targetQuickPickItems;
             });
-            quickPick.onDidChangeSelection(selection => {
-                if (selection[0]) {
+            quickPick.onDidAccept(() => {
+                const selectedItem = quickPick.selectedItems[0];
+                if (selectedItem) {
                     if (quickPick.step === 1) {
                         quickPick.step++;
                         quickPick.buttons = [QuickInputButtons.Back];
-                        const targetItem = selection[0] as CodeSnippetTargetQuickPickItem;
+                        const targetItem = selectedItem as CodeSnippetTargetQuickPickItem;
                         quickPick.items = targetItem.target.clients.map(
                             client => ({
                                 label: client.title,
@@ -111,7 +112,7 @@ export class CodeSnippetController {
                             })
                         );
                     } else if (quickPick.step === 2) {
-                        const { target: { key: tk, title: tt }, client: { key: ck, title: ct } } = (selection[0] as CodeSnippetClientQuickPickItem);
+                        const { target: { key: tk, title: tt }, client: { key: ck, title: ct } } = (selectedItem as CodeSnippetClientQuickPickItem);
                         Telemetry.sendEvent('Generate Code Snippet', { 'target': tk, 'client': ck });
                         let result = snippet.convert(tk, ck);
                         this._convertedResult = result;
