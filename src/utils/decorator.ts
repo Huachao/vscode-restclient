@@ -2,8 +2,8 @@
 
 import { Telemetry } from './telemetry';
 
-export function trace(eventName: string) {
-    return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
+export function trace(eventName: string): MethodDecorator {
+    return (target, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
         if (descriptor === undefined) {
             descriptor = Object.getOwnPropertyDescriptor(target, propertyKey);
         }

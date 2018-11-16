@@ -1,11 +1,14 @@
 'use strict';
 
 import { TextDocument } from 'vscode';
-import * as Constants from "../../common/constants";
+import * as Constants from '../../common/constants';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
+import { calculateMD5Hash } from '../misc';
 import { HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
+
+type FileVariableValue = Record<'name' | 'value', string>;
 
 export class FileVariableProvider implements HttpVariableProvider {
     private static _instance: FileVariableProvider;
@@ -28,6 +31,10 @@ export class FileVariableProvider implements HttpVariableProvider {
         RequestVariableProvider.Instance,
     ];
 
+    private readonly cache = new Map<string, FileVariableValue[]>();
+
+    private readonly fileMD5Hash = new Map<string, string>();
+
     private constructor() {
     }
 
@@ -44,42 +51,51 @@ export class FileVariableProvider implements HttpVariableProvider {
         if (!variable) {
             return { name, error: ResolveErrorMessage.FileVariableNotExist };
         } else {
-            return variable;
+            const value = await this.processFileVariableValue(document, variable.value);
+            return { name, value };
         }
     }
 
-    public getAll(document: TextDocument): Promise<HttpVariableValue[]> {
-        return this.getFileVariables(document);
+    public async getAll(document: TextDocument): Promise<HttpVariableValue[]> {
+        const variables = await this.getFileVariables(document);
+        return await Promise.all(variables.map(
+            async ({ name, value }) => {
+                const parsedValue = await this.processFileVariableValue(document, value);
+                return { name, value: parsedValue };
+            }));
     }
 
-    private async getFileVariables(document: TextDocument): Promise<HttpVariableValue[]> {
+    private async getFileVariables(document: TextDocument): Promise<FileVariableValue[]> {
+        const file = document.uri.toString();
         const fileContent = document.getText();
-        const variables: HttpVariableValue[] = [];
-
-        const regex = new RegExp(Constants.FileVariableDefinitionRegex, 'mg');
-
-        let match: RegExpExecArray;
-        while (match = regex.exec(fileContent)) {
-            const key = match[1];
-            const originalValue = await (this.processFileVariableValue(document, match[2]));
-            let value = "";
-            let isPrevCharEscape = false;
-            for (const currentChar of originalValue) {
-                if (isPrevCharEscape) {
-                    isPrevCharEscape = false;
-                    value += this.escapee.get(currentChar) || currentChar;
-                } else {
-                    if (currentChar === "\\") {
-                        isPrevCharEscape = true;
-                        continue;
+        const fileHash = calculateMD5Hash(fileContent);
+        if (!this.cache.has(file) || fileHash !== this.fileMD5Hash.get(file)) {
+            const regex = new RegExp(Constants.FileVariableDefinitionRegex, 'mg');
+            const variables = new Map<string, FileVariableValue>();
+            let match: RegExpExecArray;
+            while (match = regex.exec(fileContent)) {
+                const [, key, originalValue] = match;
+                let value = "";
+                let isPrevCharEscape = false;
+                for (const currentChar of originalValue) {
+                    if (isPrevCharEscape) {
+                        isPrevCharEscape = false;
+                        value += this.escapee.get(currentChar) || currentChar;
+                    } else {
+                        if (currentChar === "\\") {
+                            isPrevCharEscape = true;
+                            continue;
+                        }
+                        value += currentChar;
                     }
-                    value += currentChar;
                 }
+                variables.set(key, { name: key, value });
             }
-            variables.push({ name: key, value });
+            this.cache.set(file, [...variables.values()]);
+            this.fileMD5Hash.set(file, fileHash);
         }
 
-        return variables;
+        return this.cache.get(file);
     }
 
     private async processFileVariableValue(document: TextDocument, value: string): Promise<string> {
