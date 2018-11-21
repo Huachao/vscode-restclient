@@ -51,18 +51,15 @@ export class FileVariableProvider implements HttpVariableProvider {
         if (!variable) {
             return { name, error: ResolveErrorMessage.FileVariableNotExist };
         } else {
-            const value = await this.processFileVariableValue(document, variable.value);
-            return { name, value };
+            const variableMap = await this.resolveFileVariables(document, variables);
+            return { name, value: variableMap.get(name) };
         }
     }
 
     public async getAll(document: TextDocument): Promise<HttpVariableValue[]> {
         const variables = await this.getFileVariables(document);
-        return await Promise.all(variables.map(
-            async ({ name, value }) => {
-                const parsedValue = await this.processFileVariableValue(document, value);
-                return { name, value: parsedValue };
-            }));
+        const variableMap = await this.resolveFileVariables(document, variables);
+        return [...variableMap.entries()].map(([name, value]) => ({ name, value }));
     }
 
     private async getFileVariables(document: TextDocument): Promise<FileVariableValue[]> {
@@ -98,7 +95,63 @@ export class FileVariableProvider implements HttpVariableProvider {
         return this.cache.get(file);
     }
 
-    private async processFileVariableValue(document: TextDocument, value: string): Promise<string> {
+    private async resolveFileVariables(document: TextDocument, variables: FileVariableValue[]): Promise<Map<string, string>> {
+        // Resolve non-file varaibles in variable value
+        const fileVariableNames = new Set(variables.map(v => v.name));
+        const resolvedVariables = await Promise.all(variables.map(
+            async ({name, value}) => {
+                const parsedValue = await this.processNonFileVariableValue(document, value, fileVariableNames);
+                return { name, value: parsedValue };
+            }
+        ));
+
+        const variableMap = new Map(resolvedVariables.map(({name, value}): [string, string] => [name, value]));
+        const dependentVariables = new Map<string, string[]>();
+        const dependencyCount = new Map<string, number>();
+        const noDependencyVariables: string[] = [];
+        for (const [name, value] of variableMap) {
+            const dependentVariableNames = new Set(this.resolveDependentFileVariableNames(value).filter(v => variableMap.has(v)));
+            if (dependentVariableNames.size === 0) {
+                noDependencyVariables.push(name);
+            } else {
+                dependencyCount.set(name, dependentVariableNames.size);
+                dependentVariableNames.forEach(dname => {
+                    if (dependentVariables.has(dname)) {
+                        dependentVariables.get(dname).push(name);
+                    } else {
+                        dependentVariables.set(dname, [name]);
+                    }
+                });
+            }
+        }
+
+        // Resolve all dependent file variables to actual value
+        while (noDependencyVariables.length !== 0) {
+            const current = noDependencyVariables.shift();
+            if (!dependentVariables.has(current)) {
+                continue;
+            }
+            const dependents = dependentVariables.get(current);
+            dependents.forEach(d => {
+                const originalValue = variableMap.get(d);
+                const currentValue = originalValue.replace(
+                    new RegExp(`{{\\s*${current}\s*}}`, 'g'),
+                    variableMap.get(current));
+                variableMap.set(d, currentValue);
+                const newCount = dependencyCount.get(d) - 1;
+                if (newCount === 0) {
+                    noDependencyVariables.push(d);
+                    dependencyCount.delete(d);
+                } else {
+                    dependencyCount.set(d, newCount);
+                }
+            });
+        }
+
+        return variableMap;
+    }
+
+    private async processNonFileVariableValue(document: TextDocument, value: string, variables: Set<string>): Promise<string> {
         const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;
         let result = '';
         let match: RegExpExecArray;
@@ -108,15 +161,17 @@ export class FileVariableProvider implements HttpVariableProvider {
             result += value.substring(lastIndex, match.index);
             lastIndex = variableReferenceRegex.lastIndex;
             const name = match[1].trim();
-            const context = { rawRequest: value, parsedRequest: result };
-            for (const provider of this.innerVariableProviders) {
-                if (await provider.has(document, name, context)) {
-                    const { value, error, warning } = await provider.get(document, name, context);
-                    if (!error && !warning) {
-                        result += value;
-                        continue variable;
-                    } else {
-                        break;
+            if (!variables.has(name)) {
+                const context = { rawRequest: value, parsedRequest: result };
+                for (const provider of this.innerVariableProviders) {
+                    if (await provider.has(document, name, context)) {
+                        const { value, error, warning } = await provider.get(document, name, context);
+                        if (!error && !warning) {
+                            result += value;
+                            continue variable;
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
@@ -124,6 +179,16 @@ export class FileVariableProvider implements HttpVariableProvider {
             result += `{{${name}}}`;
         }
         result += value.substring(lastIndex);
+        return result;
+    }
+
+    private resolveDependentFileVariableNames(value: string): string[] {
+        const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;
+        let match: RegExpExecArray;
+        const result = [];
+        while (match = variableReferenceRegex.exec(value)) {
+            result.push(match[1].trim());
+        }
         return result;
     }
 }
