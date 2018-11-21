@@ -4,6 +4,7 @@ import * as path from 'path';
 import { commands, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { Headers } from '../models/base';
+import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
 import { disposeAll } from '../utils/dispose';
@@ -102,7 +103,7 @@ export class HttpResponseWebview extends BaseWebview {
         if (contentType) {
             contentType = contentType.trim();
         }
-        if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType)) {
+        if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
             innerHtml = `<img src="data:${contentType};base64,${response.bodyBuffer.toString('base64')}">`;
         } else {
             let code = this.highlightResponse(response);
@@ -324,6 +325,10 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             }
             return null;
         }
+    }
+
+    private static isHeadRequest({ request: { method } }: {request: HttpRequest}): boolean {
+        return method && method.toLowerCase() === 'head';
     }
 }
 
