@@ -10,11 +10,11 @@ import { SystemVariableProvider } from './httpVariableProviders/systemVariablePr
 
 export class VariableProcessor {
 
-    private static readonly providers: HttpVariableProvider[] = [
-        SystemVariableProvider.Instance,
-        RequestVariableProvider.Instance,
-        FileVariableProvider.Instance,
-        EnvironmentVariableProvider.Instance,
+    private static readonly providers: [HttpVariableProvider, boolean][] = [
+        [SystemVariableProvider.Instance, false],
+        [RequestVariableProvider.Instance, true],
+        [FileVariableProvider.Instance, true],
+        [EnvironmentVariableProvider.Instance, true],
     ];
 
     public static async processRawRequest(request: string) {
@@ -22,6 +22,7 @@ export class VariableProcessor {
         let result = '';
         let match: RegExpExecArray;
         let lastIndex = 0;
+        const resolvedVariables = new Map<string, string>();
         variable:
         while (match = variableReferenceRegex.exec(request)) {
             result += request.substring(lastIndex, match.index);
@@ -29,10 +30,17 @@ export class VariableProcessor {
             const name = match[1].trim();
             const document = window.activeTextEditor.document;
             const context = { rawRequest: request, parsedRequest: result };
-            for (const provider of VariableProcessor.providers) {
+            for (const [provider, cacheable] of VariableProcessor.providers) {
+                if (resolvedVariables.has(name)) {
+                    result += resolvedVariables.get(name);
+                    continue variable;
+                }
                 if (await provider.has(document, name, context)) {
                     const { value, error, warning } = await provider.get(document, name, context);
                     if (!error && !warning) {
+                        if (cacheable) {
+                            resolvedVariables.set(name, value as string);
+                        }
                         result += value;
                         continue variable;
                     } else {
@@ -48,7 +56,7 @@ export class VariableProcessor {
     }
 
     public static async getAllVariablesDefinitions(document: TextDocument): Promise<Map<string, VariableType[]>> {
-        const [, requestProvider, fileProvider, environmentProvider] = VariableProcessor.providers;
+        const [, [requestProvider], [fileProvider], [environmentProvider]] = VariableProcessor.providers;
         const requestVariables = await (requestProvider as RequestVariableProvider).getAll(document);
         const fileVariables = await (fileProvider as FileVariableProvider).getAll(document);
         const environmentVariables = await (environmentProvider as EnvironmentVariableProvider).getAll(document);

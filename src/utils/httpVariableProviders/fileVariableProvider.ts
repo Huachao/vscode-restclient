@@ -8,6 +8,7 @@ import { calculateMD5Hash } from '../misc';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
+import { SystemVariableProvider } from './systemVariableProvider';
 
 type FileVariableValue = Record<'name' | 'value', string>;
 
@@ -29,6 +30,7 @@ export class FileVariableProvider implements HttpVariableProvider {
     ]);
 
     private readonly innerVariableProviders: HttpVariableProvider[] = [
+        SystemVariableProvider.Instance,
         RequestVariableProvider.Instance,
         EnvironmentVariableProvider.Instance,
     ];
