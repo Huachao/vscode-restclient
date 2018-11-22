@@ -5,6 +5,7 @@ import * as Constants from '../../common/constants';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { calculateMD5Hash } from '../misc';
+import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
 
@@ -29,6 +30,7 @@ export class FileVariableProvider implements HttpVariableProvider {
 
     private readonly innerVariableProviders: HttpVariableProvider[] = [
         RequestVariableProvider.Instance,
+        EnvironmentVariableProvider.Instance,
     ];
 
     private readonly cache = new Map<string, FileVariableValue[]>();
