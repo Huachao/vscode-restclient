@@ -100,6 +100,14 @@ export class MimeUtility {
         return MimeUtility.parse(contentTypeString).type === 'text/css';
     }
 
+    public static isMultiPartMixed(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        return MimeUtility.parse(contentTypeString).type === 'multipart/mixed';
+    }
+
     public static isMultiPartFormData(contentTypeString: string): boolean {
         if (!contentTypeString) {
             return false;

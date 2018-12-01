@@ -71,17 +71,20 @@ export class HttpRequestParser implements IRequestParser {
                 headers = RequestParserUtil.parseRequestHeaders(headerLines.slice(index));
 
                 // get body range
-                let bodyStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
+                const bodyStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
                 if (bodyStartLine !== -1) {
-                    let contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
+                    const contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
                     firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
-                    let bodyEndLine = MimeUtility.isMultiPartFormData(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
+                    const bodyEndLine =
+                        MimeUtility.isMultiPartFormData(contentTypeHeader) || MimeUtility.isMultiPartMixed(contentTypeHeader) || firstEmptyLine === -1
+                            ? lines.length
+                            : firstEmptyLine;
                     bodyLines = lines.slice(bodyStartLine, bodyEndLine);
                 }
             } else {
                 // parse body, since no headers provided
-                let firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
-                let bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
+                const firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
+                const bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                 bodyLines = lines.slice(headerStartLine, bodyEndLine);
             }
         }
