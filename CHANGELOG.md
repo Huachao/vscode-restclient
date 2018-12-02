@@ -1,3 +1,10 @@
+## 0.20.4 (2018/12/2)
+* __Feature__: [Support file variables reference other file variables](https://github.com/Huachao/vscode-restclient/issues/247)
+* __Feature__: [Support file variables reference system and environment variables](https://github.com/Huachao/vscode-restclient/issues/208)
+* __Improvement__: [Display actual response for image `HEAD` request](https://github.com/Huachao/vscode-restclient/issues/293)
+* __Bug Fix__: [Redirect all 3xx requests](https://github.com/Huachao/vscode-restclient/issues/285)
+* __Bug Fix__: [Parse rquest body correctly of `multipart/mixed` mime type](https://github.com/Huachao/vscode-restclient/issues/232)
+
 ## 0.20.3 (2018/11/1)
 * __Bug Fix__: [Cannot read property 'toLowerCase' of null](https://github.com/Huachao/vscode-restclient/issues/219)
 * __Bug Fix__: [Fix incorrect JSON body rendering for variable reference syntax](https://github.com/Huachao/vscode-restclient/issues/264)
