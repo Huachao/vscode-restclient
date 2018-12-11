@@ -449,7 +449,7 @@ System variables provide a pre-defined set of variables that can be used in any 
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
 * `{{$timestamp [offset option]}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`.
-* `{{$datetime rfc1123|iso8601 [offset option]}}`: Add a datetime string in either _ISO8601_ or _RFC1322_ format. You can even specify any date time based on current time similar to `timestamp` like: `{{$datetime iso8601 1 y}}` to represent a year later in _ISO8601_ format.
+* `{{$datetime rfc1123|iso8601 [offset option]}}`: Add a datetime string in either _ISO8601_ or _RFC1123_ format. You can even specify any date time based on current time similar to `timestamp` like: `{{$datetime iso8601 1 y}}` to represent a year later in _ISO8601_ format.
 
 The option string you can specify in `timestamp` and `datetime` are:
 
