@@ -13,10 +13,11 @@ import { isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 import { BaseWebview } from './baseWebview';
 
-const autoLinker = require('autolinker');
 const hljs = require('highlight.js');
 
 export class HttpResponseWebview extends BaseWebview {
+
+    private readonly urlRegex = /(https?:\/\/[^\s"'<>\]\)]+)/gi;
 
     private readonly httpResponsePreviewActiveContextKey = 'httpResponsePreviewFocus';
 
@@ -251,18 +252,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     }
 
     private addUrlLinks(innerHtml: string) {
-        return autoLinker.link(innerHtml, {
-            urls: {
-                schemeMatches: true,
-                wwwMatches: true,
-                tldMatches: false
-            },
-            email: false,
-            phone: false,
-            stripPrefix: false,
-            stripTrailingSlash: false,
-            decodePercentEncoding: false
-        });
+        return innerHtml.replace(this.urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
     }
 
     private getFoldingRange(lines: string[]): Map<number, FoldingRange> {

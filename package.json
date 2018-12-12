@@ -530,7 +530,6 @@
   "dependencies": {
     "adal-node": "^0.1.26",
     "applicationinsights": "^1.0.5",
-    "autolinker": "^1.4.0",
     "clipboardy": "^1.2.3",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
