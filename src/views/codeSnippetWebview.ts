@@ -1,6 +1,7 @@
 'use strict';
 
 import { commands, ViewColumn, WebviewPanel, window } from 'vscode';
+import { disposeAll } from '../utils/dispose';
 import { BaseWebview } from './baseWebview';
 
 const hljs = require('highlight.js');
@@ -55,7 +56,7 @@ export class CodeSnippetWebview extends BaseWebview {
     }
 
     public dispose() {
-        this.panels.forEach(p => p.dispose());
+        disposeAll(this.panels);
     }
 
     private getHtmlForWebview(convertResult: string, lang: string): string {
