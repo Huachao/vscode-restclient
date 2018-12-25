@@ -193,6 +193,7 @@ export class RequestController {
         this._durationStatusBarItem.dispose();
         this._sizeStatusBarItem.dispose();
         this._webview.dispose();
+        this._outputChannel.dispose();
     }
 
     private setSendingProgressStatusText() {
