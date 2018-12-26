@@ -7,10 +7,9 @@ import { MimeUtility } from './mimeUtility';
 import { isJSONString } from './misc';
 const pd = require('pretty-data').pd;
 
-
 export class ResponseFormatUtility {
 
-    private static readonly specialTokenMapping = {
+    private static readonly jsonSpecialTokenMapping = {
         [SyntaxKind.OpenBraceToken]: '{',
         [SyntaxKind.CloseBraceToken]: '}',
         [SyntaxKind.OpenBracketToken]: '[',
@@ -54,35 +53,32 @@ export class ResponseFormatUtility {
             return os.EOL + ' '.repeat(indentLevel * indentSize);
         }
 
-        function getTokenValue() {
+        function scanNext(): [SyntaxKind, string] {
+            const token = scanner.scan();
             const offset = scanner.getTokenOffset();
             const length = scanner.getTokenLength();
-            return text.substr(offset, length);
+            const value = text.substr(offset, length);
+            return [ token, value ];
         }
 
-
-        let firstToken = scanner.scan();
-        let firstTokenValue = getTokenValue();
+        let [firstToken, firstTokenValue] = scanNext();
         let secondToken: SyntaxKind;
         let secondTokenValue: string;
         let result = '';
 
-
         while (firstToken !== SyntaxKind.EOF) {
-            secondToken = scanner.scan();
-            secondTokenValue = getTokenValue();
-
+            [secondToken, secondTokenValue] = scanNext();
 
             switch (firstToken) {
                 case SyntaxKind.OpenBraceToken:
-                    result += ResponseFormatUtility.specialTokenMapping[firstToken];
+                    result += ResponseFormatUtility.jsonSpecialTokenMapping[firstToken];
                     if (secondToken !== SyntaxKind.CloseBraceToken) {
                         indentLevel++;
                         result += newLineAndIndent();
                     }
                     break;
                 case SyntaxKind.OpenBracketToken:
-                    result += ResponseFormatUtility.specialTokenMapping[firstToken];
+                    result += ResponseFormatUtility.jsonSpecialTokenMapping[firstToken];
                     if (secondToken !== SyntaxKind.CloseBracketToken) {
                         indentLevel++;
                         result += newLineAndIndent();
@@ -93,7 +89,7 @@ export class ResponseFormatUtility {
                 case SyntaxKind.NullKeyword:
                 case SyntaxKind.TrueKeyword:
                 case SyntaxKind.FalseKeyword:
-                    result += ResponseFormatUtility.specialTokenMapping[firstToken];
+                    result += ResponseFormatUtility.jsonSpecialTokenMapping[firstToken];
                     if (secondToken === SyntaxKind.CloseBraceToken
                         || secondToken === SyntaxKind.CloseBracketToken) {
                         indentLevel--;
@@ -101,7 +97,7 @@ export class ResponseFormatUtility {
                     }
                     break;
                 case SyntaxKind.CommaToken:
-                    result += ResponseFormatUtility.specialTokenMapping[firstToken];
+                    result += ResponseFormatUtility.jsonSpecialTokenMapping[firstToken];
                     if (secondToken === SyntaxKind.CloseBraceToken
                         || secondToken === SyntaxKind.CloseBracketToken) {
                         indentLevel--;
@@ -109,7 +105,7 @@ export class ResponseFormatUtility {
                     result += newLineAndIndent();
                     break;
                 case SyntaxKind.ColonToken:
-                    result += ResponseFormatUtility.specialTokenMapping[firstToken] + ' ';
+                    result += ResponseFormatUtility.jsonSpecialTokenMapping[firstToken] + ' ';
                     break;
                 case SyntaxKind.StringLiteral:
                 case SyntaxKind.NumericLiteral:
