@@ -1,6 +1,6 @@
 .github/**
 .vscode/**
-out/test/**
+out/**
 test/**
 src/**
 **/*.map
@@ -8,3 +8,5 @@ src/**
 tsconfig.json
 tslint.json
 vsc-extension-quickstart.md
+package-json.lock
+webpack.config.js

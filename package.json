@@ -46,7 +46,7 @@
     "onCommand:rest-client.clear-aad-token-cache",
     "onLanguage:http"
   ],
-  "main": "./out/src/extension",
+  "main": "./dist/extension",
   "contributes": {
     "languages": [
       {
@@ -513,8 +513,9 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
-    "compile": "tsc -watch -p ./",
+    "vscode:prepublish": "webpack --mode development",
+    "webpack": "webpack --mode development",
+    "webpack-dev": "webpack --mode development --watch",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "tslint": "tslint --project tsconfig.json -e 'language-configuration.json'"
   },
@@ -523,9 +524,12 @@
     "@types/mocha": "^2.2.32",
     "@types/node": "^8.10.25",
     "mocha": "^3.2.0",
+    "ts-loader": "^5.3.2",
     "tslint": "^5.10.0",
     "typescript": "^3.2.2",
-    "vscode": "^1.0.0"
+    "vscode": "^1.0.0",
+    "webpack": "^4.28.2",
+    "webpack-cli": "^3.1.2"
   },
   "dependencies": {
     "adal-node": "^0.1.26",
