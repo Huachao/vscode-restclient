@@ -19,7 +19,7 @@ export class RequestVariableHoverProvider implements HoverProvider {
         if (!error && !warning) {
             const contents: MarkedString[] = [];
             if (value) {
-                contents.push(typeof value !== "object" ? value : { language: 'json', value: JSON.stringify(value, null, 2) });
+                contents.push(typeof value === 'string' ? value : { language: 'json', value: JSON.stringify(value, null, 2) });
             }
 
             contents.push(new MarkdownString(`*Request Variable* \`${name}\``));
