@@ -121,7 +121,7 @@ export class HttpResponseWebview extends BaseWebview {
             ${this.settings.disableAddingHrefLinkForLargeResponse && response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024
                 ? innerHtml
                 : this.addUrlLinks(innerHtml)}
-            <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="scroll(0,0)"><span class="icon"></span></a>
+            <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="window.scroll(0,0)"><span class="icon"></span></a>
         </div>
         <script type="text/javascript" src="${this.scriptFilePath}" charset="UTF-8"></script>
     </body>`;
