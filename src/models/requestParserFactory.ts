@@ -5,7 +5,7 @@ import { HttpRequestParser } from '../utils/httpRequestParser';
 import { IRequestParser } from './IRequestParser';
 
 export interface IRequestParserFactory {
-    createRequestParser(rawHttpRequest: string);
+    createRequestParser(rawHttpRequest: string): IRequestParser;
 }
 
 export class RequestParserFactory implements IRequestParserFactory {

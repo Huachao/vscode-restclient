@@ -10,7 +10,7 @@ import { hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
 
-const yargs = require('yargs');
+const yargsParser = require('yargs-parser');
 
 const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
@@ -22,8 +22,7 @@ export class CurlRequestParser implements IRequestParser {
         requestText = requestText
             .replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2')
             .replace(/(-I|--head)(?=\s+)/, '-X HEAD');
-        let yargObject = yargs(requestText);
-        let parsedArguments = yargObject.argv;
+        const parsedArguments = yargsParser(requestText);
 
         // parse url
         let url = parsedArguments._[1];
