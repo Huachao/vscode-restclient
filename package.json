@@ -513,7 +513,7 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "webpack --mode development",
+    "vscode:prepublish": "webpack --mode production",
     "webpack": "webpack --mode development",
     "webpack-dev": "webpack --mode development --watch",
     "postinstall": "node ./node_modules/vscode/bin/install",
@@ -528,8 +528,8 @@
     "tslint": "^5.10.0",
     "typescript": "^3.2.2",
     "vscode": "^1.0.0",
-    "webpack": "^4.28.2",
-    "webpack-cli": "^3.1.2"
+    "webpack": "~4.19.1",
+    "webpack-cli": "~3.1.0"
   },
   "dependencies": {
     "adal-node": "^0.1.26",
@@ -556,7 +556,7 @@
     "tough-cookie-file-store-bugfix": "Huachao/tough-cookie-file-store-bugfix",
     "uuid": "^3.3.2",
     "xmldom": "^0.1.27",
-    "xpath": "0.0.27",
+    "xpath": "^0.0.27",
     "yargs-parser": "^11.1.1"
   }
 }
