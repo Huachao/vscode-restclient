@@ -517,7 +517,7 @@
     "webpack": "webpack --mode development",
     "webpack-dev": "webpack --mode development --watch",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "tslint": "tslint --project tsconfig.json -e 'language-configuration.json'"
+    "tslint": "tslint --project tsconfig.json"
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",
