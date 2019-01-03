@@ -31,7 +31,7 @@ export class Telemetry {
     public static sendEvent(eventName: string, properties?: { [key: string]: string }) {
         try {
             if (Telemetry.restClientSettings.enableTelemetry) {
-                appInsights.defaultClient.trackEvent({name: eventName, properties});
+                Telemetry.defaultClient.trackEvent({ name: eventName, properties });
             }
         } catch {
         }
