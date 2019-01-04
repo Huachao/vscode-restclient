@@ -153,9 +153,41 @@
         "command": "rest-client.clear-aad-token-cache",
         "title": "Clear Azure AD Token Cache",
         "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.fold-response",
+        "title": "Fold Response",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.unfold-response",
+        "title": "Unfold Response",
+        "category": "Rest Client"
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "rest-client.fold-response",
+          "when": "httpResponsePreviewFocus"
+        },
+        {
+          "command": "rest-client.unfold-response",
+          "when": "httpResponsePreviewFocus"
+        },
+        {
+          "command": "rest-client.save-response",
+          "when": "httpResponsePreviewFocus"
+        },
+        {
+          "command": "rest-client.save-response-body",
+          "when": "httpResponsePreviewFocus"
+        },
+        {
+          "command": "rest-client.copy-codesnippet",
+          "when": "httpResponsePreviewFocus"
+        }
+      ],
       "editor/title": [
         {
           "when": "httpResponsePreviewFocus",
@@ -166,6 +198,16 @@
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.save-response-body",
           "group": "navigation"
+        },
+        {
+          "when": "httpResponsePreviewFocus",
+          "command": "rest-client.fold-response",
+          "group": "1_rest-client"
+        },
+        {
+          "when": "httpResponsePreviewFocus",
+          "command": "rest-client.unfold-response",
+          "group": "1_rest-client"
         },
         {
           "when": "codeSnippetPreviewFocus",

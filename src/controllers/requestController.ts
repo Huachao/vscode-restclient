@@ -1,7 +1,7 @@
 "use strict";
 
 import { EOL } from 'os';
-import { OutputChannel, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
+import { ExtensionContext, OutputChannel, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
@@ -38,11 +38,11 @@ export class RequestController {
     private _textDocumentView: HttpResponseTextDocumentView;
     private _outputChannel: OutputChannel;
 
-    public constructor() {
+    public constructor(context: ExtensionContext) {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._sizeStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._httpClient = new HttpClient();
-        this._webview = new HttpResponseWebview();
+        this._webview = new HttpResponseWebview(context);
         this._webview.onDidCloseAllWebviewPanels(() => {
             this._durationStatusBarItem.hide();
             this._sizeStatusBarItem.hide();

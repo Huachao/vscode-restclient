@@ -1,7 +1,7 @@
 'use strict';
 
 import * as path from 'path';
-import { commands, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
+import { commands, ExtensionContext, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { Headers } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
@@ -29,14 +29,19 @@ export class HttpResponseWebview extends BaseWebview {
         return 'rest-response';
     }
 
+    private activePanel: WebviewPanel | undefined;
+
     public static activePreviewResponse: HttpResponse | undefined;
 
-    public constructor() {
+    public constructor(private readonly context: ExtensionContext) {
         super();
 
         // Init response webview map
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();
         this.iconFilePath = Uri.file(path.join(this.extensionPath, Constants.ImagesFolderName, Constants.IconFileName));
+
+        this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', () => this.foldResponseBody()));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', () => this.unfoldResponseBody()));
     }
 
     public async render(response: HttpResponse, column: ViewColumn) {
@@ -57,6 +62,7 @@ export class HttpResponseWebview extends BaseWebview {
                     const response = this.panelResponses.get(panel);
                     if (response === HttpResponseWebview.activePreviewResponse) {
                         commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, false);
+                        this.activePanel = undefined;
                         HttpResponseWebview.activePreviewResponse = undefined;
                     }
 
@@ -74,6 +80,7 @@ export class HttpResponseWebview extends BaseWebview {
 
                 panel.onDidChangeViewState(({ webviewPanel }) => {
                     commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, webviewPanel.active);
+                    this.activePanel = webviewPanel.active ? webviewPanel : undefined;
                     HttpResponseWebview.activePreviewResponse = webviewPanel.active ? this.panelResponses.get(webviewPanel) : undefined;
                 });
 
@@ -90,11 +97,24 @@ export class HttpResponseWebview extends BaseWebview {
         panel.reveal(column, !this.settings.previewResponsePanelTakeFocus);
 
         this.panelResponses.set(panel, response);
+        this.activePanel = panel;
         HttpResponseWebview.activePreviewResponse = response;
     }
 
     public dispose() {
         disposeAll(this.panels);
+    }
+
+    private foldResponseBody() {
+        if (this.activePanel) {
+            this.activePanel.webview.postMessage({ 'command': 'foldAll' });
+        }
+    }
+
+    private unfoldResponseBody() {
+        if (this.activePanel) {
+            this.activePanel.webview.postMessage({ 'command': 'unfoldAll' });
+        }
     }
 
     private getHtmlForWebview(response: HttpResponse): string {

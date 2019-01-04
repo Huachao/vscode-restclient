@@ -23,7 +23,7 @@ import { AadTokenCache } from './utils/aadTokenCache';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: ExtensionContext) {
-    let requestController = new RequestController();
+    let requestController = new RequestController(context);
     let historyController = new HistoryController();
     let responseController = new ResponseController();
     let codeSnippetController = new CodeSnippetController();
