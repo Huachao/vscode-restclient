@@ -11,6 +11,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Support _MULTIPLE_ requests in the same file (separated by `###` delimiter)
 * View image response directly in pane
 * Save raw response and response body only to local disk
+* Fold and unfold response body
 * Customize font(size/family/weight) in response preview
 * Preview response with expected parts(_headers only_, _body only_, _full response_ and _both request and response_)
 * Authentication support for:
@@ -229,6 +230,9 @@ Another icon in the upper right corner of the response preview tab is the `Save 
     "application/atom+xml": "xml"
 }
 ```
+
+## Fold and Unfold Response Body
+In the response webview panel, there are two options `Fold Response` and `Unfold Response` after clicking the `More Actions...` button. Sometimes you may want to fold or unfold the whole response body, these options provide a straightforward way to achieve this.
 
 ## Authentication
 We have supported some most common authentication schemes like _Basic Auth_, _Digest Auth_, _SSL Client Certificates_ and _Azure Active Directory(Azure AD)_.
