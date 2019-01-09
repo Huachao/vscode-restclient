@@ -7,6 +7,7 @@ import { Headers } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
+import { trace } from '../utils/decorator';
 import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
 import { isJSONString } from '../utils/misc';
@@ -105,12 +106,14 @@ export class HttpResponseWebview extends BaseWebview {
         disposeAll(this.panels);
     }
 
+    @trace('Fold Response')
     private foldResponseBody() {
         if (this.activePanel) {
             this.activePanel.webview.postMessage({ 'command': 'foldAll' });
         }
     }
 
+    @trace('Unfold Response')
     private unfoldResponseBody() {
         if (this.activePanel) {
             this.activePanel.webview.postMessage({ 'command': 'unfoldAll' });
