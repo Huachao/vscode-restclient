@@ -7,6 +7,7 @@ import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
 import { RequestController } from './controllers/requestController';
 import { ResponseController } from './controllers/responseController';
+import { Logger } from './logger';
 import { CustomVariableDefinitionProvider } from './providers/customVariableDefinitionProvider';
 import { CustomVariableHoverProvider } from './providers/customVariableHoverProvider';
 import { CustomVariableReferenceProvider } from './providers/customVariableReferenceProvider';
@@ -23,8 +24,10 @@ import { AadTokenCache } from './utils/aadTokenCache';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: ExtensionContext) {
-    let requestController = new RequestController(context);
-    let historyController = new HistoryController();
+    const logger = new Logger();
+
+    let requestController = new RequestController(context, logger);
+    let historyController = new HistoryController(logger);
     let responseController = new ResponseController();
     let codeSnippetController = new CodeSnippetController();
     let environmentController = new EnvironmentController(await EnvironmentController.getCurrentEnvironment());

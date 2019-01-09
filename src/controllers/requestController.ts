@@ -4,6 +4,7 @@ import { EOL } from 'os';
 import { ExtensionContext, OutputChannel, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
+import { Logger } from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
@@ -38,7 +39,7 @@ export class RequestController {
     private _textDocumentView: HttpResponseTextDocumentView;
     private _outputChannel: OutputChannel;
 
-    public constructor(context: ExtensionContext) {
+    public constructor(context: ExtensionContext, private readonly logger: Logger) {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._sizeStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._httpClient = new HttpClient();
@@ -48,7 +49,6 @@ export class RequestController {
             this._sizeStatusBarItem.hide();
         });
         this._textDocumentView = new HttpResponseTextDocumentView();
-        this._outputChannel = window.createOutputChannel('REST');
     }
 
     @trace('Request')
@@ -158,8 +158,7 @@ export class RequestController {
                     this._webview.render(response, previewColumn);
                 }
             } catch (reason) {
-                this._outputChannel.appendLine(reason);
-                this._outputChannel.appendLine(reason.stack);
+                this.logger.error('Unable to preview response:', reason);
                 window.showErrorMessage(reason);
             }
 
@@ -181,8 +180,7 @@ export class RequestController {
             }
             this.clearSendProgressStatusText();
             this._durationStatusBarItem.text = '';
-            this._outputChannel.appendLine(error);
-            this._outputChannel.appendLine(error.stack);
+            this.logger.error('Failed to send request:', error);
             window.showErrorMessage(error.message);
         } finally {
             this._requestStore.complete(<string>requestId);

@@ -3,19 +3,17 @@
 import * as fs from 'fs-extra';
 import moment from 'moment';
 import { EOL } from 'os';
-import { OutputChannel, window, workspace } from 'vscode';
+import { window, workspace } from 'vscode';
+import { Logger } from '../logger';
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
 import { PersistUtility } from '../utils/persistUtility';
 
-let tmp = require('tmp');
+const tmp = require('tmp');
 
 export class HistoryController {
-    private _outputChannel: OutputChannel;
-
-    public constructor() {
-        this._outputChannel = window.createOutputChannel('REST');
+    public constructor(private readonly logger: Logger) {
     }
 
     @trace('History')
@@ -48,7 +46,7 @@ export class HistoryController {
             let document = await workspace.openTextDocument(path);
             window.showTextDocument(document);
         } catch (error) {
-            this.errorHandler(error);
+            this.errorHandler(error, 'Failed to persist the request into history file:');
         }
     }
 
@@ -65,7 +63,7 @@ export class HistoryController {
                     }
                 });
         } catch (error) {
-            this.errorHandler(error);
+            this.errorHandler(error, 'Failed to clear the request history:');
         }
     }
 
@@ -97,12 +95,11 @@ export class HistoryController {
         });
     }
 
-    private errorHandler(error: any) {
-        this._outputChannel.appendLine(error);
+    private errorHandler(error: any, message: string) {
+        this.logger.error(message, error);
         window.showErrorMessage("There was an error, please view details in output log");
     }
 
     public dispose() {
-        this._outputChannel.dispose();
     }
 }

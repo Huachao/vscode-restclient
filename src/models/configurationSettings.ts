@@ -4,6 +4,7 @@ import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { Headers } from './base';
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
 import { HostCertificate } from './hostCertificate';
+import { fromString as ParseLogLevelStr, LogLevel } from './loglevel';
 import { fromString as ParsePreviewOptionStr, PreviewOption } from './previewOption';
 
 export interface IRestClientSettings {
@@ -33,6 +34,7 @@ export interface IRestClientSettings {
     formParamEncodingStrategy: FormParamEncodingStrategy;
     addRequestBodyLineIndentationAroundBrackets: boolean;
     decodeEscapedUnicodeCharacters: boolean;
+    logLevel: LogLevel;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -63,6 +65,7 @@ export class RestClientSettings implements IRestClientSettings {
     public formParamEncodingStrategy: FormParamEncodingStrategy;
     public addRequestBodyLineIndentationAroundBrackets: boolean;
     public decodeEscapedUnicodeCharacters: boolean;
+    public logLevel: LogLevel;
 
     private readonly brackets: CharacterPair[];
 
@@ -126,6 +129,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.showEnvironmentStatusBarItem = restClientSettings.get<boolean>('showEnvironmentStatusBarItem', true);
         this.addRequestBodyLineIndentationAroundBrackets = restClientSettings.get<boolean>('addRequestBodyLineIndentationAroundBrackets', true);
         this.decodeEscapedUnicodeCharacters = restClientSettings.get<boolean>('decodeEscapedUnicodeCharacters', false);
+        this.logLevel = ParseLogLevelStr(restClientSettings.get<string>('logLevel', 'error'));
         languages.setLanguageConfiguration('http', { brackets: this.addRequestBodyLineIndentationAroundBrackets ? this.brackets : [] });
 
         const httpSettings = workspace.getConfiguration("http");

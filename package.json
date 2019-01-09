@@ -541,6 +541,18 @@
           "default": false,
           "scope": "resource",
           "description": "Decode escaped unicode characters in response body."
+        },
+        "rest-client.logLevel": {
+          "type": "string",
+          "enum": [
+            "error",
+            "warn",
+            "info",
+            "verbose"
+          ],
+          "default": "error",
+          "scope": "resource",
+          "description": "The verbosity of logging in the REST output panel"
         }
       }
     },
