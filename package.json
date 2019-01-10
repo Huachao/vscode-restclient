@@ -202,12 +202,12 @@
         {
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.fold-response",
-          "group": "1_rest-client"
+          "group": "1_rest-client@1"
         },
         {
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.unfold-response",
-          "group": "1_rest-client"
+          "group": "1_rest-client@2"
         },
         {
           "when": "codeSnippetPreviewFocus",
@@ -569,7 +569,7 @@
   "scripts": {
     "vscode:prepublish": "webpack --mode production",
     "webpack": "webpack --mode development",
-    "webpack-dev": "webpack --mode development --watch",
+    "watch": "webpack --mode development --watch --info-verbosity verbose",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "tslint": "tslint --project tsconfig.json"
   },
