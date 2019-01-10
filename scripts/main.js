@@ -12,8 +12,10 @@
   }
 
   function toggleLines(e) {
-    const iconSpan = e.target;
-    const lineSpan = iconSpan.parentNode;
+    const currentElement = e.target;
+    const lineSpan = currentElement.classList.contains('icon')
+      ? currentElement.parentNode
+      : currentElement;
     const blockEndNum = getFoldingRangeEnd(lineSpan);
     const isExpandAction = lineSpan.classList.contains('collapsed');
     if (isExpandAction) {
