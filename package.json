@@ -24,7 +24,7 @@
     "url": "https://github.com/Huachao/vscode-restclient.git"
   },
   "engines": {
-    "vscode": "^1.28.0"
+    "vscode": "^1.30.0"
   },
   "categories": [
     "Other",
@@ -588,7 +588,6 @@
   "dependencies": {
     "adal-node": "^0.1.26",
     "applicationinsights": "^1.0.5",
-    "clipboardy": "^1.2.3",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
     "elegant-spinner": "^1.0.1",

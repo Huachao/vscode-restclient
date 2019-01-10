@@ -1,7 +1,7 @@
 "use strict";
 
 import { EOL } from 'os';
-import { QuickInputButtons, QuickPickItem, window } from 'vscode';
+import { Clipboard, env, QuickInputButtons, QuickPickItem, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
@@ -14,7 +14,6 @@ import { VariableProcessor } from '../utils/variableProcessor';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
-const clipboardy = require('clipboardy');
 const encodeUrl = require('encodeurl');
 const HTTPSnippet = require('httpsnippet');
 
@@ -39,11 +38,13 @@ interface CodeSnippetClientQuickPickItem extends CodeSnippetTargetQuickPickItem 
 
 export class CodeSnippetController {
     private static _availableTargets = HTTPSnippet.availableTargets();
+    private readonly clipboard: Clipboard;
     private _convertedResult;
     private _webview: CodeSnippetWebview;
 
     constructor() {
         this._webview = new CodeSnippetWebview();
+        this.clipboard = env.clipboard;
     }
 
     public async run() {
@@ -134,7 +135,7 @@ export class CodeSnippetController {
     @trace('Copy Code Snippet')
     public async copy() {
         if (this._convertedResult) {
-            clipboardy.writeSync(this._convertedResult);
+            await this.clipboard.writeText(this._convertedResult);
         }
     }
 
@@ -173,7 +174,7 @@ export class CodeSnippetController {
         let harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         let snippet = new HTTPSnippet(harHttpRequest);
         let result = snippet.convert('shell', 'curl', process.platform === 'win32' ? { indent: false } : {});
-        clipboardy.writeSync(result);
+        await this.clipboard.writeText(result);
     }
 
     private convertToHARHttpRequest(request: HttpRequest): HARHttpRequest {

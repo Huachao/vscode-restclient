@@ -3,7 +3,7 @@
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
-import { Uri, window, workspace } from 'vscode';
+import { Clipboard, env, Uri, window, workspace } from 'vscode';
 import * as Constants from '../common/constants';
 import { HttpResponse } from '../models/httpResponse';
 import { trace } from "../utils/decorator";
@@ -11,15 +11,15 @@ import { MimeUtility } from '../utils/mimeUtility';
 import { PersistUtility } from '../utils/persistUtility';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
-const clipboardy = require('clipboardy');
-
 export class ResponseController {
     public static responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
     public static responseBodySaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseBodyDownloadFolderName);
+    private readonly clipboard: Clipboard;
 
     public constructor() {
         fs.ensureDir(ResponseController.responseSaveFolderPath);
         fs.ensureDir(ResponseController.responseBodySaveFolderPath);
+        this.clipboard = env.clipboard;
     }
 
     @trace('Response-Save')
@@ -34,15 +34,14 @@ export class ResponseController {
                     let filePath = uri.fsPath;
                     await PersistUtility.ensureFileAsync(filePath);
                     await fs.writeFile(filePath, fullResponse);
-                    await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
-                        if (btn) {
-                            if (btn.title === 'Open') {
-                                workspace.openTextDocument(filePath).then(window.showTextDocument);
-                            } else if (btn.title === 'Copy Path') {
-                                clipboardy.writeSync(filePath);
-                            }
+                    const btn = await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' });
+                    if (btn) {
+                        if (btn.title === 'Open') {
+                            workspace.openTextDocument(filePath).then(window.showTextDocument);
+                        } else if (btn.title === 'Copy Path') {
+                            await this.clipboard.writeText(filePath);
                         }
-                    });
+                    }
                 }
             } catch {
                 window.showErrorMessage('Failed to save latest response to disk.');
@@ -64,15 +63,14 @@ export class ResponseController {
                     const filePath = uri.fsPath;
                     await PersistUtility.ensureFileAsync(filePath);
                     await fs.writeFile(filePath, response.bodyBuffer);
-                    await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' }).then(function (btn) {
-                        if (btn) {
-                            if (btn.title === 'Open') {
-                                workspace.openTextDocument(filePath).then(window.showTextDocument);
-                            } else if (btn.title === 'Copy Path') {
-                                clipboardy.writeSync(filePath);
-                            }
+                    const btn = await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' });
+                    if (btn) {
+                        if (btn.title === 'Open') {
+                            workspace.openTextDocument(filePath).then(window.showTextDocument);
+                        } else if (btn.title === 'Copy Path') {
+                            await this.clipboard.writeText(filePath);
                         }
-                    });
+                    }
                 }
             } catch {
                 window.showErrorMessage('Failed to save latest response body to disk');

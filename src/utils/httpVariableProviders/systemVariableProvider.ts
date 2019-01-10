@@ -2,7 +2,7 @@
 
 import * as adal from 'adal-node';
 import { DurationInputArg2, Moment, utc } from 'moment';
-import { commands, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
+import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
 import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
@@ -11,7 +11,6 @@ import { AadTokenCache } from '../aadTokenCache';
 import { HttpClient } from '../httpClient';
 import { HttpVariableContext, HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
 
-const clipboardy = require('clipboardy');
 const uuidv4 = require('uuid/v4');
 
 type SystemVariableValue = Pick<HttpVariableValue, Exclude<keyof HttpVariableValue, 'name'>>;
@@ -19,6 +18,7 @@ type ResolveSystemVariableFunc = (name: string, context: HttpVariableContext) =>
 
 export class SystemVariableProvider implements HttpVariableProvider {
 
+    private readonly clipboard: Clipboard;
     private readonly resolveFuncs: Map<string, ResolveSystemVariableFunc> = new Map<string, ResolveSystemVariableFunc>();
 
     private readonly timestampRegex: RegExp = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
@@ -40,6 +40,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     }
 
     private constructor() {
+        this.clipboard = env.clipboard;
         this.registerTimestampVariable();
         this.registerDateTimeVariable();
         this.registerGuidVariable();
@@ -161,10 +162,10 @@ export class SystemVariableProvider implements HttpVariableProvider {
                     const tokenString = token ? `${token.tokenType} ${token.accessToken}` : null;
                     if (copy && tokenString) {
                         // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
-                        clipboardy.writeSync(tokenString);
+                       this.clipboard.writeText(tokenString).then(() => resolve({ value: tokenString }));
+                    } else {
+                        resolve({ value: tokenString });
                     }
-
-                    resolve({ value: tokenString });
                 };
                 const acquireToken = () => this._acquireToken(resolveToken, reject, authContext, cloud, tenantId, targetApp, clientId);
 
@@ -238,9 +239,10 @@ export class SystemVariableProvider implements HttpVariableProvider {
             const done = "Done";
             const signInPrompt = value => {
                 if (value === signIn || value === tryAgain) {
-                    clipboardy.writeSync(codeResponse.userCode);
-                    commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
-                    window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
+                    this.clipboard.writeText(codeResponse.userCode).then(() => {
+                        commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
+                        window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
+                    });
                 } else if (value === done) {
                     authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: adal.TokenResponse) => {
                         if (tokenError) {
