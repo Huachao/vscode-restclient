@@ -49,6 +49,14 @@ export class ResponseController {
         }
     }
 
+    @trace('Response-Copy-Body')
+    public async copyBody() {
+        const response = HttpResponseWebview.activePreviewResponse;
+        if (response) {
+            await this.clipboard.writeText(response.body);
+        }
+    }
+
     @trace('Response-Save-Body')
     public async saveBody() {
         const response = HttpResponseWebview.activePreviewResponse;

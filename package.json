@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.21.1",
+  "version": "0.21.1-v",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -42,6 +42,7 @@
     "onCommand:rest-client.clear-history",
     "onCommand:rest-client.save-response",
     "onCommand:rest-client.save-response-body",
+    "onCommand:rest-client.copy-response-body",
     "onCommand:rest-client.switch-environment",
     "onCommand:rest-client.clear-aad-token-cache",
     "onLanguage:http"
@@ -131,6 +132,15 @@
         "category": "Rest Client"
       },
       {
+        "command": "rest-client.copy-response-body",
+        "title": "Copy Response Body",
+        "icon": {
+          "light": "./images/copy.svg",
+          "dark": "./images/copy-inverse.svg"
+        },
+        "category": "Rest Client"
+      },
+      {
         "command": "rest-client.generate-codesnippet",
         "title": "Generate Code Snippet",
         "category": "Rest Client"
@@ -184,6 +194,10 @@
           "when": "httpResponsePreviewFocus"
         },
         {
+          "command": "rest-client.copy-response-body",
+          "when": "httpResponsePreviewFocus"
+        },
+        {
           "command": "rest-client.copy-codesnippet",
           "when": "httpResponsePreviewFocus"
         }
@@ -197,6 +211,11 @@
         {
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.save-response-body",
+          "group": "navigation"
+        },
+        {
+          "when": "httpResponsePreviewFocus",
+          "command": "rest-client.copy-response-body",
           "group": "navigation"
         },
         {
