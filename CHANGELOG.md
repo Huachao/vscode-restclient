@@ -1,9 +1,9 @@
-## 0.21.1 (2018/1/8)
+## 0.21.1 (2019/1/8)
 * __Feature__: Add fold/unfold full response body features in the response preview panel
 * __Bug Fix__: [Copy request as cURL not working](https://github.com/Huachao/vscode-restclient/issues/308)
 * __Bug Fix__: [AAD Auth stopped to work in new version - 0.21.0](https://github.com/Huachao/vscode-restclient/issues/309)
 
-## 0.21.0 (2018/1/3)
+## 0.21.0 (2019/1/3)
 * __Bug Fix__: [Unable to collapse the json response body](https://github.com/Huachao/vscode-restclient/issues/301)
 * __Improvement__: [Use Webpack to bundle extension to improve activation time and high CPU load](https://github.com/Huachao/vscode-restclient/issues/257)
 * __Improvement__: Update _RFC1322_ to _RFC1123_
