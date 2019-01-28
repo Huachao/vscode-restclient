@@ -206,17 +206,17 @@
         {
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.save-response",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.save-response-body",
-          "group": "navigation"
+          "group": "navigation@2"
         },
         {
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.copy-response-body",
-          "group": "navigation"
+          "group": "navigation@3"
         },
         {
           "when": "httpResponsePreviewFocus",
@@ -320,7 +320,7 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "REST Client configuration",
+      "title": "REST Client Configuration",
       "properties": {
         "rest-client.followredirect": {
           "type": "boolean",
