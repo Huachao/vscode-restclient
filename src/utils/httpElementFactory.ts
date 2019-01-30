@@ -112,6 +112,12 @@ export class HttpElementFactory {
             Constants.RandomIntDescription,
             new SnippetString(`{{$\${name:${Constants.RandomIntVariableName.slice(1)}} \${1:min} \${2:max}}}`)));
         originalElements.push(new HttpElement(
+            Constants.EnvIfVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.EnvIfDescription,
+            new SnippetString(`{{$\${name:${Constants.EnvIfVariableName.slice(1)}} \${1:envName} \${2:value1} \${3:value2}}}`)));   
+        originalElements.push(new HttpElement(
             Constants.AzureActiveDirectoryVariableName,
         ElementType.SystemVariable,
             null,

@@ -10,6 +10,7 @@ import { VariableType } from '../../models/variableType';
 import { AadTokenCache } from '../aadTokenCache';
 import { HttpClient } from '../httpClient';
 import { HttpVariableContext, HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
+import { EnvironmentController } from '../../controllers/environmentController';
 
 const uuidv4 = require('uuid/v4');
 
@@ -24,6 +25,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private readonly timestampRegex: RegExp = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly datetimeRegex: RegExp = new RegExp(`\\${Constants.DateTimeVariableName}\\s(rfc1123|iso8601)(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly randomIntegerRegex: RegExp = new RegExp(`\\${Constants.RandomIntVariableName}\\s(\\-?\\d+)\\s(\\-?\\d+)`);
+    private readonly envIfRegex: RegExp = new RegExp(`\\${Constants.EnvIfVariableName}\\s(\\S+)\\s(\\S+)\\s(\\S+)`);
 
     private readonly requestUrlRegex: RegExp = /^(?:[^\s]+\s+)([^:]*:\/\/\/?[^/\s]*\/?)/;
 
@@ -46,6 +48,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerGuidVariable();
         this.registerRandomIntVariable();
         this.registerAadTokenVariable();
+        this.registerEnvIfVariable();
     }
 
     public readonly type: VariableType = VariableType.System;
@@ -105,6 +108,23 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private registerGuidVariable() {
         this.resolveFuncs.set(Constants.GuidVariableName, async name => ({ value: uuidv4() }));
+    }
+
+    private registerEnvIfVariable() {
+        this.resolveFuncs.set(Constants.EnvIfVariableName, async name => {
+            let currentEnv = await EnvironmentController.getCurrentEnvironment();
+            const groups = this.envIfRegex.exec(name);
+            if (groups !== null && groups.length === 4) {
+                const [, envName, value1, value2] = groups;
+                if (envName == currentEnv.name) {
+                    return { value: value1};
+                } else {
+                    return { value: value2};
+                }
+            }
+
+            return { warning: ResolveWarningMessage.IncorrectEnvIfVariableFormat };
+        });
     }
 
     private registerRandomIntVariable() {

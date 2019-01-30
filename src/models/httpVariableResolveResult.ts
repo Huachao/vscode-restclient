@@ -36,4 +36,6 @@ export const enum ResolveWarningMessage {
     UnsupportedBodyContentType = 'Only JSON response/request body is supported to query the result',
     InvalidJSONPath = 'Invalid JSONPath query',
     InvalidXPath = 'Invalid XPath query',
+    IncorrectEnvIfVariableFormat = 'EnvIf system variable should follow format "{{$envIf envName value1 value2}}"',
+
 }
