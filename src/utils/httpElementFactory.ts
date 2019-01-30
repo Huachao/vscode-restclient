@@ -116,7 +116,7 @@ export class HttpElementFactory {
             ElementType.SystemVariable,
             null,
             Constants.EnvIfDescription,
-            new SnippetString(`{{$\${name:${Constants.EnvIfVariableName.slice(1)}} \${1:envName} \${2:value1} \${3:value2}}}`)));   
+            new SnippetString(`{{$\${name:${Constants.EnvIfVariableName.slice(1)}} \${1:envName} \${2:value1} \${3:value2}}}`)));
         originalElements.push(new HttpElement(
             Constants.AzureActiveDirectoryVariableName,
         ElementType.SystemVariable,

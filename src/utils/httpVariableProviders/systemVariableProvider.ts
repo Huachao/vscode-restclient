@@ -4,13 +4,13 @@ import * as adal from 'adal-node';
 import { DurationInputArg2, Moment, utc } from 'moment';
 import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
+import { EnvironmentController } from '../../controllers/environmentController';
 import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { AadTokenCache } from '../aadTokenCache';
 import { HttpClient } from '../httpClient';
 import { HttpVariableContext, HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
-import { EnvironmentController } from '../../controllers/environmentController';
 
 const uuidv4 = require('uuid/v4');
 
@@ -116,7 +116,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
             const groups = this.envIfRegex.exec(name);
             if (groups !== null && groups.length === 4) {
                 const [, envName, value1, value2] = groups;
-                if (envName == currentEnv.name) {
+                if (envName === currentEnv.name) {
                     return { value: value1};
                 } else {
                     return { value: value2};
