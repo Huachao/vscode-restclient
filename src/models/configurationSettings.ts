@@ -1,4 +1,4 @@
-import { CharacterPair, languages, ViewColumn, window, workspace } from 'vscode';
+import { CharacterPair, Event, EventEmitter, languages, ViewColumn, window, workspace } from 'vscode';
 import configuration from '../../language-configuration.json';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { Headers } from './base';
@@ -35,6 +35,8 @@ export interface IRestClientSettings {
     addRequestBodyLineIndentationAroundBrackets: boolean;
     decodeEscapedUnicodeCharacters: boolean;
     logLevel: LogLevel;
+    enableSendRequestCodeLens: boolean;
+    enableCustomVariableReferencesCodeLens: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -66,6 +68,8 @@ export class RestClientSettings implements IRestClientSettings {
     public addRequestBodyLineIndentationAroundBrackets: boolean;
     public decodeEscapedUnicodeCharacters: boolean;
     public logLevel: LogLevel;
+    public enableSendRequestCodeLens: boolean;
+    public enableCustomVariableReferencesCodeLens: boolean;
 
     private readonly brackets: CharacterPair[];
 
@@ -79,14 +83,22 @@ export class RestClientSettings implements IRestClientSettings {
         return RestClientSettings._instance;
     }
 
+    public readonly configurationUpdateEventEmitter = new EventEmitter<void>();
+
+    public get onDidChangeConfiguration(): Event<void> {
+        return this.configurationUpdateEventEmitter.event;
+    }
+
     private constructor() {
         this.brackets = configuration.brackets as CharacterPair[];
         workspace.onDidChangeConfiguration(() => {
             this.initializeSettings();
+            this.configurationUpdateEventEmitter.fire();
         });
-        window.onDidChangeActiveTextEditor((e) => {
+        window.onDidChangeActiveTextEditor(e => {
             if (e) {
                 this.initializeSettings();
+                this.configurationUpdateEventEmitter.fire();
             }
         });
 
@@ -130,6 +142,8 @@ export class RestClientSettings implements IRestClientSettings {
         this.addRequestBodyLineIndentationAroundBrackets = restClientSettings.get<boolean>('addRequestBodyLineIndentationAroundBrackets', true);
         this.decodeEscapedUnicodeCharacters = restClientSettings.get<boolean>('decodeEscapedUnicodeCharacters', false);
         this.logLevel = ParseLogLevelStr(restClientSettings.get<string>('logLevel', 'error'));
+        this.enableSendRequestCodeLens = restClientSettings.get<boolean>('enableSendRequestCodeLens', true);
+        this.enableCustomVariableReferencesCodeLens = restClientSettings.get<boolean>('enableCustomVariableReferencesCodeLens', true);
         languages.setLanguageConfiguration('http', { brackets: this.addRequestBodyLineIndentationAroundBrackets ? this.brackets : [] });
 
         const httpSettings = workspace.getConfiguration("http");

@@ -572,6 +572,18 @@
           "default": "error",
           "scope": "resource",
           "description": "The verbosity of logging in the REST output panel"
+        },
+        "rest-client.enableSendRequestCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Enable/disable sending request CodeLens in request file"
+        },
+        "rest-client.enableCustomVariableReferencesCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Enable/disable custom variable references CodeLens in request file"
         }
       }
     },

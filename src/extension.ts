@@ -20,6 +20,7 @@ import { RequestVariableCompletionItemProvider } from "./providers/requestVariab
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
 import { VariableDiagnosticsProvider } from "./providers/variableDiagnosticsProvider";
 import { AadTokenCache } from './utils/aadTokenCache';
+import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -64,8 +65,14 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new RequestVariableCompletionItemProvider(), '.'));
     context.subscriptions.push(languages.registerHoverProvider(documentSelector, new CustomVariableHoverProvider()));
     context.subscriptions.push(languages.registerHoverProvider(documentSelector, new RequestVariableHoverProvider()));
-    context.subscriptions.push(languages.registerCodeLensProvider(documentSelector, new HttpCodeLensProvider()));
-    context.subscriptions.push(languages.registerCodeLensProvider(documentSelector, new CustomVariableReferencesCodeLensProvider()));
+    context.subscriptions.push(
+        new ConfigurationDependentRegistration(
+            () => languages.registerCodeLensProvider(documentSelector, new HttpCodeLensProvider()),
+            s => s.enableSendRequestCodeLens));
+    context.subscriptions.push(
+        new ConfigurationDependentRegistration(
+            () => languages.registerCodeLensProvider(documentSelector, new CustomVariableReferencesCodeLensProvider()),
+            s => s.enableCustomVariableReferencesCodeLens));
     context.subscriptions.push(languages.registerDocumentLinkProvider(documentSelector, new RequestBodyDocumentLinkProvider()));
     context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new CustomVariableDefinitionProvider()));
     context.subscriptions.push(languages.registerReferenceProvider(documentSelector, new CustomVariableReferenceProvider()));
