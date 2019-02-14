@@ -1,6 +1,7 @@
 "use strict";
 
 import { EOL } from 'os';
+import * as url from 'url';
 import { Clipboard, env, QuickInputButtons, QuickPickItem, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
@@ -166,14 +167,23 @@ export class CodeSnippetController {
         selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
+        const httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
             return;
         }
 
-        let harHttpRequest = this.convertToHARHttpRequest(httpRequest);
-        let snippet = new HTTPSnippet(harHttpRequest);
-        let result = snippet.convert('shell', 'curl', process.platform === 'win32' ? { indent: false } : {});
+        const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
+        const addPrefix = !(url.parse(harHttpRequest.url).protocol);
+        const originalUrl = harHttpRequest.url;
+        if (addPrefix) {
+            // Add protocol for url that doesn't specify protocol to pass the HTTPSnippet validation #328
+            harHttpRequest.url = `http://${originalUrl}`;
+        }
+        const snippet = new HTTPSnippet(harHttpRequest);
+        if (addPrefix) {
+            snippet.requests[0].fullUrl = originalUrl;
+        }
+        const result = snippet.convert('shell', 'curl', process.platform === 'win32' ? { indent: false } : {});
         await this.clipboard.writeText(result);
     }
 
