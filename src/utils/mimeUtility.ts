@@ -123,4 +123,12 @@ export class MimeUtility {
 
         return MimeUtility.parse(contentTypeString).type === 'application/x-www-form-urlencoded';
     }
+
+    public static isNewlineDelimitedJSON(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        return MimeUtility.parse(contentTypeString).type === 'application/x-ndjson';
+    }
 }

@@ -98,7 +98,7 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // parse body
-        let contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
+        const contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
         body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
         if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             if (this._restClientSettings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
@@ -151,16 +151,18 @@ export class HttpRequestParser implements IRequestParser {
 
         // Check if needed to upload file
         if (lines.every(line => !HttpRequestParser.uploadFromFileSyntax.test(line))) {
-            if (!MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
-                return lines.join(EOL);
-            } else {
+            if (MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
                 return lines.reduce((p, c, i) => {
                     p += `${(i === 0 || c.startsWith('&') ? '' : EOL)}${c}`;
                     return p;
                 }, '');
+            } else if (MimeUtility.isNewlineDelimitedJSON(contentTypeHeader)) {
+                return lines.join(EOL) + EOL;
+            } else {
+                return lines.join(EOL);
             }
         } else {
-            let combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
+            const combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
             for (const [index, line] of lines.entries()) {
                 if (HttpRequestParser.uploadFromFileSyntax.test(line)) {
                     let groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
