@@ -3,7 +3,6 @@
 import { EOL } from 'os';
 import * as url from 'url';
 import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument, window } from 'vscode';
-import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { Selector } from '../utils/selector';
@@ -65,7 +64,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             }
 
             if (blockStart <= blockEnd) {
-                const text = await VariableProcessor.processRawRequest(this.getRequestLines(lines, blockStart, blockEnd).join(EOL));
+                const text = await VariableProcessor.processRawRequest(lines.slice(blockStart, blockEnd + 1).join(EOL));
                 const [name, container] = this.getRequestSymbolInfo(text);
                 symbols.push(
                     new SymbolInformation(
@@ -90,16 +89,6 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
         let parser = HttpDocumentSymbolProvider.requestParserFactory.createRequestParser(text);
         let request = parser.parseHttpRequest(text, window.activeTextEditor.document.fileName);
         let parsedUrl = url.parse(request.url);
-        return [`${request.method} ${parsedUrl.path}`, parsedUrl.host];
+        return [`${request.method} ${parsedUrl.path}`, parsedUrl.host || ''];
     }
-
-    private getRequestLines(lines: string[], start: number, end: number): string[] {
-        if (start === end) {
-            return [lines[start]];
-        }
-
-        end = ArrayUtility.firstIndexOf(lines, line => /^(?!\s*[\&\?])/.test(line), start + 1);
-        return lines.slice(start, end);
-    }
-
 }
