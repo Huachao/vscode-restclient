@@ -3,7 +3,7 @@
 import * as fs from 'fs-extra';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';
-import { Stream } from 'stream';
+import { Readable, Stream } from 'stream';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
 import { Headers } from '../models/base';
@@ -107,7 +107,7 @@ export class HttpClient {
                         options.method,
                         options.url,
                         HttpClient.capitalizeHeaderName(response.toJSON().request.headers),
-                        Buffer.isBuffer(requestBody) ? fs.createReadStream(requestBody) : requestBody,
+                        Buffer.isBuffer(requestBody) ? that.convertBufferToStream(requestBody) : requestBody,
                         httpRequest.rawBody
                     )));
             })
@@ -227,6 +227,15 @@ export class HttpClient {
             stream.on('end', () => resolve(Buffer.concat(buffers)));
             stream.on('error', error => reject(error));
             (<any>stream).resume();
+        });
+    }
+
+    private convertBufferToStream(buffer: Buffer): Stream {
+        return new Readable({
+            read() {
+                this.push(buffer);
+                this.push(null);
+            }
         });
     }
 
