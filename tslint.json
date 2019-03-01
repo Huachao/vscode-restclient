@@ -12,12 +12,10 @@
         ],
         "no-console": [
             true,
-            "log",
-            "error"
+            "log"
         ],
         "no-duplicate-variable": true,
         "no-trailing-whitespace": true,
-        "no-unused-variable": true,
         "no-unused-expression": true,
         "no-var-keyword": true,
         "one-line": [
@@ -27,6 +25,13 @@
             "check-else",
             "check-open-brace",
             "check-whitespace"
+        ],
+        "ordered-imports": [
+            true,
+            {
+                "import-sources-order": "case-insensitive",
+                "named-imports-order": "case-insensitive"
+            }
         ],
         "semicolon": [
             true,
@@ -45,5 +50,8 @@
             "check-separator",
             "check-type"
         ]
+    },
+    "linterOptions": {
+        "exclude": ["*.json"]
     }
 }

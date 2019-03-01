@@ -1,3 +1,104 @@
+## 0.21.1 (2019/1/8)
+* __Feature__: Add fold/unfold full response body features in the response preview panel
+* __Bug Fix__: [Copy request as cURL not working](https://github.com/Huachao/vscode-restclient/issues/308)
+* __Bug Fix__: [AAD Auth stopped to work in new version - 0.21.0](https://github.com/Huachao/vscode-restclient/issues/309)
+
+## 0.21.0 (2019/1/3)
+* __Bug Fix__: [Unable to collapse the json response body](https://github.com/Huachao/vscode-restclient/issues/301)
+* __Improvement__: [Use Webpack to bundle extension to improve activation time and high CPU load](https://github.com/Huachao/vscode-restclient/issues/257)
+* __Improvement__: Update _RFC1322_ to _RFC1123_
+
+## 0.20.4 (2018/12/2)
+* __Feature__: [Support file variables reference other file variables](https://github.com/Huachao/vscode-restclient/issues/247)
+* __Feature__: [Support file variables reference system and environment variables](https://github.com/Huachao/vscode-restclient/issues/208)
+* __Improvement__: [Display actual response for image `HEAD` request](https://github.com/Huachao/vscode-restclient/issues/293)
+* __Bug Fix__: [Redirect all 3xx requests](https://github.com/Huachao/vscode-restclient/issues/285)
+* __Bug Fix__: [Parse rquest body correctly of `multipart/mixed` mime type](https://github.com/Huachao/vscode-restclient/issues/232)
+
+## 0.20.3 (2018/11/1)
+* __Bug Fix__: [Cannot read property 'toLowerCase' of null](https://github.com/Huachao/vscode-restclient/issues/219)
+* __Bug Fix__: [Fix incorrect JSON body rendering for variable reference syntax](https://github.com/Huachao/vscode-restclient/issues/264)
+* __Bug Fix__: [Do not decode percent encoding in response body](https://github.com/Huachao/vscode-restclient/issues/280)
+* __Bug Fix__: [Do not use system environment variables if proxy setting already set](https://github.com/Huachao/vscode-restclient/issues/273)
+* __Bug Fix__: [Handle compressed responses](https://github.com/Huachao/vscode-restclient/issues/282)
+* __Improvement__: Use new `setTextDocumentLanguage` API to refacotr text document view rendering
+
+## 0.20.2 (2018/10/10)
+* __Bug Fix__: [Recognize file variable value contains whitespaces](https://github.com/Huachao/vscode-restclient/issues/264)
+
+## 0.20.1 (2018/10/9)
+* __Bug Fix__: [Broken works with certificates](https://github.com/Huachao/vscode-restclient/issues/263)
+
+## 0.20.0 (2018/10/8)
+* __Feature__: [Support file variables reference request variables](https://github.com/Huachao/vscode-restclient/issues/181)
+* __Feature__: [Support resolve the full response body regardless of the response content type](https://github.com/Huachao/vscode-restclient/issues/188)
+* __Bug Fix__: [Fix Https proxy issue](https://github.com/Huachao/vscode-restclient/issues/255)
+* __Bug Fix__: [Reload configuration when switching active text editor](https://github.com/Huachao/vscode-restclient/issues/245)
+* __Bug Fix__: Fix incorrect http symbol range
+* __Bug Fix__: Ensure response saving directory existence before saving
+* __Improvement__: Add icon for response webview tab
+* __Improvement__: [Switch JSON formatting library from `jsonc-parser` to `js-beautify`](https://github.com/Huachao/vscode-restclient/pull/233) ([@ygraber](https://github.com/ygraber))
+* __Improvement__: [Treat the mime type of response body is `application/json` if the body itself is a `JSON` string](https://github.com/Huachao/vscode-restclient/issues/239)
+* __Improvement__: [Unset gzip setting to avoid adding `Accept-Encoding` header automatically](https://github.com/Huachao/vscode-restclient/issues/256)
+* __Improvement__: [Upgrade applicationinsights to latest version to avoid monkey patching](https://github.com/Huachao/vscode-restclient/issues/260)
+
+
+## 0.19.1 (2018/8/7)
+* __Bug Fix__: [Make Azure AAD Auth respect the audience](https://github.com/Huachao/vscode-restclient/issues/225)
+* __Bug Fix__: [Fix curl command can't be run on Windows](https://github.com/Huachao/vscode-restclient/issues/227)
+* __Bug Fix__: [Add setting `decodeEscapedUnicodeCharacters` to decode escaped characters in response body](https://github.com/Huachao/vscode-restclient/issues/230)
+* __Bug Fix__: Fix copy request as curl issue when request block leads with blank lines
+* __Improvement__: [Show response in the right editor](https://github.com/Huachao/vscode-restclient/issues/216)
+* __Improvement__: [Add `formParamEncodingStrategy` setting to control the form param encoding behavior](https://github.com/Huachao/vscode-restclient/issues/222)
+* __Improvement__: [Add `addRequestBodyLineIndentationAroundBrackets` setting to control the request body indent behavior](https://github.com/Huachao/vscode-restclient/issues/226)
+
+## 0.19.0 (2018/6/28)
+* __Breaking Change__: Remove support for setting `rest-client.defaultuseragent`, replace this with `rest-client.defaultHeaders` which has more capability to add other default request headers
+* __Breaking Change__: Remove support for setting `rest-client.previewResponseInActiveColumn`, replace this with `rest-client.previewColumn` which has more capability to specify which column to preview, not just currently active one
+* __Feature__: [Add support for default headers](https://github.com/Huachao/vscode-restclient/pull/206) ([@Kronuz](https://github.com/Kronuz))
+* __Feature__: [Show response preview in right editor](https://github.com/Huachao/vscode-restclient/issues/216)
+* __Feature__: [Preserve focus of the http editor](https://github.com/Huachao/vscode-restclient/issues/167)
+* __Bug Fix__: [Setting: 'previewOption' does not work in combination with 'previewResponseInUntitledDocument'](https://github.com/Huachao/vscode-restclient/issues/183)
+* __Bug Fix__: Fix Chinese encoding not copied to clipboard
+* __Improvement__: [Retina icon](https://github.com/Huachao/vscode-restclient/pull/217) ([@pluwen](https://github.com/pluwen))
+* __Improvement__: Add http language default configuration `editor.quickSuggestions`
+* __Improvement__: Refactor resolving http variables logic
+* __Improvement__: Leverage new Webview API to render response and code snippet
+
+## 0.18.4 (2018/5/4)
+* __Feature__: [Open a saving dialogue when saving response and response body](https://github.com/Huachao/vscode-restclient/issues/186)
+* __Bug Fix__: [Do not empty rulesets](https://github.com/Huachao/vscode-restclient/pull/203) ([@mtxr](https://github.com/mtxr))
+* __Bug Fix__: Fix document link broken
+* __Improvement__: Add syntax highlight for curl requests in http file
+* __Improvement__: Improve cpu usage to eliminate unnecessary allocation for Regex inside loop
+
+## 0.18.3 (2018/4/23)
+* __Feature__: [Support multiline x-www-form-urlencoded request body](https://github.com/Huachao/vscode-restclient/issues/169)
+* __Improvement__: [Limiting linting to local files](https://github.com/Huachao/vscode-restclient/pull/196) ([@lostintangent](https://github.com/lostintangent))
+* __Improvement__: Improvement response body syntax highlight
+
+## 0.18.2 (2018/4/17)
+* __Feature__: [Add system variable `datetime` to generate a _ISO8601_ or _RFC1123_ format datetime](https://github.com/Huachao/vscode-restclient/issues/180)
+* __Bug Fix__: [Allow request variable resolving whole xml document in response/request body](https://github.com/Huachao/vscode-restclient/issues/188)
+* __Bug Fix__: [Fix only one request is allowed per line](https://github.com/Huachao/vscode-restclient/issues/189)
+* __Bug Fix__: [Relative certificate path resolving not working](https://github.com/Huachao/vscode-restclient/issues/190)
+* __Improvement__: [Restricting language services to local files](https://github.com/Huachao/vscode-restclient/pull/187) ([@lostintangent](https://github.com/lostintangent))
+* __Improvement__: [Modify not sent request variable diagnostic level from Error to Information](https://github.com/Huachao/vscode-restclient/issues/184)
+
+## 0.18.1 (2018/3/30)
+* __Bug Fix__: Fix auto autocompletion not working after introducing request variables
+
+## 0.18.0 (2018/3/29)
+* __Feature__: [Add request variable support to provide the possibility to extract values from response](https://github.com/Huachao/vscode-restclient/pull/140) ([@cbrevik](https://github.com/cbrevik))
+* __Feature__: [Add indentation based response folding in webview](https://github.com/Huachao/vscode-restclient/issues/157)
+* __Feature__: [Add option to preview response in current active view column](https://github.com/Huachao/vscode-restclient/issues/172)
+* __Bug Fix__: [Fix JSON response zero fractions removed error when formatting](https://github.com/Huachao/vscode-restclient/issues/171)
+* __Bug Fix__: [Fix excluding hosts w/o ports bug](https://github.com/Huachao/vscode-restclient/pull/176) ([@realskim](https://github.com/realskim))
+* __Bug Fix__: Retrieve `enableTelemetry` setting from `rest-client` section
+* __Improvement__: [Adding Visual Studio Live Share support - Document Link Provider](https://github.com/Huachao/vscode-restclient/pull/174) ([@lostintangent](https://github.com/lostintangent))
+* __Improvement__: [Allow specifying $aadToken audience](https://github.com/Huachao/vscode-restclient/pull/161) ([@flanakin](https://github.com/flanakin/))
+* __Improvement__: Change the preview url suffix to `.html`
+
 ## 0.17.0 (2018/1/30)
 * __Feature__: [Add Azure Active Directory Support](https://github.com/Huachao/vscode-restclient/pulls/150) ([@flanakin](https://github.com/flanakin/))
 * __Feature__: [Highlight JSON/XML request body automatically](https://github.com/Huachao/vscode-restclient/issues/135)

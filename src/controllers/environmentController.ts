@@ -1,25 +1,23 @@
 "use strict";
 
-import { StatusBarItem, StatusBarAlignment, window } from 'vscode';
+import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
 import { EnvironmentPickItem } from '../models/environmentPickItem';
-import { PersistUtility } from '../persistUtility';
-import * as Constants from '../constants';
-import { trace } from "../decorator";
+import { trace } from "../utils/decorator";
+import { PersistUtility } from '../utils/persistUtility';
 
 export class EnvironmentController {
     private static readonly noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
         'No Environment', Constants.NoEnvironmentSelectedName, 'You Can Still Use Variables Defined In $shared Environment');
 
-    private static readonly sharedEnvironmentName: string = '$shared';
+    public static readonly sharedEnvironmentName: string = '$shared';
+    private static readonly settings: RestClientSettings = RestClientSettings.Instance;
 
     private _environmentStatusBarItem: StatusBarItem;
-    private _restClientSettings: RestClientSettings;
 
     public constructor(initEnvironment: EnvironmentPickItem) {
-        this._restClientSettings = new RestClientSettings();
-
-        if (this._restClientSettings.showEnvironmentStatusBarItem) {
+        if (EnvironmentController.settings.showEnvironmentStatusBarItem) {
             this._environmentStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
             this._environmentStatusBarItem.command = 'rest-client.switch-environment';
             this._environmentStatusBarItem.text = initEnvironment.label;
@@ -33,7 +31,7 @@ export class EnvironmentController {
         let currentEnvironment = await EnvironmentController.getCurrentEnvironment();
         let itemPickList: EnvironmentPickItem[] = [];
         itemPickList.push(EnvironmentController.noEnvironmentPickItem);
-        for (let name in this._restClientSettings.environmentVariables) {
+        for (let name in EnvironmentController.settings.environmentVariables) {
             if (name === EnvironmentController.sharedEnvironmentName) {
                 continue;
             }
@@ -49,7 +47,7 @@ export class EnvironmentController {
             return;
         }
 
-        if (this._restClientSettings.showEnvironmentStatusBarItem) {
+        if (EnvironmentController.settings.showEnvironmentStatusBarItem) {
             this._environmentStatusBarItem.text = item.label;
         }
 
@@ -63,26 +61,6 @@ export class EnvironmentController {
             await PersistUtility.saveEnvironment(currentEnvironment);
         }
         return currentEnvironment;
-    }
-
-    public static async getCustomVariables(environment: EnvironmentPickItem = null): Promise<Map<string, string>> {
-        if (!environment) {
-            environment = await EnvironmentController.getCurrentEnvironment();
-        }
-
-        let settings = new RestClientSettings();
-        let environments = settings.environmentVariables;
-        let variables = {};
-        Object.assign(
-            variables,
-            environments[EnvironmentController.sharedEnvironmentName] || {},
-            environments[environment.name] || {});
-
-        const map = new Map<string, string>();
-        Object.keys(variables).forEach(key => {
-            map.set(key, variables[key]);
-        });
-        return map;
     }
 
     public dispose() {

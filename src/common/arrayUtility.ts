@@ -10,7 +10,7 @@ export class ArrayUtility {
         }
 
         return items.slice(index);
-    };
+    }
 
     public static firstIndexOf<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean, start?: number): number {
         if (!start) {

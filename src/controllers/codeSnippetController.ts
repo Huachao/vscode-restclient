@@ -1,41 +1,57 @@
 "use strict";
 
-import { window, Uri, Disposable, workspace, commands, ViewColumn } from 'vscode';
-import { ArrayUtility } from "../common/arrayUtility";
-import { RequestParserFactory } from '../models/requestParserFactory';
-import { VariableProcessor } from '../variableProcessor';
-import { HttpRequest } from '../models/httpRequest';
-import { HARHttpRequest, HARHeader, HARCookie, HARPostData } from '../models/harHttpRequest';
-import { CodeSnippetTargetQuickPickItem } from '../models/codeSnippetTargetPickItem';
-import { CodeSnippetTarget } from '../models/codeSnippetTarget';
-import { CodeSnippetClientQuickPickItem } from '../models/codeSnippetClientPickItem';
-import { CodeSnippetClient } from '../models/codeSnippetClient';
-import { CodeSnippetTextDocumentContentProvider } from '../views/codeSnippetTextDocumentContentProvider';
-import { Selector } from '../selector';
-import { Telemetry } from '../telemetry';
-import { trace } from "../decorator";
-import * as Constants from '../constants';
 import { EOL } from 'os';
+import * as url from 'url';
+import { Clipboard, env, QuickInputButtons, QuickPickItem, window } from 'vscode';
+import { ArrayUtility } from "../common/arrayUtility";
+import * as Constants from '../common/constants';
+import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
+import { HttpRequest } from '../models/httpRequest';
+import { RequestParserFactory } from '../models/requestParserFactory';
+import { trace } from "../utils/decorator";
+import { Selector } from '../utils/selector';
+import { Telemetry } from '../utils/telemetry';
+import { VariableProcessor } from '../utils/variableProcessor';
+import { getCurrentTextDocument } from '../utils/workspaceUtility';
+import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
-const cp = require('copy-paste');
+const encodeUrl = require('encodeurl');
 const HTTPSnippet = require('httpsnippet');
+
+interface CodeSnippetTargetQuickPickItem extends QuickPickItem {
+    target: {
+        key: string;
+        title: string;
+        clients: [{
+            title: string;
+            link: string,
+            description: string
+        }]
+    };
+}
+
+interface CodeSnippetClientQuickPickItem extends CodeSnippetTargetQuickPickItem {
+    client: {
+        key: string;
+        title: string;
+    };
+}
 
 export class CodeSnippetController {
     private static _availableTargets = HTTPSnippet.availableTargets();
-    private _previewUri: Uri = Uri.parse('rest-code-snippet://authority/generate-code-snippet');
-    private _codeSnippetTextProvider: CodeSnippetTextDocumentContentProvider;
-    private _registration: Disposable;
-    private _selectedText;
+    private readonly clipboard: Clipboard;
     private _convertedResult;
+    private _webview: CodeSnippetWebview;
 
     constructor() {
-        this._codeSnippetTextProvider = new CodeSnippetTextDocumentContentProvider(null, null);
-        this._registration = workspace.registerTextDocumentContentProvider('rest-code-snippet', this._codeSnippetTextProvider);
+        this._webview = new CodeSnippetWebview();
+        this.clipboard = env.clipboard;
     }
 
     public async run() {
-        let editor = window.activeTextEditor;
-        if (!editor || !editor.document) {
+        const editor = window.activeTextEditor;
+        const document = getCurrentTextDocument();
+        if (!editor || !document) {
             return;
         }
 
@@ -46,22 +62,19 @@ export class CodeSnippetController {
         }
 
         // remove comment lines
-        let lines: string[] = selectedText.split(/\r?\n/g);
-        selectedText = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
-        if (selectedText === '') {
+        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        if (lines.length === 0 || lines.every(line => line === '')) {
             return;
         }
 
-        // remove file variables definition lines
-        lines = selectedText.split(/\r?\n/g);
-        selectedText = ArrayUtility.skipWhile(lines, l => Constants.VariableDefinitionRegex.test(l)).join(EOL);
+        // remove file variables definition lines and leading empty lines
+        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
         // variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
-        this._selectedText = selectedText;
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
             return;
         }
@@ -70,56 +83,51 @@ export class CodeSnippetController {
         let snippet = new HTTPSnippet(harHttpRequest);
 
         if (CodeSnippetController._availableTargets) {
-            let targetsPickList: CodeSnippetTargetQuickPickItem[] = CodeSnippetController._availableTargets.map(target => {
-                let item = new CodeSnippetTargetQuickPickItem();
-                item.label = target.title;
-                item.rawTarget = new CodeSnippetTarget();
-                item.rawTarget.default = target.default;
-                item.rawTarget.extname = target.extname;
-                item.rawTarget.key = target.key;
-                item.rawTarget.title = target.title;
-                item.rawTarget.clients = target.clients.map(client => {
-                    let clientItem = new CodeSnippetClient();
-                    clientItem.key = client.key;
-                    clientItem.link = client.link;
-                    clientItem.title = client.title;
-                    clientItem.description = client.description;
-
-                    return clientItem;
-                });
-
-                return item;
+            const quickPick = window.createQuickPick();
+            const targetQuickPickItems: CodeSnippetTargetQuickPickItem[] = CodeSnippetController._availableTargets.map(target => ({ label: target.title, target }));
+            quickPick.title = 'Generate Code Snippet';
+            quickPick.step = 1;
+            quickPick.totalSteps = 2;
+            quickPick.items = targetQuickPickItems;
+            quickPick.matchOnDescription = true;
+            quickPick.matchOnDetail = true;
+            quickPick.onDidHide(() => quickPick.dispose());
+            quickPick.onDidTriggerButton(() => {
+                quickPick.step--;
+                quickPick.buttons = [];
+                quickPick.items = targetQuickPickItems;
             });
+            quickPick.onDidAccept(() => {
+                const selectedItem = quickPick.selectedItems[0];
+                if (selectedItem) {
+                    if (quickPick.step === 1) {
+                        quickPick.step++;
+                        quickPick.buttons = [QuickInputButtons.Back];
+                        const targetItem = selectedItem as CodeSnippetTargetQuickPickItem;
+                        quickPick.items = targetItem.target.clients.map(
+                            client => ({
+                                label: client.title,
+                                description: client.description,
+                                detail: client.link,
+                                target: targetItem.target,
+                                client
+                            })
+                        );
+                    } else if (quickPick.step === 2) {
+                        const { target: { key: tk, title: tt }, client: { key: ck, title: ct } } = (selectedItem as CodeSnippetClientQuickPickItem);
+                        Telemetry.sendEvent('Generate Code Snippet', { 'target': tk, 'client': ck });
+                        let result = snippet.convert(tk, ck);
+                        this._convertedResult = result;
 
-            let item = await window.showQuickPick(targetsPickList, { placeHolder: "" });
-            if (!item) {
-                return;
-            } else {
-                let clientsPickList: CodeSnippetClientQuickPickItem[] = item.rawTarget.clients.map(client => {
-                    let item = new CodeSnippetClientQuickPickItem();
-                    item.label = client.title;
-                    item.description = client.description;
-                    item.detail = client.link;
-                    item.rawClient = client;
-                    return item;
-                });
-
-                let client = await window.showQuickPick(clientsPickList, { placeHolder: "" });
-                if (client) {
-                    Telemetry.sendEvent('Generate Code Snippet', { 'target': item.rawTarget.key, 'client': client.rawClient.key });
-                    let result = snippet.convert(item.rawTarget.key, client.rawClient.key);
-                    this._convertedResult = result;
-                    this._codeSnippetTextProvider.convertResult = result;
-                    this._codeSnippetTextProvider.lang = item.rawTarget.key;
-                    this._codeSnippetTextProvider.update(this._previewUri);
-
-                    try {
-                        await commands.executeCommand('vscode.previewHtml', this._previewUri, ViewColumn.Two, `${item.rawTarget.title}-${client.rawClient.title}`);
-                    } catch (reason) {
-                        window.showErrorMessage(reason);
+                        try {
+                            this._webview.render(result, `${tt}-${ct}`, tk);
+                        } catch (reason) {
+                            window.showErrorMessage(reason);
+                        }
                     }
                 }
-            }
+            });
+            quickPick.show();
         } else {
             window.showInformationMessage('No available code snippet convert targets');
         }
@@ -128,14 +136,15 @@ export class CodeSnippetController {
     @trace('Copy Code Snippet')
     public async copy() {
         if (this._convertedResult) {
-            cp.copy(this._convertedResult);
+            await this.clipboard.writeText(this._convertedResult);
         }
     }
 
     @trace('Copy Request As cURL')
     public async copyAsCurl() {
-        let editor = window.activeTextEditor;
-        if (!editor || !editor.document) {
+        const editor = window.activeTextEditor;
+        const document = getCurrentTextDocument();
+        if (!editor || !document) {
             return;
         }
 
@@ -146,30 +155,36 @@ export class CodeSnippetController {
         }
 
         // remove comment lines
-        let lines: string[] = selectedText.split(/\r?\n/g);
-        selectedText = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
-        if (selectedText === '') {
+        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        if (lines.length === 0 || lines.every(line => line === '')) {
             return;
         }
 
         // remove file variables definition lines
-        lines = selectedText.split(/\r?\n/g);
-        selectedText = ArrayUtility.skipWhile(lines, l => Constants.VariableDefinitionRegex.test(l)).join(EOL);
+        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
-        // environment variables replacement
+        // variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
-        this._selectedText = selectedText;
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
+        const httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
             return;
         }
 
-        let harHttpRequest = this.convertToHARHttpRequest(httpRequest);
-        let snippet = new HTTPSnippet(harHttpRequest);
-        let result = snippet.convert('shell', 'curl');
-        cp.copy(result);
+        const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
+        const addPrefix = !(url.parse(harHttpRequest.url).protocol);
+        const originalUrl = harHttpRequest.url;
+        if (addPrefix) {
+            // Add protocol for url that doesn't specify protocol to pass the HTTPSnippet validation #328
+            harHttpRequest.url = `http://${originalUrl}`;
+        }
+        const snippet = new HTTPSnippet(harHttpRequest);
+        if (addPrefix) {
+            snippet.requests[0].fullUrl = originalUrl;
+        }
+        const result = snippet.convert('shell', 'curl', process.platform === 'win32' ? { indent: false } : {});
+        await this.clipboard.writeText(result);
     }
 
     private convertToHARHttpRequest(request: HttpRequest): HARHttpRequest {
@@ -209,10 +224,11 @@ export class CodeSnippetController {
             }
         }
 
-        return new HARHttpRequest(request.method, request.url, headers, cookies, body);
+        return new HARHttpRequest(request.method, encodeUrl(request.url), headers, cookies, body);
     }
 
     public dispose() {
+        this._webview.dispose();
     }
 
     private static normalizeAuthHeader(authHeader) {
@@ -222,7 +238,7 @@ export class CodeSnippetController {
             if (scheme && scheme.toLowerCase() === 'basic') {
                 let params = authHeader.substr(start).trim().split(' ');
                 if (params.length === 2) {
-                    return 'Basic ' + new Buffer(`${params[0]}:${params[1]}`).toString('base64');
+                    return 'Basic ' + Buffer.from(`${params[0]}:${params[1]}`).toString('base64');
                 }
             }
         }

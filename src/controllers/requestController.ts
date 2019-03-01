@@ -1,84 +1,95 @@
 "use strict";
 
-import { window, workspace, commands, Uri, StatusBarItem, StatusBarAlignment, ViewColumn, Disposable, TextDocument, Range } from 'vscode';
-import { ArrayUtility } from "../common/arrayUtility";
-import { RequestParserFactory } from '../models/requestParserFactory';
-import { HttpClient } from '../httpClient';
-import { HttpRequest } from '../models/httpRequest';
-import { HttpResponse } from '../models/httpResponse';
-import { SerializedHttpRequest } from '../models/httpRequest';
-import { RestClientSettings } from '../models/configurationSettings';
-import { PersistUtility } from '../persistUtility';
-import { HttpResponseTextDocumentContentProvider } from '../views/httpResponseTextDocumentContentProvider';
-import { UntitledFileContentProvider } from '../views/responseUntitledFileContentProvider';
-import { trace } from "../decorator";
-import { VariableProcessor } from '../variableProcessor';
-import { RequestStore } from '../requestStore';
-import { ResponseStore } from '../responseStore';
-import { Selector } from '../selector';
-import * as Constants from '../constants';
 import { EOL } from 'os';
+import { ExtensionContext, OutputChannel, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
+import { ArrayUtility } from "../common/arrayUtility";
+import * as Constants from '../common/constants';
+import { Logger } from '../logger';
+import { RestClientSettings } from '../models/configurationSettings';
+import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
+import { HttpResponse } from '../models/httpResponse';
+import { RequestParserFactory } from '../models/requestParserFactory';
+import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
+import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
+import { trace } from "../utils/decorator";
+import { HttpClient } from '../utils/httpClient';
+import { PersistUtility } from '../utils/persistUtility';
+import { RequestStore } from '../utils/requestStore';
+import { RequestVariableCache } from "../utils/requestVariableCache";
+import { Selector } from '../utils/selector';
+import { VariableProcessor } from '../utils/variableProcessor';
+import { getCurrentTextDocument } from '../utils/workspaceUtility';
+import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
+import { HttpResponseWebview } from '../views/httpResponseWebview';
 
 const elegantSpinner = require('elegant-spinner');
 const spinner = elegantSpinner();
 
 const filesize = require('filesize');
-
-const uuid = require('node-uuid');
+const uuidv4 = require('uuid/v4');
 
 export class RequestController {
+    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
+    private readonly _requestStore: RequestStore = RequestStore.Instance;
     private _durationStatusBarItem: StatusBarItem;
     private _sizeStatusBarItem: StatusBarItem;
-    private _restClientSettings: RestClientSettings;
     private _httpClient: HttpClient;
-    private _responseTextProvider: HttpResponseTextDocumentContentProvider;
-    private _registration: Disposable;
-    private _previewUri: Uri = Uri.parse('rest-response://authority/response-preview');
     private _interval: NodeJS.Timer;
+    private _webview: HttpResponseWebview;
+    private _textDocumentView: HttpResponseTextDocumentView;
+    private _outputChannel: OutputChannel;
 
-    public constructor() {
+    public constructor(context: ExtensionContext, private readonly logger: Logger) {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._sizeStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
-        this._restClientSettings = new RestClientSettings();
-        this._httpClient = new HttpClient(this._restClientSettings);
-
-        this._responseTextProvider = new HttpResponseTextDocumentContentProvider(this._restClientSettings);
-        this._registration = workspace.registerTextDocumentContentProvider('rest-response', this._responseTextProvider);
-
-        workspace.onDidCloseTextDocument((params) => this.onDidCloseTextDocument(params));
+        this._httpClient = new HttpClient();
+        this._webview = new HttpResponseWebview(context);
+        this._webview.onDidCloseAllWebviewPanels(() => {
+            this._durationStatusBarItem.hide();
+            this._sizeStatusBarItem.hide();
+        });
+        this._textDocumentView = new HttpResponseTextDocumentView();
     }
 
     @trace('Request')
     public async run(range: Range) {
-        let editor = window.activeTextEditor;
-        if (!editor || !editor.document) {
+        const editor = window.activeTextEditor;
+        const document = getCurrentTextDocument();
+        if (!editor || !document) {
             return;
         }
 
+        const selector = new Selector();
+
         // Get selected text of selected lines or full document
-        let selectedText = new Selector().getSelectedText(editor, range);
+        let selectedText = selector.getSelectedText(editor, range);
         if (!selectedText) {
             return;
         }
 
+        // parse request variable definition name
+        const requestVariable = Selector.getRequestVariableDefinitionName(selectedText);
+
         // remove comment lines
-        let lines: string[] = selectedText.split(/\r?\n/g);
-        selectedText = lines.filter(l => !Constants.CommentIdentifiersRegex.test(l)).join(EOL);
-        if (selectedText === '') {
+        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        if (lines.length === 0 || lines.every(line => line === '')) {
             return;
         }
 
-        // remove file variables definition lines
-        lines = selectedText.split(/\r?\n/g);
-        selectedText = ArrayUtility.skipWhile(lines, l => Constants.VariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
+        // remove file variables definition lines and leading empty lines
+        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
 
         // variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, editor.document.fileName);
+        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
             return;
+        }
+
+        if (requestVariable) {
+            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, document.uri.toString());
         }
 
         await this.runCore(httpRequest);
@@ -86,7 +97,7 @@ export class RequestController {
 
     @trace('Rerun Request')
     public async rerun() {
-        let httpRequest = RequestStore.getLatest();
+        let httpRequest = this._requestStore.getLatest();
         if (!httpRequest) {
             return;
         }
@@ -97,23 +108,22 @@ export class RequestController {
     @trace('Cancel Request')
     public async cancel() {
 
-        if (RequestStore.isCompleted()) {
+        if (this._requestStore.isCompleted()) {
             return;
         }
 
         this.clearSendProgressStatusText();
 
         // cancel current request
-        RequestStore.cancel();
+        this._requestStore.cancel();
 
-        this._durationStatusBarItem.command = null;
         this._durationStatusBarItem.text = 'Cancelled $(circle-slash)';
         this._durationStatusBarItem.tooltip = null;
     }
 
     private async runCore(httpRequest: HttpRequest) {
-        let requestId = uuid.v4();
-        RequestStore.add(<string>requestId, httpRequest);
+        let requestId = uuidv4();
+        this._requestStore.add(<string>requestId, httpRequest);
 
         // clear status bar
         this.setSendingProgressStatusText();
@@ -123,7 +133,7 @@ export class RequestController {
             let response = await this._httpClient.send(httpRequest);
 
             // check cancel
-            if (RequestStore.isCancelled(<string>requestId)) {
+            if (this._requestStore.isCancelled(<string>requestId)) {
                 return;
             }
 
@@ -133,24 +143,22 @@ export class RequestController {
             this.formatSizeStatusBar(response);
             this._sizeStatusBarItem.show();
 
-            let previewUri = this.generatePreviewUri();
-            ResponseStore.add(previewUri.toString(), response);
-
-            this._responseTextProvider.update(this._previewUri);
+            if (httpRequest.requestVariableCacheKey) {
+                RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
+            }
 
             try {
+                const activeColumn = window.activeTextEditor.viewColumn;
+                const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
+                    ? activeColumn
+                    : ((activeColumn as number) + 1) as ViewColumn;
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
-                    UntitledFileContentProvider.createHttpResponseUntitledFile(
-                        response,
-                        this._restClientSettings.showResponseInDifferentTab,
-                        this._restClientSettings.previewResponseSetUntitledDocumentLanguageByContentType,
-                        this._restClientSettings.includeAdditionalInfoInResponse,
-                        this._restClientSettings.suppressResponseBodyContentTypeValidationWarning
-                    );
+                    this._textDocumentView.render(response, previewColumn);
                 } else {
-                    await commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two, `Response(${response.elapsedMillionSeconds}ms)`);
+                    this._webview.render(response, previewColumn);
                 }
             } catch (reason) {
+                this.logger.error('Unable to preview response:', reason);
                 window.showErrorMessage(reason);
             }
 
@@ -159,7 +167,7 @@ export class RequestController {
             await PersistUtility.saveRequest(serializedRequest);
         } catch (error) {
             // check cancel
-            if (RequestStore.isCancelled(<string>requestId)) {
+            if (this._requestStore.isCancelled(<string>requestId)) {
                 return;
             }
 
@@ -171,26 +179,19 @@ export class RequestController {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
             this.clearSendProgressStatusText();
-            this._durationStatusBarItem.command = null;
             this._durationStatusBarItem.text = '';
+            this.logger.error('Failed to send request:', error);
             window.showErrorMessage(error.message);
         } finally {
-            RequestStore.complete(<string>requestId);
+            this._requestStore.complete(<string>requestId);
         }
     }
 
     public dispose() {
         this._durationStatusBarItem.dispose();
         this._sizeStatusBarItem.dispose();
-        this._registration.dispose();
-    }
-
-    private generatePreviewUri(): Uri {
-        let uriString = 'rest-response://authority/response-preview';
-        if (this._restClientSettings.showResponseInDifferentTab) {
-            uriString += `/${Date.now()}`;  // just make every uri different
-        }
-        return Uri.parse(uriString);
+        this._webview.dispose();
+        this._outputChannel.dispose();
     }
 
     private setSendingProgressStatusText() {
@@ -207,20 +208,7 @@ export class RequestController {
         this._sizeStatusBarItem.hide();
     }
 
-    private onDidCloseTextDocument(doc: TextDocument): void {
-        // Remove the status bar associated with the response preview uri
-        if (this._restClientSettings.showResponseInDifferentTab) {
-            return;
-        }
-
-        if (ResponseStore.get(doc.uri.toString())) {
-            this._durationStatusBarItem.hide();
-            this._sizeStatusBarItem.hide();
-        }
-    }
-
     private formatDurationStatusBar(response: HttpResponse) {
-        this._durationStatusBarItem.command = null;
         this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
         this._durationStatusBarItem.tooltip = [
             'Breakdown of Duration:',
@@ -234,6 +222,10 @@ export class RequestController {
 
     private formatSizeStatusBar(response: HttpResponse) {
         this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
-        this._sizeStatusBarItem.tooltip = `Breakdown of Response Size:${EOL}Headers: ${filesize(response.headersSizeInBytes)}${EOL}Body: ${filesize(response.bodySizeInBytes)}`;
+        this._sizeStatusBarItem.tooltip = [
+            'Breakdown of Response Size:',
+            `Headers: ${filesize(response.headersSizeInBytes)}`,
+            `Body: ${filesize(response.bodySizeInBytes)}`
+        ].join(EOL);
     }
 }
