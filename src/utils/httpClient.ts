@@ -12,11 +12,11 @@ import { HostCertificate } from '../models/hostCertificate';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { HttpResponseTimingPhases } from '../models/httpResponseTimingPhases';
+import { AuthProcessorFactory } from './../auth/authProcessorFactory';
 import { MimeUtility } from './mimeUtility';
 import { getHeader, hasHeader } from './misc';
 import { PersistUtility } from './persistUtility';
 import { getWorkspaceRootPath } from './workspaceUtility';
-import { AuthProcessorFactory } from './auth/authProcessorFactory';
 
 const encodeUrl = require('encodeurl');
 const request = require('request');
@@ -30,7 +30,7 @@ export class HttpClient {
     }
 
     public async send(httpRequest: HttpRequest): Promise<HttpResponse> {
-        const options = await this.prepareOptions(httpRequest);
+        let options = await this.prepareOptions(httpRequest);
 
         let size = 0;
         let headersSize = 0;

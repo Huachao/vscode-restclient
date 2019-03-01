@@ -1,11 +1,13 @@
+// tslint:disable: ordered-imports
+
 import { IAuthProcessor } from '../IAuthProcessor';
 import { HttpRequest } from '../../models/httpRequest';
-import { getWorkspaceRootPath } from './../../workspaceUtility';
 
 import { AuthConfig } from 'node-sp-auth-config';
 import * as spauth from 'node-sp-auth';
 import * as path from 'path';
 import * as url from 'url';
+import { workspace, window } from 'vscode';
 
 export class SharePointAuthProcessor implements IAuthProcessor {
 
@@ -13,7 +15,7 @@ export class SharePointAuthProcessor implements IAuthProcessor {
 
     public async process(options: any): Promise<any> {
 
-        let workspacePath = getWorkspaceRootPath();
+        let workspacePath = this.getWorkspaceRootPath();
         let configPath;
 
         if (path.isAbsolute(this.authPath)) {
@@ -23,7 +25,8 @@ export class SharePointAuthProcessor implements IAuthProcessor {
         }
 
         const authConfig = new AuthConfig({
-            configPath: configPath
+            configPath: configPath,
+            headlessMode: true
         });
 
         let ctx = await authConfig.getContext();
@@ -43,5 +46,17 @@ export class SharePointAuthProcessor implements IAuthProcessor {
         options.headers = headers;
 
         return options;
+    }
+
+    private getWorkspaceRootPath(): string {
+        const editor = window.activeTextEditor;
+        const document = editor && editor.document;
+        if (document) {
+            let fileUri = document.uri;
+            let workspaceFolder = workspace.getWorkspaceFolder(fileUri);
+            if (workspaceFolder) {
+                return workspaceFolder.uri.fsPath;
+            }
+        }
     }
 }

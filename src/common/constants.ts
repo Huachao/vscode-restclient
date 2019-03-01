@@ -4,6 +4,7 @@ export const ExtensionId: string = 's-kainet.rest-client';
 export const AiKey: string = 'ad746e27-4a36-441c-8b94-5db178f81ae3';
 export const CSSFileName: string = 'rest-client.css';
 export const CSSFolderName: string = 'styles';
+export const ExtensionFolderName: string = '.sp-rest-client';
 export const ScriptFileName: string = 'main.js';
 export const ScriptsFolderName: string = 'scripts';
 export const ImagesFolderName: string = 'images';

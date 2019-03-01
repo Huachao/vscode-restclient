@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "SP REST Client",
   "description": "SharePoint REST Client for Visual Studio Code",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "publisher": "s-kainet",
   "author": {
     "name": "Huachao Mao",
