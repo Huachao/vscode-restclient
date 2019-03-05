@@ -1,3 +1,12 @@
+## 0.21.2 (2019/3/6)
+* __Feature__: [Add copy response body feature](https://github.com/Huachao/vscode-restclient/pull/317) ([@viktor-evdokimov](https://github.com/viktor-evdokimov))
+* __Feature__: [Add options to disable codelens/links](https://github.com/Huachao/vscode-restclient/issues/295)
+* __Improvement__: [Ability to force newline at end of request body for `application/x-ndjson`](https://github.com/Huachao/vscode-restclient/issues/292)
+* __Bug Fix__: [Cannot copy request as cURL or generate snippet if host looks invalid](https://github.com/Huachao/vscode-restclient/issues/328)
+* __Bug Fix__: [Unable to send requests "multipart/form-data" that contains binary files](https://github.com/Huachao/vscode-restclient/issues/332)
+* __Bug Fix__: [Add missing query string when using python(requests library) to generate code snippet](https://github.com/Huachao/vscode-restclient/issues/338)
+* __Bug Fix__: Fix request symbols not working when request url depends on requests not sent or request is in curl format
+
 ## 0.21.1 (2019/1/8)
 * __Feature__: Add fold/unfold full response body features in the response preview panel
 * __Bug Fix__: [Copy request as cURL not working](https://github.com/Huachao/vscode-restclient/issues/308)
