@@ -5,6 +5,7 @@
 * __Bug Fix__: [Cannot copy request as cURL or generate snippet if host looks invalid](https://github.com/Huachao/vscode-restclient/issues/328)
 * __Bug Fix__: [Unable to send requests "multipart/form-data" that contains binary files](https://github.com/Huachao/vscode-restclient/issues/332)
 * __Bug Fix__: [Add missing query string when using python(requests library) to generate code snippet](https://github.com/Huachao/vscode-restclient/issues/338)
+* __Bug Fix__: [Fix year 2018 -> 2019](https://github.com/Huachao/vscode-restclient/pull/318) ([@alaatm](https://github.com/alaatm))
 * __Bug Fix__: Fix request symbols not working when request url depends on requests not sent or request is in curl format
 
 ## 0.21.1 (2019/1/8)
