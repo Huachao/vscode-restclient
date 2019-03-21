@@ -4,10 +4,17 @@ import { EOL } from 'os';
 import { Range, TextEditor } from 'vscode';
 import * as Constants from '../common/constants';
 
+export interface RequestRangeOptions {
+    ignoreCommentLine?: boolean;
+    ignoreEmptyLine?: boolean;
+    ignoreFileVariableDefinitionLine?: boolean;
+    ignoreResponseRange?: boolean;
+}
+
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public getSelectedText(editor: TextEditor, range: Range = null): string {
+    public static getSelectedText(editor: TextEditor, range: Range = null): string {
         if (!editor || !editor.document) {
             return null;
         }
@@ -15,7 +22,7 @@ export class Selector {
         let selectedText: string;
         if (editor.selection.isEmpty || range) {
             let activeLine = !range ? editor.selection.active.line : range.start.line;
-            selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
+            selectedText = Selector.getDelimitedText(editor.document.getText(), activeLine);
         } else {
             selectedText = editor.document.getText(editor.selection);
         }
@@ -23,14 +30,50 @@ export class Selector {
         return selectedText;
     }
 
-    public static getDelimiterRows(lines: string[]) {
-        let rows: number[] = [];
-        for (let index = 0; index < lines.length; index++) {
-            if (lines[index].match(/^#{3,}/)) {
-                rows.push(index);
+    public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
+        options = Object.assign(
+            {
+                ignoreCommentLine: true,
+                ignoreEmptyLine: true,
+                ignoreFileVariableDefinitionLine: true,
+                ignoreResponseRange: true
+            },
+            options);
+        const requestRanges: [number, number][] = [];
+        const delimitedLines = Selector.getDelimiterRows(lines);
+        delimitedLines.push(lines.length);
+
+        let prev = -1;
+        for (const current of delimitedLines) {
+            let start = prev + 1;
+            let end = current - 1;
+            while (start <= end) {
+                const startLine = lines[start];
+                if (options.ignoreResponseRange && Selector.isResponseStatusLine(startLine)) {
+                    break;
+                }
+
+                if (options.ignoreCommentLine && Selector.isCommentLine(startLine)
+                    || options.ignoreEmptyLine && Selector.isEmptyLine(startLine)
+                    || options.ignoreFileVariableDefinitionLine && Selector.isVariableDefinitionLine(startLine)) {
+                    start++;
+                    continue;
+                }
+
+                const endLine = lines[end];
+                if (options.ignoreCommentLine && Selector.isCommentLine(endLine)
+                    || options.ignoreEmptyLine && Selector.isEmptyLine(endLine)) {
+                    end--;
+                    continue;
+                }
+
+                requestRanges.push([start, end]);
+                break;
             }
+            prev = current;
         }
-        return rows;
+
+        return requestRanges;
     }
 
     public static getRequestVariableDefinitionName(text: string): string {
@@ -54,7 +97,7 @@ export class Selector {
         return Selector.responseStatusLineRegex.test(line);
     }
 
-    private getDelimitedText(fullText: string, currentLine: number): string {
+    private static getDelimitedText(fullText: string, currentLine: number): string {
         let lines: string[] = fullText.split(Constants.LineSplitterRegex);
         let delimiterLineNumbers: number[] = Selector.getDelimiterRows(lines);
         if (delimiterLineNumbers.length === 0) {
@@ -81,5 +124,15 @@ export class Selector {
                 return lines.slice(start + 1, end).join(EOL);
             }
         }
+    }
+
+    private static getDelimiterRows(lines: string[]): number[] {
+        let rows: number[] = [];
+        for (let index = 0; index < lines.length; index++) {
+            if (lines[index].match(/^#{3,}/)) {
+                rows.push(index);
+            }
+        }
+        return rows;
     }
 }

@@ -59,10 +59,8 @@ export class RequestController {
             return;
         }
 
-        const selector = new Selector();
-
         // Get selected text of selected lines or full document
-        let selectedText = selector.getSelectedText(editor, range);
+        let selectedText = Selector.getSelectedText(editor, range);
         if (!selectedText) {
             return;
         }

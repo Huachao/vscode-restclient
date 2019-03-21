@@ -13,38 +13,19 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     private static requestParserFactory = new RequestParserFactory();
 
     public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
-        let symbols: SymbolInformation[] = [];
-        let lines: string[] = document.getText().split(Constants.LineSplitterRegex);
-        let delimitedLines: number[] = Selector.getDelimiterRows(lines);
-        delimitedLines.push(lines.length);
-
-        let requestRange: [number, number][] = [];
-        let start: number = 0;
-        for (let index = 0; index < delimitedLines.length; index++) {
-            let end = delimitedLines[index] - 1;
-            while (start < end) {
-                let line = lines[end];
-                if (Selector.isEmptyLine(line) || Selector.isCommentLine(line)) {
-                    end--;
-                } else {
-                    break;
-                }
-            }
-            if (start <= end) {
-                requestRange.push([start, end]);
-                start = delimitedLines[index] + 1;
-            }
-        }
+        const symbols: SymbolInformation[] = [];
+        const lines: string[] = document.getText().split(Constants.LineSplitterRegex);
+        const requestRange: [number, number][] = Selector.getRequestRanges(lines, { ignoreFileVariableDefinitionLine: false });
 
         for (let [blockStart, blockEnd] of requestRange) {
             // get real start for current requestRange
             while (blockStart <= blockEnd) {
-                let line = lines[blockStart];
+                const line = lines[blockStart];
                 if (Selector.isEmptyLine(line) ||
                     Selector.isCommentLine(line)) {
                     blockStart++;
                 } else if (Selector.isVariableDefinitionLine(line)) {
-                    let [name, container] = this.getVariableSymbolInfo(line);
+                    const [name, container] = this.getVariableSymbolInfo(line);
                     symbols.push(
                         new SymbolInformation(
                             name,
