@@ -56,7 +56,7 @@ export class CodeSnippetController {
         }
 
         // Get selected text of selected lines or full document
-        let selectedText = Selector.getSelectedText(editor);
+        let selectedText = Selector.getRequestText(editor);
         if (!selectedText) {
             return;
         }
@@ -149,7 +149,7 @@ export class CodeSnippetController {
         }
 
         // Get selected text of selected lines or full document
-        let selectedText = Selector.getSelectedText(editor);
+        let selectedText = Selector.getRequestText(editor);
         if (!selectedText) {
             return;
         }

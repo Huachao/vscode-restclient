@@ -5,7 +5,7 @@ import { EnvironmentController } from '../../controllers/environmentController';
 import { RestClientSettings } from '../../models/configurationSettings';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
-import { HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
+import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 
 export class EnvironmentVariableProvider implements HttpVariableProvider {
     private static _instance: EnvironmentVariableProvider;
@@ -30,7 +30,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
         return name in variables;
     }
 
-    public async get(document: TextDocument, name: string): Promise<HttpVariableValue> {
+    public async get(document: TextDocument, name: string): Promise<HttpVariable> {
         const variables = await this.getAvailableVariables();
         if (!(name in variables)) {
             return { name, error: ResolveErrorMessage.EnvironmentVariableNotExist };
@@ -39,7 +39,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
         return { name, value: variables[name] };
     }
 
-    public async getAll(document: TextDocument): Promise<HttpVariableValue[]> {
+    public async getAll(document: TextDocument): Promise<HttpVariable[]> {
         const variables = await this.getAvailableVariables();
         return Object.keys(variables).map(key => ({ name: key, value: variables[key]}));
     }

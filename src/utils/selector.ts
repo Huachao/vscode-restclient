@@ -14,7 +14,7 @@ export interface RequestRangeOptions {
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public static getSelectedText(editor: TextEditor, range: Range = null): string {
+    public static getRequestText(editor: TextEditor, range: Range = null): string {
         if (!editor || !editor.document) {
             return null;
         }

@@ -9,11 +9,11 @@ import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVar
 import { VariableType } from '../../models/variableType';
 import { AadTokenCache } from '../aadTokenCache';
 import { HttpClient } from '../httpClient';
-import { HttpVariableContext, HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
+import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
 
 const uuidv4 = require('uuid/v4');
 
-type SystemVariableValue = Pick<HttpVariableValue, Exclude<keyof HttpVariableValue, 'name'>>;
+type SystemVariableValue = Pick<HttpVariable, Exclude<keyof HttpVariable, 'name'>>;
 type ResolveSystemVariableFunc = (name: string, context: HttpVariableContext) => Promise<SystemVariableValue>;
 
 export class SystemVariableProvider implements HttpVariableProvider {
@@ -55,7 +55,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         return this.resolveFuncs.has(variableName);
     }
 
-    public async get(document: TextDocument, name: string, context: HttpVariableContext): Promise<HttpVariableValue> {
+    public async get(document: TextDocument, name: string, context: HttpVariableContext): Promise<HttpVariable> {
         const [variableName] = name.split(' ').filter(Boolean);
         if (!this.resolveFuncs.has(variableName)) {
             return { name: variableName, error: ResolveErrorMessage.SystemVariableNotExist };
@@ -65,7 +65,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         return { name: variableName, ...result };
     }
 
-    public async getAll(document: TextDocument, context: HttpVariableContext): Promise<HttpVariableValue[]> {
+    public async getAll(document: TextDocument, context: HttpVariableContext): Promise<HttpVariable[]> {
         return [...this.resolveFuncs.keys()].map(name => ({ name }));
     }
 

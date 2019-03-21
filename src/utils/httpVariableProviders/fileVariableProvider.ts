@@ -6,7 +6,7 @@ import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { calculateMD5Hash } from '../misc';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
-import { HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
+import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
 import { SystemVariableProvider } from './systemVariableProvider';
 
@@ -49,7 +49,7 @@ export class FileVariableProvider implements HttpVariableProvider {
         return variables.some(v => v.name === name);
     }
 
-    public async get(document: TextDocument, name: string): Promise<HttpVariableValue> {
+    public async get(document: TextDocument, name: string): Promise<HttpVariable> {
         const variables = await this.getFileVariables(document);
         const variable = variables.find(v => v.name === name);
         if (!variable) {
@@ -60,7 +60,7 @@ export class FileVariableProvider implements HttpVariableProvider {
         }
     }
 
-    public async getAll(document: TextDocument): Promise<HttpVariableValue[]> {
+    public async getAll(document: TextDocument): Promise<HttpVariable[]> {
         const variables = await this.getFileVariables(document);
         const variableMap = await this.resolveFileVariables(document, variables);
         return [...variableMap.entries()].map(([name, value]) => ({ name, value }));

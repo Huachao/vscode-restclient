@@ -5,9 +5,11 @@ import { RequestVariableCacheValue } from '../../models/requestVariableCacheValu
 import { VariableType } from "../../models/variableType";
 
 
-export interface HttpVariableValue {
+export type HttpVariableValue = string | {} | RequestVariableCacheValue;
+
+export interface HttpVariable {
     name: string;
-    value?: string | {} | RequestVariableCacheValue;
+    value?: HttpVariableValue;
     error?: any;
     warning?: any;
 }
@@ -20,6 +22,6 @@ export interface HttpVariableContext {
 export interface HttpVariableProvider {
     readonly type: VariableType;
     has(document: TextDocument, name: string, context: HttpVariableContext): Promise<boolean>;
-    get(document: TextDocument, name: string, context: HttpVariableContext): Promise<HttpVariableValue>;
-    getAll(document: TextDocument, context: HttpVariableContext): Promise<HttpVariableValue[]>;
+    get(document: TextDocument, name: string, context: HttpVariableContext): Promise<HttpVariable>;
+    getAll(document: TextDocument, context: HttpVariableContext): Promise<HttpVariable[]>;
 }

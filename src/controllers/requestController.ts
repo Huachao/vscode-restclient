@@ -60,7 +60,7 @@ export class RequestController {
         }
 
         // Get selected text of selected lines or full document
-        let selectedText = Selector.getSelectedText(editor, range);
+        let selectedText = Selector.getRequestText(editor, range);
         if (!selectedText) {
             return;
         }

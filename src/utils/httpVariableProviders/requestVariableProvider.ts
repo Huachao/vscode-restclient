@@ -8,7 +8,7 @@ import { VariableType } from '../../models/variableType';
 import { calculateMD5Hash } from '../misc';
 import { RequestVariableCache } from '../requestVariableCache';
 import { RequestVariableCacheValueProcessor } from '../requestVariableCacheValueProcessor';
-import { HttpVariableProvider, HttpVariableValue } from './httpVariableProvider';
+import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 
 export class RequestVariableProvider implements HttpVariableProvider {
     private static _instance: RequestVariableProvider;
@@ -36,7 +36,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
         return variables.includes(variableName);
     }
 
-    public async get(document: TextDocument, name: string): Promise<HttpVariableValue> {
+    public async get(document: TextDocument, name: string): Promise<HttpVariable> {
         const [variableName] = name.trim().split('.');
         const variables = this.getRequestVariables(document);
         if (!variables.includes(variableName)) {
@@ -51,7 +51,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
         return this.convertToHttpVariable(variableName, resolveResult);
     }
 
-    public async getAll(document: TextDocument): Promise<HttpVariableValue[]> {
+    public async getAll(document: TextDocument): Promise<HttpVariable[]> {
         const variables = this.getRequestVariables(document);
         return variables.map(v => ({ name: v, value: RequestVariableCache.get(new RequestVariableCacheKey(v, document.uri.toString())) }));
     }
@@ -76,7 +76,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
         return this.cache.get(file);
     }
 
-    private convertToHttpVariable(name: string, result: ResolveResult): HttpVariableValue {
+    private convertToHttpVariable(name: string, result: ResolveResult): HttpVariable {
         if (result.state === ResolveState.Success) {
             return { name, value: result.value };
         } else if (result.state === ResolveState.Warning) {
