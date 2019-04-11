@@ -18,23 +18,13 @@ export class EnvironmentController {
     private _environmentStatusBarItem: StatusBarItem;
 
     public constructor(initEnvironment: EnvironmentPickItem) {
-        if (EnvironmentController.settings.showEnvironmentStatusBarItem) {
-            this._environmentStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
-            this._environmentStatusBarItem.command = 'rest-client.switch-environment';
-            this._environmentStatusBarItem.text = initEnvironment.label;
-            this._environmentStatusBarItem.tooltip = 'Switch REST Client Environment';
-            this._environmentStatusBarItem.show();
+        this._environmentStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
+        this._environmentStatusBarItem.command = 'rest-client.switch-environment';
+        this._environmentStatusBarItem.text = initEnvironment.label;
+        this._environmentStatusBarItem.tooltip = 'Switch REST Client Environment';
+        this._environmentStatusBarItem.show();
 
-            window.onDidChangeActiveTextEditor(e => {
-                const document = getCurrentTextDocument();
-                if (document && languages.match(['http', 'plaintext'], document)) {
-                    this._environmentStatusBarItem.show();
-                    return;
-                } else {
-                    this._environmentStatusBarItem.hide();
-                }
-            }, this);
-        }
+        window.onDidChangeActiveTextEditor(this.showHideStatusBar, this);
     }
 
     @trace('Switch Environment')
@@ -58,9 +48,7 @@ export class EnvironmentController {
             return;
         }
 
-        if (EnvironmentController.settings.showEnvironmentStatusBarItem) {
-            this._environmentStatusBarItem.text = item.label;
-        }
+        this._environmentStatusBarItem.text = item.label;
 
         await PersistUtility.saveEnvironment(item);
     }
@@ -75,8 +63,16 @@ export class EnvironmentController {
     }
 
     public dispose() {
-        if (this._environmentStatusBarItem) {
-            this._environmentStatusBarItem.dispose();
+        this._environmentStatusBarItem.dispose();
+    }
+
+    private showHideStatusBar() {
+        const document = getCurrentTextDocument();
+        if (document && languages.match(['http', 'plaintext'], document)) {
+            this._environmentStatusBarItem.show();
+            return;
+        } else {
+            this._environmentStatusBarItem.hide();
         }
     }
 }

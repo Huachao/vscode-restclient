@@ -48,7 +48,6 @@ export class RestClientSettings implements IRestClientSettings {
     public proxyStrictSSL: boolean;
     public rememberCookiesForSubsequentRequests: boolean;
     public enableTelemetry: boolean;
-    public showEnvironmentStatusBarItem: boolean;
     public excludeHostsForProxy: string[];
     public fontSize?: number;
     public fontFamily: string;
@@ -138,7 +137,6 @@ export class RestClientSettings implements IRestClientSettings {
         this.previewOption = ParsePreviewOptionStr(restClientSettings.get<string>("previewOption", "full"));
         this.formParamEncodingStrategy = ParseFormParamEncodingStr(restClientSettings.get<string>("formParamEncodingStrategy", "automatic"));
         this.enableTelemetry = restClientSettings.get<boolean>('enableTelemetry', true);
-        this.showEnvironmentStatusBarItem = restClientSettings.get<boolean>('showEnvironmentStatusBarItem', true);
         this.addRequestBodyLineIndentationAroundBrackets = restClientSettings.get<boolean>('addRequestBodyLineIndentationAroundBrackets', true);
         this.decodeEscapedUnicodeCharacters = restClientSettings.get<boolean>('decodeEscapedUnicodeCharacters', false);
         this.logLevel = ParseLogLevelStr(restClientSettings.get<string>('logLevel', 'error'));
