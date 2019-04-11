@@ -1,11 +1,12 @@
 "use strict";
 
-import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import { languages, StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
 import { EnvironmentPickItem } from '../models/environmentPickItem';
 import { trace } from "../utils/decorator";
 import { PersistUtility } from '../utils/persistUtility';
+import { getCurrentTextDocument } from '../utils/workspaceUtility';
 
 export class EnvironmentController {
     private static readonly noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
@@ -23,6 +24,16 @@ export class EnvironmentController {
             this._environmentStatusBarItem.text = initEnvironment.label;
             this._environmentStatusBarItem.tooltip = 'Switch REST Client Environment';
             this._environmentStatusBarItem.show();
+
+            window.onDidChangeActiveTextEditor(e => {
+                const document = getCurrentTextDocument();
+                if (document && languages.match(['http', 'plaintext'], document)) {
+                    this._environmentStatusBarItem.show();
+                    return;
+                } else {
+                    this._environmentStatusBarItem.hide();
+                }
+            }, this);
         }
     }
 
@@ -64,5 +75,8 @@ export class EnvironmentController {
     }
 
     public dispose() {
+        if (this._environmentStatusBarItem) {
+            this._environmentStatusBarItem.dispose();
+        }
     }
 }
