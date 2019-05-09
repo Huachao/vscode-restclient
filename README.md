@@ -453,9 +453,9 @@ System variables provide a pre-defined set of variables that can be used in any 
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
 * `{{$timestamp [offset option]}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`.
-* `{{$datetime rfc1123|iso8601 [offset option]}}`: Add a datetime string in either _ISO8601_ or _RFC1123_ format. You can even specify any date time based on current time similar to `timestamp` like: `{{$datetime iso8601 1 y}}` to represent a year later in _ISO8601_ format.
+* `{{$datetime rfc1123|iso8601|"custom format"|'custom format' [offset option]}}`: Add a datetime string in either _ISO8601_, _RFC1123_ or a custom format. You can even specify a date time relative to the current date similar to `timestamp` like: `{{$datetime iso8601 1 y}}` to represent a year later in _ISO8601_ format. If specifying a custom format, wrap it in single or double quotes like: `{{$datetime "DD-MM-YYYY" 1 y}}`. The date is formatted using moment.js, read [here](https://momentjs.com/docs/#/parsing/string-format/) for information on format strings.
 
-The option string you can specify in `timestamp` and `datetime` are:
+The offset options you can specify in `timestamp` and `datetime` are:
 
 Option | Description
 ------ | -----------
@@ -479,7 +479,8 @@ Date: {{$datetime rfc1123}}
     "request_id": "{{$guid}}",
     "updated_at": "{{$timestamp}}",
     "created_at": "{{$timestamp -1 d}}",
-    "review_count": "{{$randomInt 5, 200}}"
+    "review_count": "{{$randomInt 5, 200}}",
+    "custom_date": "{{$datetime 'YYYY-MM-DD'}}"
 }
 ```
 > More details about `aadToken` (Azure Active Directory Token) can be found on [Wiki](https://github.com/Huachao/vscode-restclient/wiki/Azure-Active-Directory-Authentication-Samples)
