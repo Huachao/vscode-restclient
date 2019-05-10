@@ -22,7 +22,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private readonly resolveFuncs: Map<string, ResolveSystemVariableFunc> = new Map<string, ResolveSystemVariableFunc>();
 
     private readonly timestampRegex: RegExp = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
-    private readonly datetimeRegex: RegExp = new RegExp(`\\${Constants.DateTimeVariableName}\\s(rfc1123|iso8601|\'.*\'|\".*\")(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
+    private readonly datetimeRegex: RegExp = new RegExp(`\\${Constants.DateTimeVariableName}\\s(rfc1123|iso8601|\'.+\'|\".+\")(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly randomIntegerRegex: RegExp = new RegExp(`\\${Constants.RandomIntVariableName}\\s(\\-?\\d+)\\s(\\-?\\d+)`);
 
     private readonly requestUrlRegex: RegExp = /^(?:[^\s]+\s+)([^:]*:\/\/\/?[^/\s]*\/?)/;
@@ -101,10 +101,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 } else if (type === 'iso8601') {
                     return { value: date.toISOString() };
                 } else {
-                    const quotesRemoved = type
-                        .slice(0, type.length - 1)
-                        .slice(1);
-                    return { value: date.format(quotesRemoved) };
+                    return { value: date.format(type.slice(1, type.length - 2)) };
                 }
             }
 
