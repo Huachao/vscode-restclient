@@ -1,3 +1,10 @@
+## 0.21.3 (2019/5/15)
+* __Breaking Change__: Remove support for setting `rest-client.showEnvironmentStatusBarItem` in favor of automatically hide status bar for non-http file feature
+* __Feature__: [Support custom display formats in datetime system variable](https://github.com/Huachao/vscode-restclient/pull/361) ([@connelhooley](https://github.com/connelhooley))
+* __Improvement__: Hide the environment status bar for non-http file
+* __Bug Fix__: [Add title for scroll-to-top button](https://github.com/Huachao/vscode-restclient/issues/355)
+* __Bug Fix__: [Faield to generate Objective-C code snippet for request body contains `null` characters](https://github.com/Huachao/vscode-restclient/issues/349)
+
 ## 0.21.2 (2019/3/6)
 * __Feature__: [Add copy response body feature](https://github.com/Huachao/vscode-restclient/pull/317) ([@viktor-evdokimov](https://github.com/viktor-evdokimov))
 * __Feature__: [Add options to disable codelens/links](https://github.com/Huachao/vscode-restclient/issues/295)
