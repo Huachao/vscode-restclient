@@ -22,9 +22,6 @@ import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
-const elegantSpinner = require('elegant-spinner');
-const spinner = elegantSpinner();
-
 const filesize = require('filesize');
 const uuidv4 = require('uuid/v4');
 
@@ -34,7 +31,6 @@ export class RequestController {
     private _durationStatusBarItem: StatusBarItem;
     private _sizeStatusBarItem: StatusBarItem;
     private _httpClient: HttpClient;
-    private _interval: NodeJS.Timer;
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
     private _outputChannel: OutputChannel;
@@ -194,15 +190,12 @@ export class RequestController {
 
     private setSendingProgressStatusText() {
         this.clearSendProgressStatusText();
-        this._interval = setInterval(() => {
-            this._durationStatusBarItem.text = `Waiting ${spinner()}`;
-        }, 50);
+        this._durationStatusBarItem.text = `Waiting $(sync~spin)`;
         this._durationStatusBarItem.tooltip = 'Waiting Response';
         this._durationStatusBarItem.show();
     }
 
     private clearSendProgressStatusText() {
-        clearInterval(this._interval);
         this._sizeStatusBarItem.hide();
     }
 
