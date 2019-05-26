@@ -343,17 +343,19 @@ For environment variables, each environment comprises a set of key value pairs d
     "local": {
         "version": "v2",
         "host": "localhost",
-        "token": "test token"
+        "token": "test token",
+        "secret": "devSecret"
     },
     "production": {
         "host": "example.com",
-        "token": "product token"
+        "token": "product token",
+        "secret" : "prodSecret"
     }
 }
 ```
 A sample usage in `http` file for above environment variables is listed below, note that if you switch to _local_ environment, the `version` would be _v2_, if you change to _production_ environment, the `version` would be _v1_ which is inherited from the _$shared_ environment:
 ```http
-GET https://{{host}}/api/{{version}comments/1 HTTP/1.1
+GET https://{{host}}/api/{{version}}comments/1 HTTP/1.1
 Authorization: {{token}}
 ```
 
@@ -368,6 +370,7 @@ File variables can be defined in a separate request block only filled with varia
 @host = {{hostname}}:{{port}}
 @contentType = application/json
 @createdAt = {{$datetime iso8601}}
+@modifiedBy = {{$processEnv USERNAME}}
 
 ###
 
@@ -382,7 +385,8 @@ Content-Type: {{contentType}}
 
 {
     "content": "foo bar",
-    "created_at": {{createdAt}}
+    "created_at": {{createdAt}},
+    "modified_by": {{modifiedBy}}
 }
 
 ```
@@ -447,10 +451,54 @@ System variables provide a pre-defined set of variables that can be used in any 
 
   `public|cn|de|us|ppe`: Optional. Specify top-level domain (TLD) to get a token for the specified government cloud, `public` for the public cloud, or `ppe` for internal testing. Default: TLD of the REST endpoint; `public` if not valid.
 
-  `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a drop-down or press `Esc` to use the home directory (`common` for Microsoft Account).
+  `<domain|tenantId>` : Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a drop-down or press `Esc` to use the home directory (`common` for Microsoft Account).
 
   `aud:<domain|tenantId>`: Optional. Target Azure AD app id (aka client id) or domain the token should be created for (aka audience or resource). Default: Domain of the REST endpoint.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
+* `{{$processEnv [%]envVarName}}`: Allows the resolution of local machine environment variables to string values. A typical use case is for secret keys that you don't want to commit to source control.
+For example: define shell environment variable
+in `.bashrc` or similar on windows
+  ```bash
+  export DEVSECRET="XlII3JUaEZldVg="
+  export PRODSECRET="qMTkleUgjclRoRmV1WA=="
+  export USERNAME="testUser"
+  ```
+  and with extension setting environment variables.
+  ```json
+  "rest-client.environmentVariables": {
+      "$shared": {
+          "version": "v1"
+      },
+      "local": {
+          "version": "v2",
+          "host": "localhost",
+          "secretKey": "DEVSECRET"
+      },
+      "production": {
+          "host": "example.com",
+          "secretKey" : "PRODSECRET"
+      }
+  }
+  ```
+
+  You can refer directly to the key (e.g. ```PRODSECRET```) in the script, for example if running in the production environment
+  ```http
+  ### Lookup PRODSECRET from local machine environment
+  GET https://{{host}}/{{version}}/values/item1?user={{$processEnvName USERNAME}}
+  Authorization: {{$processEnvName PRODSECRET}}
+  ```
+  or, it can be rewritten to indirectly refer to the key using an extension environment setting (e.g. ```%secret```) to be environment independent using the optional ```%``` modifier.
+  ```http
+  ### Use secretKey from extension environment settings to determine
+  ### which local machine environment variable to use
+  GET https://{{host}}/{{version}}/values/item1?user={{$processEnvName USERNAME}}
+  Authorization: {{$processEnvName %secret}}
+  ```
+  `envVarName`: Mandatory. Specifies the local machine environment variable
+
+  `%`: Optional. If specified, treats envVarName as an extension setting environment variable, and uses the value of that for the lookup.
+
+
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
 * `{{$timestamp [offset option]}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`.
 * `{{$datetime rfc1123|iso8601|"custom format"|'custom format' [offset option]}}`: Add a datetime string in either _ISO8601_, _RFC1123_ or a custom display format. You can even specify a date time relative to the current date similar to `timestamp` like: `{{$datetime iso8601 1 y}}` to represent a year later in _ISO8601_ format. If specifying a custom format, wrap it in single or double quotes like: `{{$datetime "DD-MM-YYYY" 1 y}}`. The date is formatted using moment.js, read [here](https://momentjs.com/docs/#/parsing/string-format/) for information on format strings.
