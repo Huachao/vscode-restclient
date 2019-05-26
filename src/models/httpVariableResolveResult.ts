@@ -31,6 +31,7 @@ export const enum ResolveWarningMessage {
     IncorrectHeaderName = 'No value is resolved for given header name',
     IncorrectJSONPath = 'No value is resolved for given JSONPath',
     IncorrectRandomIntegerVariableFormat = 'RandomInt system variable should follow format "{{$randomInt minInteger maxInteger}}"',
+    IncorrectProcessEnvVariableFormat = 'ProcessEnv system variable should follow format "{{$processEnv envVarName}}"',
     IncorrectTimestampVariableFormat = 'Timestamp system variable should follow format "{{$timestamp [integer y|Q|M|w|d|h|m|s|ms]}}"',
     IncorrectXPath = 'No value is resolved for given XPath',
     UnsupportedBodyContentType = 'Only JSON response/request body is supported to query the result',
