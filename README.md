@@ -484,15 +484,15 @@ in `.bashrc` or similar on windows
   You can refer directly to the key (e.g. ```PRODSECRET```) in the script, for example if running in the production environment
   ```http
   ### Lookup PRODSECRET from local machine environment
-  GET https://{{host}}/{{version}}/values/item1?user={{$processEnvName USERNAME}}
-  Authorization: {{$processEnvName PRODSECRET}}
+  GET https://{{host}}/{{version}}/values/item1?user={{$processEnv USERNAME}}
+  Authorization: {{$processEnv PRODSECRET}}
   ```
   or, it can be rewritten to indirectly refer to the key using an extension environment setting (e.g. ```%secret```) to be environment independent using the optional ```%``` modifier.
   ```http
   ### Use secretKey from extension environment settings to determine
   ### which local machine environment variable to use
-  GET https://{{host}}/{{version}}/values/item1?user={{$processEnvName USERNAME}}
-  Authorization: {{$processEnvName %secret}}
+  GET https://{{host}}/{{version}}/values/item1?user={{$processEnv USERNAME}}
+  Authorization: {{$processEnv %secret}}
   ```
   `envVarName`: Mandatory. Specifies the local machine environment variable
 
