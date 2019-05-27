@@ -190,7 +190,7 @@ export class RequestController {
 
     private setSendingProgressStatusText() {
         this.clearSendProgressStatusText();
-        this._durationStatusBarItem.text = `Waiting $(sync~spin)`;
+        this._durationStatusBarItem.text = `$(sync~spin) Waiting`;
         this._durationStatusBarItem.tooltip = 'Waiting Response';
         this._durationStatusBarItem.show();
     }
