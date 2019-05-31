@@ -101,7 +101,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 } else if (type === 'iso8601') {
                     return { value: date.toISOString() };
                 } else {
-                    return { value: date.format(type.slice(1, type.length - 2)) };
+                    return { value: date.format(type.slice(1, type.length - 1)) };
                 }
             }
 
