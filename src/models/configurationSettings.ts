@@ -4,7 +4,7 @@ import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { Headers } from './base';
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
 import { HostCertificate } from './hostCertificate';
-import { fromString as ParseLogLevelStr, LogLevel } from './loglevel';
+import { fromString as ParseLogLevelStr, LogLevel } from './logLevel';
 import { fromString as ParsePreviewOptionStr, PreviewOption } from './previewOption';
 
 export interface IRestClientSettings {
