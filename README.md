@@ -451,7 +451,7 @@ System variables provide a pre-defined set of variables that can be used in any 
 
   `public|cn|de|us|ppe`: Optional. Specify top-level domain (TLD) to get a token for the specified government cloud, `public` for the public cloud, or `ppe` for internal testing. Default: TLD of the REST endpoint; `public` if not valid.
 
-  `<domain|tenantId>` : Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a drop-down or press `Esc` to use the home directory (`common` for Microsoft Account).
+  `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a drop-down or press `Esc` to use the home directory (`common` for Microsoft Account).
 
   `aud:<domain|tenantId>`: Optional. Target Azure AD app id (aka client id) or domain the token should be created for (aka audience or resource). Default: Domain of the REST endpoint.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
@@ -483,15 +483,20 @@ For example: Define a shell environment variable in `.bashrc` or similar on wind
   You can refer directly to the key (e.g. ```PRODSECRET```) in the script, for example if running in the production environment
   ```http
   ### Lookup PRODSECRET from local machine environment
-  GET https://{{host}}/{{version}}/values/item1?user={{$processEnvName USERNAME}}
-  Authorization: {{$processEnvName PRODSECRET}}
+  GET https://{{host}}/{{version}}/values/item1?user={{$processEnv USERNAME}}
+  Authorization: {{$processEnv PRODSECRET}}
   ```
   or, it can be rewritten to indirectly refer to the key using an extension environment setting (e.g. ```%secret```) to be environment independent using the optional ```%``` modifier.
   ```http
   ### Use secretKey from extension environment settings to determine
   ### which local machine environment variable to use
+<<<<<<< HEAD
   GET https://{{host}}/{{version}}/values/item1?user={{$processEnvName USERNAME}}
   Authorization: {{$processEnvName %secretKey}}
+=======
+  GET https://{{host}}/{{version}}/values/item1?user={{$processEnv USERNAME}}
+  Authorization: {{$processEnv %secret}}
+>>>>>>> 2a3f867b45674b441a981422ca98ac393d050723
   ```
   `envVarName`: Mandatory. Specifies the local machine environment variable
 
