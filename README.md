@@ -455,13 +455,12 @@ System variables provide a pre-defined set of variables that can be used in any 
 
   `aud:<domain|tenantId>`: Optional. Target Azure AD app id (aka client id) or domain the token should be created for (aka audience or resource). Default: Domain of the REST endpoint.
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
-* `{{$processEnv [%]envVarName}}`: Allows the resolution of local machine environment variables to string values. A typical use case is for secret keys that you don't want to commit to source control.
-For example: define shell environment variable
-in `.bashrc` or similar on windows
+* `{{$processEnv [%]envVarName}}`: Allows the resolution of a local machine environment variable to a string value. A typical use case is for secret keys that you don't want to commit to source control.
+For example: Define a shell environment variable in `.bashrc` or similar on windows
   ```bash
   export DEVSECRET="XlII3JUaEZldVg="
   export PRODSECRET="qMTkleUgjclRoRmV1WA=="
-  export USERNAME="testUser"
+  export USERNAME="sameUsernameInDevAndProd"
   ```
   and with extension setting environment variables.
   ```json
@@ -492,7 +491,7 @@ in `.bashrc` or similar on windows
   ### Use secretKey from extension environment settings to determine
   ### which local machine environment variable to use
   GET https://{{host}}/{{version}}/values/item1?user={{$processEnvName USERNAME}}
-  Authorization: {{$processEnvName %secret}}
+  Authorization: {{$processEnvName %secretKey}}
   ```
   `envVarName`: Mandatory. Specifies the local machine environment variable
 

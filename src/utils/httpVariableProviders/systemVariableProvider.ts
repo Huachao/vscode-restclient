@@ -21,7 +21,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private readonly clipboard: Clipboard;
     private readonly resolveFuncs: Map<string, ResolveSystemVariableFunc> = new Map<string, ResolveSystemVariableFunc>();
-    
+
     private readonly timestampRegex: RegExp = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly datetimeRegex: RegExp = new RegExp(`\\${Constants.DateTimeVariableName}\\s(rfc1123|iso8601|\'.+\'|\".+\")(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly randomIntegerRegex: RegExp = new RegExp(`\\${Constants.RandomIntVariableName}\\s(\\-?\\d+)\\s(\\-?\\d+)`);
@@ -133,38 +133,37 @@ export class SystemVariableProvider implements HttpVariableProvider {
         });
     }
 
-    private async resolveSettingsEnvironmentVariable (name:string) {
+    private async resolveSettingsEnvironmentVariable (name: string) {
         let document = null;
         let context = null;
-        if (await this.innerSettingsEnvironmentVariableProvider.has(document, name,context))
-        {
-            const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(document, name,context);
-            if (!error && !warning) 
+        if (await this.innerSettingsEnvironmentVariableProvider.has(document, name, context)) {
+            const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(document, name, context);
+            if (!error && !warning) {
                 return value.toString();
-            else
+            } else {
                 return name;
+            }
+        } else {
+            return name;
         }
-        else
-        return name;
     }
 
     private registerProcessEnvVariable() {
         this.resolveFuncs.set(Constants.ProcessEnvVariableName, async name => {
             const groups = this.processEnvRegex.exec(name);
             if (groups !== null && groups.length === 3 ) {
-                const [, refToggle,environmentVarName] = groups;
-                let processEnvName = environmentVarName
-                if(refToggle !== undefined) {
-                    processEnvName = await this.resolveSettingsEnvironmentVariable(environmentVarName)
+                const [, refToggle, environmentVarName] = groups;
+                let processEnvName = environmentVarName;
+                if (refToggle !== undefined) {
+                    processEnvName = await this.resolveSettingsEnvironmentVariable(environmentVarName);
                 }
                 let envValue = process.env[processEnvName];
-                if(envValue !== undefined) {
-                    return { value: envValue.toString()}
+                if (envValue !== undefined) {
+                    return { value: envValue.toString()};
+                } else {
+                    return { value: ''};
                 }
-                else {
-                    return { value: ''}
-                }
-            }               
+            }
             return { warning: ResolveWarningMessage.IncorrectProcessEnvVariableFormat };
         });
     }
