@@ -344,12 +344,12 @@ For environment variables, each environment comprises a set of key value pairs d
         "version": "v2",
         "host": "localhost",
         "token": "test token",
-        "secret": "devSecret"
+        "secretKey": "devSecret"
     },
     "production": {
         "host": "example.com",
         "token": "product token",
-        "secret" : "prodSecret"
+        "secretKey" : "prodSecret"
     }
 }
 ```
