@@ -490,13 +490,8 @@ For example: Define a shell environment variable in `.bashrc` or similar on wind
   ```http
   ### Use secretKey from extension environment settings to determine
   ### which local machine environment variable to use
-<<<<<<< HEAD
-  GET https://{{host}}/{{version}}/values/item1?user={{$processEnvName USERNAME}}
-  Authorization: {{$processEnvName %secretKey}}
-=======
   GET https://{{host}}/{{version}}/values/item1?user={{$processEnv USERNAME}}
   Authorization: {{$processEnv %secret}}
->>>>>>> 2a3f867b45674b441a981422ca98ac393d050723
   ```
   `envVarName`: Mandatory. Specifies the local machine environment variable
 
