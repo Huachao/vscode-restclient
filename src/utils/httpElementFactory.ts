@@ -120,7 +120,7 @@ export class HttpElementFactory {
         ));
         originalElements.push(new HttpElement(
             Constants.AzureActiveDirectoryVariableName,
-        ElementType.SystemVariable,
+            ElementType.SystemVariable,
             null,
             Constants.AzureActiveDirectoryDescription,
             new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryVariableName.slice(1)}}}}`)));
