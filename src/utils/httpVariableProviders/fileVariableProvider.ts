@@ -100,7 +100,7 @@ export class FileVariableProvider implements HttpVariableProvider {
     }
 
     private async resolveFileVariables(document: TextDocument, variables: FileVariableValue[]): Promise<Map<string, string>> {
-        // Resolve non-file varaibles in variable value
+        // Resolve non-file variables in variable value
         const fileVariableNames = new Set(variables.map(v => v.name));
         const resolvedVariables = await Promise.all(variables.map(
             async ({name, value}) => {

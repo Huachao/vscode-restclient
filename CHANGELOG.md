@@ -3,7 +3,7 @@
 * __Feature__: [Support custom display formats in datetime system variable](https://github.com/Huachao/vscode-restclient/pull/361) ([@connelhooley](https://github.com/connelhooley))
 * __Improvement__: Hide the environment status bar for non-http file
 * __Bug Fix__: [Add title for scroll-to-top button](https://github.com/Huachao/vscode-restclient/issues/355)
-* __Bug Fix__: [Faield to generate Objective-C code snippet for request body contains `null` characters](https://github.com/Huachao/vscode-restclient/issues/349)
+* __Bug Fix__: [Failed to generate Objective-C code snippet for request body contains `null` characters](https://github.com/Huachao/vscode-restclient/issues/349)
 
 ## 0.21.2 (2019/3/6)
 * __Feature__: [Add copy response body feature](https://github.com/Huachao/vscode-restclient/pull/317) ([@viktor-evdokimov](https://github.com/viktor-evdokimov))
@@ -30,7 +30,7 @@
 * __Feature__: [Support file variables reference system and environment variables](https://github.com/Huachao/vscode-restclient/issues/208)
 * __Improvement__: [Display actual response for image `HEAD` request](https://github.com/Huachao/vscode-restclient/issues/293)
 * __Bug Fix__: [Redirect all 3xx requests](https://github.com/Huachao/vscode-restclient/issues/285)
-* __Bug Fix__: [Parse rquest body correctly of `multipart/mixed` mime type](https://github.com/Huachao/vscode-restclient/issues/232)
+* __Bug Fix__: [Parse request body correctly of `multipart/mixed` mime type](https://github.com/Huachao/vscode-restclient/issues/232)
 
 ## 0.20.3 (2018/11/1)
 * __Bug Fix__: [Cannot read property 'toLowerCase' of null](https://github.com/Huachao/vscode-restclient/issues/219)
