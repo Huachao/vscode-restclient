@@ -22,7 +22,7 @@ const encodeurl = require('encodeurl');
 export class HttpRequestParser implements IRequestParser {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
-    private static readonly uploadFromFileSyntax = /^<\s+([\S]*)\s*$/;
+    private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;
 
     public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
