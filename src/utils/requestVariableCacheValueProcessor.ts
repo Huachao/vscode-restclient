@@ -7,9 +7,9 @@ import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
 import { MimeUtility } from './mimeUtility';
 import { getHeader } from './misc';
 
-const jp = require('jsonpath');
 const xpath = require('xpath');
 const { DOMParser } = require('xmldom');
+const { JSONPath } = require('jsonpath-plus');
 
 const requestVariablePathRegex: RegExp = /^(\w+)(?:\.(request|response)(?:\.(body|headers)(?:\.(.*))?)?)?$/;
 
@@ -87,7 +87,7 @@ export class RequestVariableCacheValueProcessor {
 
     private static resolveJsonHttpBody(body: any, path: string): ResolveResult {
         try {
-            const result = jp.query(body, path);
+            const result = JSONPath({path, json: body});
             const value = typeof result[0] === 'string' ? result[0] : JSON.stringify(result[0]);
             if (!value) {
                 return { state: ResolveState.Warning, message: ResolveWarningMessage.IncorrectJSONPath };

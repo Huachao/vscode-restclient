@@ -1,5 +1,6 @@
 .github/**
 .vscode/**
+node_modules
 dist/**/*.map
 out/**
 test/**

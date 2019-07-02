@@ -624,7 +624,7 @@
     "httpsnippet": "^1.19.1",
     "iconv-lite": "^0.4.15",
     "jsonc-parser": "^2.0.2",
-    "jsonpath": "^1.0.0",
+    "jsonpath-plus": "^0.20.1",
     "mime-types": "^2.1.14",
     "moment": "^2.20.1",
     "pretty-data": "^0.40.0",
