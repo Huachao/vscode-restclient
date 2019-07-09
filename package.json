@@ -29,11 +29,13 @@
   "categories": [
     "Other",
     "Snippets",
+    "Linters",
     "Programming Languages"
   ],
   "keywords": [
     "REST",
     "Http",
+    "GraphQL",
     "multi-root ready"
   ],
   "activationEvents": [

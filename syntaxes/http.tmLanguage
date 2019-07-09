@@ -85,6 +85,44 @@
                 </array>
             </dict>
             <dict>
+                <key>begin</key>
+                <string>\s*(?=(query|mutation))</string>
+                <key>name</key>
+                <string>http.request.body.graphql</string>
+                <key>end</key>
+                <string>^\s*(\#{3,}.*?)?\s*$</string>
+                <key>endCaptures</key>
+                <dict>
+                    <key>0</key>
+                    <dict>
+                        <key>name</key>
+                        <string>comment.source.sharp.http</string>
+                    </dict>
+                </dict>
+                <key>patterns</key>
+                <array>
+                    <dict>
+                        <key>include</key>
+                        <string>source.graphql</string>
+                    </dict>
+                </array>
+            </dict>
+            <dict>
+                <key>begin</key>
+                <string>\s*(?=(query|mutation))</string>
+                <key>name</key>
+                <string>http.request.body.graphql</string>
+                <key>end</key>
+                <string>^\{\s*$</string>
+                <key>patterns</key>
+                <array>
+                    <dict>
+                        <key>include</key>
+                        <string>source.graphql</string>
+                    </dict>
+                </array>
+            </dict>
+            <dict>
                 <key>match</key>
                 <string>^\s*#{1,}\s*(?:((@)name)\s+(\S+))?.*$</string>
                 <key>captures</key>
