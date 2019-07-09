@@ -33,6 +33,18 @@
         ],
         "description": "PUT Request"
     },
+    "GraphQL request block": {
+        "prefix": "graphql",
+        "body": [
+            "POST ${1:url} HTTP/1.1",
+            "X-Request-Type: GraphQL",
+            "${2:header name}: ${3:header value}",
+            "",
+            "${4:body content}",
+            "",
+            "${5:variables content(optional)}"
+        ]
+    },
     "SOAP request block": {
         "prefix": "soap",
         "body": [
