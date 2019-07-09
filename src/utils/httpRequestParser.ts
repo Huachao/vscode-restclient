@@ -121,7 +121,7 @@ export class HttpRequestParser implements IRequestParser {
                 query: body,
                 variables: JSON.parse(variables.toString())
             };
-            body = JSON.stringify(graphQlPayload, null, 2);
+            body = JSON.stringify(graphQlPayload);
             bodyLines = body.split(EOL);
         } else if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             if (this._restClientSettings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
