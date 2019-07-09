@@ -122,7 +122,6 @@ export class HttpRequestParser implements IRequestParser {
                 variables: JSON.parse(variables.toString())
             };
             body = JSON.stringify(graphQlPayload);
-            bodyLines = body.split(EOL);
         } else if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             if (this._restClientSettings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
                 const stringPairs = body.split('&');
