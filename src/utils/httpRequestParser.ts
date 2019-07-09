@@ -45,7 +45,10 @@ export class HttpRequestParser implements IRequestParser {
         // get headers range
         let headers: Headers;
         let body: string | Stream;
+        let variables: string | Stream;
         let bodyLines: string[] = [];
+        let variableLines: string[] = [];
+        let isGraphQlRequest: boolean = false;
         let headerStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', 1);
         if (headerStartLine !== -1) {
             if (headerStartLine === 1) {
@@ -73,6 +76,7 @@ export class HttpRequestParser implements IRequestParser {
                 // get body range
                 const bodyStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
                 if (bodyStartLine !== -1) {
+                    const requestTypeHeader = getHeader(headers, 'x-request-type');
                     const contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
                     firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
                     const bodyEndLine =
@@ -80,6 +84,16 @@ export class HttpRequestParser implements IRequestParser {
                             ? lines.length
                             : firstEmptyLine;
                     bodyLines = lines.slice(bodyStartLine, bodyEndLine);
+                    if (requestTypeHeader && requestTypeHeader === 'GraphQL') {
+                        const variableStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', bodyEndLine);
+                        if (variableStartLine !== -1) {
+                            firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', variableStartLine);
+                            variableLines = lines.slice(variableStartLine, firstEmptyLine === -1 ? lines.length : firstEmptyLine);
+                        }
+                        // a request don't necessarily need variables
+                        // to be considered a GraphQL request
+                        isGraphQlRequest = true;
+                    }
                 }
             } else {
                 // parse body, since no headers provided
@@ -100,7 +114,15 @@ export class HttpRequestParser implements IRequestParser {
         // parse body
         const contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
         body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
-        if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
+        if (isGraphQlRequest) {
+            variables = HttpRequestParser.parseRequestBody(variableLines, requestAbsoluteFilePath, contentTypeHeader);
+
+            let graphQlPayload = {
+                query: body,
+                variables: variables ? JSON.parse(variables.toString()) : {}
+            };
+            body = JSON.stringify(graphQlPayload);
+        } else if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             if (this._restClientSettings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
                 const stringPairs = body.split('&');
                 const encodedStringParis = [];
