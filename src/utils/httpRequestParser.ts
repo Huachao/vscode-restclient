@@ -119,7 +119,7 @@ export class HttpRequestParser implements IRequestParser {
 
             let graphQlPayload = {
                 query: body,
-                variables: JSON.parse(variables.toString())
+                variables: variables ? JSON.parse(variables.toString()) : {}
             };
             body = JSON.stringify(graphQlPayload);
         } else if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
