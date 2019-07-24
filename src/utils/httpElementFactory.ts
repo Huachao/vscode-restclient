@@ -94,6 +94,12 @@ export class HttpElementFactory {
             Constants.GuidVariableDescription,
             new SnippetString(`{{$\${name:${Constants.GuidVariableName.slice(1)}}}}`)));
         originalElements.push(new HttpElement(
+            Constants.Base64VariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.Base64VariableDescription,
+            new SnippetString(`{{$\${name:${Constants.Base64VariableName.slice(1)}} \${1:payload}}}`)));
+        originalElements.push(new HttpElement(
             Constants.TimeStampVariableName,
             ElementType.SystemVariable,
             null,

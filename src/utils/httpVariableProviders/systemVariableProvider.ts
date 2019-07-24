@@ -49,6 +49,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerRandomIntVariable();
         this.registerProcessEnvVariable();
         this.registerAadTokenVariable();
+        this.registerBase64Variable();
     }
 
     public readonly type: VariableType = VariableType.System;
@@ -114,6 +115,13 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private registerGuidVariable() {
         this.resolveFuncs.set(Constants.GuidVariableName, async name => ({ value: uuidv4() }));
+    }
+
+    private registerBase64Variable() {
+        this.resolveFuncs.set(Constants.Base64VariableName, async name => {
+            const payload = name.substring(Constants.Base64VariableName.length).trim();
+            return { value: Buffer.from(payload).toString("base64") };
+        });
     }
 
     private registerRandomIntVariable() {
