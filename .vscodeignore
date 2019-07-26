@@ -12,3 +12,9 @@ tslint.json
 vsc-extension-quickstart.md
 package-json.lock
 webpack.config.js
+images/*.gif
+images/curl-request.png
+images/http.png
+images/request-history.png
+images/navigate.png
+images/curl-request.png
