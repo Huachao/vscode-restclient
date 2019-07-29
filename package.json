@@ -604,6 +604,15 @@
     "@types/fs-extra": "^5.0.4",
     "@types/mocha": "^2.2.32",
     "@types/node": "^10.14.0",
+    "mocha": "^3.2.0",
+    "ts-loader": "^5.3.2",
+    "tslint": "^5.10.0",
+    "typescript": "^3.2.2",
+    "vscode": "^1.0.0",
+    "webpack": "^4.19.1",
+    "webpack-cli": "^3.1.0"
+  },
+  "dependencies": {
     "adal-node": "^0.1.26",
     "applicationinsights": "^1.0.5",
     "code-highlight-linenums": "^0.2.1",
@@ -619,22 +628,14 @@
     "jsonc-parser": "^2.0.2",
     "jsonpath-plus": "^0.20.1",
     "mime-types": "^2.1.14",
-    "mocha": "^3.2.0",
     "moment": "^2.20.1",
     "pretty-data": "^0.40.0",
     "request": "^2.81.0",
     "tmp": "^0.0.31",
     "tough-cookie-file-store-bugfix": "Huachao/tough-cookie-file-store-bugfix",
-    "ts-loader": "^6.0.4",
-    "tslint": "^5.10.0",
-    "typescript": "^3.5.3",
     "uuid": "^3.3.2",
-    "vscode": "^1.1.35",
-    "webpack-cli": "^3.3.6",
-    "webpack": "^4.38.0",
     "xmldom": "^0.1.27",
     "xpath": "^0.0.27",
     "yargs-parser": "^11.1.1"
-  },
-  "dependencies": {}
+  }
 }
