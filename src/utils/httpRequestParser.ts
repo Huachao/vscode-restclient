@@ -12,7 +12,7 @@ import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
 import { IRequestParser } from '../models/IRequestParser';
 import { MimeUtility } from './mimeUtility';
-import { getHeader } from './misc';
+import { getHeader, removeHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
 
@@ -93,6 +93,7 @@ export class HttpRequestParser implements IRequestParser {
                         // a request don't necessarily need variables
                         // to be considered a GraphQL request
                         isGraphQlRequest = true;
+                        removeHeader(headers, 'x-request-type');
                     }
                 }
             } else {

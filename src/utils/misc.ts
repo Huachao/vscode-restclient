@@ -16,6 +16,17 @@ export function hasHeader(headers: Headers, name: string): boolean {
     return !!(headers && name && Object.keys(headers).some(h => h.toLowerCase() === name.toLowerCase()));
 }
 
+export function removeHeader(headers: Headers, name: string) {
+    if (!headers || !name) {
+        return;
+    }
+
+    const headerName = Object.keys(headers).find(h => h.toLowerCase() === name.toLowerCase());
+    if (headerName) {
+        delete headers[headerName];
+    }
+}
+
 export function calculateMD5Hash(text: string | Buffer): string {
     return crypto.createHash('md5').update(text).digest('hex');
 }
