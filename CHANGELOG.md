@@ -1,3 +1,14 @@
+## 0.22.0 (2019/7/31)
+* __Feature__: [Add support for `GraphQL`](https://github.com/Huachao/vscode-restclient/pull/384) ([@ferronrsmith](https://github.com/ferronrsmith))
+* __Feature__: [Add new system variable - local machine environment variable](https://github.com/Huachao/vscode-restclient/pull/366) ([@mtnrbq](https://github.com/mtnrbq))
+* __Improvement__: [Reduce the extension size by excluding unnecessary images](https://github.com/Huachao/vscode-restclient/pull/397) ([@badre429](https://github.com/badre429))
+* __Improvement__: Reduce the extension size by excluding `node_modules` directory
+* __Improvement__: Replace spinner with octicon animation
+* __Improvement__: Upgrade httpsnippet package to support new languages and frameworks, e.g., `PowerShell`, `Fetch API`
+* __Bug Fix__: [Do not swallow last character in datetime format string](https://github.com/Huachao/vscode-restclient/issues/367)
+* __Bug Fix__: [Allow request body file path contains whitespaces](https://github.com/Huachao/vscode-restclient/issues/376)
+* __Bug Fix__: [Support extract JSON body with pure string payload with `$`](https://github.com/Huachao/vscode-restclient/issues/266)
+
 ## 0.21.3 (2019/5/15)
 * __Breaking Change__: Remove support for setting `rest-client.showEnvironmentStatusBarItem` in favor of automatically hide status bar for non-http file feature
 * __Feature__: [Support custom display formats in datetime system variable](https://github.com/Huachao/vscode-restclient/pull/361) ([@connelhooley](https://github.com/connelhooley))

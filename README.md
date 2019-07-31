@@ -6,9 +6,10 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 
 ## Main Features
 * Send/Cancel/Rerun __HTTP request__ in editor and view response in a separate pane with syntax highlight
-* Send __CURL command__ in editor and copy HTTP request as `CURL command`
+* Send __GraphQL query__ and author __GraphQL variables__ in editor
+* Send __cURL command__ in editor and copy HTTP request as `cURL command`
 * Auto save and view/clear request history
-* Support _MULTIPLE_ requests in the same file (separated by `###` delimiter)
+* Organize _MULTIPLE_ requests in the same file (separated by `###` delimiter)
 * View image response directly in pane
 * Save raw response and response body only to local disk
 * Fold and unfold response body
@@ -25,7 +26,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Auto completion and hover support for both __environment__, __file__ and __request__ custom variables
     - Diagnostic support for __request__ and __file__ custom variables
     - Go to definition and find all references support _ONLY_ for __file__ custom variables
-    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp [offset option]}}`, `{{$datetime rfc1123|iso8601 [offset option]}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
+    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp [offset option]}}`, `{{$datetime rfc1123|iso8601 [offset option]}}`, `{{$processEnv [%]envVarName}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
     - Easily create/update/delete environments and environment variables in setting file
     - File variables can reference both custom and system variables
     - Support environment switch
@@ -60,18 +61,18 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, click the `Send Request` link above the request, or use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right-click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate __webview__ panel of Visual Studio Code. If you'd like to use the full power of searching, selecting or manipulating in Visual Studio Code, you can also preview response in __an untitled document__ by setting `rest-client.previewResponseInUntitledDocument` to `true`, by default the value is `false`. When a request is issued, ![cloud upload](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/loading.gif) will be displayed in the status bar, after receiving the response, the icon will be changed to the duration and response size.
+Once you prepared a request, click the `Send Request` link above the request, or use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right-click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate __webview__ panel of Visual Studio Code. If you'd like to use the full power of searching, selecting or manipulating in Visual Studio Code, you can also preview response in __an untitled document__ by setting `rest-client.previewResponseInUntitledDocument` to `true`. Once a request is issued, a waiting spin icon will be displayed in the status bar until the response is received. After that the icon will be replaced with the total duration and response size.
 
-You can view the breakdown of the response time when hovering over the duration status bar, you could view the duration details of _Socket_, _DNS_, _TCP_, _First Byte_ and _Download_.
+You can view the breakdown of the response time when hovering over the total duration in status bar, you could view the duration details of _Socket_, _DNS_, _TCP_, _First Byte_ and _Download_.
 
-When hovering over the response size status bar, you could view the breakdown response size details of _headers_ and _body_.
+When hovering over the response size in status bar, you could view the breakdown response size details of _headers_ and _body_.
 
 > All the shortcuts in REST Client Extension are __ONLY__ available for file language mode `http` and `plaintext`.
 
 > __Send Request__ link above each request will only be visible when the request file is in `http` mode, more details can be found in [http language section](#http-language).
 
 ### Select Request Text
-You may even want to save numerous requests in the same file and execute any of them as you wish easily. REST Client extension could recognize any line begins with three or more consecutive `#` as a delimiter between requests. Place the cursor anywhere between the delimiters, issuing the request as above, and it will first parse the text between the delimiters as request and then send it out.
+You may even want to save numerous requests in the same file and execute any of them as you wish easily. REST Client extension could recognize requests separated by lines begin with three or more consecutive `#` as a delimiter. Place the cursor anywhere between the delimiters, issuing the request as above, and the underlying request will be sent out.
 ```http
 GET https://example.com/comments/1 HTTP/1.1
 
@@ -89,7 +90,7 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-`REST Client Extension` also provides another flexibility that you can use mouse to highlight the text in file as request text.
+REST Client extension also provides the flexibility that you can send the request with your selected text in editor.
 
 ## Install
 Press `F1`, type `ext install` then search for `rest-client`.
@@ -146,7 +147,7 @@ Authorization: token xxx
 </request>
 ```
 
-You can also specify file path to use as a body, which starts with `< `, the file path can be either in absolute or relative(relative to workspace root or current http file) formats:
+You can also specify file path to use as a body, which starts with `< `, the file path(*whitepsaces* should be preserved) can be either in absolute or relative(relative to workspace root or current http file) formats:
 ```http
 POST https://example.com/comments HTTP/1.1
 Content-Type: application/xml
@@ -191,8 +192,44 @@ name=foo
 
 > When your mouse is over the document link, you can `Ctrl+Click`(`Cmd+Click` for macOS) to open the file in a new tab.
 
-## Making CURL Request
-![CURL Request](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/curl-request.png)
+## Making GraphQL Request
+With [GraphQL](https://www.graphql.com/) support in REST Client extension, you can author and send `GraphQL` query using the request body. Besides that you can also author GraphQL variables in the request body. GraphQL variables part in request body is optional, you also need to add a **blank line** between GraphQL query and variables if you need it.
+
+You can specify a request as `GraphQL Request` by adding a custom request header `X-Request-Type: GraphQL` in your headers. The following code illustrates this:
+```http
+POST https://api.github.com/graphql
+Content-Type: application/json
+Authorization: Bearer xxx
+X-REQUEST-TYPE: GraphQL
+
+query ($name: String!, $owner: String!) {
+  repository(name: $name, owner: $owner) {
+    name
+    fullName: nameWithOwner
+    description
+    diskUsage
+    forkCount
+    stargazers(first: 5) {
+        totalCount
+        nodes {
+            login
+            name
+        }
+    }
+    watchers {
+        totalCount
+    }
+  }
+}
+
+{
+    "name": "vscode-restclient",
+    "owner": "Huachao"
+}
+```
+
+## Making cURL Request
+![cURL Request](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/curl-request.png)
 We add the capability to directly run [curl request](https://curl.haxx.se/) in REST Client extension. The issuing request command is the same as raw HTTP one. REST Client will automatically parse the request with specified parser.
 
 `REST Client` doesn't fully support all the options of `cURL`, since underneath we use `request` library to send request which doesn't accept all the `cURL` options. Supported options are listed below:
@@ -211,7 +248,7 @@ Sometimes you may want to get the curl format of an http request quickly and sav
 Once you want to cancel a processing request, use shortcut `Ctrl+Alt+K`(`Cmd+Alt+K` for macOS), or press `F1` and then select/type `Rest Client: Cancel Request`.
 
 ## Rerun Last Request
-Sometimes you may want to refresh the API response, now you could do it simply using shortcut `Ctrl+Alt+L`(`Cmd+Alt+L` for macOS), or press `F1` and then select/type `Rest Client: Rerun Last Request` to rerun last request.
+Sometimes you may want to refresh the API response, now you could do it simply using shortcut `Ctrl+Alt+L`(`Cmd+Alt+L` for macOS), or press `F1` and then select/type `Rest Client: Rerun Last Request` to rerun the last request.
 
 ## Request History
 ![request-history](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/request-history.png)
@@ -242,7 +279,7 @@ HTTP Basic Auth is a widely used protocol for simple username/password authentic
 1. Add the value of Authorization header in the base64 encoding of `username:password`.
 2. Add the value of Authorization header in the raw value of `username` and `password`, which is separated by space. REST Client extension will do the base64 encoding automatically.
 
-The corresponding examples are as follows, they are totally equivalent:
+The corresponding examples are as follows, they are equivalent:
 ```http
 GET https://httpbin.org//basic-auth/user/passwd HTTP/1.1
 Authorization: Basic dXNlcjpwYXNzd2Q=
@@ -294,7 +331,7 @@ Azure AD is Microsoft’s multi-tenant, cloud-based directory and identity manag
 
 ## Generate Code Snippet
 ![Generate Code Snippet](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/code-snippet.gif)
-Once you’ve finalized your request in REST Client extension, you might want to make the same request from your own source code. We allow you to generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as previously, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or right-click in the editor and then select `Generate Code Snippet` in the menu, or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, as well as library list. After you selected the code snippet language/library you want, the generated code snippet will be previewed in a separate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
+Once you’ve finalized your request in REST Client extension, you might want to make the same request from your source code. We allow you to generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as previously, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or right-click in the editor and then select `Generate Code Snippet` in the menu, or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, as well as library list. After you selected the code snippet language/library you want, the generated code snippet will be previewed in a separate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
 
 ## HTTP Language
 Add language support for HTTP request, with features like __syntax highlight__, __auto completion__, __code lens__ and __comment support__, when writing HTTP request in Visual Studio Code. By default, the language association will be automatically activated in two cases:
@@ -480,18 +517,17 @@ For example: Define a shell environment variable in `.bashrc` or similar on wind
   }
   ```
 
-  You can refer directly to the key (e.g. ```PRODSECRET```) in the script, for example if running in the production environment
+  You can refer directly to the key (e.g. `PRODSECRET`) in the script, for example if running in the production environment
   ```http
-  ### Lookup PRODSECRET from local machine environment
+  # Lookup PRODSECRET from local machine environment
   GET https://{{host}}/{{version}}/values/item1?user={{$processEnv USERNAME}}
   Authorization: {{$processEnv PRODSECRET}}
   ```
-  or, it can be rewritten to indirectly refer to the key using an extension environment setting (e.g. ```%secret```) to be environment independent using the optional ```%``` modifier.
+  or, it can be rewritten to indirectly refer to the key using an extension environment setting (e.g. `%secretKey`) to be environment independent using the optional `%` modifier.
   ```http
-  ### Use secretKey from extension environment settings to determine
-  ### which local machine environment variable to use
+  # Use secretKey from extension environment settings to determine which local machine environment variable to use
   GET https://{{host}}/{{version}}/values/item1?user={{$processEnv USERNAME}}
-  Authorization: {{$processEnv %secret}}
+  Authorization: {{$processEnv %secretKey}}
   ```
   `envVarName`: Mandatory. Specifies the local machine environment variable
 
