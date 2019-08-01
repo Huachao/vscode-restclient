@@ -45,12 +45,13 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', () => this.unfoldResponseBody()));
     }
 
-    public async render(response: HttpResponse, column: ViewColumn) {
+    public async render(response: HttpResponse, request: HttpRequest, column: ViewColumn) {
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
+            const tabTitle = this.settings.requestNameAsTabTitle && request.requestVariableCacheKey && request.requestVariableCacheKey.key ? request.requestVariableCacheKey.key : 'Response';
             panel = window.createWebviewPanel(
                 this.viewType,
-                `Response(${response.elapsedMillionSeconds}ms)`,
+                `${tabTitle}(${response.elapsedMillionSeconds}ms)`,
                 { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus },
                 {
                     enableFindWidget: true,
@@ -349,4 +350,3 @@ class FoldingRange {
     public constructor(public start: number, public end: number) {
     }
 }
-
