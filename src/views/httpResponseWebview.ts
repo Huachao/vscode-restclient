@@ -45,10 +45,10 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', () => this.unfoldResponseBody()));
     }
 
-    public async render(response: HttpResponse, request: HttpRequest, column: ViewColumn) {
+    public async render(response: HttpResponse, column: ViewColumn) {
+        const tabTitle = this.settings.requestNameAsResponseTabTitle && response.request.requestVariableCacheKey && response.request.requestVariableCacheKey.key || 'Response';
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
-            const tabTitle = this.settings.requestNameAsResponseTabTitle && request.requestVariableCacheKey && request.requestVariableCacheKey.key || 'Response';
             panel = window.createWebviewPanel(
                 this.viewType,
                 `${tabTitle}(${response.elapsedMillionSeconds}ms)`,
@@ -89,7 +89,7 @@ export class HttpResponseWebview extends BaseWebview {
                 this.panels.push(panel);
         } else {
             panel = this.panels[this.panels.length - 1];
-            panel.title = `Response(${response.elapsedMillionSeconds}ms)`;
+            panel.title = `${tabTitle}(${response.elapsedMillionSeconds}ms)`;
         }
 
         panel.webview.html = this.getHtmlForWebview(response);

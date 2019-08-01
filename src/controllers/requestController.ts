@@ -149,7 +149,7 @@ export class RequestController {
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
                 } else {
-                    this._webview.render(response, httpRequest, previewColumn);
+                    this._webview.render(response, previewColumn);
                 }
             } catch (reason) {
                 this.logger.error('Unable to preview response:', reason);
