@@ -48,7 +48,7 @@ export class HttpResponseWebview extends BaseWebview {
     public async render(response: HttpResponse, request: HttpRequest, column: ViewColumn) {
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
-            const tabTitle = this.settings.requestNameAsTabTitle && request.requestVariableCacheKey && request.requestVariableCacheKey.key ? request.requestVariableCacheKey.key : 'Response';
+            const tabTitle = this.settings.requestNameAsResponseTabTitle && request.requestVariableCacheKey && request.requestVariableCacheKey.key || 'Response';
             panel = window.createWebviewPanel(
                 this.viewType,
                 `${tabTitle}(${response.elapsedMillionSeconds}ms)`,
