@@ -51,26 +51,31 @@
   ],
   "main": "./dist/extension",
   "contributes": {
-    "languages": [{
-      "id": "http",
-      "aliases": [
-        "HTTP",
-        "Http",
-        "http"
-      ],
-      "extensions": [
-        ".http",
-        ".rest"
-      ],
-      "firstLine": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+(.*?)HTTP/[0-9\\.]+$",
-      "configuration": "./language-configuration.json"
-    }],
-    "grammars": [{
-      "language": "http",
-      "scopeName": "source.http",
-      "path": "./syntaxes/http.tmLanguage"
-    }],
-    "snippets": [{
+    "languages": [
+      {
+        "id": "http",
+        "aliases": [
+          "HTTP",
+          "Http",
+          "http"
+        ],
+        "extensions": [
+          ".http",
+          ".rest"
+        ],
+        "firstLine": "^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+(.*?)HTTP/[0-9\\.]+$",
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "http",
+        "scopeName": "source.http",
+        "path": "./syntaxes/http.tmLanguage"
+      }
+    ],
+    "snippets": [
+      {
         "language": "http",
         "path": "./snippets/http.json"
       },
@@ -79,7 +84,8 @@
         "path": "./snippets/http.json"
       }
     ],
-    "commands": [{
+    "commands": [
+      {
         "command": "rest-client.request",
         "title": "Send Request",
         "category": "Rest Client"
@@ -172,7 +178,8 @@
       }
     ],
     "menus": {
-      "commandPalette": [{
+      "commandPalette": [
+        {
           "command": "rest-client.fold-response",
           "when": "httpResponsePreviewFocus"
         },
@@ -197,7 +204,8 @@
           "when": "httpResponsePreviewFocus"
         }
       ],
-      "editor/title": [{
+      "editor/title": [
+        {
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.save-response",
           "group": "navigation@1"
@@ -228,7 +236,8 @@
           "group": "navigation"
         }
       ],
-      "editor/context": [{
+      "editor/context": [
+        {
           "command": "rest-client.request",
           "when": "editorTextFocus && editorLangId == http",
           "group": "rest-client@1"
@@ -245,7 +254,8 @@
         }
       ]
     },
-    "keybindings": [{
+    "keybindings": [
+      {
         "command": "rest-client.request",
         "key": "ctrl+alt+r",
         "mac": "cmd+alt+r",
@@ -405,17 +415,21 @@
           "scope": "resource",
           "description": "Sets the environments and custom variables belongs to it, especially the special environment name '$shared' is used to create variables shared across all the individual environments (e.g., {\"$shared\": {\"version\": \"v1\"}, \"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
           "additionalProperties": {
-            "anyOf": [{
-              "type": "object",
-              "default": {},
-              "description": "Sets the custom variables belong to this environment",
-              "additionalProperties": {
-                "anyOf": [{
-                  "type": "string",
-                  "description": "Value of the custom variable"
-                }]
+            "anyOf": [
+              {
+                "type": "object",
+                "default": {},
+                "description": "Sets the custom variables belong to this environment",
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "description": "Value of the custom variable"
+                    }
+                  ]
+                }
               }
-            }]
+            ]
           }
         },
         "rest-client.mimeAndFileExtensionMapping": {
@@ -437,37 +451,39 @@
           "description": "Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file)",
           "pattern": "^(?!http(s?)://)",
           "additionalProperties": {
-            "anyOf": [{
-              "type": "object",
-              "default": {},
-              "description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
-              "properties": {
-                "cert": {
-                  "type": "string",
-                  "description": "Absolute or relative path of Public x509 certificate"
+            "anyOf": [
+              {
+                "type": "object",
+                "default": {},
+                "description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
+                "properties": {
+                  "cert": {
+                    "type": "string",
+                    "description": "Absolute or relative path of Public x509 certificate"
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "Absolute or relative path of Private key"
+                  },
+                  "pfx": {
+                    "type": "string",
+                    "description": "Absolute or relative path of PKCS #12 certificate"
+                  },
+                  "passphrase": {
+                    "type": "string",
+                    "description": "[Optional] A string of passphrase for the private key or pfx"
+                  }
                 },
-                "key": {
-                  "type": "string",
-                  "description": "Absolute or relative path of Private key"
-                },
-                "pfx": {
-                  "type": "string",
-                  "description": "Absolute or relative path of PKCS #12 certificate"
-                },
-                "passphrase": {
-                  "type": "string",
-                  "description": "[Optional] A string of passphrase for the private key or pfx"
+                "dependencies": {
+                  "cert": [
+                    "key"
+                  ],
+                  "key": [
+                    "cert"
+                  ]
                 }
-              },
-              "dependencies": {
-                "cert": [
-                  "key"
-                ],
-                "key": [
-                  "cert"
-                ]
               }
-            }]
+            ]
           }
         },
         "rest-client.suppressResponseBodyContentTypeValidationWarning": {
