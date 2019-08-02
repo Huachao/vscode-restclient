@@ -12,6 +12,7 @@ export interface IRestClientSettings {
     defaultHeaders: Headers;
     timeoutInMilliseconds: number;
     showResponseInDifferentTab: boolean;
+    requestNameAsResponseTabTitle: boolean;
     proxy: string;
     proxyStrictSSL: boolean;
     rememberCookiesForSubsequentRequests: boolean;
@@ -44,6 +45,7 @@ export class RestClientSettings implements IRestClientSettings {
     public defaultHeaders: Headers;
     public timeoutInMilliseconds: number;
     public showResponseInDifferentTab: boolean;
+    public requestNameAsResponseTabTitle: boolean;
     public proxy: string;
     public proxyStrictSSL: boolean;
     public rememberCookiesForSubsequentRequests: boolean;
@@ -114,6 +116,7 @@ export class RestClientSettings implements IRestClientSettings {
                                                                   "Accept-Encoding": "gzip"
                                                               });
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
+        this.requestNameAsResponseTabTitle = restClientSettings.get<boolean>("requestNameAsResponseTabTitle", false);
         this.rememberCookiesForSubsequentRequests = restClientSettings.get<boolean>("rememberCookiesForSubsequentRequests", true);
         this.timeoutInMilliseconds = restClientSettings.get<number>("timeoutinmilliseconds", 0);
         if (this.timeoutInMilliseconds < 0) {

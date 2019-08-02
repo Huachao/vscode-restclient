@@ -46,11 +46,12 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     public async render(response: HttpResponse, column: ViewColumn) {
+        const tabTitle = this.settings.requestNameAsResponseTabTitle && response.request.requestVariableCacheKey && response.request.requestVariableCacheKey.key || 'Response';
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
                 this.viewType,
-                `Response(${response.elapsedMillionSeconds}ms)`,
+                `${tabTitle}(${response.elapsedMillionSeconds}ms)`,
                 { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus },
                 {
                     enableFindWidget: true,
@@ -88,7 +89,7 @@ export class HttpResponseWebview extends BaseWebview {
                 this.panels.push(panel);
         } else {
             panel = this.panels[this.panels.length - 1];
-            panel.title = `Response(${response.elapsedMillionSeconds}ms)`;
+            panel.title = `${tabTitle}(${response.elapsedMillionSeconds}ms)`;
         }
 
         panel.webview.html = this.getHtmlForWebview(response);
@@ -349,4 +350,3 @@ class FoldingRange {
     public constructor(public start: number, public end: number) {
     }
 }
-

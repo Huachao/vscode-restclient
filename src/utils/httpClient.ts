@@ -108,7 +108,8 @@ export class HttpClient {
                         options.url,
                         HttpClient.capitalizeHeaderName(response.toJSON().request.headers),
                         Buffer.isBuffer(requestBody) ? that.convertBufferToStream(requestBody) : requestBody,
-                        httpRequest.rawBody
+                        httpRequest.rawBody,
+                        httpRequest.requestVariableCacheKey
                     )));
             })
                 .on('data', function (data) {
