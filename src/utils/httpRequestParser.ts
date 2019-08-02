@@ -79,10 +79,7 @@ export class HttpRequestParser implements IRequestParser {
                     const requestTypeHeader = getHeader(headers, 'x-request-type');
                     const contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
                     firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
-                    const bodyEndLine =
-                        MimeUtility.isMultiPartFormData(contentTypeHeader) || MimeUtility.isMultiPartMixed(contentTypeHeader) || firstEmptyLine === -1
-                            ? lines.length
-                            : firstEmptyLine;
+                    const bodyEndLine = MimeUtility.isMultiPart(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                     bodyLines = lines.slice(bodyStartLine, bodyEndLine);
                     if (requestTypeHeader && requestTypeHeader === 'GraphQL') {
                         const variableStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', bodyEndLine);

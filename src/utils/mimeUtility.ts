@@ -116,6 +116,15 @@ export class MimeUtility {
         return MimeUtility.parse(contentTypeString).type === 'multipart/form-data';
     }
 
+    public static isMultiPart(contentTypeString: string): boolean {
+        if (!contentTypeString) {
+            return false;
+        }
+
+        const type = MimeUtility.parse(contentTypeString).type;
+        return type.startsWith('multipart/');
+    }
+
     public static isFormUrlEncoded(contentTypeString: string): boolean {
         if (!contentTypeString) {
             return false;
