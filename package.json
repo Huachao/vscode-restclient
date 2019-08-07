@@ -603,7 +603,6 @@
     "vscode:prepublish": "webpack --mode production",
     "webpack": "webpack --mode development",
     "watch": "webpack --mode development --watch --info-verbosity verbose",
-    "postinstall": "node ./node_modules/vscode/bin/install",
     "tslint": "tslint --project tsconfig.json"
   },
   "devDependencies": {
