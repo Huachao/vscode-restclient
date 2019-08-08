@@ -322,7 +322,7 @@
     ],
     "configuration": {
       "type": "object",
-      "title": "REST Client Configuration",
+      "title": "REST Client",
       "properties": {
         "rest-client.followredirect": {
           "type": "boolean",
@@ -337,7 +337,7 @@
             "Accept-Encoding": "gzip"
           },
           "scope": "resource",
-          "description": "If particular headers are omitted in request header, these will be added as headers for each request."
+          "description": "If particular headers are omitted in request headers, these will be added as headers for each request."
         },
         "rest-client.timeoutinmilliseconds": {
           "type": "integer",
@@ -413,7 +413,7 @@
             "$shared": {}
           },
           "scope": "resource",
-          "description": "Sets the environments and custom variables belongs to it, especially the special environment name '$shared' is used to create variables shared across all the individual environments (e.g., {\"$shared\": {\"version\": \"v1\"}, \"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}})",
+          "markdownDescription": "Sets the environments and custom variables belongs to it, especially the special environment name '$shared' is used to create variables shared across all the individual environments (e.g., `{\"$shared\": {\"version\": \"v1\"}, \"production\": {\"host\": \"api.example.com\"}, \"sandbox\":{\"host\":\"sandbox.api.example.com\"}}`)",
           "additionalProperties": {
             "anyOf": [
               {
@@ -436,7 +436,7 @@
           "type": "object",
           "default": {},
           "scope": "resource",
-          "description": "Sets the custom mapping of mime type and file extension of saved response body (e.g., {\"application/atom+xml\": \"xml\"})"
+          "markdownDescription": "Sets the custom mapping of mime type and file extension of saved response body (e.g., `{\"application/atom+xml\": \"xml\"}`)"
         },
         "rest-client.previewResponseInUntitledDocument": {
           "type": "boolean",
@@ -500,21 +500,27 @@
             "body",
             "exchange"
           ],
+          "enumDescriptions": [
+            "Response headers, body and status line",
+            "Response headers and status line",
+            "Response body only",
+            "Whole HTTP exchange including both request and response"
+          ],
           "default": "full",
           "scope": "resource",
-          "description": "Response preview output option. 'full' for whole response message(status line, headers and body). 'headers' for response headers(as well as status line). 'body' for response body only. 'exchange' for whole HTTP exchange (request and response)"
+          "description": "Response preview output option"
         },
         "rest-client.disableHighlightResonseBodyForLargeResponse": {
           "type": "boolean",
           "default": true,
           "scope": "resource",
-          "description": "Controls whether to highlight response body for response whose size is larger than limit specified by 'rest-client.largeResponseSizeLimitInMB'"
+          "markdownDescription": "Controls whether to highlight response body for response whose size is larger than limit specified by `rest-client.largeResponseSizeLimitInMB`"
         },
         "rest-client.disableAddingHrefLinkForLargeResponse": {
           "type": "boolean",
           "default": true,
           "scope": "resource",
-          "description": "Controls whether to add href link in previewed response for response whose size is larger than limit specified by 'rest-client.largeResponseSizeLimitInMB'"
+          "markdownDescription": "Controls whether to add href link in previewed response for response whose size is larger than limit specified by `rest-client.largeResponseSizeLimitInMB`"
         },
         "rest-client.largeResponseBodySizeLimitInMB": {
           "type": "number",
@@ -522,7 +528,7 @@
           "minimum": 0,
           "exclusiveMinimum": true,
           "scope": "resource",
-          "description": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when 'rest-client.disableHighlightResonseBodyForLargeResponse' and/or 'rest-client.disableAddingHrefLinkForLargeResponse' is set to true"
+          "markdownDescription": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when `rest-client.disableHighlightResonseBodyForLargeResponse` and/or `rest-client.disableAddingHrefLinkForLargeResponse` is set to true"
         },
         "rest-client.previewColumn": {
           "type": "string",
@@ -530,9 +536,13 @@
             "current",
             "beside"
           ],
+          "markdownEnumDescriptions": [
+            "Preview in the column of current request file",
+            "previewing at the side of the current active column and the side direction depends on `workbench.editor.openSideBySideDirection` setting, either right or below the current editor column"
+          ],
           "default": "beside",
           "scope": "resource",
-          "description": "Response preview column option. 'current' for previewing in the column of current request file. 'beside' for previewing at the side of the current active column and the side direction depends on 'workbench.editor.openSideBySideDirection' setting, either right or below the current editor column."
+          "description": "Response preview column option"
         },
         "rest-client.previewResponsePanelTakeFocus": {
           "type": "boolean",
@@ -547,15 +557,20 @@
             "never",
             "always"
           ],
+          "markdownEnumDescriptions": [
+            "Detecting encoding or not automatically and do the encoding job if necessary",
+            "Treat provided request body as is, no encoding job will be applied",
+            "Use for the scenario that `automatic` option not working properly, e.g., some special characters(`+`) are not encoded correctly"
+          ],
           "default": "automatic",
           "scope": "resource",
-          "description": "Form param encoding strategy for request body of x-www-form-urlencoded. 'automatic' for detecting encoding or not automatically and do the encoding job if necessary. 'never' for treating provided request body as is, no encoding job will be applied. 'always' for only use for the scenario that 'automatic' option not working properly, e.g., some special characters('+') are not encoded correctly."
+          "markdownDescription": "Form param encoding strategy for request body of `x-www-form-urlencoded`."
         },
         "rest-client.addRequestBodyLineIndentationAroundBrackets": {
           "type": "boolean",
           "default": true,
           "scope": "resource",
-          "description": "Add line indentation around brackets('{}', '<>', '[]') in request body when pressing enter."
+          "markdownDescription": "Add line indentation around brackets(`{}`, `<>`, `[]`) in request body when pressing enter."
         },
         "rest-client.decodeEscapedUnicodeCharacters": {
           "type": "boolean",
