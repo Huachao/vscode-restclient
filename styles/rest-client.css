@@ -139,9 +139,14 @@ code {
   background-repeat: no-repeat;
 }
 
-.vscode-dark .line .icon,
-.vscode-high-contrast .line .icon {
+.vscode-dark .line .icon {
   background: url(expand-dark.svg);
+  background-size: 1.2em;
+  background-repeat: no-repeat;
+}
+
+.vscode-high-contrast .line .icon {
+  background: url(expand-hc.svg);
   background-size: 1.2em;
   background-repeat: no-repeat;
 }
@@ -162,9 +167,14 @@ code {
   background-repeat: no-repeat;
 }
 
-.vscode-dark .line.collapsed .icon,
-.vscode-high-contrast .line.collapsed .icon {
+.vscode-dark .line.collapsed .icon {
   background: url(collapse-dark.svg);
+  background-size: 1.2em;
+  background-repeat: no-repeat;
+}
+
+.vscode-high-contrast .line.collapsed .icon {
+  background: url(collapse-hc.svg);
   background-size: 1.2em;
   background-repeat: no-repeat;
 }
