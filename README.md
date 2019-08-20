@@ -562,7 +562,7 @@ Date: {{$datetime rfc1123}}
     "request_id": "{{$guid}}",
     "updated_at": "{{$timestamp}}",
     "created_at": "{{$timestamp -1 d}}",
-    "review_count": "{{$randomInt 5, 200}}",
+    "review_count": "{{$randomInt 5 200}}",
     "custom_date": "{{$datetime 'YYYY-MM-DD'}}"
 }
 ```
