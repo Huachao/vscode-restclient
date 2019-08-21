@@ -38,7 +38,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
 
         // Check if the variable is a reference to another variable
         const value = variables[name];
-        const variableRegex = /\{{2}\$envRef(.+?)\}{2}/;
+        const variableRegex = /\{{2}\$shared (.+?)\}{2}/;
         const match = variableRegex.exec(value);
 
         if (match) {
