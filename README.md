@@ -396,6 +396,29 @@ GET https://{{host}}/api/{{version}}comments/1 HTTP/1.1
 Authorization: {{token}}
 ```
 
+You can also reference shared variables from other environment variables. For example:
+```json
+"rest-client.environmentVariables": {
+        "$shared": {
+            "nonProdToken": "xyz",
+            "prodToken": "abc"
+        },
+        "dev": {
+            "token": "{{$shared nonProdToken}}"
+        },
+        "test": {
+            "token": "{{$shared nonProdToken}}"
+        },
+        "production": {
+            "token": "{{$shared prodToken}}"
+        },
+        "prodDR": {
+            "token": "{{$shared prodToken}}"
+        }
+    }
+```
+In the above example, ```dev``` and ```test``` will use the token ```"xyz"``` while the ```production``` and ```prodDR``` environments will use the token ```"abc"```.
+
 #### File Variables
 For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contains any spaces. As for variable value, it can be consist of any characters, even whitespaces are allowed for them (Leading and trailing whitespaces will be stripped). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variable value can even contain references to all of other kinds of variables. For instance, you can create a file variable with value of other [request variables](#request-variables) like `@token = {{loginAPI.response.body.token}}`.
 
