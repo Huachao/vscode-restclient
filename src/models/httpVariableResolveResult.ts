@@ -17,6 +17,7 @@ export const enum ResolveErrorMessage {
     EnvironmentVariableNotExist = 'Environment variable does not exist',
     FileVariableNotExist = 'File variable does not exist',
     RequestVariableNotExist =  'Request variable does not exist',
+    EnvironmentReferenceVariableNotExist = "The specified shared variable does not exist"
 }
 
 export const enum ResolveWarningMessage {
