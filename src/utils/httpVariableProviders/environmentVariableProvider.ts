@@ -35,7 +35,13 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
         if (!(name in variables)) {
             return { name, error: ResolveErrorMessage.EnvironmentVariableNotExist };
         }
-
+        // Check if the variable is a reference to another variable
+        const value = variables[name];
+        const variableRegex = /\{{2}\$envRef(.+?)\}{2}/;
+        const match = variableRegex.exec(value);
+        if (match) {
+            return this.get(document, match[1].trim());
+        }
         return { name, value: variables[name] };
     }
 
