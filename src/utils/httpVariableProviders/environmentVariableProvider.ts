@@ -55,8 +55,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
     }
 
     private mapEnvironmentVariables(current: any, shared: any) {
-        for (let key in current) {
-            const value = current[key];
+        for (const [key, value] of Object.entries(current)) {
             if (typeof(value) !== "string") {
                 continue;
             }
@@ -66,11 +65,9 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
                 continue;
             }
             const referenceKey = match[1].trim();
-            const referenceValue = shared[referenceKey];
-            if (!referenceValue && referenceValue !== "") {
-                continue;
+            if (referenceKey in shared && typeof(shared[referenceKey]) === "string") {
+                current[key] = shared[referenceKey];
             }
-            current[key] = referenceValue;
         }
     }
 }
