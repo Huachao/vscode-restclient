@@ -13,6 +13,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
     private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
     public static get Instance(): EnvironmentVariableProvider {
+
         if (!EnvironmentVariableProvider._instance) {
             EnvironmentVariableProvider._instance = new EnvironmentVariableProvider();
         }
@@ -49,6 +50,27 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
         const variables = this._settings.environmentVariables;
         const currentEnvironmentVariables = variables[environmentName];
         const sharedEnvironmentVariables = variables[EnvironmentController.sharedEnvironmentName];
+        this.mapEnvironmentVariables(currentEnvironmentVariables, sharedEnvironmentVariables);
         return Object.assign({}, sharedEnvironmentVariables, currentEnvironmentVariables);
+    }
+
+    private mapEnvironmentVariables(current: any, shared: any){
+        for (let key in current) {
+            const value = current[key];
+            if (!(typeof(value) === "string")) {
+                continue;
+            }
+            const variableRegex = /\{{2}\$shared (.+?)\}{2}/;
+            const match = variableRegex.exec(value);
+            if (!match) {
+                continue;
+            }
+            const referenceKey = match[1].trim();
+            const referenceValue = shared[referenceKey];
+            if(!referenceValue) {
+                continue;
+            }
+            current[key] = referenceValue;
+        }
     }
 }
