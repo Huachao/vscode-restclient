@@ -54,10 +54,10 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
         return Object.assign({}, sharedEnvironmentVariables, currentEnvironmentVariables);
     }
 
-    private mapEnvironmentVariables(current: any, shared: any){
+    private mapEnvironmentVariables(current: any, shared: any) {
         for (let key in current) {
             const value = current[key];
-            if (!(typeof(value) === "string")) {
+            if (typeof(value) !== "string") {
                 continue;
             }
             const variableRegex = /\{{2}\$shared (.+?)\}{2}/;
@@ -67,7 +67,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
             }
             const referenceKey = match[1].trim();
             const referenceValue = shared[referenceKey];
-            if(!referenceValue) {
+            if (!referenceValue && referenceValue !== "") {
                 continue;
             }
             current[key] = referenceValue;
