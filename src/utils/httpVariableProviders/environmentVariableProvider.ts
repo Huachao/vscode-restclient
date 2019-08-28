@@ -49,6 +49,24 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
         const variables = this._settings.environmentVariables;
         const currentEnvironmentVariables = variables[environmentName];
         const sharedEnvironmentVariables = variables[EnvironmentController.sharedEnvironmentName];
+        this.mapEnvironmentVariables(currentEnvironmentVariables, sharedEnvironmentVariables);
         return Object.assign({}, sharedEnvironmentVariables, currentEnvironmentVariables);
+    }
+
+    private mapEnvironmentVariables(current: any, shared: any) {
+        for (const [key, value] of Object.entries(current)) {
+            if (typeof(value) !== "string") {
+                continue;
+            }
+            const variableRegex = /\{{2}\$shared (.+?)\}{2}/;
+            const match = variableRegex.exec(value);
+            if (!match) {
+                continue;
+            }
+            const referenceKey = match[1].trim();
+            if (typeof(shared[referenceKey]) === "string") {
+                current[key] = shared[referenceKey];
+            }
+        }
     }
 }
