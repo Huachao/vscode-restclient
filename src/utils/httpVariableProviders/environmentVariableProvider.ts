@@ -65,7 +65,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
                 continue;
             }
             const referenceKey = match[1].trim();
-            if (referenceKey in shared && typeof(shared[referenceKey]) === "string") {
+            if (typeof(shared[referenceKey]) === "string") {
                 current[key] = shared[referenceKey];
             }
         }
