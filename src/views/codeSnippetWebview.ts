@@ -60,9 +60,11 @@ export class CodeSnippetWebview extends BaseWebview {
     }
 
     private getHtmlForWebview(convertResult: string, lang: string): string {
+        const csp = this.getCsp();
         return `
             <head>
                 <link rel="stylesheet" href="${this.styleFilePath}">
+                ${csp}
             </head>
             <body>
                 <div>
@@ -82,5 +84,9 @@ export class CodeSnippetWebview extends BaseWebview {
         }
 
         return lang;
+    }
+
+    private getCsp(): string {
+        return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' http: https: data: vscode-resource:; style-src 'self' 'unsafe-inline' http: https: data: vscode-resource:;">`;
     }
 }

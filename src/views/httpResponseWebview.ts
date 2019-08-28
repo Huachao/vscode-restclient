@@ -135,10 +135,15 @@ export class HttpResponseWebview extends BaseWebview {
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
             innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
         }
+
+        // Content Security Policy
+        const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
+        const csp = this.getCsp(nonce);
         return `
     <head>
         <link rel="stylesheet" type="text/css" href="${this.styleFilePath}">
         ${this.getSettingsOverrideStyles(width)}
+        ${csp}
     </head>
     <body>
         <div>
@@ -147,7 +152,7 @@ export class HttpResponseWebview extends BaseWebview {
                 : this.addUrlLinks(innerHtml)}
             <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="window.scroll(0,0)" title="Scroll To Top"><span class="icon"></span></a>
         </div>
-        <script type="text/javascript" src="${this.scriptFilePath}" charset="UTF-8"></script>
+        <script type="text/javascript" src="${this.scriptFilePath}" nonce="${nonce}" charset="UTF-8"></script>
     </body>`;
     }
 
@@ -227,6 +232,10 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             `left: calc(${width}ch + 3px)`,
             '}',
             '</style>'].join('\n');
+    }
+
+    private getCsp(nonce: string): string {
+        return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' http: https: data: vscode-resource:; script-src 'nonce-${nonce}'; style-src 'self' 'unsafe-inline' http: https: data: vscode-resource:;">`;
     }
 
     private addLineNums(code): string {
