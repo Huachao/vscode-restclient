@@ -78,10 +78,6 @@
       {
         "language": "http",
         "path": "./snippets/http.json"
-      },
-      {
-        "language": "plaintext",
-        "path": "./snippets/http.json"
       }
     ],
     "commands": [
