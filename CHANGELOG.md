@@ -1,3 +1,10 @@
+## 0.22.1 (2019/9/19)
+* __Breaking Change__: Remove snippet support `plain text`
+* __Feature__: [Add setting to display request name as response tab title](https://github.com/Huachao/vscode-restclient/pull/400) ([@lochstar](https://github.com/lochstar))
+* __Feature__: [Allow environment variables to reference shared variables](https://github.com/Huachao/vscode-restclient/pull/409) ([@snackb](https://github.com/snackb))
+* __Improvement__: Add CSP for response and code snippet webviews
+* __Improvement__: Support multipart mime types of request
+
 ## 0.22.0 (2019/7/31)
 * __Feature__: [Add support for `GraphQL`](https://github.com/Huachao/vscode-restclient/pull/384) ([@ferronrsmith](https://github.com/ferronrsmith))
 * __Feature__: [Add new system variable - local machine environment variable](https://github.com/Huachao/vscode-restclient/pull/366) ([@mtnrbq](https://github.com/mtnrbq))

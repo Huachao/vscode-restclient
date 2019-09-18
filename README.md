@@ -371,21 +371,23 @@ The reference syntax of system and custom variables types has a subtle differenc
 Custom variables can cover different user scenarios with the benefit of environment variables, file variables, and request variables. Environment variables are mainly used for storing values that may vary in different environments. Since environment variables are directly defined in Visual Studio Code setting file, they can be referenced across different `http` files. File variables are mainly used for representing values that are constant throughout the `http` file. Request variables are used for the chaining requests scenarios which means a request needs to reference some part(header or body) of another request/response in the _same_ `http` file, imagine we need to retrieve the auth token dynamically from the login response, request variable fits the case well. Both file and request variables are defined in the `http` file and only have __File Scope__.
 
 #### Environment Variables
-For environment variables, each environment comprises a set of key value pairs defined in setting file, key and value are variable name and value respectively. Only variables defined in selected environment and shared environment are available to you. Below is a sample piece of setting file for custom environments and environment level variables:
+For environment variables, each environment comprises a set of key value pairs defined in setting file, key and value are variable name and value respectively. Only variables defined in selected environment and shared environment are available to you. You can also reference the variables in shard environment with `{{$shared variableName}}` syntax in your active environment. Below is a sample piece of setting file for custom environments and environment level variables:
 ```json
 "rest-client.environmentVariables": {
     "$shared": {
-        "version": "v1"
+        "version": "v1",
+        "prodToken": "foo",
+        "nonProdToken": "bar"
     },
     "local": {
         "version": "v2",
         "host": "localhost",
-        "token": "test token",
+        "token": "{{$shared nonProdToken}}",
         "secretKey": "devSecret"
     },
     "production": {
         "host": "example.com",
-        "token": "product token",
+        "token": "{{$shared prodToken}}",
         "secretKey" : "prodSecret"
     }
 }
