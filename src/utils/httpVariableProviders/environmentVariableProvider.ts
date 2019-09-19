@@ -1,6 +1,7 @@
 'use strict';
 
 import { TextDocument } from 'vscode';
+import * as Constants from '../../common/constants';
 import { EnvironmentController } from '../../controllers/environmentController';
 import { RestClientSettings } from '../../models/configurationSettings';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
@@ -45,7 +46,10 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
     }
 
     private async getAvailableVariables(): Promise<{ [key: string]: string }> {
-        const { name: environmentName } = await EnvironmentController.getCurrentEnvironment();
+        let { name: environmentName } = await EnvironmentController.getCurrentEnvironment();
+        if (environmentName === Constants.NoEnvironmentSelectedName) {
+            environmentName = EnvironmentController.sharedEnvironmentName;
+        }
         const variables = this._settings.environmentVariables;
         const currentEnvironmentVariables = variables[environmentName];
         const sharedEnvironmentVariables = variables[EnvironmentController.sharedEnvironmentName];
