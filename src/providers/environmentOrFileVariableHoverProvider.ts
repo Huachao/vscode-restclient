@@ -5,10 +5,10 @@ import { EnvironmentVariableProvider } from '../utils/httpVariableProviders/envi
 import { FileVariableProvider } from '../utils/httpVariableProviders/fileVariableProvider';
 import { VariableUtility } from '../utils/variableUtility';
 
-export class CustomVariableHoverProvider implements HoverProvider {
+export class EnvironmentOrFileVariableHoverProvider implements HoverProvider {
 
     public async provideHover(document: TextDocument, position: Position, token: CancellationToken): Promise<Hover> {
-        if (!VariableUtility.isVariableReference(document, position)) {
+        if (!VariableUtility.isEnvironmentOrFileVariableReference(document, position)) {
             return;
         }
 

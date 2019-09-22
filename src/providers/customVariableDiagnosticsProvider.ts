@@ -9,7 +9,7 @@ import { RequestVariableCache } from "../utils/requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { VariableProcessor } from "../utils/variableProcessor";
 
-export class VariableDiagnosticsProvider {
+export class CustomVariableDiagnosticsProvider {
     private httpDiagnosticCollection: DiagnosticCollection;
 
     constructor() {

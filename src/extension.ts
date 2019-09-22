@@ -8,17 +8,17 @@ import { HistoryController } from './controllers/historyController';
 import { RequestController } from './controllers/requestController';
 import { ResponseController } from './controllers/responseController';
 import { Logger } from './logger';
-import { CustomVariableDefinitionProvider } from './providers/customVariableDefinitionProvider';
-import { CustomVariableHoverProvider } from './providers/customVariableHoverProvider';
-import { CustomVariableReferenceProvider } from './providers/customVariableReferenceProvider';
-import { CustomVariableReferencesCodeLensProvider } from './providers/customVariableReferencesCodeLensProvider';
+import { CustomVariableDiagnosticsProvider } from "./providers/customVariableDiagnosticsProvider";
 import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
+import { EnvironmentOrFileVariableHoverProvider } from './providers/environmentOrFileVariableHoverProvider';
+import { FileVariableDefinitionProvider } from './providers/fileVariableDefinitionProvider';
+import { FileVariableReferenceProvider } from './providers/fileVariableReferenceProvider';
+import { FileVariableReferencesCodeLensProvider } from './providers/fileVariableReferencesCodeLensProvider';
 import { HttpCodeLensProvider } from './providers/httpCodeLensProvider';
 import { HttpCompletionItemProvider } from './providers/httpCompletionItemProvider';
 import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvider';
 import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
-import { VariableDiagnosticsProvider } from "./providers/variableDiagnosticsProvider";
 import { AadTokenCache } from './utils/aadTokenCache';
 import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
 
@@ -63,7 +63,7 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new HttpCompletionItemProvider()));
     context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new RequestVariableCompletionItemProvider(), '.'));
-    context.subscriptions.push(languages.registerHoverProvider(documentSelector, new CustomVariableHoverProvider()));
+    context.subscriptions.push(languages.registerHoverProvider(documentSelector, new EnvironmentOrFileVariableHoverProvider()));
     context.subscriptions.push(languages.registerHoverProvider(documentSelector, new RequestVariableHoverProvider()));
     context.subscriptions.push(
         new ConfigurationDependentRegistration(
@@ -71,14 +71,14 @@ export async function activate(context: ExtensionContext) {
             s => s.enableSendRequestCodeLens));
     context.subscriptions.push(
         new ConfigurationDependentRegistration(
-            () => languages.registerCodeLensProvider(documentSelector, new CustomVariableReferencesCodeLensProvider()),
+            () => languages.registerCodeLensProvider(documentSelector, new FileVariableReferencesCodeLensProvider()),
             s => s.enableCustomVariableReferencesCodeLens));
     context.subscriptions.push(languages.registerDocumentLinkProvider(documentSelector, new RequestBodyDocumentLinkProvider()));
-    context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new CustomVariableDefinitionProvider()));
-    context.subscriptions.push(languages.registerReferenceProvider(documentSelector, new CustomVariableReferenceProvider()));
+    context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new FileVariableDefinitionProvider()));
+    context.subscriptions.push(languages.registerReferenceProvider(documentSelector, new FileVariableReferenceProvider()));
     context.subscriptions.push(languages.registerDocumentSymbolProvider(documentSelector, new HttpDocumentSymbolProvider()));
 
-    const diagnosticsProviders = new VariableDiagnosticsProvider();
+    const diagnosticsProviders = new CustomVariableDiagnosticsProvider();
     workspace.onDidOpenTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
     workspace.onDidCloseTextDocument(diagnosticsProviders.deleteDocumentFromDiagnosticCollection, diagnosticsProviders, context.subscriptions);
     workspace.onDidSaveTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);

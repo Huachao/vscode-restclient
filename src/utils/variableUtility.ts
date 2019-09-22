@@ -4,7 +4,7 @@ import { Position, Range, TextDocument, TextLine } from 'vscode';
 import * as Constants from '../common/constants';
 
 export class VariableUtility {
-    public static isVariableDefinition(document: TextDocument, position: Position): boolean {
+    public static isFileVariableDefinition(document: TextDocument, position: Position): boolean {
         let wordRange = document.getWordRangeAtPosition(position);
         let lineRange = document.lineAt(position);
         if (!wordRange
@@ -17,7 +17,7 @@ export class VariableUtility {
         return true;
     }
 
-    public static isVariableReference(document: TextDocument, position: Position): boolean {
+    public static isEnvironmentOrFileVariableReference(document: TextDocument, position: Position): boolean {
         let wordRange = document.getWordRangeAtPosition(position);
         let lineRange = document.lineAt(position);
         return VariableUtility.isVariableReferenceFromLine(wordRange, lineRange);
@@ -48,7 +48,7 @@ export class VariableUtility {
         return true;
     }
 
-    public static getDefinitionRanges(lines: string[], variable: string): Range[] {
+    public static getFileVariableDefinitionRanges(lines: string[], variable: string): Range[] {
         let locations: Range[] = [];
         for (const [index, line] of lines.entries()) {
             let match: RegExpExecArray;
@@ -61,7 +61,7 @@ export class VariableUtility {
         return locations;
     }
 
-    public static getReferenceRanges(lines: string[], variable: string): Range[] {
+    public static getFileVariableReferenceRanges(lines: string[], variable: string): Range[] {
         const locations: Range[] = [];
         const regex = new RegExp(`\{\{${variable}\}\}`, 'g');
         for (const [index, line] of lines.entries()) {

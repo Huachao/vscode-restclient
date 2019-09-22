@@ -5,7 +5,7 @@ import * as Constants from '../common/constants';
 import { Selector } from '../utils/selector';
 import { VariableUtility } from '../utils/variableUtility';
 
-export class CustomVariableReferencesCodeLensProvider implements CodeLensProvider {
+export class FileVariableReferencesCodeLensProvider implements CodeLensProvider {
     public provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {
         const blocks: CodeLens[] = [];
         const lines: string[] = document.getText().split(Constants.LineSplitterRegex);
@@ -22,7 +22,7 @@ export class CustomVariableReferencesCodeLensProvider implements CodeLensProvide
                 let match: RegExpExecArray;
                 if (match = Constants.FileVariableDefinitionRegex.exec(line)) {
                     const variableName = match[1];
-                    const locations = VariableUtility.getReferenceRanges(lines, variableName);
+                    const locations = VariableUtility.getFileVariableReferenceRanges(lines, variableName);
                     const cmd: Command = {
                         arguments: [document.uri, range.start, locations.map(loc => new Location(document.uri, loc))],
                         title: locations.length === 1 ? '1 reference' : `${locations.length} references`,
