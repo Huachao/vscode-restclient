@@ -18,6 +18,7 @@ import { HttpCodeLensProvider } from './providers/httpCodeLensProvider';
 import { HttpCompletionItemProvider } from './providers/httpCompletionItemProvider';
 import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvider';
 import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
+import { RequestVariableDefinitionProvider } from './providers/requestVariableDefinitionProvider';
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
 import { AadTokenCache } from './utils/aadTokenCache';
 import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
@@ -75,6 +76,7 @@ export async function activate(context: ExtensionContext) {
             s => s.enableCustomVariableReferencesCodeLens));
     context.subscriptions.push(languages.registerDocumentLinkProvider(documentSelector, new RequestBodyDocumentLinkProvider()));
     context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new FileVariableDefinitionProvider()));
+    context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new RequestVariableDefinitionProvider()));
     context.subscriptions.push(languages.registerReferenceProvider(documentSelector, new FileVariableReferenceProvider()));
     context.subscriptions.push(languages.registerDocumentSymbolProvider(documentSelector, new HttpDocumentSymbolProvider()));
 
