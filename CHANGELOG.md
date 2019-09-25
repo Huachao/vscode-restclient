@@ -1,3 +1,8 @@
+## 0.22.2 (2019/9/25)
+* __Feature__: Go to definition support for request variables
+* __Bug Fix__: [Fix header auto completion is broken](https://github.com/Huachao/vscode-restclient/issues/422)
+* __Bug Fix__: [Shared variables are no longer accessible when selecting `No Environment`](https://github.com/Huachao/vscode-restclient/issues/420)
+
 ## 0.22.1 (2019/9/19)
 * __Breaking Change__: Remove snippet support `plain text`
 * __Feature__: [Add setting to display request name as response tab title](https://github.com/Huachao/vscode-restclient/pull/400) ([@lochstar](https://github.com/lochstar))

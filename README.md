@@ -25,7 +25,8 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Support both __environment__, __file__ and __request__ custom variables
     - Auto completion and hover support for both __environment__, __file__ and __request__ custom variables
     - Diagnostic support for __request__ and __file__ custom variables
-    - Go to definition and find all references support _ONLY_ for __file__ custom variables
+    - Go to definition support for __request__ and __file__ custom variables
+    - Find all references support _ONLY_ for __file__ custom variables
     - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp [offset option]}}`, `{{$datetime rfc1123|iso8601 [offset option]}}`, `{{$processEnv [%]envVarName}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
     - Easily create/update/delete environments and environment variables in setting file
     - File variables can reference both custom and system variables
