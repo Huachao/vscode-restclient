@@ -73,6 +73,9 @@ export class HttpRequestParser implements IRequestParser {
                 }
                 headers = RequestParserUtil.parseRequestHeaders(headerLines.slice(index));
 
+                // let underlying node.js module recalculate the content length
+                removeHeader(headers, 'content-length');
+
                 // get body range
                 const bodyStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
                 if (bodyStartLine !== -1) {
