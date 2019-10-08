@@ -92,7 +92,7 @@ export class HttpResponseWebview extends BaseWebview {
             panel.title = `${tabTitle}(${response.elapsedMillionSeconds}ms)`;
         }
 
-        panel.webview.html = this.getHtmlForWebview(response);
+        panel.webview.html = this.getHtmlForWebview(panel, response);
 
         commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, this.settings.previewResponsePanelTakeFocus);
 
@@ -121,7 +121,7 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
-    private getHtmlForWebview(response: HttpResponse): string {
+    private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse): string {
         let innerHtml: string;
         let width = 2;
         let contentType = response.getHeader("content-type");
@@ -141,18 +141,24 @@ export class HttpResponseWebview extends BaseWebview {
         const csp = this.getCsp(nonce);
         return `
     <head>
-        <link rel="stylesheet" type="text/css" href="${this.styleFilePath}">
+        <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.styleFilePath)}">
         ${this.getSettingsOverrideStyles(width)}
         ${csp}
+        <script nonce="${nonce}">
+            document.addEventListener('DOMContentLoaded', function () {
+                document.getElementById('scroll-to-top')
+                        .addEventListener('click', function () { window.scrollTo(0,0); });
+            });
+        </script>
     </head>
     <body>
         <div>
             ${this.settings.disableAddingHrefLinkForLargeResponse && response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024
                 ? innerHtml
                 : this.addUrlLinks(innerHtml)}
-            <a id="scroll-to-top" role="button" aria-label="scroll to top" onclick="window.scroll(0,0)" title="Scroll To Top"><span class="icon"></span></a>
+            <a id="scroll-to-top" role="button" aria-label="scroll to top" title="Scroll To Top"><span class="icon"></span></a>
         </div>
-        <script type="text/javascript" src="${this.scriptFilePath}" nonce="${nonce}" charset="UTF-8"></script>
+        <script type="text/javascript" src="${panel.webview.asWebviewUri(this.scriptFilePath)}" nonce="${nonce}" charset="UTF-8"></script>
     </body>`;
     }
 

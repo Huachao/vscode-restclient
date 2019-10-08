@@ -26,11 +26,9 @@ export abstract class BaseWebview {
     protected constructor() {
         this.extensionPath = extensions.getExtension(Constants.ExtensionId).extensionPath;
         this.panels = [];
-        this.styleFilePath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName, Constants.CSSFileName))
-            .with({ scheme: 'vscode-resource' });
+        this.styleFilePath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName, Constants.CSSFileName));
         this.styleFolderPath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName));
-        this.scriptFilePath = Uri.file(path.join(this.extensionPath, Constants.ScriptsFolderName, Constants.ScriptFileName))
-            .with({ scheme: 'vscode-resource' });
+        this.scriptFilePath = Uri.file(path.join(this.extensionPath, Constants.ScriptsFolderName, Constants.ScriptFileName));
         this.scriptFolderPath = Uri.file(path.join(this.extensionPath, Constants.ScriptsFolderName));
     }
 
