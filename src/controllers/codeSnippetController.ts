@@ -62,7 +62,7 @@ export class CodeSnippetController {
         }
 
         // remove comment lines
-        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        const lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
         if (lines.length === 0 || lines.every(line => line === '')) {
             return;
         }
@@ -74,13 +74,13 @@ export class CodeSnippetController {
         selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
+        const httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
             return;
         }
 
-        let harHttpRequest = this.convertToHARHttpRequest(httpRequest);
-        let snippet = new HTTPSnippet(harHttpRequest);
+        const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
+        const snippet = new HTTPSnippet(harHttpRequest);
 
         if (CodeSnippetController._availableTargets) {
             const quickPick = window.createQuickPick();
@@ -116,7 +116,7 @@ export class CodeSnippetController {
                     } else if (quickPick.step === 2) {
                         const { target: { key: tk, title: tt }, client: { key: ck, title: ct } } = (selectedItem as CodeSnippetClientQuickPickItem);
                         Telemetry.sendEvent('Generate Code Snippet', { 'target': tk, 'client': ck });
-                        let result = snippet.convert(tk, ck);
+                        const result = snippet.convert(tk, ck);
                         this._convertedResult = result;
 
                         try {
@@ -155,7 +155,7 @@ export class CodeSnippetController {
         }
 
         // remove comment lines
-        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        const lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
         if (lines.length === 0 || lines.every(line => line === '')) {
             return;
         }
@@ -189,8 +189,8 @@ export class CodeSnippetController {
 
     private convertToHARHttpRequest(request: HttpRequest): HARHttpRequest {
         // convert headers
-        let headers: HARHeader[] = [];
-        for (let key in request.headers) {
+        const headers: HARHeader[] = [];
+        for (const key in request.headers) {
             let headerValue = request.headers[key];
             if (key.toLowerCase() === 'authorization') {
                 headerValue = CodeSnippetController.normalizeAuthHeader(headerValue);
@@ -199,11 +199,11 @@ export class CodeSnippetController {
         }
 
         // convert cookie headers
-        let cookies: HARCookie[] = [];
-        let cookieHeader = headers.find(header => header.name.toLowerCase() === 'cookie');
+        const cookies: HARCookie[] = [];
+        const cookieHeader = headers.find(header => header.name.toLowerCase() === 'cookie');
         if (cookieHeader) {
             cookieHeader.value.split(';').forEach(pair => {
-                let [headerName, headerValue = ''] = pair.split('=', 2);
+                const [headerName, headerValue = ''] = pair.split('=', 2);
                 cookies.push(new HARCookie(headerName.trim(), headerValue.trim()));
             });
         }
@@ -211,13 +211,13 @@ export class CodeSnippetController {
         // convert body
         let body: HARPostData = null;
         if (request.body) {
-            let contentTypeHeader = headers.find(header => header.name.toLowerCase() === 'content-type');
+            const contentTypeHeader = headers.find(header => header.name.toLowerCase() === 'content-type');
             let mimeType: string;
             if (contentTypeHeader) {
                 mimeType = contentTypeHeader.value;
             }
             if (typeof request.body === 'string') {
-                let normalizedBody = request.body.split(EOL).reduce((prev, cur) => prev.concat(cur.trim()), '');
+                const normalizedBody = request.body.split(EOL).reduce((prev, cur) => prev.concat(cur.trim()), '');
                 body = new HARPostData(mimeType, normalizedBody);
             } else {
                 body = new HARPostData(mimeType, request.rawBody);
@@ -233,10 +233,10 @@ export class CodeSnippetController {
 
     private static normalizeAuthHeader(authHeader) {
         if (authHeader) {
-            let start = authHeader.indexOf(' ');
-            let scheme = authHeader.substr(0, start);
+            const start = authHeader.indexOf(' ');
+            const scheme = authHeader.substr(0, start);
             if (scheme && scheme.toLowerCase() === 'basic') {
-                let params = authHeader.substr(start).trim().split(' ');
+                const params = authHeader.substr(start).trim().split(' ');
                 if (params.length === 2) {
                     return 'Basic ' + Buffer.from(`${params[0]}:${params[1]}`).toString('base64');
                 }

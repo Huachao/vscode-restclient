@@ -30,9 +30,9 @@ export class HARPostData {
             if (text) {
                 text = decodeURIComponent(text.replace(/\+/g, '%20'));
                 this.params = [];
-                let pairs = text.split('&');
+                const pairs = text.split('&');
                 pairs.forEach(pair => {
-                    let [key, ...values] = pair.split('=');
+                    const [key, ...values] = pair.split('=');
                     this.params.push(new HARParam(key, values.join('=')));
                 });
             }

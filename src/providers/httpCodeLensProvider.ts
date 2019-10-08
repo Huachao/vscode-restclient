@@ -10,7 +10,7 @@ export class HttpCodeLensProvider implements CodeLensProvider {
         const lines: string[] = document.getText().split(Constants.LineSplitterRegex);
         const requestRanges: [number, number][] = Selector.getRequestRanges(lines);
 
-        for (let [blockStart, blockEnd] of requestRanges) {
+        for (const [blockStart, blockEnd] of requestRanges) {
             const range = new Range(blockStart, 0, blockEnd, 0);
             const cmd: Command = {
                 arguments: [document, range],

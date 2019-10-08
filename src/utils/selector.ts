@@ -21,7 +21,7 @@ export class Selector {
 
         let selectedText: string;
         if (editor.selection.isEmpty || range) {
-            let activeLine = !range ? editor.selection.active.line : range.start.line;
+            const activeLine = !range ? editor.selection.active.line : range.start.line;
             selectedText = Selector.getDelimitedText(editor.document.getText(), activeLine);
         } else {
             selectedText = editor.document.getText(editor.selection);
@@ -31,14 +31,12 @@ export class Selector {
     }
 
     public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
-        options = Object.assign(
-            {
+        options = {
                 ignoreCommentLine: true,
                 ignoreEmptyLine: true,
                 ignoreFileVariableDefinitionLine: true,
-                ignoreResponseRange: true
-            },
-            options);
+                ignoreResponseRange: true,
+            ...options};
         const requestRanges: [number, number][] = [];
         const delimitedLines = Selector.getDelimiterRows(lines);
         delimitedLines.push(lines.length);
@@ -98,8 +96,8 @@ export class Selector {
     }
 
     private static getDelimitedText(fullText: string, currentLine: number): string {
-        let lines: string[] = fullText.split(Constants.LineSplitterRegex);
-        let delimiterLineNumbers: number[] = Selector.getDelimiterRows(lines);
+        const lines: string[] = fullText.split(Constants.LineSplitterRegex);
+        const delimiterLineNumbers: number[] = Selector.getDelimiterRows(lines);
         if (delimiterLineNumbers.length === 0) {
             return fullText;
         }
@@ -118,8 +116,8 @@ export class Selector {
         }
 
         for (let index = 0; index < delimiterLineNumbers.length - 1; index++) {
-            let start = delimiterLineNumbers[index];
-            let end = delimiterLineNumbers[index + 1];
+            const start = delimiterLineNumbers[index];
+            const end = delimiterLineNumbers[index + 1];
             if (start < currentLine && currentLine < end) {
                 return lines.slice(start + 1, end).join(EOL);
             }
@@ -127,7 +125,7 @@ export class Selector {
     }
 
     private static getDelimiterRows(lines: string[]): number[] {
-        let rows: number[] = [];
+        const rows: number[] = [];
         for (let index = 0; index < lines.length; index++) {
             if (lines[index].match(/^#{3,}/)) {
                 rows.push(index);

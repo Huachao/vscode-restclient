@@ -21,7 +21,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
 
 
         const wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
-        let lineRange = document.lineAt(position);
+        const lineRange = document.lineAt(position);
 
         let fullPath = this.getRequestVariableCompletionPath(wordRange, lineRange, position);
 
@@ -58,7 +58,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
                 if (result.state === ResolveState.Warning && result.message === ResolveWarningMessage.MissingHeaderName) {
                     const {value} = result;
                     return Object.keys(value).map(p => {
-                        let item = new CompletionItem(p);
+                        const item = new CompletionItem(p);
                         item.detail = `HTTP ${ElementType[ElementType.RequestCustomVariable]}`;
                         item.documentation = new MarkdownString(`Value: \`${value[p]}\``);
                         item.insertText = p;

@@ -31,7 +31,7 @@ export class ResponseController {
             try {
                 const uri = await window.showSaveDialog({ defaultUri: Uri.file(defaultFilePath) });
                 if (uri) {
-                    let filePath = uri.fsPath;
+                    const filePath = uri.fsPath;
                     await PersistUtility.ensureFileAsync(filePath);
                     await fs.writeFile(filePath, fullResponse);
                     const btn = await window.showInformationMessage(`Saved to ${filePath}`, { title: 'Open' }, { title: 'Copy Path' });
@@ -90,9 +90,9 @@ export class ResponseController {
     }
 
     private getFullResponseString(response: HttpResponse): string {
-        let statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
+        const statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
         let headerString = '';
-        for (let header in response.headers) {
+        for (const header in response.headers) {
             if (response.headers.hasOwnProperty(header)) {
                 headerString += `${header}: ${response.headers[header]}${os.EOL}`;
             }

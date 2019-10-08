@@ -12,7 +12,7 @@ export class RequestVariableHoverProvider implements HoverProvider {
         }
 
         const wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
-        let lineRange = document.lineAt(position);
+        const lineRange = document.lineAt(position);
 
         const fullPath = this.getRequestVariableHoverPath(wordRange, lineRange);
         const { name, value, warning, error } = await RequestVariableProvider.Instance.get(document, fullPath);

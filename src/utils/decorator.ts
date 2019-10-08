@@ -8,7 +8,7 @@ export function trace(eventName: string): MethodDecorator {
             descriptor = Object.getOwnPropertyDescriptor(target, propertyKey);
         }
 
-        let originalMethod = descriptor.value;
+        const originalMethod = descriptor.value;
 
         descriptor.value = function(...args: any[]) {
             Telemetry.sendEvent(eventName);

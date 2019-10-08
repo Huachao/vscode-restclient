@@ -11,7 +11,7 @@ import { PersistUtility } from './persistUtility';
 
 export class HttpElementFactory {
     public static async getHttpElements(document: TextDocument, line: string): Promise<HttpElement[]> {
-        let originalElements: HttpElement[] = [];
+        const originalElements: HttpElement[] = [];
 
         // add http methods
         originalElements.push(new HttpElement('GET', ElementType.Method));
@@ -163,11 +163,11 @@ export class HttpElementFactory {
         }
 
         // add urls from history
-        let historyItems = await PersistUtility.loadRequests();
-        let distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));
+        const historyItems = await PersistUtility.loadRequests();
+        const distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));
         distinctRequestUrls.forEach(requestUrl => {
-            let protocol = url.parse(requestUrl).protocol;
-            let prefixLength = protocol.length + 2; // https: + //
+            const protocol = url.parse(requestUrl).protocol;
+            const prefixLength = protocol.length + 2; // https: + //
             originalElements.push(new HttpElement(`${requestUrl.substr(prefixLength)}`, ElementType.URL, '^\\s*(?:(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+)https?\\:\\/{2}'));
         });
 

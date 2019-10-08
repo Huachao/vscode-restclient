@@ -41,13 +41,13 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         // parse cookie
-        let cookieString: string = parsedArguments.b || parsedArguments.cookie;
+        const cookieString: string = parsedArguments.b || parsedArguments.cookie;
         if (cookieString && cookieString.includes('=')) {
             // Doesn't support cookie jar
             headers['Cookie'] = cookieString;
         }
 
-        let user = parsedArguments.u || parsedArguments.user;
+        const user = parsedArguments.u || parsedArguments.user;
         if (user) {
             headers['Authorization'] = `Basic ${Buffer.from(user).toString('base64')}`;
         }
@@ -59,7 +59,7 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         if (typeof body === 'string' && body[0] === '@') {
-            let fileAbsolutePath = CurlRequestParser.resolveFilePath(body.substring(1), requestAbsoluteFilePath);
+            const fileAbsolutePath = CurlRequestParser.resolveFilePath(body.substring(1), requestAbsoluteFilePath);
             if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
                 body = fs.createReadStream(fileAbsolutePath);
             } else {
@@ -86,7 +86,7 @@ export class CurlRequestParser implements IRequestParser {
             return fs.existsSync(refPath) ? refPath : null;
         }
 
-        let rootPath = getWorkspaceRootPath();
+        const rootPath = getWorkspaceRootPath();
         let absolutePath;
         if (rootPath) {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, refPath);

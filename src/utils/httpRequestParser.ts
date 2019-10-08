@@ -40,7 +40,7 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // parse request line
-        let requestLine = HttpRequestParser.parseRequestLine(lines[0]);
+        const requestLine = HttpRequestParser.parseRequestLine(lines[0]);
 
         // get headers range
         let headers: Headers;
@@ -49,17 +49,17 @@ export class HttpRequestParser implements IRequestParser {
         let bodyLines: string[] = [];
         let variableLines: string[] = [];
         let isGraphQlRequest: boolean = false;
-        let headerStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', 1);
+        const headerStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', 1);
         if (headerStartLine !== -1) {
             if (headerStartLine === 1) {
                 // parse request headers
                 let firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
-                let headerEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
-                let headerLines = lines.slice(headerStartLine, headerEndLine);
+                const headerEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
+                const headerLines = lines.slice(headerStartLine, headerEndLine);
                 let index = 0;
                 let queryString = '';
                 for (; index < headerLines.length; ) {
-                    let headerLine = (headerLines[index]).trim();
+                    const headerLine = (headerLines[index]).trim();
                     if (['?', '&'].includes(headerLine[0])) {
                         queryString += headerLine;
                         index++;
@@ -105,10 +105,10 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // if Host header provided and url is relative path, change to absolute url
-        let host = getHeader(headers, 'Host') || getHeader(this._restClientSettings.defaultHeaders, 'host');
+        const host = getHeader(headers, 'Host') || getHeader(this._restClientSettings.defaultHeaders, 'host');
         if (host && requestLine.url[0] === '/') {
-            let [, port] = host.split(':');
-            let scheme = port === '443' || port === '8443' ? 'https' : 'http';
+            const [, port] = host.split(':');
+            const scheme = port === '443' || port === '8443' ? 'https' : 'http';
             requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
@@ -118,7 +118,7 @@ export class HttpRequestParser implements IRequestParser {
         if (isGraphQlRequest) {
             variables = HttpRequestParser.parseRequestBody(variableLines, requestAbsoluteFilePath, contentTypeHeader);
 
-            let graphQlPayload = {
+            const graphQlPayload = {
                 query: body,
                 variables: variables ? JSON.parse(variables.toString()) : {}
             };
@@ -129,7 +129,7 @@ export class HttpRequestParser implements IRequestParser {
                 const encodedStringParis = [];
                 for (const stringPair of stringPairs) {
                     const [name, ...values] = stringPair.split('=');
-                    let value = values.join('=');
+                    const value = values.join('=');
                     encodedStringParis.push(`${encodeURIComponent(name)}=${encodeURIComponent(value)}`);
                 }
                 body = encodedStringParis.join('&');
@@ -143,7 +143,7 @@ export class HttpRequestParser implements IRequestParser {
 
     private static parseRequestLine(line: string): { method: string, url: string } {
         // Request-Line = Method SP Request-URI SP HTTP-Version CRLF
-        let words = line.split(' ').filter(Boolean);
+        const words = line.split(' ').filter(Boolean);
 
         let method: string;
         let url: string;
@@ -155,7 +155,7 @@ export class HttpRequestParser implements IRequestParser {
             // Provides both request method and url
             method = words.shift();
             url = line.trim().substring(method.length).trim();
-            let match = words[words.length - 1].match(/HTTP\/.*/gi);
+            const match = words[words.length - 1].match(/HTTP\/.*/gi);
             if (match) {
                 url = url.substring(0, url.lastIndexOf(words[words.length - 1])).trim();
             }
@@ -188,10 +188,10 @@ export class HttpRequestParser implements IRequestParser {
             const combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
             for (const [index, line] of lines.entries()) {
                 if (HttpRequestParser.uploadFromFileSyntax.test(line)) {
-                    let groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
+                    const groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
                     if (groups !== null && groups.length === 2) {
-                        let fileUploadPath = groups[1];
-                        let fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
+                        const fileUploadPath = groups[1];
+                        const fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
                         if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
                             combinedStream.append(fs.createReadStream(fileAbsolutePath));
                         } else {
@@ -221,7 +221,7 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         let absolutePath;
-        let rootPath = getWorkspaceRootPath();
+        const rootPath = getWorkspaceRootPath();
         if (rootPath) {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, refPath);
             if (fs.existsSync(absolutePath)) {

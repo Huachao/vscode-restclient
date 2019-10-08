@@ -12,8 +12,8 @@ export class EnvironmentOrFileVariableHoverProvider implements HoverProvider {
             return;
         }
 
-        let wordRange = document.getWordRangeAtPosition(position);
-        let selectedVariableName = document.getText(wordRange);
+        const wordRange = document.getWordRangeAtPosition(position);
+        const selectedVariableName = document.getText(wordRange);
 
         if (await FileVariableProvider.Instance.has(document, selectedVariableName)) {
             const { name, value, error, warning } = await FileVariableProvider.Instance.get(document, selectedVariableName);

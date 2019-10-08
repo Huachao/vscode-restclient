@@ -33,6 +33,7 @@
                 "named-imports-order": "case-insensitive"
             }
         ],
+        "prefer-const": true,
         "semicolon": [
             true,
             "always"

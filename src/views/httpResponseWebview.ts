@@ -131,7 +131,7 @@ export class HttpResponseWebview extends BaseWebview {
         if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
             innerHtml = `<img src="data:${contentType};base64,${response.bodyBuffer.toString('base64')}">`;
         } else {
-            let code = this.highlightResponse(response);
+            const code = this.highlightResponse(response);
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
             innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
         }
@@ -161,17 +161,17 @@ export class HttpResponseWebview extends BaseWebview {
         const previewOption = this.settings.previewOption;
         if (previewOption === PreviewOption.Exchange) {
             // for add request details
-            let request = response.request;
-            let requestNonBodyPart = `${request.method} ${request.url} HTTP/1.1
+            const request = response.request;
+            const requestNonBodyPart = `${request.method} ${request.url} HTTP/1.1
 ${HttpResponseWebview.formatHeaders(request.headers)}`;
             code += hljs.highlight('http', requestNonBodyPart + '\r\n').value;
             if (request.body) {
-                let requestContentType = request.getHeader("content-type");
+                const requestContentType = request.getHeader("content-type");
                 if (typeof request.body !== 'string') {
                     request.body = 'NOTE: Request Body From File Is Not Shown';
                 }
-                let requestBodyPart = `${ResponseFormatUtility.formatBody(request.body, requestContentType, true)}`;
-                let bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(requestContentType, request.body);
+                const requestBodyPart = `${ResponseFormatUtility.formatBody(request.body, requestContentType, true)}`;
+                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(requestContentType, request.body);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, requestBodyPart).value;
                 } else {
@@ -184,19 +184,19 @@ ${HttpResponseWebview.formatHeaders(request.headers)}`;
         }
 
         if (previewOption !== PreviewOption.Body) {
-            let responseNonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
+            const responseNonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
 ${HttpResponseWebview.formatHeaders(response.headers)}`;
             code += hljs.highlight('http', responseNonBodyPart + (previewOption !== PreviewOption.Headers ? '\r\n' : '')).value;
         }
 
         if (previewOption !== PreviewOption.Headers) {
-            let responseContentType = response.getHeader("content-type");
-            let responseBodyPart = `${ResponseFormatUtility.formatBody(response.body, responseContentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
+            const responseContentType = response.getHeader("content-type");
+            const responseBodyPart = `${ResponseFormatUtility.formatBody(response.body, responseContentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
             if (this.settings.disableHighlightResonseBodyForLargeResponse &&
                 response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024) {
                 code += responseBodyPart;
             } else {
-                let bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(responseContentType, responseBodyPart);
+                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(responseContentType, responseBodyPart);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, responseBodyPart).value;
                 } else {
@@ -244,7 +244,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         code = this.cleanLineBreaks(code);
 
         code = code.split(/\r\n|\r|\n/);
-        let max = (1 + code.length).toString().length;
+        const max = (1 + code.length).toString().length;
 
         const foldingRanges = this.getFoldingRange(code);
 
@@ -262,7 +262,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     }
 
     private cleanLineBreaks(code): string {
-        let openSpans = [],
+        const openSpans = [],
             matcher = /<\/?span[^>]*>|\r\n|\r|\n/ig,
             newline = /\r\n|\r|\n/,
             closingTag = /^<\//;
@@ -316,7 +316,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
 
     private static formatHeaders(headers: Headers): string {
         let headerString = '';
-        for (let header in headers) {
+        for (const header in headers) {
             if (headers.hasOwnProperty(header)) {
                 let value = headers[header];
                 if (typeof headers[header] !== 'string') {

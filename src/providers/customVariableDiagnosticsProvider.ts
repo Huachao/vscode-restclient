@@ -101,9 +101,9 @@ export class CustomVariableDiagnosticsProvider {
     }
 
     private findVariableReferences(document: TextDocument): Map<string, Variable[]> {
-        let vars: Map<string, Variable[]> = new Map<string, Variable[]>();
-        let lines = document.getText().split(Constants.LineSplitterRegex);
-        let pattern = /\{\{(\w+)(\..*?)*\}\}/g;
+        const vars: Map<string, Variable[]> = new Map<string, Variable[]>();
+        const lines = document.getText().split(Constants.LineSplitterRegex);
+        const pattern = /\{\{(\w+)(\..*?)*\}\}/g;
         lines.forEach((line, lineNumber) => {
             let match: RegExpExecArray;
             while (match = pattern.exec(line)) {

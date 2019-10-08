@@ -47,7 +47,7 @@ export class HttpClient {
                     return;
                 }
 
-                let contentType = getHeader(response.headers, 'Content-Type');
+                const contentType = getHeader(response.headers, 'Content-Type');
                 let encoding: string;
                 if (contentType) {
                     encoding = MimeUtility.parse(contentType).charset;
@@ -72,9 +72,9 @@ export class HttpClient {
                 }
 
                 // adjust response header case, due to the response headers in request package is in lowercase
-                let headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
-                let adjustedResponseHeaders: Headers = {};
-                for (let header in response.headers) {
+                const headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
+                const adjustedResponseHeaders: Headers = {};
+                for (const header in response.headers) {
                     let adjustedHeaderName = header;
                     if (headersDic[header]) {
                         adjustedHeaderName = headersDic[header];
@@ -135,7 +135,7 @@ export class HttpClient {
             }
         }
 
-        let options: any = {
+        const options: any = {
             url: encodeUrl(httpRequest.url),
             headers: httpRequest.headers,
             method: httpRequest.method,
@@ -151,13 +151,13 @@ export class HttpClient {
         };
 
         // set auth to digest if Authorization header follows: Authorization: Digest username password
-        let authorization = getHeader(options.headers, 'Authorization');
+        const authorization = getHeader(options.headers, 'Authorization');
         if (authorization) {
-            let start = authorization.indexOf(' ');
-            let scheme = authorization.substr(0, start);
+            const start = authorization.indexOf(' ');
+            const scheme = authorization.substr(0, start);
             if (scheme === 'Digest' || scheme === 'Basic') {
-                let params = authorization.substr(start).trim().split(' ');
-                let [user, pass] = params;
+                const params = authorization.substr(start).trim().split(' ');
+                const [user, pass] = params;
                 if (user && pass) {
                     options.auth = {
                         user,
@@ -169,7 +169,7 @@ export class HttpClient {
         }
 
         // set certificate
-        let certificate = this.getRequestCertificate(httpRequest.url);
+        const certificate = this.getRequestCertificate(httpRequest.url);
         if (certificate) {
             options.cert = certificate.cert;
             options.key = certificate.key;
@@ -204,7 +204,7 @@ export class HttpClient {
         }
 
         // add default headers if not specified
-        for (let header in this._settings.defaultHeaders) {
+        for (const header in this._settings.defaultHeaders) {
             if (!hasHeader(options.headers, header) && (header.toLowerCase() !== 'host' || httpRequest.url[0] === '/')) {
                 const value = this._settings.defaultHeaders[header];
                 if (value) {
@@ -247,24 +247,24 @@ export class HttpClient {
     private getRequestCertificate(requestUrl: string): { cert?: string, key?: string, pfx?: string, passphrase?: string } {
         const host = url.parse(requestUrl).host;
         if (host in this._settings.hostCertificates) {
-            let certificate = this._settings.hostCertificates[host];
+            const certificate = this._settings.hostCertificates[host];
             let cert = undefined,
                 key = undefined,
                 pfx = undefined;
             if (certificate.cert) {
-                let certPath = HttpClient.resolveCertificateFullPath(certificate.cert, "cert");
+                const certPath = HttpClient.resolveCertificateFullPath(certificate.cert, "cert");
                 if (certPath) {
                     cert = fs.readFileSync(certPath);
                 }
             }
             if (certificate.key) {
-                let keyPath = HttpClient.resolveCertificateFullPath(certificate.key, "key");
+                const keyPath = HttpClient.resolveCertificateFullPath(certificate.key, "key");
                 if (keyPath) {
                     key = fs.readFileSync(keyPath);
                 }
             }
             if (certificate.pfx) {
-                let pfxPath = HttpClient.resolveCertificateFullPath(certificate.pfx, "pfx");
+                const pfxPath = HttpClient.resolveCertificateFullPath(certificate.pfx, "pfx");
                 if (pfxPath) {
                     pfx = fs.readFileSync(pfxPath);
                 }
@@ -274,7 +274,7 @@ export class HttpClient {
     }
 
     private static getResponseRawHeaderNames(rawHeaders: string[]): Headers {
-        let result: Headers = {};
+        const result: Headers = {};
         rawHeaders.forEach(header => {
             result[header.toLowerCase()] = header;
         });
@@ -286,14 +286,13 @@ export class HttpClient {
             return false;
         }
 
-        let resolvedUrl = url.parse(requestUrl);
-        let hostName = resolvedUrl.hostname && resolvedUrl.hostname.toLowerCase();
-        let port = resolvedUrl.port;
-        let excludeHostsProxyList = Array.from(new Set(excludeHostsForProxy.map(eh => eh.toLowerCase())));
+        const resolvedUrl = url.parse(requestUrl);
+        const hostName = resolvedUrl.hostname && resolvedUrl.hostname.toLowerCase();
+        const port = resolvedUrl.port;
+        const excludeHostsProxyList = Array.from(new Set(excludeHostsForProxy.map(eh => eh.toLowerCase())));
 
-        for (let index = 0; index < excludeHostsProxyList.length; index++) {
-            let eh = excludeHostsProxyList[index];
-            let urlParts = eh.split(":");
+        for (const eh of excludeHostsProxyList) {
+            const urlParts = eh.split(":");
             if (!port) {
                 // if no port specified in request url, host name must exactly match
                 if (urlParts.length === 1 && urlParts[0] === hostName) {
@@ -301,7 +300,7 @@ export class HttpClient {
                 }
             } else {
                 // if port specified, match host without port or hostname:port exactly match
-                let [ph, pp] = urlParts;
+                const [ph, pp] = urlParts;
                 if (ph === hostName && (!pp || pp === port)) {
                     return true;
                 }
@@ -322,7 +321,7 @@ export class HttpClient {
         }
 
         // the path should be relative path
-        let rootPath = getWorkspaceRootPath();
+        const rootPath = getWorkspaceRootPath();
         let absolutePath = '';
         if (rootPath) {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
@@ -344,10 +343,10 @@ export class HttpClient {
     }
 
     private static capitalizeHeaderName(headers: Headers): Headers {
-        let normalizedHeaders = {};
+        const normalizedHeaders = {};
         if (headers) {
-            for (let header in headers) {
-                let capitalizedName = header.replace(/([^-]+)/g, h => h.charAt(0).toUpperCase() + h.slice(1));
+            for (const header in headers) {
+                const capitalizedName = header.replace(/([^-]+)/g, h => h.charAt(0).toUpperCase() + h.slice(1));
                 normalizedHeaders[capitalizedName] = headers[header];
             }
         }

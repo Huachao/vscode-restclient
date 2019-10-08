@@ -121,8 +121,8 @@ export class SystemVariableProvider implements HttpVariableProvider {
             const groups = this.randomIntegerRegex.exec(name);
             if (groups !== null && groups.length === 3) {
                 const [, min, max] = groups;
-                let minNum = Number(min);
-                let maxNum = Number(max);
+                const minNum = Number(min);
+                const maxNum = Number(max);
                 if (minNum < maxNum) {
                     return { value: (Math.floor(Math.random() * (maxNum - minNum)) + minNum).toString() };
                 }
@@ -133,8 +133,8 @@ export class SystemVariableProvider implements HttpVariableProvider {
     }
 
     private async resolveSettingsEnvironmentVariable (name: string) {
-        let document = null;
-        let context = null;
+        const document = null;
+        const context = null;
         if (await this.innerSettingsEnvironmentVariableProvider.has(document, name, context)) {
             const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(document, name, context);
             if (!error && !warning) {
@@ -156,7 +156,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 if (refToggle !== undefined) {
                     processEnvName = await this.resolveSettingsEnvironmentVariable(environmentVarName);
                 }
-                let envValue = process.env[processEnvName];
+                const envValue = process.env[processEnvName];
                 if (envValue !== undefined) {
                     return { value: envValue.toString()};
                 } else {
@@ -241,7 +241,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private getCloudProvider(endpoint: string): { cloud: string, targetApp: string } {
         for (const c in Constants.AzureClouds) {
-            let { aad, arm, armAudience } = Constants.AzureClouds[c];
+            const { aad, arm, armAudience } = Constants.AzureClouds[c];
             if (aad === endpoint || arm === endpoint) {
                 return {
                     cloud: c,
@@ -320,10 +320,10 @@ export class SystemVariableProvider implements HttpVariableProvider {
                                             const displayNameFirstWord = displayNameSpaceIndex > -1
                                                 ? displayName.substring(0, displayNameSpaceIndex)
                                                 : displayName;
-                                            let bestMatches = [];
+                                            const bestMatches = [];
                                             const bestMatchesRegex = new RegExp(`(^${displayNameFirstWord}\.com$)|(^${displayNameFirstWord}\.[a-z]+(?:\.[a-z]+)?$)|(^${displayNameFirstWord}[a-z]+\.com$)|(^${displayNameFirstWord}[^:]*$)|(^[^:]*${displayNameFirstWord}[^:]*$)`, "gi");
                                             const bestMatchesRegexGroups = bestMatchesRegex.source.match(new RegExp(`${displayNameFirstWord}`, "g")).length;
-                                            for (let d of element.domains) {
+                                            for (const d of element.domains) {
                                                 // find matches; use empty array for all captures (+1 for the full string) if no matches found
                                                 const matches = bestMatchesRegex.exec(d)
                                                     || Array(bestMatchesRegexGroups + 1).fill(null);

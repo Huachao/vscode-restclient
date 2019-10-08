@@ -17,12 +17,12 @@ export class MimeUtility {
     public static parse(contentTypeString: string) {
         // application/json; charset=utf-8
         // application/vnd.github.chitauri-preview+sha
-        let params = contentTypeString.split(';');
-        let types = params[0].trim().split('+');
+        const params = contentTypeString.split(';');
+        const types = params[0].trim().split('+');
         let charset = null;
         if (params.length > 1) {
             for (let i = 1; i < params.length; i++) {
-                let attributes = params[i].trim().split('=', 2);
+                const attributes = params[i].trim().split('=', 2);
                 if (attributes.length === 2 && attributes[0].toLowerCase() === 'charset') {
                     charset = attributes[1].trim();
                 }
@@ -54,7 +54,7 @@ export class MimeUtility {
             return false;
         }
 
-        let type = MimeUtility.parse(contentTypeString).type;
+        const type = MimeUtility.parse(contentTypeString).type;
         return MimeUtility.supportedImagesFormats.includes(type);
     }
 
@@ -72,7 +72,7 @@ export class MimeUtility {
             return false;
         }
 
-        let { type, suffix } = MimeUtility.parse(contentTypeString);
+        const { type, suffix } = MimeUtility.parse(contentTypeString);
         return type === 'application/xml' || type === 'text/xml' || suffix === '+xml';
     }
 

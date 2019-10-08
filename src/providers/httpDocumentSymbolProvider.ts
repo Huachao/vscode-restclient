@@ -61,15 +61,15 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     }
 
     private getVariableSymbolInfo(line: string): [string, string] {
-        let fileName = getCurrentHttpFileName();
+        const fileName = getCurrentHttpFileName();
         line = line.trim();
         return [line.substring(1, line.indexOf('=')).trim(), fileName];
     }
 
     private getRequestSymbolInfo(text: string): [string, string] {
-        let parser = HttpDocumentSymbolProvider.requestParserFactory.createRequestParser(text);
-        let request = parser.parseHttpRequest(text, window.activeTextEditor.document.fileName);
-        let parsedUrl = url.parse(request.url);
+        const parser = HttpDocumentSymbolProvider.requestParserFactory.createRequestParser(text);
+        const request = parser.parseHttpRequest(text, window.activeTextEditor.document.fileName);
+        const parsedUrl = url.parse(request.url);
         return [`${request.method} ${parsedUrl.path}`, parsedUrl.host || ''];
     }
 }
