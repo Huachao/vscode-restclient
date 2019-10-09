@@ -13,6 +13,7 @@ export class HttpRequest {
         public body: string | Stream,
         public rawBody: string,
         public requestVariableCacheKey?: RequestVariableCacheKey) {
+            this.method = method.toLocaleUpperCase();
     }
 
     public getHeader(name: string) {

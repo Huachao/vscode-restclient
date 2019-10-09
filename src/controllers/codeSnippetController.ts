@@ -231,7 +231,7 @@ export class CodeSnippetController {
         this._webview.dispose();
     }
 
-    private static normalizeAuthHeader(authHeader) {
+    private static normalizeAuthHeader(authHeader: string) {
         if (authHeader) {
             const start = authHeader.indexOf(' ');
             const scheme = authHeader.substr(0, start);

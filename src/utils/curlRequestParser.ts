@@ -73,7 +73,7 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         // parse method
-        let method: string = <string>(parsedArguments.X || parsedArguments.request);
+        let method: string = (parsedArguments.X || parsedArguments.request) as string;
         if (!method) {
             method = body ? "POST" : "GET";
         }
