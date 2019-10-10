@@ -43,7 +43,7 @@ export class HARPostData {
 export class HARHttpRequest {
     public queryString: HARParam[];
 
-    public constructor(public method: string, public url: string, public headers: HARHeader[], public cookies: HARCookie[], public postData: HARPostData) {
+    public constructor(public method: string, public url: string, public headers: HARHeader[], public cookies: HARCookie[], public postData?: HARPostData) {
         const queryObj = urlParse(url, true).query;
         this.queryString = this.flatten(queryObj);
     }

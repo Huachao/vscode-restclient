@@ -126,7 +126,7 @@ export class HttpElementFactory {
             new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryVariableName.slice(1)}}}}`)));
 
         // add environment custom variables
-        const environmentVariables = await EnvironmentVariableProvider.Instance.getAll(document);
+        const environmentVariables = await EnvironmentVariableProvider.Instance.getAll();
         for (const { name, value } of environmentVariables) {
             originalElements.push(
                 new HttpElement(
@@ -167,6 +167,9 @@ export class HttpElementFactory {
         const distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));
         distinctRequestUrls.forEach(requestUrl => {
             const protocol = url.parse(requestUrl).protocol;
+            if (!protocol) {
+                return;
+            }
             const prefixLength = protocol.length + 2; // https: + //
             originalElements.push(new HttpElement(`${requestUrl.substr(prefixLength)}`, ElementType.URL, '^\\s*(?:(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+)https?\\:\\/{2}'));
         });

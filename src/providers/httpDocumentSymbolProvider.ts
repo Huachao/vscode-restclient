@@ -46,7 +46,11 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
 
             if (blockStart <= blockEnd) {
                 const text = await VariableProcessor.processRawRequest(lines.slice(blockStart, blockEnd + 1).join(EOL));
-                const [name, container] = this.getRequestSymbolInfo(text);
+                const info = this.getRequestSymbolInfo(text);
+                if (!info) {
+                    continue;
+                }
+                const [name, container] = info;
                 symbols.push(
                     new SymbolInformation(
                         name,
@@ -63,12 +67,15 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     private getVariableSymbolInfo(line: string): [string, string] {
         const fileName = getCurrentHttpFileName();
         line = line.trim();
-        return [line.substring(1, line.indexOf('=')).trim(), fileName];
+        return [line.substring(1, line.indexOf('=')).trim(), fileName!];
     }
 
-    private getRequestSymbolInfo(text: string): [string, string] {
+    private getRequestSymbolInfo(text: string): [string, string] | null {
         const parser = HttpDocumentSymbolProvider.requestParserFactory.createRequestParser(text);
-        const request = parser.parseHttpRequest(text, window.activeTextEditor.document.fileName);
+        const request = parser.parseHttpRequest(text, window.activeTextEditor!.document.fileName);
+        if (!request) {
+            return null;
+        }
         const parsedUrl = url.parse(request.url);
         return [`${request.method} ${parsedUrl.path}`, parsedUrl.host || ''];
     }

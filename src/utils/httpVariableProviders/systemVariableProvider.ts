@@ -2,7 +2,7 @@
 
 import * as adal from 'adal-node';
 import { DurationInputArg2, Moment, utc } from 'moment';
-import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
+import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
 import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
@@ -30,7 +30,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private readonly aadRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+aud:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
 
-    private readonly innerSettingsEnvironmentVariableProvider: HttpVariableProvider =  EnvironmentVariableProvider.Instance;
+    private readonly innerSettingsEnvironmentVariableProvider: EnvironmentVariableProvider =  EnvironmentVariableProvider.Instance;
     private static _instance: SystemVariableProvider;
 
     public static get Instance(): SystemVariableProvider {
@@ -53,22 +53,22 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     public readonly type: VariableType = VariableType.System;
 
-    public async has(document: TextDocument, name: string, context: HttpVariableContext): Promise<boolean> {
+    public async has(name: string): Promise<boolean> {
         const [variableName] = name.split(' ').filter(Boolean);
         return this.resolveFuncs.has(variableName);
     }
 
-    public async get(document: TextDocument, name: string, context: HttpVariableContext): Promise<HttpVariable> {
+    public async get(name: string, document: undefined, context: HttpVariableContext): Promise<HttpVariable> {
         const [variableName] = name.split(' ').filter(Boolean);
         if (!this.resolveFuncs.has(variableName)) {
             return { name: variableName, error: ResolveErrorMessage.SystemVariableNotExist };
         }
 
-        const result = await this.resolveFuncs.get(variableName)(name, context);
+        const result = await this.resolveFuncs.get(variableName)!(name, context);
         return { name: variableName, ...result };
     }
 
-    public async getAll(document: TextDocument, context: HttpVariableContext): Promise<HttpVariable[]> {
+    public async getAll(document: undefined, context: HttpVariableContext): Promise<HttpVariable[]> {
         return [...this.resolveFuncs.keys()].map(name => ({ name }));
     }
 
@@ -133,12 +133,10 @@ export class SystemVariableProvider implements HttpVariableProvider {
     }
 
     private async resolveSettingsEnvironmentVariable (name: string) {
-        const document = null;
-        const context = null;
-        if (await this.innerSettingsEnvironmentVariableProvider.has(document, name, context)) {
-            const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(document, name, context);
+        if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
+            const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);
             if (!error && !warning) {
-                return value.toString();
+                return value!.toString();
             } else {
                 return name;
             }
@@ -203,7 +201,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                         AadTokenCache.set(`${cloud}:${tenantId}`, token);
                     }
 
-                    const tokenString = token ? `${token.tokenType} ${token.accessToken}` : null;
+                    const tokenString = `${token.tokenType} ${token.accessToken}`;
                     if (copy && tokenString) {
                         // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
                        this.clipboard.writeText(tokenString).then(() => resolve({ value: tokenString }));
@@ -217,7 +215,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 const cachedToken = !forceNewToken && AadTokenCache.get(`${cloud}:${tenantId}`);
                 if (cachedToken) {
                     // if token expired, try to refresh; otherwise, use cached token
-                    if (cachedToken.expiresOn <= new Date()) {
+                    if (cachedToken.expiresOn <= new Date() && cachedToken.refreshToken) {
                         authContext.acquireTokenWithRefreshToken(cachedToken.refreshToken, clientId, targetApp, (refreshError: Error, refreshResponse: adal.TokenResponse) => {
                             // if refresh fails, acquire new token; otherwise, cache updated token
                             if (refreshError) {
@@ -299,7 +297,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                             const client = new HttpClient();
                             const request = new HttpRequest(
                                 "GET", `${Constants.AzureClouds[cloud].arm}/tenants?api-version=2017-08-01`,
-                                { Authorization: this._getTokenString(tokenResponse) }, null, null);
+                                { Authorization: this._getTokenString(tokenResponse) }, undefined, undefined);
                             return client.send(request).then(async value => {
                                 const items = JSON.parse(value.body).value;
                                 const directories: QuickPickItem[] = [];
@@ -320,9 +318,9 @@ export class SystemVariableProvider implements HttpVariableProvider {
                                             const displayNameFirstWord = displayNameSpaceIndex > -1
                                                 ? displayName.substring(0, displayNameSpaceIndex)
                                                 : displayName;
-                                            const bestMatches = [];
+                                            const bestMatches: string[] = [];
                                             const bestMatchesRegex = new RegExp(`(^${displayNameFirstWord}\.com$)|(^${displayNameFirstWord}\.[a-z]+(?:\.[a-z]+)?$)|(^${displayNameFirstWord}[a-z]+\.com$)|(^${displayNameFirstWord}[^:]*$)|(^[^:]*${displayNameFirstWord}[^:]*$)`, "gi");
-                                            const bestMatchesRegexGroups = bestMatchesRegex.source.match(new RegExp(`${displayNameFirstWord}`, "g")).length;
+                                            const bestMatchesRegexGroups = bestMatchesRegex.source.match(new RegExp(`${displayNameFirstWord}`, "g"))!.length;
                                             for (const d of element.domains) {
                                                 // find matches; use empty array for all captures (+1 for the full string) if no matches found
                                                 const matches = bestMatchesRegex.exec(d)
@@ -341,7 +339,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                                             }
 
                                             // use the first match in the array of matches
-                                            domain = bestMatches.find(m => m) || domain;
+                                            domain = bestMatches.find(m => !!m) || domain;
                                         } catch {
                                         }
                                         domain = `${domain} (+${count - 1} more)`;
@@ -361,8 +359,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                                 });
 
                                 // default to first directory
-                                let result = directories.length && directories[0];
-
+                                let result: QuickPickItem | undefined;
                                 if (directories.length > 1) {
                                     // sort by display name and domain (in case display name isn't unique)
                                     directories.sort((a, b) => a.label + a.detail < b.label + b.detail ? -1 : 1);
@@ -374,12 +371,14 @@ export class SystemVariableProvider implements HttpVariableProvider {
                                         ignoreFocusOut: true,      // keep list open when focus is lost (so we don't have to get the device code again)
                                     };
                                     result = await window.showQuickPick(directories, options);
+                                } else {
+                                    result = directories[0];
                                 }
 
                                 // if directory selected, sign in to that directory; otherwise, stick with the default
                                 if (result) {
                                     const newDirAuthContext = new adal.AuthenticationContext(`${Constants.AzureClouds[cloud].aad}${result.description}`);
-                                    newDirAuthContext.acquireTokenWithRefreshToken(tokenResponse.refreshToken, clientId, null, (newDirError: Error, newDirResponse: adal.TokenResponse) => {
+                                    newDirAuthContext.acquireTokenWithRefreshToken(tokenResponse.refreshToken!, clientId, null!, (newDirError: Error, newDirResponse: adal.TokenResponse) => {
                                         // cache/copy new directory token, if successful
                                         resolve(newDirError ? tokenResponse : newDirResponse, true, true);
                                     });
@@ -399,7 +398,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     }
 
     private _getTokenString(token: adal.TokenResponse) {
-        return token ? `${token.tokenType} ${token.accessToken}` : null;
+        return token ? `${token.tokenType} ${token.accessToken}` : '';
     }
 
     // #endregion

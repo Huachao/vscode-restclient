@@ -3,7 +3,7 @@
 import * as path from 'path';
 import { TextDocument, window, workspace } from 'vscode';
 
-export function getWorkspaceRootPath(): string {
+export function getWorkspaceRootPath(): string | undefined {
     const document = getCurrentTextDocument();
     if (document) {
         const fileUri = document.uri;
@@ -14,7 +14,7 @@ export function getWorkspaceRootPath(): string {
     }
 }
 
-export function getCurrentHttpFileName(): string {
+export function getCurrentHttpFileName(): string | undefined {
     const document = getCurrentTextDocument();
     if (document) {
         const filePath = document.fileName;
@@ -22,7 +22,7 @@ export function getCurrentHttpFileName(): string {
     }
 }
 
-export function getCurrentTextDocument(): TextDocument {
+export function getCurrentTextDocument(): TextDocument | undefined {
     const editor = window.activeTextEditor;
     return editor && editor.document;
 }

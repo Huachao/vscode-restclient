@@ -30,13 +30,13 @@ export class RequestVariableProvider implements HttpVariableProvider {
 
     public readonly type: VariableType = VariableType.Request;
 
-    public async has(document: TextDocument, name: string): Promise<boolean> {
+    public async has(name: string, document: TextDocument): Promise<boolean> {
         const [variableName] = name.trim().split('.');
         const variables = this.getRequestVariables(document);
         return variables.includes(variableName);
     }
 
-    public async get(document: TextDocument, name: string): Promise<HttpVariable> {
+    public async get(name: string, document: TextDocument): Promise<HttpVariable> {
         const [variableName] = name.trim().split('.');
         const variables = this.getRequestVariables(document);
         if (!variables.includes(variableName)) {
@@ -64,7 +64,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
             const requestVariableReferenceRegex = new RegExp(Constants.RequestVariableDefinitionWithNameRegexFactory('\\w+'), 'mg');
 
             const variableNames = new Set<string>();
-            let match: RegExpExecArray;
+            let match: RegExpExecArray | null;
             while (match = requestVariableReferenceRegex.exec(fileContent)) {
                 const name = match[1];
                 variableNames.add(name);
@@ -73,7 +73,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
             this.fileMD5Hash.set(file, fileHash);
         }
 
-        return this.cache.get(file);
+        return this.cache.get(file)!;
     }
 
     private convertToHttpVariable(name: string, result: ResolveResult): HttpVariable {

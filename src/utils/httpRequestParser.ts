@@ -24,7 +24,7 @@ export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;
 
-    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest {
+    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest | null {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
         // split the request raw text into lines
         let lines: string[] = requestRawText.split(EOL);
@@ -43,9 +43,9 @@ export class HttpRequestParser implements IRequestParser {
         const requestLine = HttpRequestParser.parseRequestLine(lines[0]);
 
         // get headers range
-        let headers: Headers;
-        let body: string | Stream;
-        let variables: string | Stream;
+        let headers: Headers = {};
+        let body: string | Stream | undefined;
+        let variables: string | Stream | undefined;
         let bodyLines: string[] = [];
         let variableLines: string[] = [];
         let isGraphQlRequest: boolean = false;
@@ -126,13 +126,13 @@ export class HttpRequestParser implements IRequestParser {
         } else if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             if (this._restClientSettings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
                 const stringPairs = body.split('&');
-                const encodedStringParis = [];
+                const encodedStringPairs: string[] = [];
                 for (const stringPair of stringPairs) {
                     const [name, ...values] = stringPair.split('=');
                     const value = values.join('=');
-                    encodedStringParis.push(`${encodeURIComponent(name)}=${encodeURIComponent(value)}`);
+                    encodedStringPairs.push(`${encodeURIComponent(name)}=${encodeURIComponent(value)}`);
                 }
-                body = encodedStringParis.join('&');
+                body = encodedStringPairs.join('&');
             } else {
                 body = encodeurl(body);
             }
@@ -153,7 +153,7 @@ export class HttpRequestParser implements IRequestParser {
             url = words[0];
         } else {
             // Provides both request method and url
-            method = words.shift();
+            method = words.shift()!;
             url = line.trim().substring(method.length).trim();
             const match = words[words.length - 1].match(/HTTP\/.*/gi);
             if (match) {
@@ -167,9 +167,9 @@ export class HttpRequestParser implements IRequestParser {
         };
     }
 
-    private static parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string): string | Stream {
+    private static parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string | undefined): string | Stream | undefined {
         if (!lines || lines.length === 0) {
-            return null;
+            return undefined;
         }
 
         // Check if needed to upload file
@@ -211,11 +211,11 @@ export class HttpRequestParser implements IRequestParser {
         }
     }
 
-    private static getLineEnding(contentTypeHeader: string) {
+    private static getLineEnding(contentTypeHeader: string | undefined) {
         return MimeUtility.isMultiPartFormData(contentTypeHeader) ? '\r\n' : EOL;
     }
 
-    private static resolveFilePath(refPath: string, httpFilePath: string): string {
+    private static resolveFilePath(refPath: string, httpFilePath: string): string | null {
         if (path.isAbsolute(refPath)) {
             return fs.existsSync(refPath) ? refPath : null;
         }

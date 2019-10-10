@@ -112,7 +112,7 @@ export class RequestController {
         this._requestStore.cancel();
 
         this._durationStatusBarItem.text = 'Cancelled $(circle-slash)';
-        this._durationStatusBarItem.tooltip = null;
+        this._durationStatusBarItem.tooltip = undefined;
     }
 
     private async runCore(httpRequest: HttpRequest) {
@@ -142,13 +142,13 @@ export class RequestController {
             }
 
             try {
-                const activeColumn = window.activeTextEditor.viewColumn;
+                const activeColumn = window.activeTextEditor!.viewColumn;
                 const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
                     ? activeColumn
                     : ((activeColumn as number) + 1) as ViewColumn;
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
-                } else {
+                } else if (previewColumn) {
                     this._webview.render(response, previewColumn);
                 }
             } catch (reason) {

@@ -10,8 +10,8 @@ export class HttpRequest {
         public method: string,
         public url: string,
         public headers: Headers,
-        public body: string | Stream,
-        public rawBody: string,
+        public body: string | Stream | undefined,
+        public rawBody: string | undefined,
         public requestVariableCacheKey?: RequestVariableCacheKey) {
             this.method = method.toLocaleUpperCase();
     }
@@ -26,7 +26,7 @@ export class SerializedHttpRequest {
         public method: string,
         public url: string,
         public headers: Headers,
-        public body: string,
+        public body: string | undefined,
         public startTime: number) {
     }
 

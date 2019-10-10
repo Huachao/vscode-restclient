@@ -33,7 +33,7 @@ export class PersistUtility {
         await fs.writeJson(PersistUtility.environmentFilePath, environment);
     }
 
-    public static loadEnvironment(): Promise<EnvironmentPickItem> {
+    public static loadEnvironment(): Promise<EnvironmentPickItem | undefined> {
         return PersistUtility.deserializeFromFileAsync<EnvironmentPickItem>(PersistUtility.environmentFilePath);
     }
 
@@ -45,7 +45,9 @@ export class PersistUtility {
         return fs.ensureFile(path);
     }
 
-    private static async deserializeFromFileAsync<T>(path: string, defaultValue: T = null): Promise<T> {
+    private static async deserializeFromFileAsync<T>(path: string): Promise<T | undefined>;
+    private static async deserializeFromFileAsync<T>(path: string, defaultValue: T): Promise<T>;
+    private static async deserializeFromFileAsync<T>(path: string, defaultValue?: T): Promise<T | undefined> {
         try {
             return await fs.readJson(path);
         } catch {

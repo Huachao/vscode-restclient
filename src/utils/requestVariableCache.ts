@@ -27,7 +27,7 @@ export class RequestVariableCache {
         return RequestVariableCache.cache.has(cacheKey.getCacheKey());
     }
 
-    public static get(cacheKey: RequestVariableCacheKey): RequestVariableCacheValue {
+    public static get(cacheKey: RequestVariableCacheKey): RequestVariableCacheValue | undefined {
         return RequestVariableCache.cache.get(cacheKey.getCacheKey());
     }
 

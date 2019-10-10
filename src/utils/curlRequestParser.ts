@@ -16,7 +16,7 @@ const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
 export class CurlRequestParser implements IRequestParser {
 
-    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest {
+    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest | null {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(requestRawText.trim()));
         requestText = requestText
@@ -81,13 +81,13 @@ export class CurlRequestParser implements IRequestParser {
         return new HttpRequest(method, url, headers, body, body);
     }
 
-    private static resolveFilePath(refPath: string, httpFilePath: string): string {
+    private static resolveFilePath(refPath: string, httpFilePath: string): string | undefined {
         if (path.isAbsolute(refPath)) {
-            return fs.existsSync(refPath) ? refPath : null;
+            return fs.existsSync(refPath) ? refPath : undefined;
         }
 
         const rootPath = getWorkspaceRootPath();
-        let absolutePath;
+        let absolutePath: string;
         if (rootPath) {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, refPath);
             if (fs.existsSync(absolutePath)) {
@@ -100,7 +100,7 @@ export class CurlRequestParser implements IRequestParser {
             return absolutePath;
         }
 
-        return null;
+        return undefined;
     }
 
     private static mergeIntoSingleLine(text: string): string {

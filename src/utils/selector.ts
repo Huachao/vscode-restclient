@@ -14,12 +14,12 @@ export interface RequestRangeOptions {
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public static getRequestText(editor: TextEditor, range: Range = null): string {
+    public static getRequestText(editor: TextEditor, range: Range | null = null): string | null {
         if (!editor || !editor.document) {
             return null;
         }
 
-        let selectedText: string;
+        let selectedText: string | null;
         if (editor.selection.isEmpty || range) {
             const activeLine = !range ? editor.selection.active.line : range.start.line;
             selectedText = Selector.getDelimitedText(editor.document.getText(), activeLine);
@@ -74,7 +74,7 @@ export class Selector {
         return requestRanges;
     }
 
-    public static getRequestVariableDefinitionName(text: string): string {
+    public static getRequestVariableDefinitionName(text: string): string | null {
         const matched = text.match(Constants.RequestVariableDefinitionRegex);
         return matched && matched[1];
     }
@@ -95,7 +95,7 @@ export class Selector {
         return Selector.responseStatusLineRegex.test(line);
     }
 
-    private static getDelimitedText(fullText: string, currentLine: number): string {
+    private static getDelimitedText(fullText: string, currentLine: number): string | null {
         const lines: string[] = fullText.split(Constants.LineSplitterRegex);
         const delimiterLineNumbers: number[] = Selector.getDelimiterRows(lines);
         if (delimiterLineNumbers.length === 0) {
@@ -122,6 +122,8 @@ export class Selector {
                 return lines.slice(start + 1, end).join(EOL);
             }
         }
+
+        return null;
     }
 
     private static getDelimiterRows(lines: string[]): number[] {

@@ -3,9 +3,9 @@
 import * as crypto from 'crypto';
 import { Headers } from '../models/base';
 
-export function getHeader(headers: Headers, name: string): string {
+export function getHeader(headers: Headers, name: string): string | undefined {
     if (!headers || !name) {
-        return null;
+        return undefined;
     }
 
     const headerName = Object.keys(headers).find(h => h.toLowerCase() === name.toLowerCase());

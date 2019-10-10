@@ -21,7 +21,7 @@ export class ResponseFormatUtility {
         [SyntaxKind.FalseKeyword]: 'false'
     };
 
-    public static formatBody(body: string, contentType: string, suppressValidation: boolean): string {
+    public static formatBody(body: string, contentType: string | undefined, suppressValidation: boolean): string {
         if (contentType) {
             if (MimeUtility.isJSON(contentType)) {
                 if (isJSONString(body)) {

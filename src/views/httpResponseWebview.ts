@@ -258,7 +258,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             .map(function (line, i) {
                 const lineNum = i + 1;
                 const range = foldingRanges.has(lineNum)
-                    ? ` range-start="${foldingRanges.get(lineNum).start}" range-end="${foldingRanges.get(lineNum).end}"`
+                    ? ` range-start="${foldingRanges.get(lineNum)!.start}" range-end="${foldingRanges.get(lineNum)!.end}"`
                     : '';
                 const folding = foldingRanges.has(lineNum) ? '<span class="icon"></span>' : '';
                 return `<span class="line width-${max}" start="${lineNum}"${range}>${line}${folding}</span>`;
@@ -267,13 +267,13 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         return code;
     }
 
-    private cleanLineBreaks(code): string {
-        const openSpans = [],
+    private cleanLineBreaks(code: string): string {
+        const openSpans: string[] = [],
             matcher = /<\/?span[^>]*>|\r\n|\r|\n/ig,
             newline = /\r\n|\r|\n/,
             closingTag = /^<\//;
 
-        return code.replace(matcher, function (match) {
+        return code.replace(matcher, function (match: string) {
             if (newline.test(match)) {
                 if (openSpans.length) {
                     return openSpans.map(() => '</span>').join('') + match + openSpans.join('');
@@ -296,7 +296,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
 
     private getFoldingRange(lines: string[]): Map<number, FoldingRange> {
         const result = new Map<number, FoldingRange>();
-        const stack = [];
+        const stack: [number, number][] = [];
 
         const leadingSpaceCount = lines
             .map((line, index) => [index, line.search(/\S/)])
@@ -334,7 +334,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         return headerString;
     }
 
-    private static getHighlightLanguageAlias(contentType: string, content: string = null): string {
+    private static getHighlightLanguageAlias(contentType: string | undefined, content: string | null = null): string | null {
         if (MimeUtility.isJSON(contentType)) {
             return 'json';
         } else if (MimeUtility.isJavaScript(contentType)) {
@@ -356,8 +356,8 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         }
     }
 
-    private static isHeadRequest({ request: { method } }: {request: HttpRequest}): boolean {
-        return method && method.toLowerCase() === 'head';
+    private static isHeadRequest({ request: { method } }: { request: HttpRequest }): boolean {
+        return !!(method && method.toLowerCase() === 'head');
     }
 }
 

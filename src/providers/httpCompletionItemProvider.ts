@@ -6,9 +6,9 @@ import { HttpElementFactory } from '../utils/httpElementFactory';
 import { VariableUtility } from "../utils/variableUtility";
 
 export class HttpCompletionItemProvider implements CompletionItemProvider {
-    public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
+    public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[] | undefined> {
         if (VariableUtility.isPartialRequestVariableReference(document, position)) {
-            return;
+            return undefined;
         }
 
         const elements = await HttpElementFactory.getHttpElements(document, document.lineAt(position).text);

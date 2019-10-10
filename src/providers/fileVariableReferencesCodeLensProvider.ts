@@ -19,7 +19,7 @@ export class FileVariableReferencesCodeLensProvider implements CodeLensProvider 
                 }
 
                 const range = new Range(blockStart, 0, blockEnd, 0);
-                let match: RegExpExecArray;
+                let match: RegExpExecArray | null;
                 if (match = Constants.FileVariableDefinitionRegex.exec(line)) {
                     const variableName = match[1];
                     const locations = VariableUtility.getFileVariableReferenceRanges(lines, variableName);

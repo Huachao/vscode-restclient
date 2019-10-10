@@ -93,7 +93,7 @@ export class CodeSnippetController {
             quickPick.matchOnDetail = true;
             quickPick.onDidHide(() => quickPick.dispose());
             quickPick.onDidTriggerButton(() => {
-                quickPick.step--;
+                quickPick.step!--;
                 quickPick.buttons = [];
                 quickPick.items = targetQuickPickItems;
             });
@@ -209,18 +209,15 @@ export class CodeSnippetController {
         }
 
         // convert body
-        let body: HARPostData = null;
+        let body: HARPostData | undefined;
         if (request.body) {
             const contentTypeHeader = headers.find(header => header.name.toLowerCase() === 'content-type');
-            let mimeType: string;
-            if (contentTypeHeader) {
-                mimeType = contentTypeHeader.value;
-            }
+            const mimeType: string = (contentTypeHeader && contentTypeHeader.value) || 'application/json';
             if (typeof request.body === 'string') {
                 const normalizedBody = request.body.split(EOL).reduce((prev, cur) => prev.concat(cur.trim()), '');
                 body = new HARPostData(mimeType, normalizedBody);
             } else {
-                body = new HARPostData(mimeType, request.rawBody);
+                body = new HARPostData(mimeType, request.rawBody!);
             }
         }
 

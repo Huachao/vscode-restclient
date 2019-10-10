@@ -24,7 +24,7 @@ export class HttpResponseTextDocumentView {
         });
     }
 
-    public async render(response: HttpResponse, column: ViewColumn) {
+    public async render(response: HttpResponse, column?: ViewColumn) {
         const content = this.getTextDocumentContent(response);
         const language = this.getVSCodeDocumentLanguageId(response);
         let document: TextDocument;

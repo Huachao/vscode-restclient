@@ -15,7 +15,7 @@ import { HttpResponseTimingPhases } from '../models/httpResponseTimingPhases';
 import { MimeUtility } from './mimeUtility';
 import { getHeader, hasHeader } from './misc';
 import { PersistUtility } from './persistUtility';
-import { getWorkspaceRootPath } from './workspaceUtility';
+import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
 const encodeUrl = require('encodeurl');
 const request = require('request');
@@ -48,7 +48,7 @@ export class HttpClient {
                 }
 
                 const contentType = getHeader(response.headers, 'Content-Type');
-                let encoding: string;
+                let encoding: string | undefined;
                 if (contentType) {
                     encoding = MimeUtility.parse(contentType).charset;
                 }
@@ -68,7 +68,7 @@ export class HttpClient {
                 }
 
                 if (that._settings.decodeEscapedUnicodeCharacters) {
-                    bodyString = that.decodeEscapedUnicodeCharacters(bodyString);
+                    bodyString = that.decodeEscapedUnicodeCharacters(bodyString!);
                 }
 
                 // adjust response header case, due to the response headers in request package is in lowercase
@@ -90,7 +90,7 @@ export class HttpClient {
                     response.statusMessage,
                     response.httpVersion,
                     adjustedResponseHeaders,
-                    bodyString,
+                    bodyString!,
                     response.elapsedTime,
                     size,
                     headersSize,
@@ -126,7 +126,7 @@ export class HttpClient {
 
     private async prepareOptions(httpRequest: HttpRequest): Promise<{ [key: string]: any }> {
         const originalRequestBody = httpRequest.body;
-        let requestBody: string | Buffer;
+        let requestBody: string | Buffer | undefined;
         if (originalRequestBody) {
             if (typeof originalRequestBody !== 'string') {
                 requestBody = await this.convertStreamToBuffer(originalRequestBody);
@@ -180,10 +180,10 @@ export class HttpClient {
         // set proxy
         if (this._settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, this._settings.excludeHostsForProxy)) {
             const proxyEndpoint = url.parse(this._settings.proxy);
-            if (/^https?:$/.test(proxyEndpoint.protocol)) {
+            if (/^https?:$/.test(proxyEndpoint.protocol || '')) {
                 const proxyOptions = {
                     host: proxyEndpoint.hostname,
-                    port: +proxyEndpoint.port,
+                    port: Number(proxyEndpoint.port),
                     rejectUnauthorized: this._settings.proxyStrictSSL
                 };
 
@@ -244,13 +244,17 @@ export class HttpClient {
         return body.replace(/\\u([\d\w]{4})/gi, (_, g) => String.fromCharCode(parseInt(g, 16)));
     }
 
-    private getRequestCertificate(requestUrl: string): { cert?: string, key?: string, pfx?: string, passphrase?: string } {
+    private getRequestCertificate(requestUrl: string): HostCertificate | null {
         const host = url.parse(requestUrl).host;
+        if (!host) {
+            return null;
+        }
+
         if (host in this._settings.hostCertificates) {
             const certificate = this._settings.hostCertificates[host];
-            let cert = undefined,
-                key = undefined,
-                pfx = undefined;
+            let cert: Buffer | undefined,
+                key: Buffer | undefined,
+                pfx: Buffer | undefined;
             if (certificate.cert) {
                 const certPath = HttpClient.resolveCertificateFullPath(certificate.cert, "cert");
                 if (certPath) {
@@ -271,6 +275,8 @@ export class HttpClient {
             }
             return new HostCertificate(cert, key, pfx, certificate.passphrase);
         }
+
+        return null;
     }
 
     private static getResponseRawHeaderNames(rawHeaders: string[]): Headers {
@@ -310,11 +316,11 @@ export class HttpClient {
         return false;
     }
 
-    private static resolveCertificateFullPath(absoluteOrRelativePath: string, certName: string): string {
+    private static resolveCertificateFullPath(absoluteOrRelativePath: string, certName: string): string | undefined {
         if (path.isAbsolute(absoluteOrRelativePath)) {
             if (!fs.existsSync(absoluteOrRelativePath)) {
                 window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
-                return;
+                return undefined;
             } else {
                 return absoluteOrRelativePath;
             }
@@ -329,16 +335,21 @@ export class HttpClient {
                 return absolutePath;
             } else {
                 window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
-                return;
+                return undefined;
             }
         }
 
-        absolutePath = path.join(path.dirname(window.activeTextEditor.document.fileName), absoluteOrRelativePath);
+        const currentFilePath = getCurrentHttpFileName();
+        if (!currentFilePath) {
+            return undefined;
+        }
+
+        absolutePath = path.join(path.dirname(currentFilePath), absoluteOrRelativePath);
         if (fs.existsSync(absolutePath)) {
             return absolutePath;
         } else {
             window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
-            return;
+            return undefined;
         }
     }
 

@@ -24,7 +24,7 @@ export abstract class BaseWebview {
     protected panels: WebviewPanel[];
 
     protected constructor() {
-        this.extensionPath = extensions.getExtension(Constants.ExtensionId).extensionPath;
+        this.extensionPath = extensions.getExtension(Constants.ExtensionId)!.extensionPath;
         this.panels = [];
         this.styleFilePath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName, Constants.CSSFileName));
         this.styleFolderPath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName));
