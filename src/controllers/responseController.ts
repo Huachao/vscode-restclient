@@ -61,8 +61,7 @@ export class ResponseController {
     public async saveBody() {
         const response = HttpResponseWebview.activePreviewResponse;
         if (response) {
-            const contentType = response.getHeader("content-type");
-            const extension = MimeUtility.getExtension(contentType as string, '');
+            const extension = MimeUtility.getExtension(response.contentType, '');
             const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
             const defaultFilePath = path.join(ResponseController.responseBodySaveFolderPath, fileName);
             try {
