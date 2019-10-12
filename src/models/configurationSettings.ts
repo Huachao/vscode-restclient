@@ -1,7 +1,7 @@
 import { CharacterPair, Event, EventEmitter, languages, ViewColumn, window, workspace } from 'vscode';
 import configuration from '../../language-configuration.json';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
-import { Headers } from './base';
+import { RequestHeaders } from './base';
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
 import { HostCertificate } from './hostCertificate';
 import { fromString as ParseLogLevelStr, LogLevel } from './logLevel';
@@ -9,7 +9,7 @@ import { fromString as ParsePreviewOptionStr, PreviewOption } from './previewOpt
 
 export interface IRestClientSettings {
     followRedirect: boolean;
-    defaultHeaders: Headers;
+    defaultHeaders: RequestHeaders;
     timeoutInMilliseconds: number;
     showResponseInDifferentTab: boolean;
     requestNameAsResponseTabTitle: boolean;
@@ -42,7 +42,7 @@ export interface IRestClientSettings {
 
 export class RestClientSettings implements IRestClientSettings {
     public followRedirect: boolean;
-    public defaultHeaders: Headers;
+    public defaultHeaders: RequestHeaders;
     public timeoutInMilliseconds: number;
     public showResponseInDifferentTab: boolean;
     public requestNameAsResponseTabTitle: boolean;
@@ -110,11 +110,11 @@ export class RestClientSettings implements IRestClientSettings {
         const document = getCurrentTextDocument();
         const restClientSettings = workspace.getConfiguration("rest-client", document ? document.uri : null);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
-        this.defaultHeaders = restClientSettings.get<Headers>("defaultHeaders",
-                                                              {
-                                                                  "User-Agent": "vscode-restclient",
-                                                                  "Accept-Encoding": "gzip"
-                                                              });
+        this.defaultHeaders = restClientSettings.get<RequestHeaders>("defaultHeaders",
+                                                                     {
+                                                                         "User-Agent": "vscode-restclient",
+                                                                         "Accept-Encoding": "gzip"
+                                                                     });
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
         this.requestNameAsResponseTabTitle = restClientSettings.get<boolean>("requestNameAsResponseTabTitle", false);
         this.rememberCookiesForSubsequentRequests = restClientSettings.get<boolean>("rememberCookiesForSubsequentRequests", true);

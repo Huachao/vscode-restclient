@@ -6,7 +6,7 @@ import * as path from 'path';
 import { Readable, Stream } from 'stream';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
-import { Headers } from '../models/base';
+import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HostCertificate } from '../models/hostCertificate';
 import { HttpRequest } from '../models/httpRequest';
@@ -50,7 +50,7 @@ export class HttpClient {
                 const contentType = getHeader(response.headers, 'Content-Type');
                 let encoding: string | undefined;
                 if (contentType) {
-                    encoding = MimeUtility.parse(contentType).charset;
+                    encoding = MimeUtility.parse(contentType as string).charset;
                 }
 
                 if (!encoding) {
@@ -73,7 +73,7 @@ export class HttpClient {
 
                 // adjust response header case, due to the response headers in request package is in lowercase
                 const headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
-                const adjustedResponseHeaders: Headers = {};
+                const adjustedResponseHeaders: ResponseHeaders = {};
                 for (const header in response.headers) {
                     let adjustedHeaderName = header;
                     if (headersDic[header]) {
@@ -151,7 +151,7 @@ export class HttpClient {
         };
 
         // set auth to digest if Authorization header follows: Authorization: Digest username password
-        const authorization = getHeader(options.headers, 'Authorization');
+        const authorization = getHeader(options.headers, 'Authorization') as string | undefined;
         if (authorization) {
             const start = authorization.indexOf(' ');
             const scheme = authorization.substr(0, start);
@@ -279,8 +279,8 @@ export class HttpClient {
         return null;
     }
 
-    private static getResponseRawHeaderNames(rawHeaders: string[]): Headers {
-        const result: Headers = {};
+    private static getResponseRawHeaderNames(rawHeaders: string[]): { [key: string]: string } {
+        const result: { [key: string]: string } = {};
         rawHeaders.forEach(header => {
             result[header.toLowerCase()] = header;
         });
@@ -353,7 +353,7 @@ export class HttpClient {
         }
     }
 
-    private static capitalizeHeaderName(headers: Headers): Headers {
+    private static capitalizeHeaderName(headers: RequestHeaders): RequestHeaders {
         const normalizedHeaders = {};
         if (headers) {
             for (const header in headers) {

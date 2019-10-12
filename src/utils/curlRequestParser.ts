@@ -3,7 +3,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Uri } from 'vscode';
-import { Headers } from '../models/base';
+import { RequestHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
 import { IRequestParser } from '../models/IRequestParser';
 import { hasHeader } from './misc';
@@ -31,7 +31,7 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         // parse header
-        let headers: Headers = {};
+        let headers: RequestHeaders = {};
         let parsedHeaders = parsedArguments.H || parsedArguments.header;
         if (parsedHeaders) {
             if (!Array.isArray(parsedHeaders)) {

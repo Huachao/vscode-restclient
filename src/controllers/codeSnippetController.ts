@@ -191,11 +191,17 @@ export class CodeSnippetController {
         // convert headers
         const headers: HARHeader[] = [];
         for (const key in request.headers) {
-            let headerValue = request.headers[key];
-            if (key.toLowerCase() === 'authorization') {
-                headerValue = CodeSnippetController.normalizeAuthHeader(headerValue);
+            const headerValue = request.headers[key];
+            if (!headerValue) {
+                continue;
             }
-            headers.push(new HARHeader(key, headerValue));
+            const headerValues = Array.isArray(headerValue) ? headerValue : [headerValue.toString()];
+            for (let value of headerValues) {
+                if (key.toLowerCase() === 'authorization') {
+                    value = CodeSnippetController.normalizeAuthHeader(value);
+                }
+                headers.push(new HARHeader(key, value));
+            }
         }
 
         // convert cookie headers

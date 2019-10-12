@@ -6,13 +6,13 @@ import * as path from 'path';
 import { Stream } from 'stream';
 import { Uri } from 'vscode';
 import { ArrayUtility } from '../common/arrayUtility';
-import { Headers } from '../models/base';
+import { RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
 import { IRequestParser } from '../models/IRequestParser';
 import { MimeUtility } from './mimeUtility';
-import { getHeader, removeHeader } from './misc';
+import { getContentType, getHeader, removeHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
 
@@ -43,7 +43,7 @@ export class HttpRequestParser implements IRequestParser {
         const requestLine = HttpRequestParser.parseRequestLine(lines[0]);
 
         // get headers range
-        let headers: Headers = {};
+        let headers: RequestHeaders = {};
         let body: string | Stream | undefined;
         let variables: string | Stream | undefined;
         let bodyLines: string[] = [];
@@ -80,7 +80,7 @@ export class HttpRequestParser implements IRequestParser {
                 const bodyStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
                 if (bodyStartLine !== -1) {
                     const requestTypeHeader = getHeader(headers, 'x-request-type');
-                    const contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
+                    const contentTypeHeader = getContentType(headers) || getContentType(this._restClientSettings.defaultHeaders);
                     firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
                     const bodyEndLine = MimeUtility.isMultiPart(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                     bodyLines = lines.slice(bodyStartLine, bodyEndLine);
@@ -107,13 +107,13 @@ export class HttpRequestParser implements IRequestParser {
         // if Host header provided and url is relative path, change to absolute url
         const host = getHeader(headers, 'Host') || getHeader(this._restClientSettings.defaultHeaders, 'host');
         if (host && requestLine.url[0] === '/') {
-            const [, port] = host.split(':');
+            const [, port] = host.toString().split(':');
             const scheme = port === '443' || port === '8443' ? 'https' : 'http';
             requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
         // parse body
-        const contentTypeHeader = getHeader(headers, 'content-type') || getHeader(this._restClientSettings.defaultHeaders, 'content-type');
+        const contentTypeHeader = getContentType(headers) || getContentType(this._restClientSettings.defaultHeaders);
         body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
         if (isGraphQlRequest) {
             variables = HttpRequestParser.parseRequestBody(variableLines, requestAbsoluteFilePath, contentTypeHeader);

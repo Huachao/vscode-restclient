@@ -3,7 +3,7 @@
 import * as path from 'path';
 import { commands, ExtensionContext, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
 import * as Constants from '../common/constants';
-import { Headers } from '../models/base';
+import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
@@ -124,7 +124,7 @@ export class HttpResponseWebview extends BaseWebview {
     private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse): string {
         let innerHtml: string;
         let width = 2;
-        let contentType = response.getHeader("content-type");
+        let contentType = response.contentType;
         if (contentType) {
             contentType = contentType.trim();
         }
@@ -172,12 +172,11 @@ export class HttpResponseWebview extends BaseWebview {
 ${HttpResponseWebview.formatHeaders(request.headers)}`;
             code += hljs.highlight('http', requestNonBodyPart + '\r\n').value;
             if (request.body) {
-                const requestContentType = request.getHeader("content-type");
                 if (typeof request.body !== 'string') {
                     request.body = 'NOTE: Request Body From File Is Not Shown';
                 }
-                const requestBodyPart = `${ResponseFormatUtility.formatBody(request.body, requestContentType, true)}`;
-                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(requestContentType, request.body);
+                const requestBodyPart = `${ResponseFormatUtility.formatBody(request.body, request.contentType, true)}`;
+                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(request.contentType, request.body);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, requestBodyPart).value;
                 } else {
@@ -196,13 +195,12 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         }
 
         if (previewOption !== PreviewOption.Headers) {
-            const responseContentType = response.getHeader("content-type");
-            const responseBodyPart = `${ResponseFormatUtility.formatBody(response.body, responseContentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
+            const responseBodyPart = `${ResponseFormatUtility.formatBody(response.body, response.contentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
             if (this.settings.disableHighlightResonseBodyForLargeResponse &&
                 response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024) {
                 code += responseBodyPart;
             } else {
-                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(responseContentType, responseBodyPart);
+                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(response.contentType, responseBodyPart);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, responseBodyPart).value;
                 } else {
@@ -320,7 +318,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         return result;
     }
 
-    private static formatHeaders(headers: Headers): string {
+    private static formatHeaders(headers: RequestHeaders | ResponseHeaders): string {
         let headerString = '';
         for (const header in headers) {
             if (headers.hasOwnProperty(header)) {
