@@ -106,6 +106,12 @@ export class HttpElementFactory {
             Constants.DateTimeVariableNameDescription,
             new SnippetString(`{{$\${name:${Constants.DateTimeVariableName.slice(1)}} \${1|rfc1123,iso8601|}}}`)));
         originalElements.push(new HttpElement(
+            Constants.LocalDateTimeVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.LocalDateTimeVariableNameDescription,
+            new SnippetString(`{{$\${name:${Constants.LocalDateTimeVariableName.slice(1)}} \${1|rfc1123,iso8601|}}}`)));
+        originalElements.push(new HttpElement(
             Constants.RandomIntVariableName,
             ElementType.SystemVariable,
             null,

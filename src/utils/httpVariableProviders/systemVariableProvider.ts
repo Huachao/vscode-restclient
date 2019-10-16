@@ -23,6 +23,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private readonly resolveFuncs: Map<string, ResolveSystemVariableFunc> = new Map<string, ResolveSystemVariableFunc>();
     private readonly timestampRegex: RegExp = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly datetimeRegex: RegExp = new RegExp(`\\${Constants.DateTimeVariableName}\\s(rfc1123|iso8601|\'.+\'|\".+\")(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
+    private readonly localDatetimeRegex: RegExp = new RegExp(`\\${Constants.LocalDateTimeVariableName}\\s(rfc1123|iso8601|\'.+\'|\".+\")(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly randomIntegerRegex: RegExp = new RegExp(`\\${Constants.RandomIntVariableName}\\s(\\-?\\d+)\\s(\\-?\\d+)`);
     private readonly processEnvRegex: RegExp = new RegExp(`\\${Constants.ProcessEnvVariableName}\\s(\\%)?(\\w+)`);
 
@@ -45,6 +46,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.clipboard = env.clipboard;
         this.registerTimestampVariable();
         this.registerDateTimeVariable();
+        this.registerLocalDateTimeVariable();
         this.registerGuidVariable();
         this.registerRandomIntVariable();
         this.registerProcessEnvVariable();
@@ -109,6 +111,29 @@ export class SystemVariableProvider implements HttpVariableProvider {
             }
 
             return { warning: ResolveWarningMessage.IncorrectDateTimeVariableFormat };
+        });
+    }
+
+    private registerLocalDateTimeVariable() {
+        this.resolveFuncs.set(Constants.LocalDateTimeVariableName, async name => {
+            const groups = this.localDatetimeRegex.exec(name);
+            if (groups !== null && groups.length === 4) {
+                const [, type, offset, option] = groups;
+                let date: Moment = utc().local();
+                if (offset && option) {
+                    date = date.add(offset, option as DurationInputArg2);
+                }
+
+                if (type === 'rfc1123') {
+                    return { value: date.toString() };
+                } else if (type === 'iso8601') {
+                    return { value: date.toISOString(true) };
+                } else {
+                    return { value: date.format(type.slice(1, type.length - 1)) };
+                }
+            }
+
+            return { warning: ResolveWarningMessage.IncorrectLocalDateTimeVariableFormat };
         });
     }
 

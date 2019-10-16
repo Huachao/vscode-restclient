@@ -23,6 +23,8 @@ export const TimeStampVariableDescription = "Add a number of milliseconds betwee
  You can also provide the offset with current time in the format {{$timestamp number string}}";
 export const DateTimeVariableName = "$datetime";
 export const DateTimeVariableNameDescription = "Add a datetime string in either ISO8601 or RFC1123 format";
+export const LocalDateTimeVariableName = "$localDatetime";
+export const LocalDateTimeVariableNameDescription = "Add a local datetime string in either ISO8601 or RFC1123 format";
 export const GuidVariableName = "$guid";
 export const GuidVariableDescription = "Add a RFC 4122 v4 UUID";
 export const RandomIntVariableName = "$randomInt";

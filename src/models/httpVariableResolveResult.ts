@@ -28,6 +28,7 @@ export const enum ResolveWarningMessage {
     RequestBodyNotExist = "Request body of given request doesn't exist",
     ResponseBodyNotExist = "Response body of given request doesn't exist",
     IncorrectDateTimeVariableFormat = 'Datetime system variable should follow format "{{$datetime rfc1123|iso8601 [integer y|Q|M|w|d|h|m|s|ms]}}"',
+    IncorrectLocalDateTimeVariableFormat = 'Local datetime system variable should follow format "{{$localDatetime rfc1123|iso8601 [integer y|Q|M|w|d|h|m|s|ms]}}"',
     IncorrectHeaderName = 'No value is resolved for given header name',
     IncorrectJSONPath = 'No value is resolved for given JSONPath',
     IncorrectRandomIntegerVariableFormat = 'RandomInt system variable should follow format "{{$randomInt minInteger maxInteger}}"',
