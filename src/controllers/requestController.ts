@@ -21,6 +21,7 @@ import { VariableProcessor } from '../utils/variableProcessor';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
+import * as jmespath from 'jmespath';
 
 const filesize = require('filesize');
 const uuidv4 = require('uuid/v4');
@@ -76,6 +77,14 @@ export class RequestController {
         // variables replacement
         selectedText = await VariableProcessor.processRawRequest(selectedText);
 
+        // look for JMESPath query
+        const pipe = selectedText.indexOf('|');
+        let jmesQuery = '';
+        if (pipe) {
+            jmesQuery = selectedText.substring(pipe);
+            selectedText = selectedText.substring(0, pipe-1);
+        }
+
         // parse http request
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
@@ -86,7 +95,7 @@ export class RequestController {
             httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, document.uri.toString());
         }
 
-        await this.runCore(httpRequest);
+        await this.runCore(httpRequest, jmesQuery);
     }
 
     @trace('Rerun Request')
@@ -115,7 +124,7 @@ export class RequestController {
         this._durationStatusBarItem.tooltip = null;
     }
 
-    private async runCore(httpRequest: HttpRequest) {
+    private async runCore(httpRequest: HttpRequest, jmesQuery: string = '') {
         let requestId = uuidv4();
         this._requestStore.add(<string>requestId, httpRequest);
 
@@ -146,7 +155,11 @@ export class RequestController {
                 const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
                     ? activeColumn
                     : ((activeColumn as number) + 1) as ViewColumn;
-                if (this._restClientSettings.previewResponseInUntitledDocument) {
+                
+                if (jmesQuery) {
+                    this.EvaluateJMESPathExpression(response.body, jmesQuery, previewColumn);
+                }
+                else if (this._restClientSettings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
                 } else {
                     this._webview.render(response, previewColumn);
@@ -178,6 +191,16 @@ export class RequestController {
             window.showErrorMessage(error.message);
         } finally {
             this._requestStore.complete(<string>requestId);
+        }
+    }
+
+    private EvaluateJMESPathExpression(jsonDoc: string, query: string, previewColumn: number) {
+        try {
+            let result = jmespath.search(jsonDoc, query);
+            this._textDocumentView.render(result, previewColumn);
+        } catch (err) {
+            let errorMessage = `${err.name}: ${err.message}`;
+            window.showErrorMessage(errorMessage);
         }
     }
 
