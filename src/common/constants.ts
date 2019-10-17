@@ -31,7 +31,8 @@ export const RandomIntVariableName = "$randomInt";
 export const RandomIntDescription = "Returns a random integer between min (included) and max (excluded)";
 export const ProcessEnvVariableName = "$processEnv";
 export const ProcessEnvDescription = "Returns the value of process environment variable or '' if not found ";
-
+export const DotenvVariableName = "$dotenv";
+export const DotenvDescription = "Returns the environment value stored in a .env file";
 export const AzureActiveDirectoryVariableName = "$aadToken";
 export const AzureActiveDirectoryDescription = "Prompts to sign in to Azure AD and adds the token to the request";
 /**

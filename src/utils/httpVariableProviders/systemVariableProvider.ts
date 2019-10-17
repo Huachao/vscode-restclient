@@ -1,8 +1,11 @@
 'use strict';
 
 import * as adal from 'adal-node';
+import * as dotenv from 'dotenv';
+import * as fs from 'fs-extra';
 import { DurationInputArg2, Moment, utc } from 'moment';
-import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
+import * as path from 'path';
+import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
 import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
@@ -15,7 +18,7 @@ import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpV
 const uuidv4 = require('uuid/v4');
 
 type SystemVariableValue = Pick<HttpVariable, Exclude<keyof HttpVariable, 'name'>>;
-type ResolveSystemVariableFunc = (name: string, context: HttpVariableContext) => Promise<SystemVariableValue>;
+type ResolveSystemVariableFunc = (name: string, document: TextDocument, context: HttpVariableContext) => Promise<SystemVariableValue>;
 
 export class SystemVariableProvider implements HttpVariableProvider {
 
@@ -26,6 +29,8 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private readonly localDatetimeRegex: RegExp = new RegExp(`\\${Constants.LocalDateTimeVariableName}\\s(rfc1123|iso8601|\'.+\'|\".+\")(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly randomIntegerRegex: RegExp = new RegExp(`\\${Constants.RandomIntVariableName}\\s(\\-?\\d+)\\s(\\-?\\d+)`);
     private readonly processEnvRegex: RegExp = new RegExp(`\\${Constants.ProcessEnvVariableName}\\s(\\%)?(\\w+)`);
+
+    private readonly dotenvRegex: RegExp = new RegExp(`\\${Constants.DotenvVariableName}\\s([\\w-.]+)`);
 
     private readonly requestUrlRegex: RegExp = /^(?:[^\s]+\s+)([^:]*:\/\/\/?[^/\s]*\/?)/;
 
@@ -50,23 +55,24 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerGuidVariable();
         this.registerRandomIntVariable();
         this.registerProcessEnvVariable();
+        this.registerDotenvVariable();
         this.registerAadTokenVariable();
     }
 
     public readonly type: VariableType = VariableType.System;
 
-    public async has(name: string): Promise<boolean> {
+    public async has(name: string, document: TextDocument): Promise<boolean> {
         const [variableName] = name.split(' ').filter(Boolean);
         return this.resolveFuncs.has(variableName);
     }
 
-    public async get(name: string, document: undefined, context: HttpVariableContext): Promise<HttpVariable> {
+    public async get(name: string, document: TextDocument, context: HttpVariableContext): Promise<HttpVariable> {
         const [variableName] = name.split(' ').filter(Boolean);
         if (!this.resolveFuncs.has(variableName)) {
             return { name: variableName, error: ResolveErrorMessage.SystemVariableNotExist };
         }
 
-        const result = await this.resolveFuncs.get(variableName)!(name, context);
+        const result = await this.resolveFuncs.get(variableName)!(name, document, context);
         return { name: variableName, ...result };
     }
 
@@ -138,7 +144,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     }
 
     private registerGuidVariable() {
-        this.resolveFuncs.set(Constants.GuidVariableName, async name => ({ value: uuidv4() }));
+        this.resolveFuncs.set(Constants.GuidVariableName, async () => ({ value: uuidv4() }));
     }
 
     private registerRandomIntVariable() {
@@ -181,17 +187,38 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 }
                 const envValue = process.env[processEnvName];
                 if (envValue !== undefined) {
-                    return { value: envValue.toString()};
+                    return { value: envValue.toString() };
                 } else {
-                    return { value: ''};
+                    return { value: '' };
                 }
             }
             return { warning: ResolveWarningMessage.IncorrectProcessEnvVariableFormat };
         });
     }
 
+    private registerDotenvVariable() {
+        this.resolveFuncs.set(Constants.DotenvVariableName, async (name, document) => {
+            const absolutePath = path.join(path.dirname(document.fileName), '.env');
+            if (!await fs.pathExists(absolutePath)) {
+                return { warning: ResolveWarningMessage.DotenvFileNotFound };
+            }
+            const parsed = dotenv.parse(fs.readFileSync(absolutePath));
+            const groups = this.dotenvRegex.exec(name);
+            if (groups !== null && groups.length === 2) {
+                const [, key] = groups;
+                if (!(key in parsed)) {
+                    return { warning: ResolveWarningMessage.DotenvVariableNotFound };
+                }
+
+                return { value: parsed[key] };
+            }
+
+            return { warning: ResolveWarningMessage.IncorrectDotenvVariableFormat };
+        });
+    }
+
     private registerAadTokenVariable() {
-        this.resolveFuncs.set(Constants.AzureActiveDirectoryVariableName, (name, context) => {
+        this.resolveFuncs.set(Constants.AzureActiveDirectoryVariableName, (name, document, context) => {
             // get target app from URL
             const match = this.requestUrlRegex.exec(context.parsedRequest);
             const url = (match && match[1]) || context.parsedRequest;

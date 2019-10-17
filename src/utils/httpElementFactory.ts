@@ -125,6 +125,13 @@ export class HttpElementFactory {
             new SnippetString(`{{$\${name:${Constants.ProcessEnvVariableName.slice(1)}} \${2:process environment variable name}}}`)
         ));
         originalElements.push(new HttpElement(
+            Constants.DotenvVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.DotenvDescription,
+            new SnippetString(`{{$\${name:${Constants.DotenvVariableName.slice(1)}} \${2:.env variable name}}}`)
+        ));
+        originalElements.push(new HttpElement(
             Constants.AzureActiveDirectoryVariableName,
             ElementType.SystemVariable,
             null,
