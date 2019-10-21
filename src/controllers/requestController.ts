@@ -1,7 +1,7 @@
 "use strict";
 
 import { EOL } from 'os';
-import { ExtensionContext, OutputChannel, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
+import { ExtensionContext, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
 import { Logger } from '../logger';
@@ -33,7 +33,6 @@ export class RequestController {
     private _httpClient: HttpClient;
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
-    private _outputChannel: OutputChannel;
 
     public constructor(context: ExtensionContext, private readonly logger: Logger) {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
@@ -185,7 +184,6 @@ export class RequestController {
         this._durationStatusBarItem.dispose();
         this._sizeStatusBarItem.dispose();
         this._webview.dispose();
-        this._outputChannel.dispose();
     }
 
     private setSendingProgressStatusText() {

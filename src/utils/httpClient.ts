@@ -75,11 +75,7 @@ export class HttpClient {
                 const headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
                 const adjustedResponseHeaders: ResponseHeaders = {};
                 for (const header in response.headers) {
-                    let adjustedHeaderName = header;
-                    if (headersDic[header]) {
-                        adjustedHeaderName = headersDic[header];
-                        adjustedResponseHeaders[headersDic[header]] = response.headers[header];
-                    }
+                    const adjustedHeaderName = headersDic[header] || header;
                     adjustedResponseHeaders[adjustedHeaderName] = response.headers[header];
                 }
 
