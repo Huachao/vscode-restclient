@@ -5,7 +5,7 @@ import { HttpResponse } from '../models/httpResponse';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from "../models/httpVariableResolveResult";
 import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
 import { MimeUtility } from './mimeUtility';
-import { getHeader } from './misc';
+import { getContentType, getHeader } from './misc';
 
 const xpath = require('xpath');
 const { DOMParser } = require('xmldom');
@@ -59,7 +59,7 @@ export class RequestVariableCacheValueProcessor {
                 return { state: ResolveState.Success, value: body };
             }
 
-            const contentTypeHeader = getHeader(headers, 'content-type');
+            const contentTypeHeader = getContentType(headers);
             if (MimeUtility.isJSON(contentTypeHeader)) {
                 const parsedBody = JSON.parse(body as string);
 

@@ -27,7 +27,15 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Diagnostic support for __request__ and __file__ custom variables
     - Go to definition support for __request__ and __file__ custom variables
     - Find all references support _ONLY_ for __file__ custom variables
-    - Provide system dynamic variables `{{$guid}}`, `{{$randomInt min max}}`, `{{$timestamp [offset option]}}`, `{{$datetime rfc1123|iso8601 [offset option]}}`, `{{$processEnv [%]envVarName}}`, and `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
+    - Provide system dynamic variables
+      + `{{$guid}}`
+      + `{{$randomInt min max}}`
+      + `{{$timestamp [offset option]}}`
+      + `{{$datetime rfc1123|iso8601 [offset option]}}`
+      + `{{$localDatetime rfc1123|iso8601 [offset option]}}`
+      + `{{$processEnv [%]envVarName}}`
+      + `{{$dotenv variableName}}`
+      + `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
     - Easily create/update/delete environments and environment variables in setting file
     - File variables can reference both custom and system variables
     - Support environment switch
@@ -537,9 +545,11 @@ For example: Define a shell environment variable in `.bashrc` or similar on wind
   `%`: Optional. If specified, treats envVarName as an extension setting environment variable, and uses the value of that for the lookup.
 
 
+* `{{$dotenv variableName}}`: Returns the environment value stored in the [`.env`](https://github.com/motdotla/dotenv) file which exists in the same directory of your `.http` file.
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
 * `{{$timestamp [offset option]}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`.
 * `{{$datetime rfc1123|iso8601|"custom format"|'custom format' [offset option]}}`: Add a datetime string in either _ISO8601_, _RFC1123_ or a custom display format. You can even specify a date time relative to the current date similar to `timestamp` like: `{{$datetime iso8601 1 y}}` to represent a year later in _ISO8601_ format. If specifying a custom format, wrap it in single or double quotes like: `{{$datetime "DD-MM-YYYY" 1 y}}`. The date is formatted using moment.js, read [here](https://momentjs.com/docs/#/parsing/string-format/) for information on format strings.
+* `{{$localDatetime rfc1123|iso8601|"custom format"|'custom format' [offset option]}}`: Similar to `$datetime` except that `$localDatetime` returns a time string in your local time zone.
 
 The offset options you can specify in `timestamp` and `datetime` are:
 
@@ -562,11 +572,13 @@ Content-Type: application/xml
 Date: {{$datetime rfc1123}}
 
 {
+    "user_name": "{{$dotenv USERNAME}}",
     "request_id": "{{$guid}}",
     "updated_at": "{{$timestamp}}",
     "created_at": "{{$timestamp -1 d}}",
     "review_count": "{{$randomInt 5 200}}",
-    "custom_date": "{{$datetime 'YYYY-MM-DD'}}"
+    "custom_date": "{{$datetime 'YYYY-MM-DD'}}",
+    "local_custom_date": "{{$localDatetime 'YYYY-MM-DD'}}"
 }
 ```
 > More details about `aadToken` (Azure Active Directory Token) can be found on [Wiki](https://github.com/Huachao/vscode-restclient/wiki/Azure-Active-Directory-Authentication-Samples)

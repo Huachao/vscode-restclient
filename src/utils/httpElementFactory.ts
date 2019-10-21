@@ -11,7 +11,7 @@ import { PersistUtility } from './persistUtility';
 
 export class HttpElementFactory {
     public static async getHttpElements(document: TextDocument, line: string): Promise<HttpElement[]> {
-        let originalElements: HttpElement[] = [];
+        const originalElements: HttpElement[] = [];
 
         // add http methods
         originalElements.push(new HttpElement('GET', ElementType.Method));
@@ -106,6 +106,12 @@ export class HttpElementFactory {
             Constants.DateTimeVariableNameDescription,
             new SnippetString(`{{$\${name:${Constants.DateTimeVariableName.slice(1)}} \${1|rfc1123,iso8601|}}}`)));
         originalElements.push(new HttpElement(
+            Constants.LocalDateTimeVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.LocalDateTimeVariableNameDescription,
+            new SnippetString(`{{$\${name:${Constants.LocalDateTimeVariableName.slice(1)}} \${1|rfc1123,iso8601|}}}`)));
+        originalElements.push(new HttpElement(
             Constants.RandomIntVariableName,
             ElementType.SystemVariable,
             null,
@@ -119,6 +125,13 @@ export class HttpElementFactory {
             new SnippetString(`{{$\${name:${Constants.ProcessEnvVariableName.slice(1)}} \${2:process environment variable name}}}`)
         ));
         originalElements.push(new HttpElement(
+            Constants.DotenvVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.DotenvDescription,
+            new SnippetString(`{{$\${name:${Constants.DotenvVariableName.slice(1)}} \${2:.env variable name}}}`)
+        ));
+        originalElements.push(new HttpElement(
             Constants.AzureActiveDirectoryVariableName,
             ElementType.SystemVariable,
             null,
@@ -126,7 +139,7 @@ export class HttpElementFactory {
             new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryVariableName.slice(1)}}}}`)));
 
         // add environment custom variables
-        const environmentVariables = await EnvironmentVariableProvider.Instance.getAll(document);
+        const environmentVariables = await EnvironmentVariableProvider.Instance.getAll();
         for (const { name, value } of environmentVariables) {
             originalElements.push(
                 new HttpElement(
@@ -163,11 +176,14 @@ export class HttpElementFactory {
         }
 
         // add urls from history
-        let historyItems = await PersistUtility.loadRequests();
-        let distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));
+        const historyItems = await PersistUtility.loadRequests();
+        const distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));
         distinctRequestUrls.forEach(requestUrl => {
-            let protocol = url.parse(requestUrl).protocol;
-            let prefixLength = protocol.length + 2; // https: + //
+            const protocol = url.parse(requestUrl).protocol;
+            if (!protocol) {
+                return;
+            }
+            const prefixLength = protocol.length + 2; // https: + //
             originalElements.push(new HttpElement(`${requestUrl.substr(prefixLength)}`, ElementType.URL, '^\\s*(?:(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+)https?\\:\\/{2}'));
         });
 

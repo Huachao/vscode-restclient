@@ -64,7 +64,7 @@ export class CustomVariableDiagnosticsProvider {
         [...variableReferences.entries()]
             .filter(([name]) =>
                 allAvailableVariables.has(name)
-                && allAvailableVariables.get(name)[0] === VariableType.Request
+                && allAvailableVariables.get(name)![0] === VariableType.Request
                 && !RequestVariableCache.has(new RequestVariableCacheKey(name, document.uri.toString())))
             .forEach(([, variables]) => {
                 variables.forEach(v => {
@@ -80,13 +80,13 @@ export class CustomVariableDiagnosticsProvider {
         [...variableReferences.entries()]
             .filter(([name]) =>
                 allAvailableVariables.has(name)
-                && allAvailableVariables.get(name)[0] === VariableType.Request
+                && allAvailableVariables.get(name)![0] === VariableType.Request
                 && RequestVariableCache.has(new RequestVariableCacheKey(name, document.uri.toString())))
             .forEach(([name, variables]) => {
                 const value = RequestVariableCache.get(new RequestVariableCacheKey(name, document.uri.toString()));
                 variables.forEach(v => {
                     const path = v.variableValue.replace(/^\{{2}\s*/, '').replace(/\s*\}{2}$/, '');
-                    const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value, path);
+                    const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value!, path);
                     if (result.state !== ResolveState.Success) {
                         diagnostics.push(
                             new Diagnostic(
@@ -101,11 +101,11 @@ export class CustomVariableDiagnosticsProvider {
     }
 
     private findVariableReferences(document: TextDocument): Map<string, Variable[]> {
-        let vars: Map<string, Variable[]> = new Map<string, Variable[]>();
-        let lines = document.getText().split(Constants.LineSplitterRegex);
-        let pattern = /\{\{(\w+)(\..*?)*\}\}/g;
+        const vars: Map<string, Variable[]> = new Map<string, Variable[]>();
+        const lines = document.getText().split(Constants.LineSplitterRegex);
+        const pattern = /\{\{(\w+)(\..*?)*\}\}/g;
         lines.forEach((line, lineNumber) => {
-            let match: RegExpExecArray;
+            let match: RegExpExecArray | null;
             while (match = pattern.exec(line)) {
                 const [variablePath, variableName] = match;
                 const variable = new Variable(
@@ -116,7 +116,7 @@ export class CustomVariableDiagnosticsProvider {
                     lineNumber
                 );
                 if (vars.has(variableName)) {
-                    vars.get(variableName).push(variable);
+                    vars.get(variableName)!.push(variable);
                 } else {
                     vars.set(variableName, [variable]);
                 }

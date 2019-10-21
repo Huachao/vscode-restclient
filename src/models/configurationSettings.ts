@@ -1,7 +1,7 @@
 import { CharacterPair, Event, EventEmitter, languages, ViewColumn, window, workspace } from 'vscode';
 import configuration from '../../language-configuration.json';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
-import { Headers } from './base';
+import { RequestHeaders } from './base';
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
 import { HostCertificate } from './hostCertificate';
 import { fromString as ParseLogLevelStr, LogLevel } from './logLevel';
@@ -9,18 +9,18 @@ import { fromString as ParsePreviewOptionStr, PreviewOption } from './previewOpt
 
 export interface IRestClientSettings {
     followRedirect: boolean;
-    defaultHeaders: Headers;
+    defaultHeaders: RequestHeaders;
     timeoutInMilliseconds: number;
     showResponseInDifferentTab: boolean;
     requestNameAsResponseTabTitle: boolean;
-    proxy: string;
+    proxy?: string;
     proxyStrictSSL: boolean;
     rememberCookiesForSubsequentRequests: boolean;
     enableTelemetry: boolean;
     excludeHostsForProxy: string[];
     fontSize?: number;
-    fontFamily: string;
-    fontWeight: string;
+    fontFamily?: string;
+    fontWeight?: string;
     environmentVariables: Map<string, Map<string, string>>;
     mimeAndFileExtensionMapping: Map<string, string>;
     previewResponseInUntitledDocument: boolean;
@@ -42,18 +42,18 @@ export interface IRestClientSettings {
 
 export class RestClientSettings implements IRestClientSettings {
     public followRedirect: boolean;
-    public defaultHeaders: Headers;
+    public defaultHeaders: RequestHeaders;
     public timeoutInMilliseconds: number;
     public showResponseInDifferentTab: boolean;
     public requestNameAsResponseTabTitle: boolean;
-    public proxy: string;
+    public proxy?: string;
     public proxyStrictSSL: boolean;
     public rememberCookiesForSubsequentRequests: boolean;
     public enableTelemetry: boolean;
     public excludeHostsForProxy: string[];
     public fontSize?: number;
-    public fontFamily: string;
-    public fontWeight: string;
+    public fontFamily?: string;
+    public fontWeight?: string;
     public environmentVariables: Map<string, Map<string, string>>;
     public mimeAndFileExtensionMapping: Map<string, string>;
     public previewResponseInUntitledDocument: boolean;
@@ -110,11 +110,11 @@ export class RestClientSettings implements IRestClientSettings {
         const document = getCurrentTextDocument();
         const restClientSettings = workspace.getConfiguration("rest-client", document ? document.uri : null);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
-        this.defaultHeaders = restClientSettings.get<Headers>("defaultHeaders",
-                                                              {
-                                                                  "User-Agent": "vscode-restclient",
-                                                                  "Accept-Encoding": "gzip"
-                                                              });
+        this.defaultHeaders = restClientSettings.get<RequestHeaders>("defaultHeaders",
+                                                                     {
+                                                                         "User-Agent": "vscode-restclient",
+                                                                         "Accept-Encoding": "gzip"
+                                                                     });
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
         this.requestNameAsResponseTabTitle = restClientSettings.get<boolean>("requestNameAsResponseTabTitle", false);
         this.rememberCookiesForSubsequentRequests = restClientSettings.get<boolean>("rememberCookiesForSubsequentRequests", true);
@@ -123,9 +123,9 @@ export class RestClientSettings implements IRestClientSettings {
             this.timeoutInMilliseconds = 0;
         }
         this.excludeHostsForProxy = restClientSettings.get<string[]>("excludeHostsForProxy", []);
-        this.fontSize = restClientSettings.get<number>("fontSize", null);
-        this.fontFamily = restClientSettings.get<string>("fontFamily", null);
-        this.fontWeight = restClientSettings.get<string>("fontWeight", null);
+        this.fontSize = restClientSettings.get<number>("fontSize");
+        this.fontFamily = restClientSettings.get<string>("fontFamily");
+        this.fontWeight = restClientSettings.get<string>("fontWeight");
 
         this.environmentVariables = restClientSettings.get<Map<string, Map<string, string>>>("environmentVariables", new Map<string, Map<string, string>>());
         this.mimeAndFileExtensionMapping = restClientSettings.get<Map<string, string>>("mimeAndFileExtensionMapping", new Map<string, string>());
@@ -148,7 +148,7 @@ export class RestClientSettings implements IRestClientSettings {
         languages.setLanguageConfiguration('http', { brackets: this.addRequestBodyLineIndentationAroundBrackets ? this.brackets : [] });
 
         const httpSettings = workspace.getConfiguration("http");
-        this.proxy = httpSettings.get<string>('proxy', undefined);
+        this.proxy = httpSettings.get<string>('proxy');
         this.proxyStrictSSL = httpSettings.get<boolean>('proxyStrictSSL', false);
     }
 

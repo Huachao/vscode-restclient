@@ -5,9 +5,9 @@ import * as Constants from '../common/constants';
 import { VariableUtility } from '../utils/variableUtility';
 
 export class FileVariableDefinitionProvider implements DefinitionProvider {
-    public async provideDefinition(document: TextDocument, position: Position, token: CancellationToken): Promise<Definition> {
+    public async provideDefinition(document: TextDocument, position: Position, token: CancellationToken): Promise<Definition | undefined> {
         if (!VariableUtility.isEnvironmentOrFileVariableReference(document, position)) {
-            return;
+            return undefined;
         }
 
         const documentLines = document.getText().split(Constants.LineSplitterRegex);

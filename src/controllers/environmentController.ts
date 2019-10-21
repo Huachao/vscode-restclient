@@ -29,21 +29,21 @@ export class EnvironmentController {
 
     @trace('Switch Environment')
     public async switchEnvironment() {
-        let currentEnvironment = await EnvironmentController.getCurrentEnvironment();
-        let itemPickList: EnvironmentPickItem[] = [];
+        const currentEnvironment = await EnvironmentController.getCurrentEnvironment();
+        const itemPickList: EnvironmentPickItem[] = [];
         itemPickList.push(EnvironmentController.noEnvironmentPickItem);
-        for (let name in EnvironmentController.settings.environmentVariables) {
+        for (const name in EnvironmentController.settings.environmentVariables) {
             if (name === EnvironmentController.sharedEnvironmentName) {
                 continue;
             }
-            let item = new EnvironmentPickItem(name, name);
+            const item = new EnvironmentPickItem(name, name);
             if (item.name === currentEnvironment.name) {
                 item.description = '$(check)';
             }
             itemPickList.push(item);
         }
 
-        let item = await window.showQuickPick(itemPickList, { placeHolder: "Select REST Client Environment" });
+        const item = await window.showQuickPick(itemPickList, { placeHolder: "Select REST Client Environment" });
         if (!item) {
             return;
         }

@@ -30,9 +30,9 @@ export class HARPostData {
             if (text) {
                 text = decodeURIComponent(text.replace(/\+/g, '%20'));
                 this.params = [];
-                let pairs = text.split('&');
+                const pairs = text.split('&');
                 pairs.forEach(pair => {
-                    let [key, ...values] = pair.split('=');
+                    const [key, ...values] = pair.split('=');
                     this.params.push(new HARParam(key, values.join('=')));
                 });
             }
@@ -43,7 +43,7 @@ export class HARPostData {
 export class HARHttpRequest {
     public queryString: HARParam[];
 
-    public constructor(public method: string, public url: string, public headers: HARHeader[], public cookies: HARCookie[], public postData: HARPostData) {
+    public constructor(public method: string, public url: string, public headers: HARHeader[], public cookies: HARCookie[], public postData?: HARPostData) {
         const queryObj = urlParse(url, true).query;
         this.queryString = this.flatten(queryObj);
     }

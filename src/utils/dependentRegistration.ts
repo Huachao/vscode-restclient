@@ -4,7 +4,7 @@ import { Disposable } from 'vscode';
 import { RestClientSettings } from '../models/configurationSettings';
 
 class ConditionalRegistration {
-    private registration: Disposable;
+    private registration: Disposable | undefined;
 
     public constructor(private readonly doRegister: () => Disposable) {
     }

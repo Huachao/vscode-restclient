@@ -44,12 +44,12 @@ export class FileVariableProvider implements HttpVariableProvider {
 
     public readonly type: VariableType = VariableType.File;
 
-    public async has(document: TextDocument, name: string): Promise<boolean> {
+    public async has(name: string, document: TextDocument): Promise<boolean> {
         const variables = await this.getFileVariables(document);
         return variables.some(v => v.name === name);
     }
 
-    public async get(document: TextDocument, name: string): Promise<HttpVariable> {
+    public async get(name: string, document: TextDocument): Promise<HttpVariable> {
         const variables = await this.getFileVariables(document);
         const variable = variables.find(v => v.name === name);
         if (!variable) {
@@ -73,7 +73,7 @@ export class FileVariableProvider implements HttpVariableProvider {
         if (!this.cache.has(file) || fileHash !== this.fileMD5Hash.get(file)) {
             const regex = new RegExp(Constants.FileVariableDefinitionRegex, 'mg');
             const variables = new Map<string, FileVariableValue>();
-            let match: RegExpExecArray;
+            let match: RegExpExecArray | null;
             while (match = regex.exec(fileContent)) {
                 const [, key, originalValue] = match;
                 let value = "";
@@ -96,7 +96,7 @@ export class FileVariableProvider implements HttpVariableProvider {
             this.fileMD5Hash.set(file, fileHash);
         }
 
-        return this.cache.get(file);
+        return this.cache.get(file)!;
     }
 
     private async resolveFileVariables(document: TextDocument, variables: FileVariableValue[]): Promise<Map<string, string>> {
@@ -121,7 +121,7 @@ export class FileVariableProvider implements HttpVariableProvider {
                 dependencyCount.set(name, dependentVariableNames.size);
                 dependentVariableNames.forEach(dname => {
                     if (dependentVariables.has(dname)) {
-                        dependentVariables.get(dname).push(name);
+                        dependentVariables.get(dname)!.push(name);
                     } else {
                         dependentVariables.set(dname, [name]);
                     }
@@ -132,17 +132,17 @@ export class FileVariableProvider implements HttpVariableProvider {
         // Resolve all dependent file variables to actual value
         while (noDependencyVariables.length !== 0) {
             const current = noDependencyVariables.shift();
-            if (!dependentVariables.has(current)) {
+            if (!dependentVariables.has(current!)) {
                 continue;
             }
-            const dependents = dependentVariables.get(current);
-            dependents.forEach(d => {
+            const dependents = dependentVariables.get(current!);
+            dependents!.forEach(d => {
                 const originalValue = variableMap.get(d);
-                const currentValue = originalValue.replace(
+                const currentValue = originalValue!.replace(
                     new RegExp(`{{\\s*${current}\s*}}`, 'g'),
-                    variableMap.get(current));
+                    variableMap.get(current!)!);
                 variableMap.set(d, currentValue);
-                const newCount = dependencyCount.get(d) - 1;
+                const newCount = dependencyCount.get(d)! - 1;
                 if (newCount === 0) {
                     noDependencyVariables.push(d);
                     dependencyCount.delete(d);
@@ -158,7 +158,7 @@ export class FileVariableProvider implements HttpVariableProvider {
     private async processNonFileVariableValue(document: TextDocument, value: string, variables: Set<string>): Promise<string> {
         const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;
         let result = '';
-        let match: RegExpExecArray;
+        let match: RegExpExecArray | null;
         let lastIndex = 0;
         variable:
         while (match = variableReferenceRegex.exec(value)) {
@@ -168,8 +168,8 @@ export class FileVariableProvider implements HttpVariableProvider {
             if (!variables.has(name)) {
                 const context = { rawRequest: value, parsedRequest: result };
                 for (const provider of this.innerVariableProviders) {
-                    if (await provider.has(document, name, context)) {
-                        const { value, error, warning } = await provider.get(document, name, context);
+                    if (await provider.has(name, document, context)) {
+                        const { value, error, warning } = await provider.get(name, document, context);
                         if (!error && !warning) {
                             result += value;
                             continue variable;
@@ -188,8 +188,8 @@ export class FileVariableProvider implements HttpVariableProvider {
 
     private resolveDependentFileVariableNames(value: string): string[] {
         const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;
-        let match: RegExpExecArray;
-        const result = [];
+        let match: RegExpExecArray | null;
+        const result: string[] = [];
         while (match = variableReferenceRegex.exec(value)) {
             result.push(match[1].trim());
         }

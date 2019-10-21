@@ -28,7 +28,7 @@ export class RequestStore {
         }
     }
 
-    public getLatest(): HttpRequest {
+    public getLatest(): HttpRequest | undefined {
         return this.cache.get(this.currentRequestId);
     }
 

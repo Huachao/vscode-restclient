@@ -21,7 +21,7 @@ export interface HttpVariableContext {
 
 export interface HttpVariableProvider {
     readonly type: VariableType;
-    has(document: TextDocument, name: string, context: HttpVariableContext): Promise<boolean>;
-    get(document: TextDocument, name: string, context: HttpVariableContext): Promise<HttpVariable>;
-    getAll(document: TextDocument, context: HttpVariableContext): Promise<HttpVariable[]>;
+    has(name: string, document?: TextDocument, context?: HttpVariableContext): Promise<boolean>;
+    get(name: string, document?: TextDocument, context?: HttpVariableContext): Promise<HttpVariable>;
+    getAll(document?: TextDocument, context?: HttpVariableContext): Promise<HttpVariable[]>;
 }

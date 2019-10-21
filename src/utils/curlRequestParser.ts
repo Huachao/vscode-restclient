@@ -3,7 +3,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Uri } from 'vscode';
-import { Headers } from '../models/base';
+import { RequestHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
 import { IRequestParser } from '../models/IRequestParser';
 import { hasHeader } from './misc';
@@ -16,7 +16,7 @@ const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
 export class CurlRequestParser implements IRequestParser {
 
-    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest {
+    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest | null {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(requestRawText.trim()));
         requestText = requestText
@@ -31,7 +31,7 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         // parse header
-        let headers: Headers = {};
+        let headers: RequestHeaders = {};
         let parsedHeaders = parsedArguments.H || parsedArguments.header;
         if (parsedHeaders) {
             if (!Array.isArray(parsedHeaders)) {
@@ -41,13 +41,13 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         // parse cookie
-        let cookieString: string = parsedArguments.b || parsedArguments.cookie;
+        const cookieString: string = parsedArguments.b || parsedArguments.cookie;
         if (cookieString && cookieString.includes('=')) {
             // Doesn't support cookie jar
             headers['Cookie'] = cookieString;
         }
 
-        let user = parsedArguments.u || parsedArguments.user;
+        const user = parsedArguments.u || parsedArguments.user;
         if (user) {
             headers['Authorization'] = `Basic ${Buffer.from(user).toString('base64')}`;
         }
@@ -59,7 +59,7 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         if (typeof body === 'string' && body[0] === '@') {
-            let fileAbsolutePath = CurlRequestParser.resolveFilePath(body.substring(1), requestAbsoluteFilePath);
+            const fileAbsolutePath = CurlRequestParser.resolveFilePath(body.substring(1), requestAbsoluteFilePath);
             if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
                 body = fs.createReadStream(fileAbsolutePath);
             } else {
@@ -73,7 +73,7 @@ export class CurlRequestParser implements IRequestParser {
         }
 
         // parse method
-        let method: string = <string>(parsedArguments.X || parsedArguments.request);
+        let method: string = (parsedArguments.X || parsedArguments.request) as string;
         if (!method) {
             method = body ? "POST" : "GET";
         }
@@ -81,13 +81,13 @@ export class CurlRequestParser implements IRequestParser {
         return new HttpRequest(method, url, headers, body, body);
     }
 
-    private static resolveFilePath(refPath: string, httpFilePath: string): string {
+    private static resolveFilePath(refPath: string, httpFilePath: string): string | undefined {
         if (path.isAbsolute(refPath)) {
-            return fs.existsSync(refPath) ? refPath : null;
+            return fs.existsSync(refPath) ? refPath : undefined;
         }
 
-        let rootPath = getWorkspaceRootPath();
-        let absolutePath;
+        const rootPath = getWorkspaceRootPath();
+        let absolutePath: string;
         if (rootPath) {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, refPath);
             if (fs.existsSync(absolutePath)) {
@@ -100,7 +100,7 @@ export class CurlRequestParser implements IRequestParser {
             return absolutePath;
         }
 
-        return null;
+        return undefined;
     }
 
     private static mergeIntoSingleLine(text: string): string {

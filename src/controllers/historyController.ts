@@ -19,14 +19,14 @@ export class HistoryController {
     @trace('History')
     public async save() {
         try {
-            let requests = await PersistUtility.loadRequests();
+            const requests = await PersistUtility.loadRequests();
             if (!requests || requests.length <= 0) {
                 window.showInformationMessage("No request history items are found!");
                 return;
             }
-            let itemPickList: HistoryQuickPickItem[] = requests.map(request => {
+            const itemPickList: HistoryQuickPickItem[] = requests.map(request => {
                 // TODO: add headers and body in pick item?
-                let item = new HistoryQuickPickItem();
+                const item = new HistoryQuickPickItem();
                 item.label = `${request.method.toUpperCase()} ${request.url}`;
                 if (request.body && typeof request.body === 'string' && request.body.length > 0) {
                     item.description = `${request.body.length} body bytes`;
@@ -38,12 +38,12 @@ export class HistoryController {
                 return item;
             });
 
-            let item = await window.showQuickPick(itemPickList, { placeHolder: "" });
+            const item = await window.showQuickPick(itemPickList, { placeHolder: "" });
             if (!item) {
                 return;
             }
-            let path = await this.createRequestInTempFile(item.rawRequest);
-            let document = await workspace.openTextDocument(path);
+            const path = await this.createRequestInTempFile(item.rawRequest);
+            const document = await workspace.openTextDocument(path);
             window.showTextDocument(document);
         } catch (error) {
             this.errorHandler(error, 'Failed to persist the request into history file:');
@@ -76,9 +76,9 @@ export class HistoryController {
                 }
                 let output = `${request.method.toUpperCase()} ${request.url}${EOL}`;
                 if (request.headers) {
-                    for (let header in request.headers) {
+                    for (const header in request.headers) {
                         if (request.headers.hasOwnProperty(header)) {
-                            let value = request.headers[header];
+                            const value = request.headers[header];
                             output += `${header}: ${value}${EOL}`;
                         }
                     }

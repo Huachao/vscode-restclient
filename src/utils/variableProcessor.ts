@@ -1,12 +1,13 @@
 'use strict';
 
-import { TextDocument, window } from 'vscode';
+import { TextDocument } from 'vscode';
 import { VariableType } from "../models/variableType";
 import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
 import { HttpVariableProvider } from './httpVariableProviders/httpVariableProvider';
 import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
 import { SystemVariableProvider } from './httpVariableProviders/systemVariableProvider';
+import { getCurrentTextDocument } from './workspaceUtility';
 
 export class VariableProcessor {
 
@@ -20,7 +21,7 @@ export class VariableProcessor {
     public static async processRawRequest(request: string) {
         const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;
         let result = '';
-        let match: RegExpExecArray;
+        let match: RegExpExecArray | null;
         let lastIndex = 0;
         const resolvedVariables = new Map<string, string>();
         variable:
@@ -28,15 +29,15 @@ export class VariableProcessor {
             result += request.substring(lastIndex, match.index);
             lastIndex = variableReferenceRegex.lastIndex;
             const name = match[1].trim();
-            const document = window.activeTextEditor.document;
+            const document = getCurrentTextDocument();
             const context = { rawRequest: request, parsedRequest: result };
             for (const [provider, cacheable] of VariableProcessor.providers) {
                 if (resolvedVariables.has(name)) {
                     result += resolvedVariables.get(name);
                     continue variable;
                 }
-                if (await provider.has(document, name, context)) {
-                    const { value, error, warning } = await provider.get(document, name, context);
+                if (await provider.has(name, document, context)) {
+                    const { value, error, warning } = await provider.get(name, document, context);
                     if (!error && !warning) {
                         if (cacheable) {
                             resolvedVariables.set(name, value as string);
@@ -59,14 +60,14 @@ export class VariableProcessor {
         const [, [requestProvider], [fileProvider], [environmentProvider]] = VariableProcessor.providers;
         const requestVariables = await (requestProvider as RequestVariableProvider).getAll(document);
         const fileVariables = await (fileProvider as FileVariableProvider).getAll(document);
-        const environmentVariables = await (environmentProvider as EnvironmentVariableProvider).getAll(document);
+        const environmentVariables = await (environmentProvider as EnvironmentVariableProvider).getAll();
 
         const variableDefinitions = new Map<string, VariableType[]>();
 
         // Request variables in file
         requestVariables.forEach(({ name }) => {
             if (variableDefinitions.has(name)) {
-                variableDefinitions.get(name).push(VariableType.Request);
+                variableDefinitions.get(name)!.push(VariableType.Request);
             } else {
                 variableDefinitions.set(name, [VariableType.Request]);
             }
@@ -75,7 +76,7 @@ export class VariableProcessor {
         // Normal file variables
         fileVariables.forEach(({ name }) => {
             if (variableDefinitions.has(name)) {
-                variableDefinitions.get(name).push(VariableType.File);
+                variableDefinitions.get(name)!.push(VariableType.File);
             } else {
                 variableDefinitions.set(name, [VariableType.File]);
             }
@@ -84,7 +85,7 @@ export class VariableProcessor {
         // Environment variables
         environmentVariables.forEach(({ name }) => {
             if (variableDefinitions.has(name)) {
-                variableDefinitions.get(name).push(VariableType.Environment);
+                variableDefinitions.get(name)!.push(VariableType.Environment);
             } else {
                 variableDefinitions.set(name, [VariableType.Environment]);
             }

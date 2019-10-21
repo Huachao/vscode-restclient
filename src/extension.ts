@@ -28,11 +28,11 @@ import { ConfigurationDependentRegistration } from './utils/dependentRegistratio
 export async function activate(context: ExtensionContext) {
     const logger = new Logger();
 
-    let requestController = new RequestController(context, logger);
-    let historyController = new HistoryController(logger);
-    let responseController = new ResponseController();
-    let codeSnippetController = new CodeSnippetController();
-    let environmentController = new EnvironmentController(await EnvironmentController.getCurrentEnvironment());
+    const requestController = new RequestController(context, logger);
+    const historyController = new HistoryController(logger);
+    const responseController = new ResponseController();
+    const codeSnippetController = new CodeSnippetController();
+    const environmentController = new EnvironmentController(await EnvironmentController.getCurrentEnvironment());
     context.subscriptions.push(requestController);
     context.subscriptions.push(historyController);
     context.subscriptions.push(responseController);

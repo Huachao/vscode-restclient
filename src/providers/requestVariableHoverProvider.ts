@@ -6,16 +6,19 @@ import { VariableUtility } from '../utils/variableUtility';
 
 export class RequestVariableHoverProvider implements HoverProvider {
 
-    public async provideHover(document: TextDocument, position: Position, token: CancellationToken): Promise<Hover> {
+    public async provideHover(document: TextDocument, position: Position, token: CancellationToken): Promise<Hover | undefined> {
         if (!VariableUtility.isRequestVariableReference(document, position)) {
-            return;
+            return undefined;
         }
 
         const wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
-        let lineRange = document.lineAt(position);
+        const lineRange = document.lineAt(position);
 
-        const fullPath = this.getRequestVariableHoverPath(wordRange, lineRange);
-        const { name, value, warning, error } = await RequestVariableProvider.Instance.get(document, fullPath);
+        const fullPath = this.getRequestVariableHoverPath(wordRange!, lineRange);
+        if (!fullPath) {
+            return undefined;
+        }
+        const { name, value, warning, error } = await RequestVariableProvider.Instance.get(fullPath, document);
         if (!error && !warning) {
             const contents: MarkedString[] = [];
             if (value) {
@@ -27,7 +30,7 @@ export class RequestVariableHoverProvider implements HoverProvider {
             return new Hover(contents, wordRange);
         }
 
-        return;
+        return undefined;
     }
 
     private getRequestVariableHoverPath(wordRange: Range, lineRange: TextLine) {

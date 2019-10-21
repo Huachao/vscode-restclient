@@ -16,12 +16,12 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
         const base = path.dirname(document.uri.toString());
         const text = document.getText();
 
-        let lines: string[] = text.split(Constants.LineSplitterRegex);
+        const lines: string[] = text.split(Constants.LineSplitterRegex);
         for (let index = 0; index < lines.length; index++) {
-            let line = lines[index];
-            let match: RegExpMatchArray;
+            const line = lines[index];
+            let match: RegExpMatchArray | null;
             if (match = this._linkPattern.exec(line)) {
-                let filePath = match[2];
+                const filePath = match[2];
                 const offset = match[1].length;
                 const linkStart = new Position(index, offset);
                 const linkEnd = new Position(index, offset + filePath.length);

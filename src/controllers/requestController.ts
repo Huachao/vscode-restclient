@@ -1,7 +1,7 @@
 "use strict";
 
 import { EOL } from 'os';
-import { ExtensionContext, OutputChannel, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
+import { ExtensionContext, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";
 import * as Constants from '../common/constants';
 import { Logger } from '../logger';
@@ -34,7 +34,6 @@ export class RequestController {
     private _httpClient: HttpClient;
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
-    private _outputChannel: OutputChannel;
 
     public constructor(context: ExtensionContext, private readonly logger: Logger) {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
@@ -66,7 +65,7 @@ export class RequestController {
         const requestVariable = Selector.getRequestVariableDefinitionName(selectedText);
 
         // remove comment lines
-        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
+        const lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
         if (lines.length === 0 || lines.every(line => line === '')) {
             return;
         }
@@ -86,7 +85,7 @@ export class RequestController {
         }
 
         // parse http request
-        let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
+        const httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
         if (!httpRequest) {
             return;
         }
@@ -100,7 +99,7 @@ export class RequestController {
 
     @trace('Rerun Request')
     public async rerun() {
-        let httpRequest = this._requestStore.getLatest();
+        const httpRequest = this._requestStore.getLatest();
         if (!httpRequest) {
             return;
         }
@@ -121,11 +120,11 @@ export class RequestController {
         this._requestStore.cancel();
 
         this._durationStatusBarItem.text = 'Cancelled $(circle-slash)';
-        this._durationStatusBarItem.tooltip = null;
+        this._durationStatusBarItem.tooltip = undefined;
     }
 
     private async runCore(httpRequest: HttpRequest, jmesQuery: string = '') {
-        let requestId = uuidv4();
+        const requestId = uuidv4();
         this._requestStore.add(<string>requestId, httpRequest);
 
         // clear status bar
@@ -133,7 +132,7 @@ export class RequestController {
 
         // set http request
         try {
-            let response = await this._httpClient.send(httpRequest);
+            const response = await this._httpClient.send(httpRequest);
 
             // check cancel
             if (this._requestStore.isCancelled(<string>requestId)) {
@@ -151,16 +150,16 @@ export class RequestController {
             }
 
             try {
-                const activeColumn = window.activeTextEditor.viewColumn;
+                const activeColumn = window.activeTextEditor!.viewColumn;
                 const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
                     ? activeColumn
                     : ((activeColumn as number) + 1) as ViewColumn;
                 
                 if (jmesQuery) {
-                    this.EvaluateJMESPathExpression(response, previewColumn, jmesQuery);
+                    this.EvaluateJMESPathExpression(response, jmesQuery, previewColumn);
                 } else if (this._restClientSettings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
-                } else {
+                } else if (previewColumn) {
                     this._webview.render(response, previewColumn);
                 }
             } catch (reason) {
@@ -169,7 +168,7 @@ export class RequestController {
             }
 
             // persist to history json file
-            let serializedRequest = SerializedHttpRequest.convertFromHttpRequest(httpRequest);
+            const serializedRequest = SerializedHttpRequest.convertFromHttpRequest(httpRequest);
             await PersistUtility.saveRequest(serializedRequest);
         } catch (error) {
             // check cancel
@@ -193,10 +192,10 @@ export class RequestController {
         }
     }
 
-    private EvaluateJMESPathExpression(response: HttpResponse, previewColumn: number, query: string) {
+    private EvaluateJMESPathExpression(response: HttpResponse, query: string, column?: ViewColumn) {
         try {
             let result = jmespath.search(JSON.parse(response.body), query);
-            this._textDocumentView.renderContent(JSON.stringify(result, null, 1), previewColumn, 'json');
+            this._textDocumentView.renderContent(JSON.stringify(result, null, 1), 'json', column);
         } catch (err) {
             let errorMessage = `${err.name}: ${err.message}`;
             window.showErrorMessage(errorMessage);
@@ -207,7 +206,6 @@ export class RequestController {
         this._durationStatusBarItem.dispose();
         this._sizeStatusBarItem.dispose();
         this._webview.dispose();
-        this._outputChannel.dispose();
     }
 
     private setSendingProgressStatusText() {

@@ -6,7 +6,7 @@ import * as path from 'path';
 import { Readable, Stream } from 'stream';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
-import { Headers } from '../models/base';
+import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HostCertificate } from '../models/hostCertificate';
 import { HttpRequest } from '../models/httpRequest';
@@ -15,7 +15,7 @@ import { HttpResponseTimingPhases } from '../models/httpResponseTimingPhases';
 import { MimeUtility } from './mimeUtility';
 import { getHeader, hasHeader } from './misc';
 import { PersistUtility } from './persistUtility';
-import { getWorkspaceRootPath } from './workspaceUtility';
+import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
 const encodeUrl = require('encodeurl');
 const request = require('request');
@@ -47,10 +47,10 @@ export class HttpClient {
                     return;
                 }
 
-                let contentType = getHeader(response.headers, 'Content-Type');
-                let encoding: string;
+                const contentType = getHeader(response.headers, 'Content-Type');
+                let encoding: string | undefined;
                 if (contentType) {
-                    encoding = MimeUtility.parse(contentType).charset;
+                    encoding = MimeUtility.parse(contentType as string).charset;
                 }
 
                 if (!encoding) {
@@ -68,18 +68,14 @@ export class HttpClient {
                 }
 
                 if (that._settings.decodeEscapedUnicodeCharacters) {
-                    bodyString = that.decodeEscapedUnicodeCharacters(bodyString);
+                    bodyString = that.decodeEscapedUnicodeCharacters(bodyString!);
                 }
 
                 // adjust response header case, due to the response headers in request package is in lowercase
-                let headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
-                let adjustedResponseHeaders: Headers = {};
-                for (let header in response.headers) {
-                    let adjustedHeaderName = header;
-                    if (headersDic[header]) {
-                        adjustedHeaderName = headersDic[header];
-                        adjustedResponseHeaders[headersDic[header]] = response.headers[header];
-                    }
+                const headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
+                const adjustedResponseHeaders: ResponseHeaders = {};
+                for (const header in response.headers) {
+                    const adjustedHeaderName = headersDic[header] || header;
                     adjustedResponseHeaders[adjustedHeaderName] = response.headers[header];
                 }
 
@@ -90,7 +86,7 @@ export class HttpClient {
                     response.statusMessage,
                     response.httpVersion,
                     adjustedResponseHeaders,
-                    bodyString,
+                    bodyString!,
                     response.elapsedTime,
                     size,
                     headersSize,
@@ -126,7 +122,7 @@ export class HttpClient {
 
     private async prepareOptions(httpRequest: HttpRequest): Promise<{ [key: string]: any }> {
         const originalRequestBody = httpRequest.body;
-        let requestBody: string | Buffer;
+        let requestBody: string | Buffer | undefined;
         if (originalRequestBody) {
             if (typeof originalRequestBody !== 'string') {
                 requestBody = await this.convertStreamToBuffer(originalRequestBody);
@@ -135,7 +131,7 @@ export class HttpClient {
             }
         }
 
-        let options: any = {
+        const options: any = {
             url: encodeUrl(httpRequest.url),
             headers: httpRequest.headers,
             method: httpRequest.method,
@@ -151,13 +147,13 @@ export class HttpClient {
         };
 
         // set auth to digest if Authorization header follows: Authorization: Digest username password
-        let authorization = getHeader(options.headers, 'Authorization');
+        const authorization = getHeader(options.headers, 'Authorization') as string | undefined;
         if (authorization) {
-            let start = authorization.indexOf(' ');
-            let scheme = authorization.substr(0, start);
+            const start = authorization.indexOf(' ');
+            const scheme = authorization.substr(0, start);
             if (scheme === 'Digest' || scheme === 'Basic') {
-                let params = authorization.substr(start).trim().split(' ');
-                let [user, pass] = params;
+                const params = authorization.substr(start).trim().split(' ');
+                const [user, pass] = params;
                 if (user && pass) {
                     options.auth = {
                         user,
@@ -169,7 +165,7 @@ export class HttpClient {
         }
 
         // set certificate
-        let certificate = this.getRequestCertificate(httpRequest.url);
+        const certificate = this.getRequestCertificate(httpRequest.url);
         if (certificate) {
             options.cert = certificate.cert;
             options.key = certificate.key;
@@ -180,10 +176,10 @@ export class HttpClient {
         // set proxy
         if (this._settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, this._settings.excludeHostsForProxy)) {
             const proxyEndpoint = url.parse(this._settings.proxy);
-            if (/^https?:$/.test(proxyEndpoint.protocol)) {
+            if (/^https?:$/.test(proxyEndpoint.protocol || '')) {
                 const proxyOptions = {
                     host: proxyEndpoint.hostname,
-                    port: +proxyEndpoint.port,
+                    port: Number(proxyEndpoint.port),
                     rejectUnauthorized: this._settings.proxyStrictSSL
                 };
 
@@ -204,7 +200,7 @@ export class HttpClient {
         }
 
         // add default headers if not specified
-        for (let header in this._settings.defaultHeaders) {
+        for (const header in this._settings.defaultHeaders) {
             if (!hasHeader(options.headers, header) && (header.toLowerCase() !== 'host' || httpRequest.url[0] === '/')) {
                 const value = this._settings.defaultHeaders[header];
                 if (value) {
@@ -244,37 +240,43 @@ export class HttpClient {
         return body.replace(/\\u([\d\w]{4})/gi, (_, g) => String.fromCharCode(parseInt(g, 16)));
     }
 
-    private getRequestCertificate(requestUrl: string): { cert?: string, key?: string, pfx?: string, passphrase?: string } {
+    private getRequestCertificate(requestUrl: string): HostCertificate | null {
         const host = url.parse(requestUrl).host;
+        if (!host) {
+            return null;
+        }
+
         if (host in this._settings.hostCertificates) {
-            let certificate = this._settings.hostCertificates[host];
-            let cert = undefined,
-                key = undefined,
-                pfx = undefined;
+            const certificate = this._settings.hostCertificates[host];
+            let cert: Buffer | undefined,
+                key: Buffer | undefined,
+                pfx: Buffer | undefined;
             if (certificate.cert) {
-                let certPath = HttpClient.resolveCertificateFullPath(certificate.cert, "cert");
+                const certPath = HttpClient.resolveCertificateFullPath(certificate.cert, "cert");
                 if (certPath) {
                     cert = fs.readFileSync(certPath);
                 }
             }
             if (certificate.key) {
-                let keyPath = HttpClient.resolveCertificateFullPath(certificate.key, "key");
+                const keyPath = HttpClient.resolveCertificateFullPath(certificate.key, "key");
                 if (keyPath) {
                     key = fs.readFileSync(keyPath);
                 }
             }
             if (certificate.pfx) {
-                let pfxPath = HttpClient.resolveCertificateFullPath(certificate.pfx, "pfx");
+                const pfxPath = HttpClient.resolveCertificateFullPath(certificate.pfx, "pfx");
                 if (pfxPath) {
                     pfx = fs.readFileSync(pfxPath);
                 }
             }
             return new HostCertificate(cert, key, pfx, certificate.passphrase);
         }
+
+        return null;
     }
 
-    private static getResponseRawHeaderNames(rawHeaders: string[]): Headers {
-        let result: Headers = {};
+    private static getResponseRawHeaderNames(rawHeaders: string[]): { [key: string]: string } {
+        const result: { [key: string]: string } = {};
         rawHeaders.forEach(header => {
             result[header.toLowerCase()] = header;
         });
@@ -286,14 +288,13 @@ export class HttpClient {
             return false;
         }
 
-        let resolvedUrl = url.parse(requestUrl);
-        let hostName = resolvedUrl.hostname && resolvedUrl.hostname.toLowerCase();
-        let port = resolvedUrl.port;
-        let excludeHostsProxyList = Array.from(new Set(excludeHostsForProxy.map(eh => eh.toLowerCase())));
+        const resolvedUrl = url.parse(requestUrl);
+        const hostName = resolvedUrl.hostname && resolvedUrl.hostname.toLowerCase();
+        const port = resolvedUrl.port;
+        const excludeHostsProxyList = Array.from(new Set(excludeHostsForProxy.map(eh => eh.toLowerCase())));
 
-        for (let index = 0; index < excludeHostsProxyList.length; index++) {
-            let eh = excludeHostsProxyList[index];
-            let urlParts = eh.split(":");
+        for (const eh of excludeHostsProxyList) {
+            const urlParts = eh.split(":");
             if (!port) {
                 // if no port specified in request url, host name must exactly match
                 if (urlParts.length === 1 && urlParts[0] === hostName) {
@@ -301,7 +302,7 @@ export class HttpClient {
                 }
             } else {
                 // if port specified, match host without port or hostname:port exactly match
-                let [ph, pp] = urlParts;
+                const [ph, pp] = urlParts;
                 if (ph === hostName && (!pp || pp === port)) {
                     return true;
                 }
@@ -311,18 +312,18 @@ export class HttpClient {
         return false;
     }
 
-    private static resolveCertificateFullPath(absoluteOrRelativePath: string, certName: string): string {
+    private static resolveCertificateFullPath(absoluteOrRelativePath: string, certName: string): string | undefined {
         if (path.isAbsolute(absoluteOrRelativePath)) {
             if (!fs.existsSync(absoluteOrRelativePath)) {
                 window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
-                return;
+                return undefined;
             } else {
                 return absoluteOrRelativePath;
             }
         }
 
         // the path should be relative path
-        let rootPath = getWorkspaceRootPath();
+        const rootPath = getWorkspaceRootPath();
         let absolutePath = '';
         if (rootPath) {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
@@ -330,24 +331,29 @@ export class HttpClient {
                 return absolutePath;
             } else {
                 window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
-                return;
+                return undefined;
             }
         }
 
-        absolutePath = path.join(path.dirname(window.activeTextEditor.document.fileName), absoluteOrRelativePath);
+        const currentFilePath = getCurrentHttpFileName();
+        if (!currentFilePath) {
+            return undefined;
+        }
+
+        absolutePath = path.join(path.dirname(currentFilePath), absoluteOrRelativePath);
         if (fs.existsSync(absolutePath)) {
             return absolutePath;
         } else {
             window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
-            return;
+            return undefined;
         }
     }
 
-    private static capitalizeHeaderName(headers: Headers): Headers {
-        let normalizedHeaders = {};
+    private static capitalizeHeaderName(headers: RequestHeaders): RequestHeaders {
+        const normalizedHeaders = {};
         if (headers) {
-            for (let header in headers) {
-                let capitalizedName = header.replace(/([^-]+)/g, h => h.charAt(0).toUpperCase() + h.slice(1));
+            for (const header in headers) {
+                const capitalizedName = header.replace(/([^-]+)/g, h => h.charAt(0).toUpperCase() + h.slice(1));
                 normalizedHeaders[capitalizedName] = headers[header];
             }
         }

@@ -5,7 +5,7 @@ import * as adal from 'adal-node';
 export class AadTokenCache {
     private static cache = new Map<string, adal.TokenResponse>();
 
-    public static get(key: string): adal.TokenResponse {
+    public static get(key: string): adal.TokenResponse | undefined {
         return AadTokenCache.cache.get(key);
     }
 

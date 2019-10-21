@@ -48,7 +48,7 @@ export class CodeSnippetWebview extends BaseWebview {
             panel.title = title;
         }
 
-        panel.webview.html = this.getHtmlForWebview(convertResult, lang);
+        panel.webview.html = this.getHtmlForWebview(panel, convertResult, lang);
 
         commands.executeCommand('setContext', this.codeSnippetPreviewActiveContextKey, true);
 
@@ -59,11 +59,11 @@ export class CodeSnippetWebview extends BaseWebview {
         disposeAll(this.panels);
     }
 
-    private getHtmlForWebview(convertResult: string, lang: string): string {
+    private getHtmlForWebview(panel: WebviewPanel, convertResult: string, lang: string): string {
         const csp = this.getCsp();
         return `
             <head>
-                <link rel="stylesheet" href="${this.styleFilePath}">
+                <link rel="stylesheet" href="${panel.webview.asWebviewUri(this.styleFilePath)}">
                 ${csp}
             </head>
             <body>

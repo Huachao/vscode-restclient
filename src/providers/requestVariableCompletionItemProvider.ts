@@ -14,16 +14,16 @@ const firstPartRegex: RegExp = /^(\w+)\.$/;
 const secondPartRegex: RegExp = /^(\w+)\.(request|response)\.$/;
 
 export class RequestVariableCompletionItemProvider implements CompletionItemProvider {
-    public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
+    public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[] | undefined> {
         if (!VariableUtility.isPartialRequestVariableReference(document, position)) {
             return [];
         }
 
 
         const wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
-        let lineRange = document.lineAt(position);
+        const lineRange = document.lineAt(position);
 
-        let fullPath = this.getRequestVariableCompletionPath(wordRange, lineRange, position);
+        let fullPath = this.getRequestVariableCompletionPath(wordRange!, lineRange, position);
 
         if (!fullPath) {
             return undefined;
@@ -58,7 +58,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
                 if (result.state === ResolveState.Warning && result.message === ResolveWarningMessage.MissingHeaderName) {
                     const {value} = result;
                     return Object.keys(value).map(p => {
-                        let item = new CompletionItem(p);
+                        const item = new CompletionItem(p);
                         item.detail = `HTTP ${ElementType[ElementType.RequestCustomVariable]}`;
                         item.documentation = new MarkdownString(`Value: \`${value[p]}\``);
                         item.insertText = p;
@@ -69,7 +69,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
             }
         }
 
-        return;
+        return undefined;
     }
 
     private checkIfRequestVariableDefined(document: TextDocument, variableName: string) {
