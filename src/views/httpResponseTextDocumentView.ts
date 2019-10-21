@@ -27,6 +27,26 @@ export class HttpResponseTextDocumentView {
     public async render(response: HttpResponse, column: ViewColumn) {
         const content = this.getTextDocumentContent(response);
         const language = this.getVSCodeDocumentLanguageId(response);
+        this.renderContent(content, column, language);
+
+        // let document: TextDocument;
+        // if (this.settings.showResponseInDifferentTab || this.documents.length === 0) {
+        //     document = await workspace.openTextDocument({ language, content });
+        //     this.documents.push(document);
+        //     await window.showTextDocument(document, { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus, preview: false });
+        // } else {
+        //     document = this.documents[this.documents.length - 1];
+        //     languages.setTextDocumentLanguage(document, language);
+        //     const editor = await window.showTextDocument(document, { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus, preview: false });
+        //     editor.edit(edit => {
+        //         const startPosition = new Position(0, 0);
+        //         const endPosition = document.lineAt(document.lineCount - 1).range.end;
+        //         edit.replace(new Range(startPosition, endPosition), content);
+        //     });
+        // }
+    }
+
+    public async renderContent(content: string, column: ViewColumn, language: string) {
         let document: TextDocument;
         if (this.settings.showResponseInDifferentTab || this.documents.length === 0) {
             document = await workspace.openTextDocument({ language, content });
