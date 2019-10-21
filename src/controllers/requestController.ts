@@ -78,12 +78,13 @@ export class RequestController {
         selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         // look for JMESPath query
-        const pipe = selectedText.indexOf('|');
-        let jmesQuery = '';
-        if (pipe) {
-            jmesQuery = selectedText.substring(pipe);
-            selectedText = selectedText.substring(0, pipe-1);
+        const pipeIndex = selectedText.indexOf('|');
+        var jmesQuery = '';
+        if (pipeIndex > -1) {
+            jmesQuery = selectedText.substring(pipeIndex+1).trim();
+            selectedText = selectedText.substring(0, pipeIndex-1).trim();
         }
+        //console.log(jmesQuery);
 
         // parse http request
         let httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
@@ -96,6 +97,7 @@ export class RequestController {
         }
 
         await this.runCore(httpRequest, jmesQuery);
+        //await this.runCore(httpRequest);
     }
 
     @trace('Rerun Request')
@@ -124,6 +126,7 @@ export class RequestController {
         this._durationStatusBarItem.tooltip = null;
     }
 
+    //private async runCore(httpRequest: HttpRequest) {
     private async runCore(httpRequest: HttpRequest, jmesQuery: string = '') {
         let requestId = uuidv4();
         this._requestStore.add(<string>requestId, httpRequest);
@@ -157,7 +160,7 @@ export class RequestController {
                     : ((activeColumn as number) + 1) as ViewColumn;
                 
                 if (jmesQuery) {
-                    this.EvaluateJMESPathExpression(response.body, jmesQuery, previewColumn);
+                    this.EvaluateJMESPathExpression(response, previewColumn, jmesQuery);
                 }
                 else if (this._restClientSettings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
@@ -194,10 +197,12 @@ export class RequestController {
         }
     }
 
-    private EvaluateJMESPathExpression(jsonDoc: string, query: string, previewColumn: number) {
+    private EvaluateJMESPathExpression(response: HttpResponse, previewColumn: number, query: string) {
         try {
-            let result = jmespath.search(jsonDoc, query);
-            this._textDocumentView.render(result, previewColumn);
+            //let result = jmespath.search(response.body, query);
+            let result = jmespath.search(JSON.parse(response.body), query);
+            this._textDocumentView.renderContent(result, previewColumn, 'json');
+            //this._textDocumentView.renderContent(response.body, previewColumn, 'json');
         } catch (err) {
             let errorMessage = `${err.name}: ${err.message}`;
             window.showErrorMessage(errorMessage);
