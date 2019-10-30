@@ -10,7 +10,7 @@ import { PreviewOption } from '../models/previewOption';
 import { trace } from '../utils/decorator';
 import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
-import { isJSONString } from '../utils/misc';
+import { base64, isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 import { BaseWebview } from './baseWebview';
 
@@ -51,7 +51,7 @@ export class HttpResponseWebview extends BaseWebview {
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
                 this.viewType,
-                `${tabTitle}(${response.elapsedMillionSeconds}ms)`,
+                `${tabTitle}(${response.timingPhases.total}ms)`,
                 { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus },
                 {
                     enableFindWidget: true,
@@ -89,7 +89,7 @@ export class HttpResponseWebview extends BaseWebview {
                 this.panels.push(panel);
         } else {
             panel = this.panels[this.panels.length - 1];
-            panel.title = `${tabTitle}(${response.elapsedMillionSeconds}ms)`;
+            panel.title = `${tabTitle}(${response.timingPhases.total}ms)`;
         }
 
         panel.webview.html = this.getHtmlForWebview(panel, response);
@@ -129,7 +129,7 @@ export class HttpResponseWebview extends BaseWebview {
             contentType = contentType.trim();
         }
         if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
-            innerHtml = `<img src="data:${contentType};base64,${response.bodyBuffer.toString('base64')}">`;
+            innerHtml = `<img src="data:${contentType};base64,${base64(response.bodyBuffer)}">`;
         } else {
             const code = this.highlightResponse(response);
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;

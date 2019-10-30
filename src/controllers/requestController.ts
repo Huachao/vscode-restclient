@@ -198,12 +198,13 @@ export class RequestController {
     }
 
     private formatDurationStatusBar(response: HttpResponse) {
-        this._durationStatusBarItem.text = ` $(clock) ${response.elapsedMillionSeconds}ms`;
+        this._durationStatusBarItem.text = ` $(clock) ${response.timingPhases.total}ms`;
         this._durationStatusBarItem.tooltip = [
             'Breakdown of Duration:',
             `Socket: ${response.timingPhases.wait.toFixed(1)}ms`,
             `DNS: ${response.timingPhases.dns.toFixed(1)}ms`,
             `TCP: ${response.timingPhases.tcp.toFixed(1)}ms`,
+            `Request: ${response.timingPhases.request.toFixed(1)}ms`,
             `FirstByte: ${response.timingPhases.firstByte.toFixed(1)}ms`,
             `Download: ${response.timingPhases.download.toFixed(1)}ms`
         ].join(EOL);

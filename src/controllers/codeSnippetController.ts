@@ -9,6 +9,7 @@ import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/har
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { trace } from "../utils/decorator";
+import { base64 } from '../utils/misc';
 import { Selector } from '../utils/selector';
 import { Telemetry } from '../utils/telemetry';
 import { VariableProcessor } from '../utils/variableProcessor';
@@ -241,7 +242,7 @@ export class CodeSnippetController {
             if (scheme && scheme.toLowerCase() === 'basic') {
                 const params = authHeader.substr(start).trim().split(' ');
                 if (params.length === 2) {
-                    return 'Basic ' + Buffer.from(`${params[0]}:${params[1]}`).toString('base64');
+                    return `Basic ${base64(`${params[0]}:${params[1]}`)}`;
                 }
             }
         }

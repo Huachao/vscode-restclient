@@ -5,7 +5,7 @@ import * as Constants from '../../common/constants';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { RequestVariableCacheKey } from '../../models/requestVariableCacheKey';
 import { VariableType } from '../../models/variableType';
-import { calculateMD5Hash } from '../misc';
+import { md5 } from '../misc';
 import { RequestVariableCache } from '../requestVariableCache';
 import { RequestVariableCacheValueProcessor } from '../requestVariableCacheValueProcessor';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
@@ -59,7 +59,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
     private getRequestVariables(document: TextDocument): string[] {
         const file = document.uri.toString();
         const fileContent = document.getText();
-        const fileHash = calculateMD5Hash(fileContent);
+        const fileHash = md5(fileContent);
         if (!this.cache.has(file) || fileHash !== this.fileMD5Hash.get(file)) {
             const requestVariableReferenceRegex = new RegExp(Constants.RequestVariableDefinitionWithNameRegexFactory('\\w+'), 'mg');
 

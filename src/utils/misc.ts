@@ -35,8 +35,13 @@ export function removeHeader(headers: RequestHeaders | ResponseHeaders, name: st
     }
 }
 
-export function calculateMD5Hash(text: string | Buffer): string {
+export function md5(text: string | Buffer): string {
     return crypto.createHash('md5').update(text).digest('hex');
+}
+
+export function base64(text: string | Buffer): string {
+    const buffer = Buffer.isBuffer(text) ? text : Buffer.from(text);
+    return buffer.toString('base64');
 }
 
 export function isJSONString(text: string): boolean {

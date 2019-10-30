@@ -1,6 +1,7 @@
 "use strict";
 
 import * as fs from 'fs-extra';
+import { GotBodyOptions } from 'got';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';
 import { Readable, Stream } from 'stream';
@@ -12,13 +13,16 @@ import { HostCertificate } from '../models/hostCertificate';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { HttpResponseTimingPhases } from '../models/httpResponseTimingPhases';
+import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
-import { getHeader, hasHeader } from './misc';
+import { base64, getHeader, hasHeader } from './misc';
 import { PersistUtility } from './persistUtility';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
+import got = require('got');
+
 const encodeUrl = require('encodeurl');
-const request = require('request');
+const { CookieJar } = require('tough-cookie');
 const cookieStore = require('tough-cookie-file-store-bugfix');
 
 export class HttpClient {
@@ -31,96 +35,85 @@ export class HttpClient {
     public async send(httpRequest: HttpRequest): Promise<HttpResponse> {
         const options = await this.prepareOptions(httpRequest);
 
-        let size = 0;
+        let bodySize = 0;
         let headersSize = 0;
-        return new Promise<HttpResponse>((resolve, reject) => {
-            const that = this;
-            request(options, function (error, response, body) {
-                if (error) {
-                    if (error.message) {
-                        if (error.message.startsWith("Header name must be a valid HTTP Token")) {
-                            error.message = "Header must be in 'header name: header value' format, "
-                                + "please also make sure there is a blank line between headers and body";
-                        }
-                    }
-                    reject(error);
-                    return;
-                }
-
-                const contentType = getHeader(response.headers, 'Content-Type');
-                let encoding: string | undefined;
-                if (contentType) {
-                    encoding = MimeUtility.parse(contentType as string).charset;
-                }
-
-                if (!encoding) {
-                    encoding = "utf8";
-                }
-
-                const bodyBuffer: Buffer = Buffer.isBuffer(body) ? body : Buffer.from(body);
-                let bodyString: string;
-                try {
-                    bodyString = iconv.decode(bodyBuffer, encoding);
-                } catch {
-                    if (encoding !== 'utf8') {
-                        bodyString = iconv.decode(bodyBuffer, 'utf8');
-                    }
-                }
-
-                if (that._settings.decodeEscapedUnicodeCharacters) {
-                    bodyString = that.decodeEscapedUnicodeCharacters(bodyString!);
-                }
-
-                // adjust response header case, due to the response headers in request package is in lowercase
-                const headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
-                const adjustedResponseHeaders: ResponseHeaders = {};
-                for (const header in response.headers) {
-                    const adjustedHeaderName = headersDic[header] || header;
-                    adjustedResponseHeaders[adjustedHeaderName] = response.headers[header];
-                }
-
-                const requestBody = options.body;
-
-                resolve(new HttpResponse(
-                    response.statusCode,
-                    response.statusMessage,
-                    response.httpVersion,
-                    adjustedResponseHeaders,
-                    bodyString!,
-                    response.elapsedTime,
-                    size,
-                    headersSize,
-                    bodyBuffer,
-                    new HttpResponseTimingPhases(
-                        response.timingPhases.total,
-                        response.timingPhases.wait,
-                        response.timingPhases.dns,
-                        response.timingPhases.tcp,
-                        response.timingPhases.firstByte,
-                        response.timingPhases.download
-                    ),
-                    new HttpRequest(
-                        options.method,
-                        options.url,
-                        HttpClient.capitalizeHeaderName(response.toJSON().request.headers),
-                        Buffer.isBuffer(requestBody) ? that.convertBufferToStream(requestBody) : requestBody,
-                        httpRequest.rawBody,
-                        httpRequest.requestVariableCacheKey
-                    )));
-            })
-                .on('data', function (data) {
-                    size += data.length;
-                })
-                .on('response', function (response) {
-                    if (response.rawHeaders) {
-                        headersSize += response.rawHeaders.map(h => h.length).reduce((a, b) => a + b, 0);
-                        headersSize += (response.rawHeaders.length) / 2;
-                    }
-                });
+        const requestUrl = encodeUrl(httpRequest.url);
+        const request = got(requestUrl, options);
+        (request as any).on('response', res => {
+            if (res.rawHeaders) {
+                headersSize += res.rawHeaders.map(h => h.length).reduce((a, b) => a + b, 0);
+                headersSize += (res.rawHeaders.length) / 2;
+            }
+            res.on('data', chunk => {
+                bodySize += chunk.length;
+            });
         });
+
+        const response = await request;
+
+        const contentType = response.headers['content-type'];
+        let encoding: string | undefined;
+        if (contentType) {
+            encoding = MimeUtility.parse(contentType).charset;
+        }
+
+        if (!encoding) {
+            encoding = "utf8";
+        }
+
+        const bodyBuffer = response.body;
+        let bodyString: string;
+        try {
+            bodyString = iconv.decode(bodyBuffer, encoding);
+        } catch {
+            if (encoding !== 'utf8') {
+                bodyString = iconv.decode(bodyBuffer, 'utf8');
+            }
+        }
+
+        if (this._settings.decodeEscapedUnicodeCharacters) {
+            bodyString = this.decodeEscapedUnicodeCharacters(bodyString!);
+        }
+
+        // adjust response header case, due to the response headers in nodejs http module is in lowercase
+        const headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
+        const adjustedResponseHeaders: ResponseHeaders = {};
+        for (const header in response.headers) {
+            const adjustedHeaderName = headersDic[header] || header;
+            adjustedResponseHeaders[adjustedHeaderName] = response.headers[header];
+        }
+
+        const requestBody = options.body;
+
+        return new HttpResponse(
+            response.statusCode,
+            response.statusMessage,
+            response.httpVersion,
+            adjustedResponseHeaders,
+            bodyString!,
+            bodySize,
+            headersSize,
+            bodyBuffer,
+            new HttpResponseTimingPhases(
+                response.timings.phases.total,
+                response.timings.phases.wait,
+                response.timings.phases.dns,
+                response.timings.phases.tcp,
+                response.timings.phases.request,
+                (response.timings.phases as any).firstByte,     // typo bug in @types/got
+                response.timings.phases.download
+            ),
+            new HttpRequest(
+                options.method!,
+                requestUrl,
+                HttpClient.capitalizeHeaderName((response as any).request.gotOptions.headers),
+                Buffer.isBuffer(requestBody) ? this.convertBufferToStream(requestBody) : requestBody,
+                httpRequest.rawBody,
+                httpRequest.requestVariableCacheKey
+            ));
     }
 
-    private async prepareOptions(httpRequest: HttpRequest): Promise<{ [key: string]: any }> {
+    private async prepareOptions(httpRequest: HttpRequest): Promise<GotBodyOptions<null>> {
         const originalRequestBody = httpRequest.body;
         let requestBody: string | Buffer | undefined;
         if (originalRequestBody) {
@@ -131,36 +124,35 @@ export class HttpClient {
             }
         }
 
-        const options: any = {
-            url: encodeUrl(httpRequest.url),
+        const options: GotBodyOptions<null> = {
             headers: httpRequest.headers,
             method: httpRequest.method,
             body: requestBody,
             encoding: null,
-            time: true,
-            timeout: this._settings.timeoutInMilliseconds,
             followRedirect: this._settings.followRedirect,
-            followAllRedirects: this._settings.followRedirect,
-            followOriginalHttpMethod: true,
-            jar: this._settings.rememberCookiesForSubsequentRequests ? request.jar(new cookieStore(PersistUtility.cookieFilePath)) : false,
-            strictSSL: false,
-            forever: true
+            cookieJar: this._settings.rememberCookiesForSubsequentRequests ? new CookieJar(new cookieStore(PersistUtility.cookieFilePath)) : undefined,
+            rejectUnauthorized: false,
+            throwHttpErrors: false
         };
 
-        // set auth to digest if Authorization header follows: Authorization: Digest username password
+        if (this._settings.timeoutInMilliseconds > 0) {
+            options.timeout = this._settings.timeoutInMilliseconds;
+        }
+
+        if (!options.headers) {
+            options.headers = httpRequest.headers = {};
+        }
+
+        // TODO: refactor auth
         const authorization = getHeader(options.headers, 'Authorization') as string | undefined;
         if (authorization) {
-            const start = authorization.indexOf(' ');
-            const scheme = authorization.substr(0, start);
-            if (scheme === 'Digest' || scheme === 'Basic') {
-                const params = authorization.substr(start).trim().split(' ');
-                const [user, pass] = params;
-                if (user && pass) {
-                    options.auth = {
-                        user,
-                        pass,
-                        sendImmediately: scheme === 'Basic'
-                    };
+            const [scheme, user, ...args] = authorization.split(/\s+/);
+            if (args.length > 0) {
+                const pass = args.join(' ');
+                if (scheme === 'Basic') {
+                    options.headers!['Authorization'] = `Basic ${base64(`${user}:${pass}`)}`;
+                } else if (scheme === 'Digest') {
+                    options.hooks = { afterResponse: [digest(user, pass)] };
                 }
             }
         }
@@ -192,14 +184,6 @@ export class HttpClient {
             }
         }
 
-        if (this._settings.proxy && !options.agent) {
-            options.proxy = null;
-        }
-
-        if (!options.headers) {
-            options.headers = httpRequest.headers = {};
-        }
-
         // add default headers if not specified
         for (const header in this._settings.defaultHeaders) {
             if (!hasHeader(options.headers, header) && (header.toLowerCase() !== 'host' || httpRequest.url[0] === '/')) {
@@ -210,9 +194,9 @@ export class HttpClient {
             }
         }
 
-        const acceptEncoding = getHeader(options.headers, 'Accept-Encoding');
+        const acceptEncoding = getHeader(options.headers, 'Accept-Encoding') as string | undefined;
         if (acceptEncoding && acceptEncoding.includes('gzip')) {
-            options.gzip = true;
+            options.decompress = true;
         }
 
         return options;

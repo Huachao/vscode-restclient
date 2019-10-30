@@ -1,8 +1,8 @@
 "use strict";
 
 import { Stream } from 'stream';
-import { getContentType, getHeader } from '../utils/misc';
-import { RequestHeaders, RequestHeaderValue } from './base';
+import { getContentType } from '../utils/misc';
+import { RequestHeaders } from './base';
 import { RequestVariableCacheKey } from './requestVariableCacheKey';
 
 export class HttpRequest {
@@ -14,10 +14,6 @@ export class HttpRequest {
         public rawBody: string | undefined,
         public requestVariableCacheKey?: RequestVariableCacheKey) {
             this.method = method.toLocaleUpperCase();
-    }
-
-    public getHeader(name: string): RequestHeaderValue {
-        return getHeader(this.headers, name);
     }
 
     public get contentType(): string | undefined {

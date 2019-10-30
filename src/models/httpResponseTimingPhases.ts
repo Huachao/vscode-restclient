@@ -6,6 +6,7 @@ export class HttpResponseTimingPhases {
         public wait: number,
         public dns: number,
         public tcp: number,
+        public request: number,
         public firstByte: number,
         public download: number) {
     }

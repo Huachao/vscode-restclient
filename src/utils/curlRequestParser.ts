@@ -6,7 +6,7 @@ import { Uri } from 'vscode';
 import { RequestHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
 import { IRequestParser } from '../models/IRequestParser';
-import { hasHeader } from './misc';
+import { base64, hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
 
@@ -49,7 +49,7 @@ export class CurlRequestParser implements IRequestParser {
 
         const user = parsedArguments.u || parsedArguments.user;
         if (user) {
-            headers['Authorization'] = `Basic ${Buffer.from(user).toString('base64')}`;
+            headers['Authorization'] = `Basic ${base64(user)}`;
         }
 
         // parse body

@@ -4,7 +4,7 @@ import { TextDocument } from 'vscode';
 import * as Constants from '../../common/constants';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
-import { calculateMD5Hash } from '../misc';
+import { md5 } from '../misc';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
@@ -69,7 +69,7 @@ export class FileVariableProvider implements HttpVariableProvider {
     private async getFileVariables(document: TextDocument): Promise<FileVariableValue[]> {
         const file = document.uri.toString();
         const fileContent = document.getText();
-        const fileHash = calculateMD5Hash(fileContent);
+        const fileHash = md5(fileContent);
         if (!this.cache.has(file) || fileHash !== this.fileMD5Hash.get(file)) {
             const regex = new RegExp(Constants.FileVariableDefinitionRegex, 'mg');
             const variables = new Map<string, FileVariableValue>();
