@@ -76,12 +76,7 @@ export class HttpClient {
         }
 
         // adjust response header case, due to the response headers in nodejs http module is in lowercase
-        const headersDic = HttpClient.getResponseRawHeaderNames(response.rawHeaders);
-        const adjustedResponseHeaders: ResponseHeaders = {};
-        for (const header in response.headers) {
-            const adjustedHeaderName = headersDic[header] || header;
-            adjustedResponseHeaders[adjustedHeaderName] = response.headers[header];
-        }
+        const responseHeaders: ResponseHeaders = HttpClient.normalizeHeaderNames(response.headers, response.rawHeaders);
 
         const requestBody = options.body;
 
@@ -89,7 +84,7 @@ export class HttpClient {
             response.statusCode,
             response.statusMessage,
             response.httpVersion,
-            adjustedResponseHeaders,
+            responseHeaders,
             bodyString!,
             bodySize,
             headersSize,
@@ -106,7 +101,9 @@ export class HttpClient {
             new HttpRequest(
                 options.method!,
                 requestUrl,
-                HttpClient.capitalizeHeaderName((response as any).request.gotOptions.headers),
+                HttpClient.normalizeHeaderNames(
+                    (response as any).request.gotOptions.headers as RequestHeaders,
+                    Object.keys(httpRequest.headers)),
                 Buffer.isBuffer(requestBody) ? this.convertBufferToStream(requestBody) : requestBody,
                 httpRequest.rawBody,
                 httpRequest.requestVariableCacheKey
@@ -260,14 +257,6 @@ export class HttpClient {
         return null;
     }
 
-    private static getResponseRawHeaderNames(rawHeaders: string[]): { [key: string]: string } {
-        const result: { [key: string]: string } = {};
-        rawHeaders.forEach(header => {
-            result[header.toLowerCase()] = header;
-        });
-        return result;
-    }
-
     private static ignoreProxy(requestUrl: string, excludeHostsForProxy: string[]): Boolean {
         if (!excludeHostsForProxy || excludeHostsForProxy.length === 0) {
             return false;
@@ -334,15 +323,18 @@ export class HttpClient {
         }
     }
 
-    private static capitalizeHeaderName(headers: RequestHeaders): RequestHeaders {
-        const normalizedHeaders = {};
-        if (headers) {
-            for (const header in headers) {
-                const capitalizedName = header.replace(/([^-]+)/g, h => h.charAt(0).toUpperCase() + h.slice(1));
-                normalizedHeaders[capitalizedName] = headers[header];
-            }
+    private static normalizeHeaderNames<T extends RequestHeaders | ResponseHeaders>(headers: T, rawHeaders: string[]): T {
+        const headersDic: { [key: string]: string } = rawHeaders.reduce(
+            (prev, cur) => {
+                prev[cur.toLowerCase()] = cur;
+                return prev;
+            }, {});
+        const adjustedResponseHeaders = {} as RequestHeaders | ResponseHeaders;
+        for (const header in headers) {
+            const adjustedHeaderName = headersDic[header] || header;
+            adjustedResponseHeaders[adjustedHeaderName] = headers[header];
         }
 
-        return normalizedHeaders;
+        return adjustedResponseHeaders as T;
     }
 }
