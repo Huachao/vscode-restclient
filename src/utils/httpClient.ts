@@ -15,7 +15,7 @@ import { HttpResponse } from '../models/httpResponse';
 import { HttpResponseTimingPhases } from '../models/httpResponseTimingPhases';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
-import { base64, getHeader, hasHeader } from './misc';
+import { base64, getHeader, hasHeader, removeHeader } from './misc';
 import { PersistUtility } from './persistUtility';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
@@ -147,8 +147,10 @@ export class HttpClient {
             if (args.length > 0) {
                 const pass = args.join(' ');
                 if (scheme === 'Basic') {
+                    removeHeader(options.headers, 'Authorization');
                     options.headers!['Authorization'] = `Basic ${base64(`${user}:${pass}`)}`;
                 } else if (scheme === 'Digest') {
+                    removeHeader(options.headers, 'Authorization');
                     options.hooks = { afterResponse: [digest(user, pass)] };
                 }
             }
