@@ -49,7 +49,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
         const requestVariables = await RequestVariableProvider.Instance.getAll(document);
         for (const { name, value } of requestVariables) {
             // Only add completion items for headers
-            const regex = new RegExp(`^(${name})\.(?:request|response)\.headers\.$`);
+            const regex = new RegExp(`^(${name}).(?:request|response).headers.$`);
             if (regex.test(fullPath)) {
                 // Remove last dot if present
                 fullPath = fullPath.replace(/\.$/, '');

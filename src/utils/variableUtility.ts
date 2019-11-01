@@ -79,7 +79,7 @@ export class VariableUtility {
 
     public static getFileVariableReferenceRanges(lines: string[], variable: string): Range[] {
         const locations: Range[] = [];
-        const regex = new RegExp(`\{\{${variable}\}\}`, 'g');
+        const regex = new RegExp(`{{${variable}}}`, 'g');
         for (const [index, line] of lines.entries()) {
             if (Constants.CommentIdentifiersRegex.test(line)) {
                 continue;

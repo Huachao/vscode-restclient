@@ -371,7 +371,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                                                 ? displayName.substring(0, displayNameSpaceIndex)
                                                 : displayName;
                                             const bestMatches: string[] = [];
-                                            const bestMatchesRegex = new RegExp(`(^${displayNameFirstWord}\.com$)|(^${displayNameFirstWord}\.[a-z]+(?:\.[a-z]+)?$)|(^${displayNameFirstWord}[a-z]+\.com$)|(^${displayNameFirstWord}[^:]*$)|(^[^:]*${displayNameFirstWord}[^:]*$)`, "gi");
+                                            const bestMatchesRegex = new RegExp(`(^${displayNameFirstWord}.com$)|(^${displayNameFirstWord}.[a-z]+(?:.[a-z]+)?$)|(^${displayNameFirstWord}[a-z]+.com$)|(^${displayNameFirstWord}[^:]*$)|(^[^:]*${displayNameFirstWord}[^:]*$)`, "gi");
                                             const bestMatchesRegexGroups = bestMatchesRegex.source.match(new RegExp(`${displayNameFirstWord}`, "g"))!.length;
                                             for (const d of element.domains) {
                                                 // find matches; use empty array for all captures (+1 for the full string) if no matches found

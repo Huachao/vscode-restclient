@@ -139,7 +139,7 @@ export class FileVariableProvider implements HttpVariableProvider {
             dependents!.forEach(d => {
                 const originalValue = variableMap.get(d);
                 const currentValue = originalValue!.replace(
-                    new RegExp(`{{\\s*${current}\s*}}`, 'g'),
+                    new RegExp(`{{\\s*${current}\\s*}}`, 'g'),
                     variableMap.get(current!)!);
                 variableMap.set(d, currentValue);
                 const newCount = dependencyCount.get(d)! - 1;

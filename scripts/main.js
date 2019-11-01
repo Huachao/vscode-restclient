@@ -49,7 +49,7 @@
 
   function foldLineSpan(lineSpan) {
     const blockEndNum = getFoldingRangeEnd(lineSpan);
-    lineSpan.classList.add('collapsed')
+    lineSpan.classList.add('collapsed');
 
     let span = lineSpan;
     let excludeEndLineNum = -1;
@@ -74,7 +74,7 @@
 
   function unfoldLineSpan(lineSpan) {
     const blockEndNum = getFoldingRangeEnd(lineSpan);
-    lineSpan.classList.remove('collapsed')
+    lineSpan.classList.remove('collapsed');
 
     let span = lineSpan;
     let excludeEndLineNum = -1;
