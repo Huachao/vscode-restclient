@@ -618,7 +618,7 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^5.0.4",
-    "@types/got": "^9.6.7",
+    "@types/got": "^9.6.8",
     "@types/mocha": "^2.2.32",
     "@types/node": "^10.14.0",
     "@types/vscode": "^1.38.0",

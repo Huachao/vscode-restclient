@@ -95,7 +95,7 @@ export class HttpClient {
                 response.timings.phases.dns,
                 response.timings.phases.tcp,
                 response.timings.phases.request,
-                (response.timings.phases as any).firstByte,     // typo bug in @types/got
+                response.timings.phases.firstByte,
                 response.timings.phases.download
             ),
             new HttpRequest(
