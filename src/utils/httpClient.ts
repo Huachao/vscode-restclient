@@ -1,7 +1,6 @@
 "use strict";
 
 import * as fs from 'fs-extra';
-import { GotBodyOptions } from 'got';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';
 import { Readable, Stream } from 'stream';
@@ -62,17 +61,10 @@ export class HttpClient {
         }
 
         const bodyBuffer = response.body;
-        let bodyString: string;
-        try {
-            bodyString = iconv.decode(bodyBuffer, encoding);
-        } catch {
-            if (encoding !== 'utf8') {
-                bodyString = iconv.decode(bodyBuffer, 'utf8');
-            }
-        }
+        let bodyString = iconv.encodingExists(encoding) ? iconv.decode(bodyBuffer, encoding) : bodyBuffer.toString();
 
         if (this._settings.decodeEscapedUnicodeCharacters) {
-            bodyString = this.decodeEscapedUnicodeCharacters(bodyString!);
+            bodyString = this.decodeEscapedUnicodeCharacters(bodyString);
         }
 
         // adjust response header case, due to the response headers in nodejs http module is in lowercase
@@ -85,7 +77,7 @@ export class HttpClient {
             response.statusMessage,
             response.httpVersion,
             responseHeaders,
-            bodyString!,
+            bodyString,
             bodySize,
             headersSize,
             bodyBuffer,
@@ -110,7 +102,7 @@ export class HttpClient {
             ));
     }
 
-    private async prepareOptions(httpRequest: HttpRequest): Promise<GotBodyOptions<null>> {
+    private async prepareOptions(httpRequest: HttpRequest): Promise<got.GotBodyOptions<null>> {
         const originalRequestBody = httpRequest.body;
         let requestBody: string | Buffer | undefined;
         if (originalRequestBody) {
@@ -121,7 +113,7 @@ export class HttpClient {
             }
         }
 
-        const options: GotBodyOptions<null> = {
+        const options: got.GotBodyOptions<null> = {
             headers: httpRequest.headers,
             method: httpRequest.method,
             body: requestBody,
