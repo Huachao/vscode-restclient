@@ -112,8 +112,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultHeaders = restClientSettings.get<RequestHeaders>("defaultHeaders",
                                                                      {
-                                                                         "User-Agent": "vscode-restclient",
-                                                                         "Accept-Encoding": "gzip"
+                                                                         "User-Agent": "vscode-restclient"
                                                                      });
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
         this.requestNameAsResponseTabTitle = restClientSettings.get<boolean>("requestNameAsResponseTabTitle", false);

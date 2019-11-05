@@ -118,6 +118,7 @@ export class HttpClient {
             method: httpRequest.method,
             body: requestBody,
             encoding: null,
+            decompress: true,
             followRedirect: this._settings.followRedirect,
             cookieJar: this._settings.rememberCookiesForSubsequentRequests ? new CookieJar(new cookieStore(PersistUtility.cookieFilePath)) : undefined,
             rejectUnauthorized: false,
@@ -183,11 +184,6 @@ export class HttpClient {
                     options.headers[header] = value;
                 }
             }
-        }
-
-        const acceptEncoding = getHeader(options.headers, 'Accept-Encoding') as string | undefined;
-        if (acceptEncoding && acceptEncoding.includes('gzip')) {
-            options.decompress = true;
         }
 
         return options;

@@ -329,8 +329,7 @@
         "rest-client.defaultHeaders": {
           "type": "object",
           "default": {
-            "User-Agent": "vscode-restclient",
-            "Accept-Encoding": "gzip"
+            "User-Agent": "vscode-restclient"
           },
           "scope": "resource",
           "description": "If particular headers are omitted in request headers, these will be added as headers for each request."
