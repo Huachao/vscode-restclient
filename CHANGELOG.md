@@ -1,3 +1,13 @@
+## 0.23.0 (2019/11/20)
+* __Feature__: [Add new system varaible - .env file variable](https://github.com/Huachao/vscode-restclient/issues/418)
+* __Feature__: [Add new system varaible - local datetime](https://github.com/Huachao/vscode-restclient/issues/433)
+* __Bug Fix__: [308 Permanent Redirect changes method to GET](https://github.com/Huachao/vscode-restclient/issues/436)
+* __Bug Fix__: [Command `Copy As cURL` not working for request method in lower case](https://github.com/Huachao/vscode-restclient/issues/431)
+* __Bug Fix__: [Preserve custom request header case](https://github.com/Huachao/vscode-restclient/issues/435)
+* __Bug Fix__: Fix scroll to top not working
+* __Improvement__: [Replaced images with vscode-icons](https://github.com/Huachao/vscode-restclient/pull/440) ([@lochstar](lochstar))
+* __Improvement__: [Ignore user provided `Content-Length` value](https://github.com/Huachao/vscode-restclient/issues/424)
+
 ## 0.22.2 (2019/9/25)
 * __Feature__: Go to definition support for request variables
 * __Bug Fix__: [Fix header auto completion is broken](https://github.com/Huachao/vscode-restclient/issues/422)
