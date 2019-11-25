@@ -47,14 +47,14 @@
     "onCommand:rest-client.copy-response-body",
     "onCommand:rest-client.switch-environment",
     "onCommand:rest-client.clear-aad-token-cache",
-    "onLanguage:http",
     "onCommand:rest-client.cancel-request",
     "onCommand:rest-client.rerun-last-request",
     "onCommand:rest-client.generate-codesnippet",
     "onCommand:rest-client.copy-codesnippet",
     "onCommand:rest-client.copy-request-as-curl",
     "onCommand:rest-client.fold-response",
-    "onCommand:rest-client.unfold-response"
+    "onCommand:rest-client.unfold-response",
+    "onLanguage:http"
   ],
   "main": "./dist/extension",
   "contributes": {
