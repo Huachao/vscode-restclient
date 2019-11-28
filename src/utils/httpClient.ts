@@ -82,13 +82,13 @@ export class HttpClient {
             headersSize,
             bodyBuffer,
             new HttpResponseTimingPhases(
-                response.timings.phases.total,
-                response.timings.phases.wait,
-                response.timings.phases.dns,
-                response.timings.phases.tcp,
-                response.timings.phases.request,
-                response.timings.phases.firstByte,
-                response.timings.phases.download
+                response.timings.phases.total || 0,
+                response.timings.phases.wait || 0,
+                response.timings.phases.dns || 0,
+                response.timings.phases.tcp || 0,
+                response.timings.phases.request || 0,
+                response.timings.phases.firstByte || 0,
+                response.timings.phases.download || 0
             ),
             new HttpRequest(
                 options.method!,
