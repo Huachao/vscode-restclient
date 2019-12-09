@@ -179,10 +179,13 @@ export class HttpRequestParser implements IRequestParser {
                     p += `${(i === 0 || c.startsWith('&') ? '' : EOL)}${c}`;
                     return p;
                 }, '');
-            } else if (MimeUtility.isNewlineDelimitedJSON(contentTypeHeader)) {
-                return lines.join(EOL) + EOL;
             } else {
-                return lines.join(EOL);
+                const lineEnding = HttpRequestParser.getLineEnding(contentTypeHeader);
+                let result = lines.join(lineEnding);
+                if (MimeUtility.isNewlineDelimitedJSON(contentTypeHeader)) {
+                    result += lineEnding;
+                }
+                return result;
             }
         } else {
             const combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
