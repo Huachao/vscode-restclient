@@ -1,5 +1,3 @@
-'use strict';
-
 import { Position, Range, TextDocument, TextLine } from 'vscode';
 import * as Constants from '../common/constants';
 

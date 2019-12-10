@@ -1,5 +1,3 @@
-"use strict";
-
 import * as fs from 'fs-extra';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';

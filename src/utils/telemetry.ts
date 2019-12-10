@@ -1,5 +1,3 @@
-'use strict';
-
 import * as appInsights from "applicationinsights";
 import packageLockJson from '../../package-lock.json';
 import packageJson from '../../package.json';

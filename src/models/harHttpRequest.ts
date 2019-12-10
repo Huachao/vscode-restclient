@@ -1,5 +1,3 @@
-"use strict";
-
 import { ParsedUrlQuery } from 'querystring';
 import { parse as urlParse } from 'url';
 

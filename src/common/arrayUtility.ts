@@ -1,5 +1,3 @@
-'use strict';
-
 export class ArrayUtility {
     public static skipWhile<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean): T[] {
         let index = 0;

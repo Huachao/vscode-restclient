@@ -1,5 +1,3 @@
-'use strict';
-
 import { EOL } from 'os';
 import { languages, Position, Range, TextDocument, ViewColumn, window, workspace } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';

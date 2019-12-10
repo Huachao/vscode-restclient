@@ -1,5 +1,3 @@
-'use strict';
-
 import { CancellationToken, CompletionItem, CompletionItemKind, CompletionItemProvider, MarkdownString, Position, Range, TextDocument, TextLine } from 'vscode';
 import * as Constants from "../common/constants";
 import { ElementType } from "../models/httpElement";

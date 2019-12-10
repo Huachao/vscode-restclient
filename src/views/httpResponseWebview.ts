@@ -1,5 +1,3 @@
-'use strict';
-
 import * as path from 'path';
 import { commands, ExtensionContext, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
 import * as Constants from '../common/constants';

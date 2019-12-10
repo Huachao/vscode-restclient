@@ -1,5 +1,3 @@
-"use strict";
-
 import * as fs from 'fs-extra';
 import moment from 'moment';
 import { EOL } from 'os';

@@ -1,5 +1,3 @@
-'use strict';
-
 export interface Action<T> {
     (item: T): void;
 }

@@ -1,5 +1,3 @@
-"use strict";
-
 export class HttpResponseTimingPhases {
     public constructor(
         public total: number,

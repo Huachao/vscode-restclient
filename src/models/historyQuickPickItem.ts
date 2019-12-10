@@ -1,5 +1,3 @@
-"use strict";
-
 import { QuickPickItem } from 'vscode';
 import { SerializedHttpRequest } from './httpRequest';
 

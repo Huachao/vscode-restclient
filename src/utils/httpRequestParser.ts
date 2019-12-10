@@ -1,5 +1,3 @@
-"use strict";
-
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
 import * as path from 'path';

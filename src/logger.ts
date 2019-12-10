@@ -1,5 +1,3 @@
-'use strict';
-
 import { OutputChannel, window } from 'vscode';
 import { RestClientSettings } from './models/configurationSettings';
 import { LogLevel } from './models/logLevel';

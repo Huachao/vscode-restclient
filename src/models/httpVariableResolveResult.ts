@@ -1,5 +1,3 @@
-"use strict";
-
 export type ResolveResult = { state: ResolveState.Success, value: any }
                           | { state: ResolveState.Warning, value?: any, message: ResolveWarningMessage }
                           | { state: ResolveState.Error, message: ResolveErrorMessage };

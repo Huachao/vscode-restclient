@@ -1,5 +1,3 @@
-"use strict";
-
 import { RestClientSettings } from '../models/configurationSettings';
 import { MIME } from '../models/mime';
 

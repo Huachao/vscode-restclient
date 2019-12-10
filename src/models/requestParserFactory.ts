@@ -1,5 +1,3 @@
-"use strict";
-
 import { CurlRequestParser } from '../utils/curlRequestParser';
 import { HttpRequestParser } from '../utils/httpRequestParser';
 import { IRequestParser } from './IRequestParser';

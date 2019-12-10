@@ -1,5 +1,3 @@
-"use strict";
-
 import { getContentType } from '../utils/misc';
 import { ResponseHeaders } from './base';
 import { HttpRequest } from "./httpRequest";

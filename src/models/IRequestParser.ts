@@ -1,5 +1,3 @@
-"use strict";
-
 import { HttpRequest } from './httpRequest';
 
 export interface IRequestParser {

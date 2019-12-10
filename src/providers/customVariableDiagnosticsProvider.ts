@@ -1,5 +1,3 @@
-'use strict';
-
 import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, languages, Position, Range, TextDocument, workspace } from 'vscode';
 import * as Constants from '../common/constants';
 import { ResolveState } from '../models/httpVariableResolveResult';

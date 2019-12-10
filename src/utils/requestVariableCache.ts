@@ -1,5 +1,3 @@
-"use strict";
-
 import { Event, EventEmitter } from "vscode";
 import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
 import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';

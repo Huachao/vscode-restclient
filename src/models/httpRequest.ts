@@ -1,5 +1,3 @@
-"use strict";
-
 import { Stream } from 'stream';
 import { getContentType } from '../utils/misc';
 import { RequestHeaders } from './base';

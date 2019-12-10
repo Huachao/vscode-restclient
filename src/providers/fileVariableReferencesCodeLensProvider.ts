@@ -1,5 +1,3 @@
-'use strict';
-
 import { CancellationToken, CodeLens, CodeLensProvider, Command, Location, Range, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { Selector } from '../utils/selector';

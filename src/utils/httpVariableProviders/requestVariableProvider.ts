@@ -1,5 +1,3 @@
-'use strict';
-
 import { TextDocument } from 'vscode';
 import * as Constants from '../../common/constants';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from '../../models/httpVariableResolveResult';

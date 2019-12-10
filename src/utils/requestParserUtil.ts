@@ -1,5 +1,3 @@
-'use strict';
-
 import { RequestHeaders } from "../models/base";
 
 export class RequestParserUtil {

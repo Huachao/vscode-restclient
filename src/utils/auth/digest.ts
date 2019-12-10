@@ -1,5 +1,3 @@
-'use strict';
-
 import * as stream from 'stream';
 import * as url from 'url';
 import { md5 } from '../misc';

@@ -1,5 +1,3 @@
-"use strict";
-
 import * as path from 'path';
 import { TextDocument, window, workspace } from 'vscode';
 

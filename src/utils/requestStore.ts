@@ -1,5 +1,3 @@
-"use strict";
-
 import { HttpRequest } from '../models/httpRequest';
 
 export class RequestStore {

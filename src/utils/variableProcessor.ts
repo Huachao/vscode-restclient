@@ -1,5 +1,3 @@
-'use strict';
-
 import { TextDocument } from 'vscode';
 import { VariableType } from "../models/variableType";
 import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';

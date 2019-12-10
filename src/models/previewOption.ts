@@ -1,5 +1,3 @@
-"use strict";
-
 export enum PreviewOption {
     Full,
     Headers,

@@ -1,5 +1,3 @@
-"use strict";
-
 export class RequestVariableCacheKey {
     public constructor(
         public key: string,

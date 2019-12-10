@@ -1,5 +1,3 @@
-"use strict";
-
 import { Disposable } from 'vscode';
 import { RestClientSettings } from '../models/configurationSettings';
 

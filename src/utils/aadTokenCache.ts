@@ -1,5 +1,3 @@
-'use strict';
-
 import * as adal from 'adal-node';
 
 export class AadTokenCache {

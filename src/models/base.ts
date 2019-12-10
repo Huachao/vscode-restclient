@@ -1,5 +1,3 @@
-"use strict";
-
 import * as http from 'http';
 
 export type ResponseHeaders = http.IncomingHttpHeaders;

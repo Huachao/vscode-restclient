@@ -1,5 +1,3 @@
-'use strict';
-
 import { createScanner, SyntaxKind } from 'jsonc-parser';
 import * as os from 'os';
 import { window } from 'vscode';

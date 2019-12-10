@@ -1,5 +1,3 @@
-"use strict";
-
 import { languages, StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';

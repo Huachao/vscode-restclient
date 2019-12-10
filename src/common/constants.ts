@@ -1,5 +1,3 @@
-'use strict';
-
 export const ExtensionId: string = 'humao.rest-client';
 export const AiKey: string = 'ad746e27-4a36-441c-8b94-5db178f81ae3';
 export const CSSFileName: string = 'rest-client.css';

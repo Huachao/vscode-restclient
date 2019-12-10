@@ -1,5 +1,3 @@
-"use strict";
-
 import { QuickPickItem } from 'vscode';
 
 export class EnvironmentPickItem implements QuickPickItem {

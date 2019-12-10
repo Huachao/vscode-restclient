@@ -1,5 +1,3 @@
-'use strict';
-
 import { commands, ViewColumn, WebviewPanel, window } from 'vscode';
 import { disposeAll } from '../utils/dispose';
 import { BaseWebview } from './baseWebview';

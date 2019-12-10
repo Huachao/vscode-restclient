@@ -1,5 +1,3 @@
-'use strict';
-
 import * as path from 'path';
 import { Event, EventEmitter, extensions, Uri, WebviewPanel } from 'vscode';
 import * as Constants from '../common/constants';

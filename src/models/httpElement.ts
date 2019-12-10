@@ -1,5 +1,3 @@
-"use strict";
-
 import { MarkdownString, SnippetString } from 'vscode';
 
 export class HttpElement {

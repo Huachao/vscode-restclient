@@ -9,6 +9,7 @@
             "es2018"
         ],
         "sourceMap": true,
+        "alwaysStrict": true,
         "strictNullChecks": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,

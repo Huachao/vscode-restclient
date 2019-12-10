@@ -1,5 +1,3 @@
-'use strict';
-
 import { EOL } from 'os';
 import * as url from 'url';
 import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument, window } from 'vscode';

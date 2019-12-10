@@ -1,5 +1,3 @@
-"use strict";
-
 import { EOL } from 'os';
 import * as url from 'url';
 import { Clipboard, env, QuickInputButtons, QuickPickItem, window } from 'vscode';

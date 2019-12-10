@@ -1,5 +1,3 @@
-"use strict";
-
 import { EOL } from 'os';
 import { ExtensionContext, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
 import { ArrayUtility } from "../common/arrayUtility";

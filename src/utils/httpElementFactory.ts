@@ -1,5 +1,3 @@
-"use strict";
-
 import * as url from 'url';
 import { MarkdownString, SnippetString, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';

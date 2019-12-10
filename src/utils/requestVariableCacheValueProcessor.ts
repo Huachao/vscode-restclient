@@ -1,5 +1,3 @@
-"use strict";
-
 import { HttpRequest } from "../models/httpRequest";
 import { HttpResponse } from '../models/httpResponse';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from "../models/httpVariableResolveResult";

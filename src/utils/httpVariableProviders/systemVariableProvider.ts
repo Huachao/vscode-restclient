@@ -1,5 +1,3 @@
-'use strict';
-
 import * as adal from 'adal-node';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';

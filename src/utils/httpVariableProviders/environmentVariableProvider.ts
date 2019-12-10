@@ -1,5 +1,3 @@
-'use strict';
-
 import * as Constants from '../../common/constants';
 import { EnvironmentController } from '../../controllers/environmentController';
 import { RestClientSettings } from '../../models/configurationSettings';

@@ -1,5 +1,3 @@
-'use strict';
-
 import { CancellationToken, Location, Position, Range, ReferenceContext, ReferenceProvider, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { VariableUtility } from '../utils/variableUtility';

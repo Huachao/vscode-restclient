@@ -1,5 +1,3 @@
-'use strict';
-
 import { TextDocument } from "vscode";
 import { RequestVariableCacheValue } from '../../models/requestVariableCacheValue';
 import { VariableType } from "../../models/variableType";

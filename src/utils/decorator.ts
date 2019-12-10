@@ -1,5 +1,3 @@
-'use strict';
-
 import { Telemetry } from './telemetry';
 
 export function trace(eventName: string): MethodDecorator {

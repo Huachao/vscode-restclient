@@ -1,5 +1,3 @@
-'use strict';
-
 import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, TextDocument } from 'vscode';
 import { EnvironmentVariableProvider } from '../utils/httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from '../utils/httpVariableProviders/fileVariableProvider';
