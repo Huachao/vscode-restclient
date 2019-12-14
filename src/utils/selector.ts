@@ -72,9 +72,9 @@ export class Selector {
         return requestRanges;
     }
 
-    public static getRequestVariableDefinitionName(text: string): string | null {
+    public static getRequestVariableDefinitionName(text: string): string | undefined {
         const matched = text.match(Constants.RequestVariableDefinitionRegex);
-        return matched && matched[1];
+        return matched?.[1];
     }
 
     public static isCommentLine(line: string): boolean {

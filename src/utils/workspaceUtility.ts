@@ -22,5 +22,5 @@ export function getCurrentHttpFileName(): string | undefined {
 
 export function getCurrentTextDocument(): TextDocument | undefined {
     const editor = window.activeTextEditor;
-    return editor && editor.document;
+    return editor?.document;
 }

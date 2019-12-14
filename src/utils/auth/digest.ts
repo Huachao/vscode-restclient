@@ -34,7 +34,7 @@ export function digest(user: string, pass: string): got.AfterResponseHook<got.Go
 
             const ha1Compute = function (algorithm, user, realm, pass, nonce, cnonce) {
                 const ha1 = md5(user + ':' + realm + ':' + pass);
-                if (algorithm && algorithm.toLowerCase() === 'md5-sess') {
+                if (algorithm?.toLowerCase() === 'md5-sess') {
                     return md5(ha1 + ':' + nonce + ':' + cnonce);
                 } else {
                     return ha1;

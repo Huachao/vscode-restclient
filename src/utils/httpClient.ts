@@ -251,7 +251,7 @@ export class HttpClient {
         }
 
         const resolvedUrl = url.parse(requestUrl);
-        const hostName = resolvedUrl.hostname && resolvedUrl.hostname.toLowerCase();
+        const hostName = resolvedUrl.hostname?.toLowerCase();
         const port = resolvedUrl.port;
         const excludeHostsProxyList = Array.from(new Set(excludeHostsForProxy.map(eh => eh.toLowerCase())));
 

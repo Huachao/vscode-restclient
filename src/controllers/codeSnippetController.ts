@@ -217,7 +217,7 @@ export class CodeSnippetController {
         let body: HARPostData | undefined;
         if (request.body) {
             const contentTypeHeader = headers.find(header => header.name.toLowerCase() === 'content-type');
-            const mimeType: string = (contentTypeHeader && contentTypeHeader.value) || 'application/json';
+            const mimeType: string = contentTypeHeader?.value ?? 'application/json';
             if (typeof request.body === 'string') {
                 const normalizedBody = request.body.split(EOL).reduce((prev, cur) => prev.concat(cur.trim()), '');
                 body = new HARPostData(mimeType, normalizedBody);
@@ -237,7 +237,7 @@ export class CodeSnippetController {
         if (authHeader) {
             const start = authHeader.indexOf(' ');
             const scheme = authHeader.substr(0, start);
-            if (scheme && scheme.toLowerCase() === 'basic') {
+            if (scheme.toLowerCase() === 'basic') {
                 const params = authHeader.substr(start).trim().split(' ');
                 if (params.length === 2) {
                     return `Basic ${base64(`${params[0]}:${params[1]}`)}`;

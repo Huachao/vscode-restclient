@@ -82,7 +82,7 @@ export class HttpRequestParser implements IRequestParser {
                     firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
                     const bodyEndLine = MimeUtility.isMultiPart(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
                     bodyLines = lines.slice(bodyStartLine, bodyEndLine);
-                    if (requestTypeHeader && requestTypeHeader === 'GraphQL') {
+                    if (requestTypeHeader === 'GraphQL') {
                         const variableStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', bodyEndLine);
                         if (variableStartLine !== -1) {
                             firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', variableStartLine);
@@ -190,7 +190,7 @@ export class HttpRequestParser implements IRequestParser {
             for (const [index, line] of lines.entries()) {
                 if (HttpRequestParser.uploadFromFileSyntax.test(line)) {
                     const groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
-                    if (groups !== null && groups.length === 2) {
+                    if (groups?.length === 2) {
                         const fileUploadPath = groups[1];
                         const fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
                         if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {

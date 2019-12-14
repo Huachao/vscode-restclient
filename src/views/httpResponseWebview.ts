@@ -44,7 +44,7 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     public async render(response: HttpResponse, column: ViewColumn) {
-        const tabTitle = this.settings.requestNameAsResponseTabTitle && response.request.requestVariableCacheKey && response.request.requestVariableCacheKey.key || 'Response';
+        const tabTitle = (this.settings.requestNameAsResponseTabTitle && response.request.requestVariableCacheKey?.key) || 'Response';
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
@@ -126,7 +126,7 @@ export class HttpResponseWebview extends BaseWebview {
         if (contentType) {
             contentType = contentType.trim();
         }
-        if (contentType && MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
+        if (MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
             innerHtml = `<img src="data:${contentType};base64,${base64(response.bodyBuffer)}">`;
         } else {
             const code = this.highlightResponse(response);
@@ -353,7 +353,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     }
 
     private static isHeadRequest({ request: { method } }: { request: HttpRequest }): boolean {
-        return !!(method && method.toLowerCase() === 'head');
+        return !!(method?.toLowerCase() === 'head');
     }
 }
 
