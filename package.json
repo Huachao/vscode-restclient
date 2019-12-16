@@ -603,6 +603,12 @@
           "default": true,
           "scope": "resource",
           "description": "Enable/disable custom variable references CodeLens in request file"
+        },
+        "rest-client.retry": {
+          "type": "number",
+          "default": 0,
+          "scope": "resource",
+          "description": "Number of retry request"
         }
       }
     },

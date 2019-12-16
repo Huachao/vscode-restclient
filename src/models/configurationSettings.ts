@@ -38,6 +38,7 @@ export interface IRestClientSettings {
     logLevel: LogLevel;
     enableSendRequestCodeLens: boolean;
     enableCustomVariableReferencesCodeLens: boolean;
+    retry: number;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -71,6 +72,7 @@ export class RestClientSettings implements IRestClientSettings {
     public logLevel: LogLevel;
     public enableSendRequestCodeLens: boolean;
     public enableCustomVariableReferencesCodeLens: boolean;
+    public retry: number;
 
     private readonly brackets: CharacterPair[];
 
@@ -144,6 +146,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.logLevel = ParseLogLevelStr(restClientSettings.get<string>('logLevel', 'error'));
         this.enableSendRequestCodeLens = restClientSettings.get<boolean>('enableSendRequestCodeLens', true);
         this.enableCustomVariableReferencesCodeLens = restClientSettings.get<boolean>('enableCustomVariableReferencesCodeLens', true);
+        this.retry = restClientSettings.get<number>("retry", 0);
         languages.setLanguageConfiguration('http', { brackets: this.addRequestBodyLineIndentationAroundBrackets ? this.brackets : [] });
 
         const httpSettings = workspace.getConfiguration("http");

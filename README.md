@@ -624,6 +624,7 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.logLevel`: The verbosity of logging in the REST output panel. (Default is __error__)
 * `rest-client.enableSendRequestCodeLens`: Enable/disable sending request CodeLens in request file. (Default is __true__)
 * `rest-client.enableCustomVariableReferencesCodeLens`: Enable/disable custom variable references CodeLens in request file. (Default is __true__)
+* `rest-client.retry`: Number of retry request. (Default is __0__)
 
 Rest Client extension respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`). Only HTTP and HTTPS proxies are supported.
 
