@@ -608,7 +608,7 @@
           "type": "number",
           "default": 0,
           "scope": "resource",
-          "description": "Number of retry request"
+          "description": "The number limit of retry requests. The default is turned off with 0."
         }
       }
     },
