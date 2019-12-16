@@ -69,26 +69,28 @@ export class FileVariableProvider implements HttpVariableProvider {
         const fileContent = document.getText();
         const fileHash = md5(fileContent);
         if (!this.cache.has(file) || fileHash !== this.fileMD5Hash.get(file)) {
-            const regex = new RegExp(Constants.FileVariableDefinitionRegex, 'mg');
             const variables = new Map<string, FileVariableValue>();
-            let match: RegExpExecArray | null;
-            while (match = regex.exec(fileContent)) {
-                const [, key, originalValue] = match;
-                let value = "";
-                let isPrevCharEscape = false;
-                for (const currentChar of originalValue) {
-                    if (isPrevCharEscape) {
-                        isPrevCharEscape = false;
-                        value += this.escapee.get(currentChar) || currentChar;
-                    } else {
-                        if (currentChar === "\\") {
-                            isPrevCharEscape = true;
-                            continue;
+            for (const line of fileContent.split(Constants.LineSplitterRegex)) {
+                const regex = new RegExp(Constants.FileVariableDefinitionRegex, 'g');
+                let match: RegExpExecArray | null;
+                while (match = regex.exec(line)) {
+                    const [, key, originalValue] = match;
+                    let value = "";
+                    let isPrevCharEscape = false;
+                    for (const currentChar of originalValue) {
+                        if (isPrevCharEscape) {
+                            isPrevCharEscape = false;
+                            value += this.escapee.get(currentChar) || currentChar;
+                        } else {
+                            if (currentChar === "\\") {
+                                isPrevCharEscape = true;
+                                continue;
+                            }
+                            value += currentChar;
                         }
-                        value += currentChar;
                     }
+                    variables.set(key, { name: key, value });
                 }
-                variables.set(key, { name: key, value });
             }
             this.cache.set(file, [...variables.values()]);
             this.fileMD5Hash.set(file, fileHash);

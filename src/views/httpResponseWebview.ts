@@ -353,7 +353,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     }
 
     private static isHeadRequest({ request: { method } }: { request: HttpRequest }): boolean {
-        return !!(method?.toLowerCase() === 'head');
+        return method.toLowerCase() === 'head';
     }
 }
 

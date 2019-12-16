@@ -70,7 +70,7 @@ export const AzureClouds: { [key: string]: { aad: string, arm: string, armAudien
 
 export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
-export const FileVariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.+?)\s*$/;
+export const FileVariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.*?)\s*$/;
 
 export const RequestVariableDefinitionWithNameRegexFactory = (name: string, flags?: string): RegExp =>
     new RegExp(`^\\s*(?:#{1,}|\\/{2,})\\s+@name\\s+(${name})\\s*$`, flags);
