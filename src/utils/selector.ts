@@ -102,11 +102,6 @@ export class Selector {
         return requestRanges;
     }
 
-    public static getRequestVariableDefinitionName(text: string): string | undefined {
-        const matched = text.match(Constants.RequestVariableDefinitionRegex);
-        return matched?.[1];
-    }
-
     public static isCommentLine(line: string): boolean {
         return Constants.CommentIdentifiersRegex.test(line);
     }
@@ -115,12 +110,21 @@ export class Selector {
         return line.trim() === '';
     }
 
+    public static isRequestVariableDefinitionLine(line: string): boolean {
+        return Constants.RequestVariableDefinitionRegex.test(line);
+    }
+
     public static isFileVariableDefinitionLine(line: string): boolean {
         return Constants.FileVariableDefinitionRegex.test(line);
     }
 
     public static isResponseStatusLine(line: string): boolean {
         return Selector.responseStatusLineRegex.test(line);
+    }
+
+    public static getRequestVariableDefinitionName(text: string): string | undefined {
+        const matched = text.match(Constants.RequestVariableDefinitionRegex);
+        return matched?.[1];
     }
 
     private static getDelimitedText(fullText: string, currentLine: number): string | null {

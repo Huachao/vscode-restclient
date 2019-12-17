@@ -13,17 +13,23 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
         const symbols: SymbolInformation[] = [];
         const lines: string[] = document.getText().split(Constants.LineSplitterRegex);
-        const requestRange: [number, number][] = Selector.getRequestRanges(lines, { ignoreFileVariableDefinitionLine: false });
+        const requestRange: [number, number][] = Selector.getRequestRanges(
+            lines,
+            { ignoreCommentLine: false , ignoreFileVariableDefinitionLine: false });
 
         for (let [blockStart, blockEnd] of requestRange) {
             // get real start for current requestRange
+            let requestName: string | undefined;
             while (blockStart <= blockEnd) {
                 const line = lines[blockStart];
                 if (Selector.isEmptyLine(line) ||
                     Selector.isCommentLine(line)) {
+                    if (Selector.isRequestVariableDefinitionLine(line)) {
+                        requestName = Selector.getRequestVariableDefinitionName(line);
+                    }
                     blockStart++;
                 } else if (Selector.isFileVariableDefinitionLine(line)) {
-                    const [name, container] = this.getVariableSymbolInfo(line);
+                    const [name, container] = this.getFileVariableSymbolInfo(line);
                     symbols.push(
                         new SymbolInformation(
                             name,
@@ -43,9 +49,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             }
 
             if (blockStart <= blockEnd) {
-                const text = await VariableProcessor.processRawRequest(lines.slice(blockStart, blockEnd + 1).join(EOL));
-                const info = this.getRequestSymbolInfo(text);
-                const [name, container] = info;
+                const [name, container] = await this.getRequestSymbolInfo(lines.slice(blockStart, blockEnd + 1).join(EOL), requestName);
                 symbols.push(
                     new SymbolInformation(
                         name,
@@ -59,13 +63,19 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
         return symbols;
     }
 
-    private getVariableSymbolInfo(line: string): [string, string] {
+    private getFileVariableSymbolInfo(line: string): [string, string] {
         const fileName = getCurrentHttpFileName();
         line = line.trim();
         return [line.substring(1, line.indexOf('=')).trim(), fileName!];
     }
 
-    private getRequestSymbolInfo(text: string): [string, string] {
+    private async getRequestSymbolInfo(rawText: string, name: string | undefined): Promise<[string, string]> {
+        // For request with name, return the request name and file name instead
+        if (name) {
+            return [name, getCurrentHttpFileName()!];
+        }
+
+        const text = await VariableProcessor.processRawRequest(rawText);
         const parser = HttpDocumentSymbolProvider.requestParserFactory.createRequestParser(text);
         const request = parser.parseHttpRequest(window.activeTextEditor!.document.fileName);
         const parsedUrl = url.parse(request.url);
