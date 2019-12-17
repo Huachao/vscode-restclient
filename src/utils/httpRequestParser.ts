@@ -22,20 +22,13 @@ export class HttpRequestParser implements IRequestParser {
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;
 
-    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest | null {
+    public constructor(public requestRawText: string) {
+    }
+
+    public parseHttpRequest(requestAbsoluteFilePath: string): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
         // split the request raw text into lines
-        let lines: string[] = requestRawText.split(EOL);
-
-        // skip leading empty lines
-        lines = ArrayUtility.skipWhile(lines, value => value.trim() === '');
-
-        // skip trailing empty lines
-        lines = ArrayUtility.skipWhile(lines.reverse(), value => value.trim() === '').reverse();
-
-        if (lines.length === 0) {
-            return null;
-        }
+        const lines: string[] = this.requestRawText.split(EOL);
 
         // parse request line
         const requestLine = HttpRequestParser.parseRequestLine(lines[0]);

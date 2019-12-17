@@ -12,7 +12,7 @@ export class FileVariableReferencesCodeLensProvider implements CodeLensProvider 
         for (let [blockStart, blockEnd] of requestRanges) {
             while (blockStart <= blockEnd) {
                 const line = lines[blockStart];
-                if (!Selector.isVariableDefinitionLine(line)) {
+                if (!Selector.isFileVariableDefinitionLine(line)) {
                     break;
                 }
 

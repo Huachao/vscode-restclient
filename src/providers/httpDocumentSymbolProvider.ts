@@ -22,7 +22,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
                 if (Selector.isEmptyLine(line) ||
                     Selector.isCommentLine(line)) {
                     blockStart++;
-                } else if (Selector.isVariableDefinitionLine(line)) {
+                } else if (Selector.isFileVariableDefinitionLine(line)) {
                     const [name, container] = this.getVariableSymbolInfo(line);
                     symbols.push(
                         new SymbolInformation(
@@ -45,9 +45,6 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             if (blockStart <= blockEnd) {
                 const text = await VariableProcessor.processRawRequest(lines.slice(blockStart, blockEnd + 1).join(EOL));
                 const info = this.getRequestSymbolInfo(text);
-                if (!info) {
-                    continue;
-                }
                 const [name, container] = info;
                 symbols.push(
                     new SymbolInformation(
@@ -68,12 +65,9 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
         return [line.substring(1, line.indexOf('=')).trim(), fileName!];
     }
 
-    private getRequestSymbolInfo(text: string): [string, string] | null {
+    private getRequestSymbolInfo(text: string): [string, string] {
         const parser = HttpDocumentSymbolProvider.requestParserFactory.createRequestParser(text);
-        const request = parser.parseHttpRequest(text, window.activeTextEditor!.document.fileName);
-        if (!request) {
-            return null;
-        }
+        const request = parser.parseHttpRequest(window.activeTextEditor!.document.fileName);
         const parsedUrl = url.parse(request.url);
         return [`${request.method} ${parsedUrl.path}`, parsedUrl.host || ''];
     }

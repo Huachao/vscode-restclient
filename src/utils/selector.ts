@@ -1,6 +1,8 @@
 import { EOL } from 'os';
 import { Range, TextEditor } from 'vscode';
+import { ArrayUtility } from '../common/arrayUtility';
 import * as Constants from '../common/constants';
+import { VariableProcessor } from './variableProcessor';
 
 export interface RequestRangeOptions {
     ignoreCommentLine?: boolean;
@@ -9,10 +11,15 @@ export interface RequestRangeOptions {
     ignoreResponseRange?: boolean;
 }
 
+export interface SelectedRequest {
+    text: string;
+    name?: string;
+}
+
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public static getRequestText(editor: TextEditor, range: Range | null = null): string | null {
+    public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
         if (!editor || !editor.document) {
             return null;
         }
@@ -25,7 +32,30 @@ export class Selector {
             selectedText = editor.document.getText(editor.selection);
         }
 
-        return selectedText;
+        if (selectedText === null) {
+            return null;
+        }
+
+        // parse request variable definition name
+        const requestVariable = Selector.getRequestVariableDefinitionName(selectedText);
+
+        // remove comment lines
+        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Selector.isCommentLine(l));
+
+        // remove file variables definition lines and leading empty lines
+        lines = ArrayUtility.skipWhile(lines, l => Selector.isFileVariableDefinitionLine(l) || Selector.isEmptyLine(l));
+
+        if (lines.length === 0) {
+            return null;
+        }
+
+        // variables replacement
+        selectedText = await VariableProcessor.processRawRequest(lines.join(EOL));
+
+        return {
+            text: selectedText,
+            name: requestVariable
+        };
     }
 
     public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
@@ -51,7 +81,7 @@ export class Selector {
 
                 if (options.ignoreCommentLine && Selector.isCommentLine(startLine)
                     || options.ignoreEmptyLine && Selector.isEmptyLine(startLine)
-                    || options.ignoreFileVariableDefinitionLine && Selector.isVariableDefinitionLine(startLine)) {
+                    || options.ignoreFileVariableDefinitionLine && Selector.isFileVariableDefinitionLine(startLine)) {
                     start++;
                     continue;
                 }
@@ -85,7 +115,7 @@ export class Selector {
         return line.trim() === '';
     }
 
-    public static isVariableDefinitionLine(line: string): boolean {
+    public static isFileVariableDefinitionLine(line: string): boolean {
         return Constants.FileVariableDefinitionRegex.test(line);
     }
 

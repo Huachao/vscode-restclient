@@ -1,8 +1,6 @@
 import { EOL } from 'os';
 import * as url from 'url';
 import { Clipboard, env, QuickInputButtons, QuickPickItem, window } from 'vscode';
-import { ArrayUtility } from "../common/arrayUtility";
-import * as Constants from '../common/constants';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -10,7 +8,6 @@ import { trace } from "../utils/decorator";
 import { base64 } from '../utils/misc';
 import { Selector } from '../utils/selector';
 import { Telemetry } from '../utils/telemetry';
-import { VariableProcessor } from '../utils/variableProcessor';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
@@ -54,29 +51,15 @@ export class CodeSnippetController {
             return;
         }
 
-        // Get selected text of selected lines or full document
-        let selectedText = Selector.getRequestText(editor);
-        if (!selectedText) {
+        const selectedRequest = await Selector.getRequest(editor);
+        if (!selectedRequest) {
             return;
         }
 
-        // remove comment lines
-        const lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
-        if (lines.length === 0 || lines.every(line => line === '')) {
-            return;
-        }
-
-        // remove file variables definition lines and leading empty lines
-        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
-
-        // variables replacement
-        selectedText = await VariableProcessor.processRawRequest(selectedText);
+        const { text } = selectedRequest;
 
         // parse http request
-        const httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
-        if (!httpRequest) {
-            return;
-        }
+        const httpRequest = new RequestParserFactory().createRequestParser(text).parseHttpRequest(document.fileName);
 
         const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         const snippet = new HTTPSnippet(harHttpRequest);
@@ -147,29 +130,15 @@ export class CodeSnippetController {
             return;
         }
 
-        // Get selected text of selected lines or full document
-        let selectedText = Selector.getRequestText(editor);
-        if (!selectedText) {
+        const selectedRequest = await Selector.getRequest(editor);
+        if (!selectedRequest) {
             return;
         }
 
-        // remove comment lines
-        const lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
-        if (lines.length === 0 || lines.every(line => line === '')) {
-            return;
-        }
-
-        // remove file variables definition lines
-        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
-
-        // variables replacement
-        selectedText = await VariableProcessor.processRawRequest(selectedText);
+        const { text } = selectedRequest;
 
         // parse http request
-        const httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
-        if (!httpRequest) {
-            return;
-        }
+        const httpRequest = new RequestParserFactory().createRequestParser(text).parseHttpRequest(document.fileName);
 
         const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         const addPrefix = !(url.parse(harHttpRequest.url).protocol);

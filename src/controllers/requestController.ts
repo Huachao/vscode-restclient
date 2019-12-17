@@ -1,7 +1,5 @@
 import { EOL } from 'os';
 import { ExtensionContext, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
-import { ArrayUtility } from "../common/arrayUtility";
-import * as Constants from '../common/constants';
 import { Logger } from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
@@ -15,7 +13,6 @@ import { PersistUtility } from '../utils/persistUtility';
 import { RequestStore } from '../utils/requestStore';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
-import { VariableProcessor } from '../utils/variableProcessor';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
@@ -52,35 +49,18 @@ export class RequestController {
             return;
         }
 
-        // Get selected text of selected lines or full document
-        let selectedText = Selector.getRequestText(editor, range);
-        if (!selectedText) {
+        const selectedRequest = await Selector.getRequest(editor, range);
+        if (!selectedRequest) {
             return;
         }
 
-        // parse request variable definition name
-        const requestVariable = Selector.getRequestVariableDefinitionName(selectedText);
-
-        // remove comment lines
-        const lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Constants.CommentIdentifiersRegex.test(l));
-        if (lines.length === 0 || lines.every(line => line === '')) {
-            return;
-        }
-
-        // remove file variables definition lines and leading empty lines
-        selectedText = ArrayUtility.skipWhile(lines, l => Constants.FileVariableDefinitionRegex.test(l) || l.trim() === '').join(EOL);
-
-        // variables replacement
-        selectedText = await VariableProcessor.processRawRequest(selectedText);
+        const { text, name } = selectedRequest;
 
         // parse http request
-        const httpRequest = new RequestParserFactory().createRequestParser(selectedText).parseHttpRequest(selectedText, document.fileName);
-        if (!httpRequest) {
-            return;
-        }
+        const httpRequest = new RequestParserFactory().createRequestParser(text).parseHttpRequest(document.fileName);
 
-        if (requestVariable) {
-            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(requestVariable, document.uri.toString());
+        if (name) {
+            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(name, document.uri.toString());
         }
 
         await this.runCore(httpRequest);

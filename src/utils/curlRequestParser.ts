@@ -14,9 +14,12 @@ const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
 export class CurlRequestParser implements IRequestParser {
 
-    public parseHttpRequest(requestRawText: string, requestAbsoluteFilePath: string): HttpRequest | null {
+    public constructor(public requestRawText: string) {
+    }
+
+    public parseHttpRequest(requestAbsoluteFilePath: string): HttpRequest {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
-            CurlRequestParser.mergeIntoSingleLine(requestRawText.trim()));
+            CurlRequestParser.mergeIntoSingleLine(this.requestRawText.trim()));
         requestText = requestText
             .replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2')
             .replace(/(-I|--head)(?=\s+)/, '-X HEAD');

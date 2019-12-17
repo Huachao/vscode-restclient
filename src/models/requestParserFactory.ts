@@ -12,9 +12,9 @@ export class RequestParserFactory implements IRequestParserFactory {
 
     public createRequestParser(rawHttpRequest: string): IRequestParser {
         if (RequestParserFactory.curlRegex.test(rawHttpRequest)) {
-            return new CurlRequestParser();
+            return new CurlRequestParser(rawHttpRequest);
         } else {
-            return new HttpRequestParser();
+            return new HttpRequestParser(rawHttpRequest);
         }
     }
 }

@@ -1,5 +1,6 @@
 import { Position, Range, TextDocument, TextLine } from 'vscode';
 import * as Constants from '../common/constants';
+import { Selector } from './selector';
 
 export class VariableUtility {
     public static isFileVariableDefinition(document: TextDocument, position: Position): boolean {
@@ -79,7 +80,7 @@ export class VariableUtility {
         const locations: Range[] = [];
         const regex = new RegExp(`{{${variable}}}`, 'g');
         for (const [index, line] of lines.entries()) {
-            if (Constants.CommentIdentifiersRegex.test(line)) {
+            if (Selector.isCommentLine(line)) {
                 continue;
             }
 
