@@ -120,7 +120,8 @@ export class HttpClient {
             followRedirect: this._settings.followRedirect,
             cookieJar: this._settings.rememberCookiesForSubsequentRequests ? new CookieJar(new cookieStore(PersistUtility.cookieFilePath)) : undefined,
             rejectUnauthorized: false,
-            throwHttpErrors: false
+            throwHttpErrors: false,
+            retry: this._settings.retry
         };
 
         if (this._settings.timeoutInMilliseconds > 0) {
