@@ -1,137 +1,154 @@
-import { Diagnostic, DiagnosticCollection, DiagnosticSeverity, languages, Position, Range, TextDocument, workspace } from 'vscode';
+import { ConfigurationChangeEvent, Diagnostic, DiagnosticCollection, DiagnosticSeverity, Disposable, languages, Position, Range, TextDocument, workspace } from 'vscode';
 import * as Constants from '../common/constants';
 import { ResolveState } from '../models/httpVariableResolveResult';
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { VariableType } from '../models/variableType';
+import { disposeAll } from '../utils/dispose';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { VariableProcessor } from "../utils/variableProcessor";
 
+interface VariableWithPosition {
+    name: string;
+    path: string;
+    begin: Position;
+    end: Position;
+}
+
 export class CustomVariableDiagnosticsProvider {
-    private httpDiagnosticCollection: DiagnosticCollection;
+    private httpDiagnosticCollection: DiagnosticCollection = languages.createDiagnosticCollection();
+
+    private disposables: Disposable[] = [this.httpDiagnosticCollection];
+
+    private pendingHttpDocuments = new Set<TextDocument>();
+
+    private timer: NodeJS.Timer | undefined;
 
     constructor() {
-        this.httpDiagnosticCollection = languages.createDiagnosticCollection();
-
-        this.checkVariablesInAllTextDocuments();
-
-        RequestVariableCache.onDidCreateNewRequestVariable(() => this.checkVariablesInAllTextDocuments());
-
-        workspace.onDidChangeConfiguration(e => e.affectsConfiguration('rest-client') && this.checkVariablesInAllTextDocuments());
+        this.disposables.push(
+            workspace.onDidOpenTextDocument(document => this.queue(document)),
+            workspace.onDidChangeTextDocument(event => this.queue(event.document)),
+            workspace.onDidCloseTextDocument(document => this.clear(document)),
+            workspace.onDidChangeConfiguration(event => this.queueAll(event)),
+            RequestVariableCache.onDidCreateNewRequestVariable(event => this.queue(event.document))
+        );
+        this.queueAll();
     }
 
-    public dispose(): void {
-        this.httpDiagnosticCollection.clear();
-        this.httpDiagnosticCollection.dispose();
-    }
-
-    public deleteDocumentFromDiagnosticCollection(textDocument: TextDocument) {
-        if (this.httpDiagnosticCollection.has(textDocument.uri)) {
-            this.httpDiagnosticCollection.delete(textDocument.uri);
+    private queue(document: TextDocument) {
+        if (document.languageId === 'http' && document.uri.scheme === 'file') {
+            this.pendingHttpDocuments.add(document);
+            this.startTimer();
         }
     }
 
-    public checkVariablesInAllTextDocuments() {
-        workspace.textDocuments.forEach(this.checkVariables, this);
+    private queueAll(event?: ConfigurationChangeEvent) {
+        workspace.textDocuments
+            .filter(document => event === undefined || event.affectsConfiguration('rest-client', document.uri))
+            .forEach(document => this.queue(document));
     }
 
-    public async checkVariables(document: TextDocument) {
-        if (document.languageId !== 'http' || document.uri.scheme !== 'file') {
-            return;
+    private startTimer() {
+        if (this.timer) {
+            clearTimeout(this.timer);
         }
+        this.timer = setTimeout(() => {
+            this.checkVariables();
+        }, 300);
+    }
 
-        const diagnostics: Diagnostic[] = [];
+    private clear(document: TextDocument) {
+        this.httpDiagnosticCollection.delete(document.uri);
+        this.pendingHttpDocuments.delete(document);
+    }
 
-        const allAvailableVariables = await VariableProcessor.getAllVariablesDefinitions(document);
-        const variableReferences = this.findVariableReferences(document);
+    public dispose() {
+        disposeAll(this.disposables);
+        this.disposables = [];
+    }
 
-        // Variable not found
-        [...variableReferences.entries()]
-            .filter(([name]) => !allAvailableVariables.has(name))
-            .forEach(([, variables]) => {
-                variables.forEach(v => {
-                    diagnostics.push(
-                        new Diagnostic(
-                            new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
-                            `${v.variableName} is not found`,
-                            DiagnosticSeverity.Error));
-                });
-            });
+    public async checkVariables() {
+        for (const document of this.pendingHttpDocuments) {
+            this.pendingHttpDocuments.delete(document);
+            if (document.isClosed) {
+                continue;
+            }
 
-        // Request variable not active
-        [...variableReferences.entries()]
-            .filter(([name]) =>
-                allAvailableVariables.has(name)
-                && allAvailableVariables.get(name)![0] === VariableType.Request
-                && !RequestVariableCache.has(new RequestVariableCacheKey(name, document.uri.toString())))
-            .forEach(([, variables]) => {
-                variables.forEach(v => {
-                    diagnostics.push(
-                        new Diagnostic(
-                            new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
-                            `Request '${v.variableName}' has not been sent`,
-                            DiagnosticSeverity.Information));
-                });
-            });
+            const diagnostics: Diagnostic[] = [];
 
-        // Request variable resolve with warning or error
-        [...variableReferences.entries()]
-            .filter(([name]) =>
-                allAvailableVariables.has(name)
-                && allAvailableVariables.get(name)![0] === VariableType.Request
-                && RequestVariableCache.has(new RequestVariableCacheKey(name, document.uri.toString())))
-            .forEach(([name, variables]) => {
-                const value = RequestVariableCache.get(new RequestVariableCacheKey(name, document.uri.toString()));
-                variables.forEach(v => {
-                    const path = v.variableValue.replace(/^\{{2}\s*/, '').replace(/\s*\}{2}$/, '');
-                    const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value!, path);
-                    if (result.state !== ResolveState.Success) {
+            const allAvailableVariables = await VariableProcessor.getAllVariablesDefinitions(document);
+            const variableReferences = this.findVariableReferences(document);
+
+            // Variable not found
+            [...variableReferences.entries()]
+                .filter(([name]) => !allAvailableVariables.has(name))
+                .forEach(([, variables]) => {
+                    variables.forEach(({name, begin, end}) => {
                         diagnostics.push(
-                            new Diagnostic(
-                                new Range(new Position(v.lineNumber, v.startIndex), new Position(v.lineNumber, v.endIndex)),
-                                result.message,
-                                result.state === ResolveState.Error ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning));
-                    }
+                            new Diagnostic(new Range(begin, end), `${name} is not found`, DiagnosticSeverity.Error));
+                    });
                 });
-            });
 
-        this.httpDiagnosticCollection.set(document.uri, diagnostics);
+            // Request variable not active
+            [...variableReferences.entries()]
+                .filter(([name]) =>
+                    allAvailableVariables.has(name)
+                    && allAvailableVariables.get(name)![0] === VariableType.Request
+                    && !RequestVariableCache.has(new RequestVariableCacheKey(name, document)))
+                .forEach(([, variables]) => {
+                    variables.forEach(({name, begin, end}) => {
+                        diagnostics.push(
+                            new Diagnostic(new Range(begin, end), `Request '${name}' has not been sent`, DiagnosticSeverity.Information));
+                    });
+                });
+
+            // Request variable resolve with warning or error
+            [...variableReferences.entries()]
+                .filter(([name]) =>
+                    allAvailableVariables.has(name)
+                    && allAvailableVariables.get(name)![0] === VariableType.Request
+                    && RequestVariableCache.has(new RequestVariableCacheKey(name, document)))
+                .forEach(([name, variables]) => {
+                    const value = RequestVariableCache.get(new RequestVariableCacheKey(name, document));
+                    variables.forEach(({path, begin, end}) => {
+                        path = path.replace(/^\{{2}\s*/, '').replace(/\s*\}{2}$/, '');
+                        const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value!, path);
+                        if (result.state !== ResolveState.Success) {
+                            diagnostics.push(
+                                new Diagnostic(
+                                    new Range(begin, end),
+                                    result.message,
+                                    result.state === ResolveState.Error ? DiagnosticSeverity.Error : DiagnosticSeverity.Warning));
+                        }
+                    });
+                });
+
+            this.httpDiagnosticCollection.set(document.uri, diagnostics);
+        }
     }
 
-    private findVariableReferences(document: TextDocument): Map<string, Variable[]> {
-        const vars: Map<string, Variable[]> = new Map<string, Variable[]>();
+    private findVariableReferences(document: TextDocument): Map<string, VariableWithPosition[]> {
+        const vars = new Map<string, VariableWithPosition[]>();
         const lines = document.getText().split(Constants.LineSplitterRegex);
         const pattern = /\{\{(\w+)(\..*?)*\}\}/g;
         lines.forEach((line, lineNumber) => {
             let match: RegExpExecArray | null;
             while (match = pattern.exec(line)) {
-                const [variablePath, variableName] = match;
-                const variable = new Variable(
-                    variableName,
-                    variablePath,
-                    match.index,
-                    match.index + variablePath.length,
-                    lineNumber
-                );
-                if (vars.has(variableName)) {
-                    vars.get(variableName)!.push(variable);
+                const [path, name] = match;
+                const variable = {
+                    name,
+                    path,
+                    begin: new Position(lineNumber, match.index),
+                    end: new Position(lineNumber, match.index + path.length)
+                };
+                if (vars.has(name)) {
+                    vars.get(name)!.push(variable);
                 } else {
-                    vars.set(variableName, [variable]);
+                    vars.set(name, [variable]);
                 }
             }
         });
 
         return vars;
-    }
-}
-
-class Variable {
-    constructor(
-        public variableName: string,
-        public variableValue: string,
-        public startIndex: number,
-        public endIndex: number,
-        public lineNumber: number) {
-
     }
 }

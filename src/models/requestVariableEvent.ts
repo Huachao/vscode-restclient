@@ -1,5 +1,6 @@
-import { RequestVariableCacheKey } from "./requestVariableCacheKey";
+import { TextDocument } from 'vscode';
 
 export interface RequestVariableEvent {
-  cacheKey: RequestVariableCacheKey;
+    name: string;
+    document: TextDocument;
 }

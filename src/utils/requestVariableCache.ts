@@ -18,7 +18,8 @@ export class RequestVariableCache {
 
     public static add(cacheKey: RequestVariableCacheKey, value: RequestVariableCacheValue) {
         RequestVariableCache.cache.set(cacheKey.getCacheKey(), value);
-        RequestVariableCache.eventEmitter.fire({ cacheKey });
+        const { key: name, document } = cacheKey;
+        RequestVariableCache.eventEmitter.fire({ name, document });
     }
 
     public static has(cacheKey: RequestVariableCacheKey): boolean {

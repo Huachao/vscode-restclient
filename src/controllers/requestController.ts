@@ -60,7 +60,7 @@ export class RequestController {
         const httpRequest = new RequestParserFactory().createRequestParser(text).parseHttpRequest(document.fileName);
 
         if (name) {
-            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(name, document.uri.toString());
+            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(name, document);
         }
 
         await this.runCore(httpRequest);

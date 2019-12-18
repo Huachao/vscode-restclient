@@ -40,7 +40,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
         if (!variables.includes(variableName)) {
             return { name: variableName, error: ResolveErrorMessage.RequestVariableNotExist };
         }
-        const value = RequestVariableCache.get(new RequestVariableCacheKey(variableName, document.uri.toString()));
+        const value = RequestVariableCache.get(new RequestVariableCacheKey(variableName, document));
         if (value === undefined) {
             return { name: variableName , warning: ResolveWarningMessage.RequestVariableNotSent };
         }
@@ -51,7 +51,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
 
     public async getAll(document: TextDocument): Promise<HttpVariable[]> {
         const variables = this.getRequestVariables(document);
-        return variables.map(v => ({ name: v, value: RequestVariableCache.get(new RequestVariableCacheKey(v, document.uri.toString())) }));
+        return variables.map(v => ({ name: v, value: RequestVariableCache.get(new RequestVariableCacheKey(v, document)) }));
     }
 
     private getRequestVariables(document: TextDocument): string[] {

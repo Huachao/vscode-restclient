@@ -81,9 +81,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerDocumentSymbolProvider(documentSelector, new HttpDocumentSymbolProvider()));
 
     const diagnosticsProviders = new CustomVariableDiagnosticsProvider();
-    workspace.onDidOpenTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
-    workspace.onDidCloseTextDocument(diagnosticsProviders.deleteDocumentFromDiagnosticCollection, diagnosticsProviders, context.subscriptions);
-    workspace.onDidSaveTextDocument(diagnosticsProviders.checkVariables, diagnosticsProviders, context.subscriptions);
+    context.subscriptions.push(diagnosticsProviders);
 }
 
 // this method is called when your extension is deactivated
