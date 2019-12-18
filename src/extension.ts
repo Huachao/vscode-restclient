@@ -7,7 +7,6 @@ import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
 import { RequestController } from './controllers/requestController';
 import { ResponseController } from './controllers/responseController';
-import { Logger } from './logger';
 import { CustomVariableDiagnosticsProvider } from "./providers/customVariableDiagnosticsProvider";
 import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
 import { EnvironmentOrFileVariableHoverProvider } from './providers/environmentOrFileVariableHoverProvider';
@@ -26,10 +25,8 @@ import { ConfigurationDependentRegistration } from './utils/dependentRegistratio
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: ExtensionContext) {
-    const logger = new Logger();
-
-    const requestController = new RequestController(context, logger);
-    const historyController = new HistoryController(logger);
+    const requestController = new RequestController(context);
+    const historyController = new HistoryController();
     const responseController = new ResponseController();
     const codeSnippetController = new CodeSnippetController();
     const environmentController = new EnvironmentController(await EnvironmentController.getCurrentEnvironment());

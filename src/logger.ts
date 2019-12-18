@@ -11,7 +11,7 @@ function getOrCreateOutputChannel() {
     return outputChannel;
 }
 
-export class Logger {
+class Logger {
     private readonly _outputChannel: OutputChannel;
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     public constructor() {
@@ -55,3 +55,5 @@ export class Logger {
         return JSON.stringify(data, null, 2);
     }
 }
+
+export const logger = new Logger();

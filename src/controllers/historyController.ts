@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import moment from 'moment';
 import { EOL } from 'os';
 import { window, workspace } from 'vscode';
-import { Logger } from '../logger';
+import { logger } from '../logger';
 import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
@@ -11,14 +11,14 @@ import { PersistUtility } from '../utils/persistUtility';
 const tmp = require('tmp');
 
 export class HistoryController {
-    public constructor(private readonly logger: Logger) {
+    public constructor() {
     }
 
     @trace('History')
     public async save() {
         try {
             const requests = await PersistUtility.loadRequests();
-            if (!requests || requests.length <= 0) {
+            if (requests.length === 0) {
                 window.showInformationMessage("No request history items are found!");
                 return;
             }
@@ -94,8 +94,8 @@ export class HistoryController {
     }
 
     private errorHandler(error: any, message: string) {
-        this.logger.error(message, error);
-        window.showErrorMessage("There was an error, please view details in output log");
+        logger.error(message, error);
+        window.showErrorMessage(message);
     }
 
     public dispose() {

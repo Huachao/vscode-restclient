@@ -1,6 +1,6 @@
 import { EOL } from 'os';
 import { ExtensionContext, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
-import { Logger } from '../logger';
+import { logger } from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
@@ -29,7 +29,7 @@ export class RequestController {
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
 
-    public constructor(context: ExtensionContext, private readonly logger: Logger) {
+    public constructor(context: ExtensionContext) {
         this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._sizeStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         this._httpClient = new HttpClient();
@@ -129,7 +129,7 @@ export class RequestController {
                     this._webview.render(response, previewColumn);
                 }
             } catch (reason) {
-                this.logger.error('Unable to preview response:', reason);
+                logger.error('Unable to preview response:', reason);
                 window.showErrorMessage(reason);
             }
 
@@ -151,7 +151,7 @@ export class RequestController {
             }
             this.clearSendProgressStatusText();
             this._durationStatusBarItem.text = '';
-            this.logger.error('Failed to send request:', error);
+            logger.error('Failed to send request:', error);
             window.showErrorMessage(error.message);
         } finally {
             this._requestStore.complete(<string>requestId);
