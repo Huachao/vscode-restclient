@@ -12,7 +12,7 @@ const firstPartRegex: RegExp = /^(\w+)\.$/;
 const secondPartRegex: RegExp = /^(\w+)\.(request|response)\.$/;
 
 export class RequestVariableCompletionItemProvider implements CompletionItemProvider {
-    public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[] | undefined> {
+    public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
         if (!VariableUtility.isPartialRequestVariableReference(document, position)) {
             return [];
         }
@@ -24,7 +24,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
         let fullPath = this.getRequestVariableCompletionPath(wordRange!, lineRange, position);
 
         if (!fullPath) {
-            return undefined;
+            return [];
         }
 
         const match = fullPath.match(/(\w+)\.(.*?)?/);
@@ -67,7 +67,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
             }
         }
 
-        return undefined;
+        return [];
     }
 
     private checkIfRequestVariableDefined(document: TextDocument, variableName: string) {

@@ -77,8 +77,8 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerReferenceProvider(documentSelector, new FileVariableReferenceProvider()));
     context.subscriptions.push(languages.registerDocumentSymbolProvider(documentSelector, new HttpDocumentSymbolProvider()));
 
-    const diagnosticsProviders = new CustomVariableDiagnosticsProvider();
-    context.subscriptions.push(diagnosticsProviders);
+    const diagnosticsProvider = new CustomVariableDiagnosticsProvider();
+    context.subscriptions.push(diagnosticsProvider);
 }
 
 // this method is called when your extension is deactivated

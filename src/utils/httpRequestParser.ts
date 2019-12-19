@@ -159,7 +159,7 @@ export class HttpRequestParser implements IRequestParser {
     }
 
     private static parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string | undefined): string | Stream | undefined {
-        if (!lines || lines.length === 0) {
+        if (lines.length === 0) {
             return undefined;
         }
 

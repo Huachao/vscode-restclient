@@ -15,7 +15,7 @@ export function getHeader(headers: RequestHeaders | ResponseHeaders, name: strin
 
 export function getContentType(headers: RequestHeaders | ResponseHeaders): string | undefined {
     const value = getHeader(headers, 'content-type');
-    return value ? value.toString() : undefined;
+    return value?.toString();
 }
 
 export function hasHeader(headers: RequestHeaders | ResponseHeaders, name: string): boolean {
