@@ -106,7 +106,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 }
 
                 if (type === 'rfc1123') {
-                    return { value: date.toString() };
+                    return { value: date.toDate().toUTCString() };
                 } else if (type === 'iso8601') {
                     return { value: date.toISOString() };
                 } else {
@@ -129,7 +129,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 }
 
                 if (type === 'rfc1123') {
-                    return { value: date.toString() };
+                    return { value: date.locale('en').format('ddd, DD MMM YYYY HH:mm:ss ZZ') };
                 } else if (type === 'iso8601') {
                     return { value: date.toISOString(true) };
                 } else {
