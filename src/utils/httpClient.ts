@@ -2,6 +2,7 @@ import * as fs from 'fs-extra';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';
 import { Readable, Stream } from 'stream';
+import { CookieJar } from 'tough-cookie';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
@@ -19,14 +20,16 @@ import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility
 import got = require('got');
 
 const encodeUrl = require('encodeurl');
-const { CookieJar } = require('tough-cookie');
 const cookieStore = require('tough-cookie-file-store-bugfix');
 
 export class HttpClient {
     private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
+    private readonly cookieJar: CookieJar;
+
     public constructor() {
         PersistUtility.ensureCookieFile();
+        this.cookieJar = new CookieJar(new cookieStore(PersistUtility.cookieFilePath));
     }
 
     public async send(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -118,9 +121,27 @@ export class HttpClient {
             encoding: null,
             decompress: true,
             followRedirect: this._settings.followRedirect,
-            cookieJar: this._settings.rememberCookiesForSubsequentRequests ? new CookieJar(new cookieStore(PersistUtility.cookieFilePath)) : undefined,
             rejectUnauthorized: false,
-            throwHttpErrors: false
+            throwHttpErrors: false,
+            hooks: {
+                beforeRequest: [
+                    opts => {
+                        const cookieString = this.cookieJar.getCookieStringSync(httpRequest.url, { expire: true });
+                        if (cookieString) {
+                            opts.headers!.cookie = [cookieString, getHeader(httpRequest.headers, 'cookie')].filter(Boolean).join('; ');
+                        }
+                    }
+                ],
+                afterResponse: [
+                    res => {
+                        if (this._settings.rememberCookiesForSubsequentRequests) {
+                            const setCookie = getHeader(res.headers, 'set-cookie') as string[] | undefined;
+                            setCookie?.map(rawCookie => this.cookieJar.setCookieSync(rawCookie, res.url));
+                        }
+                        return res;
+                    }
+                ]
+            }
         };
 
         if (this._settings.timeoutInMilliseconds > 0) {
@@ -142,7 +163,7 @@ export class HttpClient {
                     options.headers!['Authorization'] = `Basic ${base64(`${user}:${pass}`)}`;
                 } else if (scheme === 'Digest') {
                     removeHeader(options.headers, 'Authorization');
-                    options.hooks = { afterResponse: [digest(user, pass)] };
+                    options.hooks!.afterResponse!.push(digest(user, pass));
                 }
             }
         }
