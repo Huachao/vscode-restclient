@@ -25,6 +25,10 @@ export class HttpResponseTextDocumentView {
     public async render(response: HttpResponse, column?: ViewColumn) {
         const content = this.getTextDocumentContent(response);
         const language = this.getVSCodeDocumentLanguageId(response);
+        this.renderContent(content, language, column);
+    }
+
+    public async renderContent(content: string, language: string, column?: ViewColumn) {
         let document: TextDocument;
         if (this.settings.showResponseInDifferentTab || this.documents.length === 0) {
             document = await workspace.openTextDocument({ language, content });
