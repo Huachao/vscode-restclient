@@ -68,7 +68,6 @@ export class EnvironmentController {
         const document = getCurrentTextDocument();
         if (document && languages.match(['http', 'plaintext'], document)) {
             this._environmentStatusBarItem.show();
-            return;
         } else {
             this._environmentStatusBarItem.hide();
         }

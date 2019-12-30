@@ -108,7 +108,7 @@ export class RestClientSettings implements IRestClientSettings {
 
     private initializeSettings() {
         const document = getCurrentTextDocument();
-        const restClientSettings = workspace.getConfiguration("rest-client", document ? document.uri : null);
+        const restClientSettings = workspace.getConfiguration("rest-client", document?.uri);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultHeaders = restClientSettings.get<RequestHeaders>("defaultHeaders",
                                                                      {

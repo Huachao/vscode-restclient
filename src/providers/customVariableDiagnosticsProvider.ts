@@ -1,5 +1,6 @@
 import { ConfigurationChangeEvent, Diagnostic, DiagnosticCollection, DiagnosticSeverity, Disposable, languages, Position, Range, TextDocument, workspace } from 'vscode';
 import * as Constants from '../common/constants';
+import { DocumentCache } from '../models/documentCache';
 import { ResolveState } from '../models/httpVariableResolveResult';
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { VariableType } from '../models/variableType';
@@ -23,6 +24,8 @@ export class CustomVariableDiagnosticsProvider {
     private pendingHttpDocuments = new Set<TextDocument>();
 
     private timer: NodeJS.Timer | undefined;
+
+    private fileVaraibleReferenceCache = new DocumentCache<Map<string, VariableWithPosition[]>>();
 
     constructor() {
         this.disposables.push(
@@ -128,6 +131,10 @@ export class CustomVariableDiagnosticsProvider {
     }
 
     private findVariableReferences(document: TextDocument): Map<string, VariableWithPosition[]> {
+        if (this.fileVaraibleReferenceCache.has(document)) {
+            return this.fileVaraibleReferenceCache.get(document)!;
+        }
+
         const vars = new Map<string, VariableWithPosition[]>();
         const lines = document.getText().split(Constants.LineSplitterRegex);
         const pattern = /\{\{(\w+)(\..*?)*\}\}/g;
@@ -148,6 +155,8 @@ export class CustomVariableDiagnosticsProvider {
                 }
             }
         });
+
+        this.fileVaraibleReferenceCache.set(document, vars);
 
         return vars;
     }

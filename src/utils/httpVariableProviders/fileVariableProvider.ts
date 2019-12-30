@@ -1,8 +1,8 @@
 import { TextDocument } from 'vscode';
 import * as Constants from '../../common/constants';
+import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
-import { md5 } from '../misc';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
@@ -33,9 +33,7 @@ export class FileVariableProvider implements HttpVariableProvider {
         EnvironmentVariableProvider.Instance,
     ];
 
-    private readonly cache = new Map<string, FileVariableValue[]>();
-
-    private readonly fileMD5Hash = new Map<string, string>();
+    private readonly fileVariableCache = new DocumentCache<FileVariableValue[]>();
 
     private constructor() {
     }
@@ -65,51 +63,51 @@ export class FileVariableProvider implements HttpVariableProvider {
     }
 
     private async getFileVariables(document: TextDocument): Promise<FileVariableValue[]> {
-        const file = document.uri.toString();
-        const fileContent = document.getText();
-        const fileHash = md5(fileContent);
-        if (!this.cache.has(file) || fileHash !== this.fileMD5Hash.get(file)) {
-            const variables = new Map<string, FileVariableValue>();
-            for (const line of fileContent.split(Constants.LineSplitterRegex)) {
-                const regex = new RegExp(Constants.FileVariableDefinitionRegex, 'g');
-                let match: RegExpExecArray | null;
-                while (match = regex.exec(line)) {
-                    const [, key, originalValue] = match;
-                    let value = "";
-                    let isPrevCharEscape = false;
-                    for (const currentChar of originalValue) {
-                        if (isPrevCharEscape) {
-                            isPrevCharEscape = false;
-                            value += this.escapee.get(currentChar) || currentChar;
-                        } else {
-                            if (currentChar === "\\") {
-                                isPrevCharEscape = true;
-                                continue;
-                            }
-                            value += currentChar;
-                        }
-                    }
-                    variables.set(key, { name: key, value });
-                }
-            }
-            this.cache.set(file, [...variables.values()]);
-            this.fileMD5Hash.set(file, fileHash);
+        if (this.fileVariableCache.has(document)) {
+            return this.fileVariableCache.get(document)!;
         }
 
-        return this.cache.get(file)!;
+        const fileContent = document.getText();
+        const variables = new Map<string, FileVariableValue>();
+        for (const line of fileContent.split(Constants.LineSplitterRegex)) {
+            const regex = new RegExp(Constants.FileVariableDefinitionRegex, 'g');
+            let match: RegExpExecArray | null;
+            while (match = regex.exec(line)) {
+                const [, key, originalValue] = match;
+                let value = "";
+                let isPrevCharEscape = false;
+                for (const currentChar of originalValue) {
+                    if (isPrevCharEscape) {
+                        isPrevCharEscape = false;
+                        value += this.escapee.get(currentChar) || currentChar;
+                    } else {
+                        if (currentChar === "\\") {
+                            isPrevCharEscape = true;
+                            continue;
+                        }
+                        value += currentChar;
+                    }
+                }
+                variables.set(key, { name: key, value });
+            }
+        }
+
+        const values = [...variables.values()];
+        this.fileVariableCache.set(document, values);
+        return values;
     }
 
     private async resolveFileVariables(document: TextDocument, variables: FileVariableValue[]): Promise<Map<string, string>> {
         // Resolve non-file variables in variable value
         const fileVariableNames = new Set(variables.map(v => v.name));
         const resolvedVariables = await Promise.all(variables.map(
-            async ({name, value}) => {
+            async ({ name, value }) => {
                 const parsedValue = await this.processNonFileVariableValue(document, value, fileVariableNames);
                 return { name, value: parsedValue };
             }
         ));
 
-        const variableMap = new Map(resolvedVariables.map(({name, value}): [string, string] => [name, value]));
+        const variableMap = new Map(resolvedVariables.map(({ name, value }): [string, string] => [name, value]));
         const dependentVariables = new Map<string, string[]>();
         const dependencyCount = new Map<string, number>();
         const noDependencyVariables: string[] = [];

@@ -12,10 +12,6 @@ export class RequestVariableCache {
         return RequestVariableCache.eventEmitter.event;
     }
 
-    public static get size(): number {
-        return RequestVariableCache.cache.size;
-    }
-
     public static add(cacheKey: RequestVariableCacheKey, value: RequestVariableCacheValue) {
         RequestVariableCache.cache.set(cacheKey.getCacheKey(), value);
         const { key: name, document } = cacheKey;
