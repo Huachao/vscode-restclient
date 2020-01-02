@@ -73,7 +73,6 @@ export class RequestController {
 
     @trace('Cancel Request')
     public async cancel() {
-
         if (this._requestStore.isCompleted()) {
             return;
         }

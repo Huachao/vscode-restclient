@@ -1,5 +1,6 @@
 import { ConfigurationChangeEvent, Diagnostic, DiagnosticCollection, DiagnosticSeverity, Disposable, languages, Position, Range, TextDocument, workspace } from 'vscode';
 import * as Constants from '../common/constants';
+import { EnvironmentController } from '../controllers/environmentController';
 import { DocumentCache } from '../models/documentCache';
 import { ResolveState } from '../models/httpVariableResolveResult';
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
@@ -33,6 +34,7 @@ export class CustomVariableDiagnosticsProvider {
             workspace.onDidChangeTextDocument(event => this.queue(event.document)),
             workspace.onDidCloseTextDocument(document => this.clear(document)),
             workspace.onDidChangeConfiguration(event => this.queueAll(event)),
+            EnvironmentController.onDidChangeEnvironment(_ => this.queueAll()),
             RequestVariableCache.onDidCreateNewRequestVariable(event => this.queue(event.document))
         );
         this.queueAll();

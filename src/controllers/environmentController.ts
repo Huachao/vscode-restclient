@@ -1,28 +1,27 @@
-import { languages, StatusBarAlignment, StatusBarItem, window } from 'vscode';
+import { EventEmitter, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
 import { EnvironmentPickItem } from '../models/environmentPickItem';
 import { trace } from "../utils/decorator";
+import { EnvironmentStatusEntry } from '../utils/environmentStatusBarEntry';
 import { PersistUtility } from '../utils/persistUtility';
-import { getCurrentTextDocument } from '../utils/workspaceUtility';
 
 export class EnvironmentController {
     private static readonly noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
         'No Environment', Constants.NoEnvironmentSelectedName, 'You Can Still Use Variables Defined In $shared Environment');
 
     public static readonly sharedEnvironmentName: string = '$shared';
+
+    private static readonly _onDidChangeEnvironment = new EventEmitter<string>();
+
+    public static readonly onDidChangeEnvironment = EnvironmentController._onDidChangeEnvironment.event;
+
     private static readonly settings: RestClientSettings = RestClientSettings.Instance;
 
-    private _environmentStatusBarItem: StatusBarItem;
+    private environmentStatusEntry: EnvironmentStatusEntry;
 
     public constructor(initEnvironment: EnvironmentPickItem) {
-        this._environmentStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 100);
-        this._environmentStatusBarItem.command = 'rest-client.switch-environment';
-        this._environmentStatusBarItem.text = initEnvironment.label;
-        this._environmentStatusBarItem.tooltip = 'Switch REST Client Environment';
-        this._environmentStatusBarItem.show();
-
-        window.onDidChangeActiveTextEditor(this.showHideStatusBar, this);
+        this.environmentStatusEntry = new EnvironmentStatusEntry(initEnvironment.label);
     }
 
     @trace('Switch Environment')
@@ -46,7 +45,8 @@ export class EnvironmentController {
             return;
         }
 
-        this._environmentStatusBarItem.text = item.label;
+        EnvironmentController._onDidChangeEnvironment.fire(item.label);
+        this.environmentStatusEntry.update(item.label);
 
         await PersistUtility.saveEnvironment(item);
     }
@@ -61,15 +61,6 @@ export class EnvironmentController {
     }
 
     public dispose() {
-        this._environmentStatusBarItem.dispose();
-    }
-
-    private showHideStatusBar() {
-        const document = getCurrentTextDocument();
-        if (document && languages.match(['http', 'plaintext'], document)) {
-            this._environmentStatusBarItem.show();
-        } else {
-            this._environmentStatusBarItem.hide();
-        }
+        this.environmentStatusEntry.dispose();
     }
 }
