@@ -1,9 +1,19 @@
 import { EOL } from 'os';
 import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import { HttpResponse } from '../models/httpResponse';
-import { assert } from './misc';
 
 const filesize = require('filesize');
+
+type NonReceivedRequestStatus = {
+    state: RequestState.Closed | RequestState.Cancelled | RequestState.Error | RequestState.Pending
+};
+
+type ReceivedRequestStatus = {
+    state: RequestState.Received,
+    response: HttpResponse
+};
+
+type RequestStaus = ReceivedRequestStatus | NonReceivedRequestStatus;
 
 export enum RequestState {
     Closed,
@@ -28,10 +38,10 @@ export class RequestStatusEntry {
         this.sizeEntry.dispose();
     }
 
-    public update(state: RequestState, response?: HttpResponse) {
+    public update(status: RequestStaus) {
         this.sizeEntry.hide();
 
-        switch (state) {
+        switch (status.state) {
             case RequestState.Closed:
             case RequestState.Error:
                 this.durationEntry.hide();
@@ -52,7 +62,7 @@ export class RequestStatusEntry {
                 break;
 
             case RequestState.Received:
-                assert(response !== undefined);
+                const response = status.response;
                 this.durationEntry.text = `$(clock) ${response.timingPhases.total}ms`;
                 this.durationEntry.tooltip = [
                     'Breakdown of Duration:',

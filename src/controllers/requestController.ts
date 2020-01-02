@@ -31,7 +31,7 @@ export class RequestController {
         this._httpClient = new HttpClient();
         this._webview = new HttpResponseWebview(context);
         this._webview.onDidCloseAllWebviewPanels(() => {
-            this._requestStatusEntry.update(RequestState.Closed);
+            this._requestStatusEntry.update({ state: RequestState.Closed });
         });
         this._textDocumentView = new HttpResponseTextDocumentView();
     }
@@ -80,7 +80,7 @@ export class RequestController {
         // cancel current request
         this._requestStore.cancel();
 
-        this._requestStatusEntry.update(RequestState.Cancelled);
+        this._requestStatusEntry.update({ state: RequestState.Cancelled });
     }
 
     private async runCore(httpRequest: HttpRequest) {
@@ -88,7 +88,7 @@ export class RequestController {
         this._requestStore.add(<string>requestId, httpRequest);
 
         // clear status bar
-        this._requestStatusEntry.update(RequestState.Pending);
+        this._requestStatusEntry.update({ state: RequestState.Pending});
 
         // set http request
         try {
@@ -99,7 +99,7 @@ export class RequestController {
                 return;
             }
 
-            this._requestStatusEntry.update(RequestState.Received, response);
+            this._requestStatusEntry.update({ state: RequestState.Received, response });
 
             if (httpRequest.requestVariableCacheKey) {
                 RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
@@ -136,7 +136,7 @@ export class RequestController {
             } else if (error.code === 'ENETUNREACH') {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
-            this._requestStatusEntry.update(RequestState.Error);
+            this._requestStatusEntry.update({ state: RequestState.Error});
             logger.error('Failed to send request:', error);
             window.showErrorMessage(error.message);
         } finally {
