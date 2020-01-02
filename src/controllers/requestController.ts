@@ -1,15 +1,14 @@
-import { EOL } from 'os';
-import { ExtensionContext, Range, StatusBarAlignment, StatusBarItem, ViewColumn, window } from 'vscode';
+import { ExtensionContext, Range, ViewColumn, window } from 'vscode';
 import { logger } from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
-import { HttpResponse } from '../models/httpResponse';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
 import { PersistUtility } from '../utils/persistUtility';
+import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
 import { RequestStore } from '../utils/requestStore';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
@@ -17,26 +16,22 @@ import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
-const filesize = require('filesize');
 const uuidv4 = require('uuid/v4');
 
 export class RequestController {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private readonly _requestStore: RequestStore = RequestStore.Instance;
-    private _durationStatusBarItem: StatusBarItem;
-    private _sizeStatusBarItem: StatusBarItem;
+    private _requestStatusEntry: RequestStatusEntry;
     private _httpClient: HttpClient;
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
 
     public constructor(context: ExtensionContext) {
-        this._durationStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
-        this._sizeStatusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
+        this._requestStatusEntry = new RequestStatusEntry();
         this._httpClient = new HttpClient();
         this._webview = new HttpResponseWebview(context);
         this._webview.onDidCloseAllWebviewPanels(() => {
-            this._durationStatusBarItem.hide();
-            this._sizeStatusBarItem.hide();
+            this._requestStatusEntry.update(RequestState.Closed);
         });
         this._textDocumentView = new HttpResponseTextDocumentView();
     }
@@ -83,13 +78,10 @@ export class RequestController {
             return;
         }
 
-        this.clearSendProgressStatusText();
-
         // cancel current request
         this._requestStore.cancel();
 
-        this._durationStatusBarItem.text = 'Cancelled $(circle-slash)';
-        this._durationStatusBarItem.tooltip = undefined;
+        this._requestStatusEntry.update(RequestState.Cancelled);
     }
 
     private async runCore(httpRequest: HttpRequest) {
@@ -97,7 +89,7 @@ export class RequestController {
         this._requestStore.add(<string>requestId, httpRequest);
 
         // clear status bar
-        this.setSendingProgressStatusText();
+        this._requestStatusEntry.update(RequestState.Pending);
 
         // set http request
         try {
@@ -108,11 +100,7 @@ export class RequestController {
                 return;
             }
 
-            this.clearSendProgressStatusText();
-            this.formatDurationStatusBar(response);
-
-            this.formatSizeStatusBar(response);
-            this._sizeStatusBarItem.show();
+            this._requestStatusEntry.update(RequestState.Received, response);
 
             if (httpRequest.requestVariableCacheKey) {
                 RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
@@ -149,8 +137,7 @@ export class RequestController {
             } else if (error.code === 'ENETUNREACH') {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
-            this.clearSendProgressStatusText();
-            this._durationStatusBarItem.text = '';
+            this._requestStatusEntry.update(RequestState.Error);
             logger.error('Failed to send request:', error);
             window.showErrorMessage(error.message);
         } finally {
@@ -159,41 +146,7 @@ export class RequestController {
     }
 
     public dispose() {
-        this._durationStatusBarItem.dispose();
-        this._sizeStatusBarItem.dispose();
+        this._requestStatusEntry.dispose();
         this._webview.dispose();
-    }
-
-    private setSendingProgressStatusText() {
-        this.clearSendProgressStatusText();
-        this._durationStatusBarItem.text = `$(sync~spin) Waiting`;
-        this._durationStatusBarItem.tooltip = 'Waiting Response';
-        this._durationStatusBarItem.show();
-    }
-
-    private clearSendProgressStatusText() {
-        this._sizeStatusBarItem.hide();
-    }
-
-    private formatDurationStatusBar(response: HttpResponse) {
-        this._durationStatusBarItem.text = ` $(clock) ${response.timingPhases.total}ms`;
-        this._durationStatusBarItem.tooltip = [
-            'Breakdown of Duration:',
-            `Socket: ${response.timingPhases.wait.toFixed(1)}ms`,
-            `DNS: ${response.timingPhases.dns.toFixed(1)}ms`,
-            `TCP: ${response.timingPhases.tcp.toFixed(1)}ms`,
-            `Request: ${response.timingPhases.request.toFixed(1)}ms`,
-            `FirstByte: ${response.timingPhases.firstByte.toFixed(1)}ms`,
-            `Download: ${response.timingPhases.download.toFixed(1)}ms`
-        ].join(EOL);
-    }
-
-    private formatSizeStatusBar(response: HttpResponse) {
-        this._sizeStatusBarItem.text = ` $(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
-        this._sizeStatusBarItem.tooltip = [
-            'Breakdown of Response Size:',
-            `Headers: ${filesize(response.headersSizeInBytes)}`,
-            `Body: ${filesize(response.bodySizeInBytes)}`
-        ].join(EOL);
     }
 }

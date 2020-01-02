@@ -1,3 +1,4 @@
+import { AssertionError } from 'assert';
 import * as crypto from 'crypto';
 import { RequestHeaders, RequestHeaderValue, ResponseHeaders, ResponseHeaderValue } from '../models/base';
 
@@ -48,5 +49,11 @@ export function isJSONString(text: string): boolean {
         return true;
     } catch {
         return false;
+    }
+}
+
+export function assert(condition: any, msg?: string): asserts condition {
+    if (!condition) {
+        throw new AssertionError({ message: msg });
     }
 }
