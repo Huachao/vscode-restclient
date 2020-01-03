@@ -53,11 +53,9 @@ export class HistoryController {
         try {
             window.showInformationMessage(`Do you really want to clear request history?`, { title: 'Yes' }, { title: 'No' })
                 .then(async function (btn) {
-                    if (btn) {
-                        if (btn.title === 'Yes') {
-                            await PersistUtility.clearRequests();
-                            window.showInformationMessage('Request history has been cleared');
-                        }
+                    if (btn?.title === 'Yes') {
+                        await PersistUtility.clearRequests();
+                        window.showInformationMessage('Request history has been cleared');
                     }
                 });
         } catch (error) {

@@ -20,7 +20,7 @@ export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
     public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
-        if (!editor || !editor.document) {
+        if (!editor.document) {
             return null;
         }
 

@@ -88,7 +88,7 @@ export class RequestController {
         this._requestStore.add(<string>requestId, httpRequest);
 
         // clear status bar
-        this._requestStatusEntry.update({ state: RequestState.Pending});
+        this._requestStatusEntry.update({ state: RequestState.Pending });
 
         // set http request
         try {
