@@ -1,4 +1,5 @@
 import { DocumentWrapper } from "../utils/DocumentWrapper";
+import { MyEventEmitter } from "../utils/myEventEmitter";
 import { RequestHeaders } from './base';
 import { FormParamEncodingStrategy } from './formParamEncodingStrategy';
 import { HostCertificate } from './hostCertificate';
@@ -43,5 +44,5 @@ export abstract class RestClientSettings {
     abstract showWarningMessage(message: string): void;
     abstract getCurrentHttpFileName(): string | undefined;
     abstract getCurrentDocumentWrapper(): DocumentWrapper | undefined;
+    abstract getEmitter<T>(): MyEventEmitter<T>;
 }
-

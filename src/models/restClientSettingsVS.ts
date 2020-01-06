@@ -3,6 +3,8 @@ import { CharacterPair, Event, EventEmitter, languages, TextDocument, ViewColumn
 import configuration from '../../language-configuration.json';
 import { DocumentWrapper } from "../utils/DocumentWrapper";
 import { DocumentWrapperVS } from '../utils/documentWrapperVS';
+import { EventEmitterVS } from '../utils/eventEmitterVS';
+import { MyEventEmitter } from '../utils/myEventEmitter';
 import { RequestHeaders } from "./base";
 import { RestClientSettings } from "./configurationSettings";
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
@@ -105,6 +107,10 @@ export class RestClientSettingsVS implements RestClientSettings {
 
     showWarningMessage(message: string): void {
         window.showWarningMessage(message);
+    }
+
+    getEmitter<T>(): MyEventEmitter<T> {
+        return new EventEmitterVS<T>(new EventEmitter<T>());
     }
 
     public constructor() {

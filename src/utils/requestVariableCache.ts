@@ -1,14 +1,15 @@
-import { Event, EventEmitter } from "vscode";
+import { RestClientSettings } from "../models/configurationSettings";
 import { RequestVariableCacheKey } from "../models/requestVariableCacheKey";
 import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
 import { RequestVariableEvent } from '../models/requestVariableEvent';
+import { MyEvent, MyEventEmitter } from "./myEventEmitter";
 
 export class RequestVariableCache {
     private static cache: Map<string, RequestVariableCacheValue> = new Map<string, RequestVariableCacheValue>();
 
-    private static readonly eventEmitter = new EventEmitter<RequestVariableEvent>();
+    private static readonly eventEmitter: MyEventEmitter<RequestVariableEvent> = RestClientSettings.Instance.getEmitter<RequestVariableEvent>();
 
-    public static get onDidCreateNewRequestVariable(): Event<RequestVariableEvent> {
+    public static get onDidCreateNewRequestVariable(): MyEvent<RequestVariableEvent> {
         return RequestVariableCache.eventEmitter.event;
     }
 
