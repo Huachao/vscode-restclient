@@ -1,8 +1,8 @@
-import { TextDocument } from 'vscode';
 import * as Constants from '../../common/constants';
 import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
+import { DocumentWrapper } from "../DocumentWrapper";
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
@@ -40,12 +40,12 @@ export class FileVariableProvider implements HttpVariableProvider {
 
     public readonly type: VariableType = VariableType.File;
 
-    public async has(name: string, document: TextDocument): Promise<boolean> {
+    public async has(name: string, document: DocumentWrapper): Promise<boolean> {
         const variables = await this.getFileVariables(document);
         return variables.some(v => v.name === name);
     }
 
-    public async get(name: string, document: TextDocument): Promise<HttpVariable> {
+    public async get(name: string, document: DocumentWrapper): Promise<HttpVariable> {
         const variables = await this.getFileVariables(document);
         const variable = variables.find(v => v.name === name);
         if (!variable) {
@@ -56,13 +56,13 @@ export class FileVariableProvider implements HttpVariableProvider {
         }
     }
 
-    public async getAll(document: TextDocument): Promise<HttpVariable[]> {
+    public async getAll(document: DocumentWrapper): Promise<HttpVariable[]> {
         const variables = await this.getFileVariables(document);
         const variableMap = await this.resolveFileVariables(document, variables);
         return [...variableMap.entries()].map(([name, value]) => ({ name, value }));
     }
 
-    private async getFileVariables(document: TextDocument): Promise<FileVariableValue[]> {
+    private async getFileVariables(document: DocumentWrapper): Promise<FileVariableValue[]> {
         if (this.fileVariableCache.has(document)) {
             return this.fileVariableCache.get(document)!;
         }
@@ -97,7 +97,7 @@ export class FileVariableProvider implements HttpVariableProvider {
         return values;
     }
 
-    private async resolveFileVariables(document: TextDocument, variables: FileVariableValue[]): Promise<Map<string, string>> {
+    private async resolveFileVariables(document: DocumentWrapper, variables: FileVariableValue[]): Promise<Map<string, string>> {
         // Resolve non-file variables in variable value
         const fileVariableNames = new Set(variables.map(v => v.name));
         const resolvedVariables = await Promise.all(variables.map(
@@ -153,7 +153,7 @@ export class FileVariableProvider implements HttpVariableProvider {
         return variableMap;
     }
 
-    private async processNonFileVariableValue(document: TextDocument, value: string, variables: Set<string>): Promise<string> {
+    private async processNonFileVariableValue(document: DocumentWrapper, value: string, variables: Set<string>): Promise<string> {
         const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;
         let result = '';
         let match: RegExpExecArray | null;

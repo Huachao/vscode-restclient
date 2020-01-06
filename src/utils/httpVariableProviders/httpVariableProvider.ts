@@ -1,7 +1,6 @@
-import { TextDocument } from "vscode";
 import { RequestVariableCacheValue } from '../../models/requestVariableCacheValue';
 import { VariableType } from "../../models/variableType";
-
+import { DocumentWrapper } from '../DocumentWrapper';
 
 export type HttpVariableValue = string | {} | RequestVariableCacheValue;
 
@@ -19,7 +18,7 @@ export interface HttpVariableContext {
 
 export interface HttpVariableProvider {
     readonly type: VariableType;
-    has(name: string, document?: TextDocument, context?: HttpVariableContext): Promise<boolean>;
-    get(name: string, document?: TextDocument, context?: HttpVariableContext): Promise<HttpVariable>;
-    getAll(document?: TextDocument, context?: HttpVariableContext): Promise<HttpVariable[]>;
+    has(name: string, document?: DocumentWrapper, context?: HttpVariableContext): Promise<boolean>;
+    get(name: string, document?: DocumentWrapper, context?: HttpVariableContext): Promise<HttpVariable>;
+    getAll(document?: DocumentWrapper, context?: HttpVariableContext): Promise<HttpVariable[]>;
 }

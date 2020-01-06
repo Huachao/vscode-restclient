@@ -13,7 +13,6 @@ import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry
 import { RequestStore } from '../utils/requestStore';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
-import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
@@ -40,7 +39,7 @@ export class RequestController {
     @trace('Request')
     public async run(range: Range) {
         const editor = window.activeTextEditor;
-        const document = getCurrentTextDocument();
+        const document = this._restClientSettings.getCurrentDocumentWrapper();
         if (!editor || !document) {
             return;
         }

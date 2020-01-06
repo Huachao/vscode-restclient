@@ -6,6 +6,8 @@ import { ResolveState } from '../models/httpVariableResolveResult';
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { VariableType } from '../models/variableType';
 import { disposeAll } from '../utils/dispose';
+import { DocumentWrapper } from "../utils/DocumentWrapper";
+import { DocumentWrapperVS } from '../utils/documentWrapperVS';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { VariableProcessor } from "../utils/variableProcessor";
@@ -35,7 +37,7 @@ export class CustomVariableDiagnosticsProvider {
             workspace.onDidCloseTextDocument(document => this.clear(document)),
             workspace.onDidChangeConfiguration(event => this.queueAll(event)),
             EnvironmentController.onDidChangeEnvironment(_ => this.queueAll()),
-            RequestVariableCache.onDidCreateNewRequestVariable(event => this.queue(event.document))
+            RequestVariableCache.onDidCreateNewRequestVariable(event => this.queue(DocumentWrapperVS.unwrap(event.document)))
         );
         this.queueAll();
     }
@@ -74,6 +76,7 @@ export class CustomVariableDiagnosticsProvider {
 
     public async checkVariables() {
         for (const document of this.pendingHttpDocuments) {
+            const documentWrapper = new DocumentWrapperVS(document);
             this.pendingHttpDocuments.delete(document);
             if (document.isClosed) {
                 continue;
@@ -81,14 +84,14 @@ export class CustomVariableDiagnosticsProvider {
 
             const diagnostics: Diagnostic[] = [];
 
-            const allAvailableVariables = await VariableProcessor.getAllVariablesDefinitions(document);
-            const variableReferences = this.findVariableReferences(document);
+            const allAvailableVariables = await VariableProcessor.getAllVariablesDefinitions(documentWrapper);
+            const variableReferences = this.findVariableReferences(documentWrapper);
 
             // Variable not found
             [...variableReferences.entries()]
                 .filter(([name]) => !allAvailableVariables.has(name))
                 .forEach(([, variables]) => {
-                    variables.forEach(({name, begin, end}) => {
+                    variables.forEach(({ name, begin, end }) => {
                         diagnostics.push(
                             new Diagnostic(new Range(begin, end), `${name} is not found`, DiagnosticSeverity.Error));
                     });
@@ -99,9 +102,9 @@ export class CustomVariableDiagnosticsProvider {
                 .filter(([name]) =>
                     allAvailableVariables.has(name)
                     && allAvailableVariables.get(name)![0] === VariableType.Request
-                    && !RequestVariableCache.has(new RequestVariableCacheKey(name, document)))
+                    && !RequestVariableCache.has(new RequestVariableCacheKey(name, documentWrapper)))
                 .forEach(([, variables]) => {
-                    variables.forEach(({name, begin, end}) => {
+                    variables.forEach(({ name, begin, end }) => {
                         diagnostics.push(
                             new Diagnostic(new Range(begin, end), `Request '${name}' has not been sent`, DiagnosticSeverity.Information));
                     });
@@ -112,10 +115,10 @@ export class CustomVariableDiagnosticsProvider {
                 .filter(([name]) =>
                     allAvailableVariables.has(name)
                     && allAvailableVariables.get(name)![0] === VariableType.Request
-                    && RequestVariableCache.has(new RequestVariableCacheKey(name, document)))
+                    && RequestVariableCache.has(new RequestVariableCacheKey(name, documentWrapper)))
                 .forEach(([name, variables]) => {
-                    const value = RequestVariableCache.get(new RequestVariableCacheKey(name, document));
-                    variables.forEach(({path, begin, end}) => {
+                    const value = RequestVariableCache.get(new RequestVariableCacheKey(name, documentWrapper));
+                    variables.forEach(({ path, begin, end }) => {
                         path = path.replace(/^\{{2}\s*/, '').replace(/\s*\}{2}$/, '');
                         const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value!, path);
                         if (result.state !== ResolveState.Success) {
@@ -132,7 +135,7 @@ export class CustomVariableDiagnosticsProvider {
         }
     }
 
-    private findVariableReferences(document: TextDocument): Map<string, VariableWithPosition[]> {
+    private findVariableReferences(document: DocumentWrapper): Map<string, VariableWithPosition[]> {
         if (this.fileVaraibleReferenceCache.has(document)) {
             return this.fileVaraibleReferenceCache.get(document)!;
         }

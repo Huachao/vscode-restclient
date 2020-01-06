@@ -1,7 +1,8 @@
+import { DocumentWrapper } from "../utils/DocumentWrapper";
 import { RequestHeaders } from './base';
 import { FormParamEncodingStrategy } from './formParamEncodingStrategy';
 import { HostCertificate } from './hostCertificate';
-import {  LogLevel } from './logLevel';
+import { LogLevel } from './logLevel';
 import { PreviewOption } from './previewOption';
 
 export abstract class RestClientSettings {
@@ -39,7 +40,8 @@ export abstract class RestClientSettings {
     static Instance: RestClientSettings;
     abstract getRootFsPath(): string | undefined;
     abstract getRootPath(): string | undefined;
-    abstract showWarningMessage(message: string) : void;
+    abstract showWarningMessage(message: string): void;
     abstract getCurrentHttpFileName(): string | undefined;
+    abstract getCurrentDocumentWrapper(): DocumentWrapper | undefined;
 }
 

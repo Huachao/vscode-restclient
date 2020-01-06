@@ -1,9 +1,9 @@
-import { TextDocument } from 'vscode';
 import * as Constants from '../../common/constants';
 import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { RequestVariableCacheKey } from '../../models/requestVariableCacheKey';
 import { VariableType } from '../../models/variableType';
+import { DocumentWrapper } from "../DocumentWrapper";
 import { RequestVariableCache } from '../requestVariableCache';
 import { RequestVariableCacheValueProcessor } from '../requestVariableCacheValueProcessor';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
@@ -26,13 +26,13 @@ export class RequestVariableProvider implements HttpVariableProvider {
 
     public readonly type: VariableType = VariableType.Request;
 
-    public async has(name: string, document: TextDocument): Promise<boolean> {
+    public async has(name: string, document: DocumentWrapper): Promise<boolean> {
         const [variableName] = name.trim().split('.');
         const variables = this.getRequestVariables(document);
         return variables.includes(variableName);
     }
 
-    public async get(name: string, document: TextDocument): Promise<HttpVariable> {
+    public async get(name: string, document: DocumentWrapper): Promise<HttpVariable> {
         const [variableName] = name.trim().split('.');
         const variables = this.getRequestVariables(document);
         if (!variables.includes(variableName)) {
@@ -47,12 +47,12 @@ export class RequestVariableProvider implements HttpVariableProvider {
         return this.convertToHttpVariable(variableName, resolveResult);
     }
 
-    public async getAll(document: TextDocument): Promise<HttpVariable[]> {
+    public async getAll(document: DocumentWrapper): Promise<HttpVariable[]> {
         const variables = this.getRequestVariables(document);
         return variables.map(v => ({ name: v, value: RequestVariableCache.get(new RequestVariableCacheKey(v, document)) }));
     }
 
-    private getRequestVariables(document: TextDocument): string[] {
+    private getRequestVariables(document: DocumentWrapper): string[] {
         if (this.requestVariableCache.has(document)) {
             return this.requestVariableCache.get(document)!;
         }

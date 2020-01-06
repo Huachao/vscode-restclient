@@ -1,6 +1,7 @@
 import { CancellationToken, CodeLens, CodeLensProvider, Command, Location, Range, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { DocumentCache } from '../models/documentCache';
+import { DocumentWrapperVS } from '../utils/documentWrapperVS';
 import { Selector } from '../utils/selector';
 import { VariableUtility } from '../utils/variableUtility';
 
@@ -8,8 +9,10 @@ export class FileVariableReferencesCodeLensProvider implements CodeLensProvider 
     private readonly fileVariableReferenceCache = new DocumentCache<CodeLens[]>();
 
     public provideCodeLenses(document: TextDocument, token: CancellationToken): Promise<CodeLens[]> {
-        if (this.fileVariableReferenceCache.has(document)) {
-            return Promise.resolve(this.fileVariableReferenceCache.get(document)!);
+        const documentWrapper = new DocumentWrapperVS(document);
+
+        if (this.fileVariableReferenceCache.has(documentWrapper)) {
+            return Promise.resolve(this.fileVariableReferenceCache.get(documentWrapper)!);
         }
 
         const blocks: CodeLens[] = [];
@@ -39,7 +42,7 @@ export class FileVariableReferencesCodeLensProvider implements CodeLensProvider 
             }
         }
 
-        this.fileVariableReferenceCache.set(document, blocks);
+        this.fileVariableReferenceCache.set(documentWrapper, blocks);
 
         return Promise.resolve(blocks);
     }

@@ -1,4 +1,5 @@
 import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, Range, TextDocument, TextLine } from 'vscode';
+import { DocumentWrapperVS } from '../utils/documentWrapperVS';
 import { RequestVariableProvider } from '../utils/httpVariableProviders/requestVariableProvider';
 import { VariableUtility } from '../utils/variableUtility';
 
@@ -16,7 +17,7 @@ export class RequestVariableHoverProvider implements HoverProvider {
         if (!fullPath) {
             return undefined;
         }
-        const { name, value, warning, error } = await RequestVariableProvider.Instance.get(fullPath, document);
+        const { name, value, warning, error } = await RequestVariableProvider.Instance.get(fullPath, new DocumentWrapperVS(document));
         if (!error && !warning) {
             const contents: MarkedString[] = [];
             if (value) {

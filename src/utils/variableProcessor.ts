@@ -1,11 +1,11 @@
-import { TextDocument } from 'vscode';
+import { RestClientSettings } from '../models/configurationSettings';
 import { VariableType } from "../models/variableType";
+import { DocumentWrapper } from './DocumentWrapper';
 import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
 import { HttpVariableProvider } from './httpVariableProviders/httpVariableProvider';
 import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
 import { SystemVariableProvider } from './httpVariableProviders/systemVariableProvider';
-import { getCurrentTextDocument } from './workspaceUtility';
 
 export class VariableProcessor {
 
@@ -27,7 +27,7 @@ export class VariableProcessor {
             result += request.substring(lastIndex, match.index);
             lastIndex = variableReferenceRegex.lastIndex;
             const name = match[1].trim();
-            const document = getCurrentTextDocument();
+            const document = RestClientSettings.Instance.getCurrentDocumentWrapper();
             const context = { rawRequest: request, parsedRequest: result };
             for (const [provider, cacheable] of VariableProcessor.providers) {
                 if (resolvedVariables.has(name)) {
@@ -54,7 +54,7 @@ export class VariableProcessor {
         return result;
     }
 
-    public static async getAllVariablesDefinitions(document: TextDocument): Promise<Map<string, VariableType[]>> {
+    public static async getAllVariablesDefinitions(document: DocumentWrapper): Promise<Map<string, VariableType[]>> {
         const [, [requestProvider], [fileProvider], [environmentProvider]] = VariableProcessor.providers;
         const requestVariables = await (requestProvider as RequestVariableProvider).getAll(document);
         const fileVariables = await (fileProvider as FileVariableProvider).getAll(document);

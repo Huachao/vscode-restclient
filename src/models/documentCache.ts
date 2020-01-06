@@ -1,4 +1,4 @@
-import { TextDocument } from 'vscode';
+import { DocumentWrapper } from "../utils/DocumentWrapper";
 
 interface CacheValue<T> {
     version: number;
@@ -12,17 +12,17 @@ export class DocumentCache<T> {
         this._cache = new Map<string, CacheValue<T>>();
     }
 
-    public get(document: TextDocument): T | undefined {
+    public get(document: DocumentWrapper): T | undefined {
         const result = this._cache.get(this.getKey(document));
         return result?.version === document.version ? result.value : undefined;
     }
 
-    public set(document: TextDocument, value: T): this {
+    public set(document: DocumentWrapper, value: T): this {
         this._cache.set(this.getKey(document), { version: document.version, value });
         return this;
     }
 
-    public delete(document: TextDocument): boolean {
+    public delete(document: DocumentWrapper): boolean {
         return this.has(document) && this._cache.delete(this.getKey(document));
     }
 
@@ -30,13 +30,13 @@ export class DocumentCache<T> {
         this._cache.clear();
     }
 
-    public has(document: TextDocument): boolean {
+    public has(document: DocumentWrapper): boolean {
         const key = this.getKey(document);
         return this._cache.has(key)
             && this._cache.get(key)!.version === document.version;
     }
 
-    private getKey(document: TextDocument): string {
-        return `${document.uri.toString()}`;
+    private getKey(document: DocumentWrapper): string {
+        return `${document.getPath()}`;
     }
 }

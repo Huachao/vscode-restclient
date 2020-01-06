@@ -1,6 +1,8 @@
 import * as path from 'path';
 import { CharacterPair, Event, EventEmitter, languages, ViewColumn, window, workspace } from 'vscode';
 import configuration from '../../language-configuration.json';
+import { DocumentWrapper } from "../utils/DocumentWrapper";
+import { DocumentWrapperVS } from '../utils/documentWrapperVS';
 import { getCurrentTextDocument } from "../utils/workspaceUtility";
 import { RequestHeaders } from "./base";
 import { RestClientSettings } from "./configurationSettings";
@@ -86,6 +88,14 @@ export class RestClientSettingsVS implements RestClientSettings {
         if (document) {
             const filePath = document.fileName;
             return path.basename(filePath, path.extname(filePath));
+        }
+    }
+
+    getCurrentDocumentWrapper(): DocumentWrapper | undefined {
+        if (window.activeTextEditor) {
+            return new DocumentWrapperVS(window.activeTextEditor!.document);
+        } else {
+            return undefined;
         }
     }
 

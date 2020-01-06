@@ -3,6 +3,7 @@ import * as Constants from "../common/constants";
 import { ElementType } from "../models/httpElement";
 import { ResolveState, ResolveWarningMessage } from "../models/httpVariableResolveResult";
 import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
+import { DocumentWrapperVS } from '../utils/documentWrapperVS';
 import { RequestVariableProvider } from '../utils/httpVariableProviders/requestVariableProvider';
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { VariableUtility } from "../utils/variableUtility";
@@ -44,7 +45,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
             ];
         }
 
-        const requestVariables = await RequestVariableProvider.Instance.getAll(document);
+        const requestVariables = await RequestVariableProvider.Instance.getAll(new DocumentWrapperVS(document));
         for (const { name, value } of requestVariables) {
             // Only add completion items for headers
             const regex = new RegExp(`^(${name}).(?:request|response).headers.$`);
@@ -54,7 +55,7 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
 
                 const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value as RequestVariableCacheValue, fullPath);
                 if (result.state === ResolveState.Warning && result.message === ResolveWarningMessage.MissingHeaderName) {
-                    const {value} = result;
+                    const { value } = result;
                     return Object.keys(value).map(p => {
                         const item = new CompletionItem(p);
                         item.detail = `HTTP ${ElementType[ElementType.RequestCustomVariable]}`;

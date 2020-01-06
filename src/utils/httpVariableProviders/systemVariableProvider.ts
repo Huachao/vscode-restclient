@@ -9,6 +9,8 @@ import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { AadTokenCache } from '../aadTokenCache';
+import { DocumentWrapper } from "../DocumentWrapper";
+import { DocumentWrapperVS } from "../documentWrapperVS";
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
@@ -34,7 +36,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private readonly aadRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+aud:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
 
-    private readonly innerSettingsEnvironmentVariableProvider: EnvironmentVariableProvider =  EnvironmentVariableProvider.Instance;
+    private readonly innerSettingsEnvironmentVariableProvider: EnvironmentVariableProvider = EnvironmentVariableProvider.Instance;
     private static _instance: SystemVariableProvider;
 
     public static get Instance(): SystemVariableProvider {
@@ -59,18 +61,20 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     public readonly type: VariableType = VariableType.System;
 
-    public async has(name: string, document: TextDocument): Promise<boolean> {
+    public async has(name: string, document: DocumentWrapper): Promise<boolean> {
         const [variableName] = name.split(' ').filter(Boolean);
         return this.resolveFuncs.has(variableName);
     }
 
-    public async get(name: string, document: TextDocument, context: HttpVariableContext): Promise<HttpVariable> {
+    public async get(name: string, document: DocumentWrapper, context: HttpVariableContext): Promise<HttpVariable> {
         const [variableName] = name.split(' ').filter(Boolean);
         if (!this.resolveFuncs.has(variableName)) {
             return { name: variableName, error: ResolveErrorMessage.SystemVariableNotExist };
         }
 
-        const result = await this.resolveFuncs.get(variableName)!(name, document, context);
+        const textDocument = DocumentWrapperVS.unwrap(document);
+
+        const result = await this.resolveFuncs.get(variableName)!(name, textDocument, context);
         return { name: variableName, ...result };
     }
 
@@ -161,9 +165,9 @@ export class SystemVariableProvider implements HttpVariableProvider {
         });
     }
 
-    private async resolveSettingsEnvironmentVariable (name: string) {
+    private async resolveSettingsEnvironmentVariable(name: string) {
         if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
-            const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);
+            const { value, error, warning } = await this.innerSettingsEnvironmentVariableProvider.get(name);
             if (!error && !warning) {
                 return value!.toString();
             } else {
@@ -177,7 +181,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private registerProcessEnvVariable() {
         this.resolveFuncs.set(Constants.ProcessEnvVariableName, async name => {
             const groups = this.processEnvRegex.exec(name);
-            if (groups !== null && groups.length === 3 ) {
+            if (groups !== null && groups.length === 3) {
                 const [, refToggle, environmentVarName] = groups;
                 let processEnvName = environmentVarName;
                 if (refToggle !== undefined) {
@@ -254,7 +258,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                     const tokenString = `${token.tokenType} ${token.accessToken}`;
                     if (copy && tokenString) {
                         // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
-                       this.clipboard.writeText(tokenString).then(() => resolve({ value: tokenString }));
+                        this.clipboard.writeText(tokenString).then(() => resolve({ value: tokenString }));
                     } else {
                         resolve({ value: tokenString });
                     }

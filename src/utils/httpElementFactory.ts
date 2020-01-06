@@ -2,6 +2,7 @@ import * as url from 'url';
 import { MarkdownString, SnippetString, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { ElementType, HttpElement } from '../models/httpElement';
+import { DocumentWrapperVS } from './documentWrapperVS';
 import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
 import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
@@ -148,8 +149,9 @@ export class HttpElementFactory {
                     new SnippetString(`{{${name}}}`)));
         }
 
+        const documentWrapper = new DocumentWrapperVS(document);
         // add file custom variables
-        const fileVariables = await FileVariableProvider.Instance.getAll(document);
+        const fileVariables = await FileVariableProvider.Instance.getAll(documentWrapper);
         for (const { name, value } of fileVariables) {
             originalElements.push(
                 new HttpElement(
@@ -161,7 +163,7 @@ export class HttpElementFactory {
         }
 
         // add request variables
-        const requestVariables = await RequestVariableProvider.Instance.getAll(document);
+        const requestVariables = await RequestVariableProvider.Instance.getAll(documentWrapper);
         for (const { name, value } of requestVariables) {
             const v = new MarkdownString(`Value: Request Variable ${name}${value ? '' : ' *(Inactive)*'}`);
             originalElements.push(

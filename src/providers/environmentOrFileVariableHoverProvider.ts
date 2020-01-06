@@ -1,4 +1,5 @@
 import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, TextDocument } from 'vscode';
+import { DocumentWrapperVS } from '../utils/documentWrapperVS';
 import { EnvironmentVariableProvider } from '../utils/httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from '../utils/httpVariableProviders/fileVariableProvider';
 import { VariableUtility } from '../utils/variableUtility';
@@ -13,8 +14,9 @@ export class EnvironmentOrFileVariableHoverProvider implements HoverProvider {
         const wordRange = document.getWordRangeAtPosition(position);
         const selectedVariableName = document.getText(wordRange);
 
-        if (await FileVariableProvider.Instance.has(selectedVariableName, document)) {
-            const { name, value, error, warning } = await FileVariableProvider.Instance.get(selectedVariableName, document);
+        const documentWrapper = new DocumentWrapperVS(document);
+        if (await FileVariableProvider.Instance.has(selectedVariableName, documentWrapper)) {
+            const { name, value, error, warning } = await FileVariableProvider.Instance.get(selectedVariableName, documentWrapper);
             if (!warning && !error) {
                 const contents: MarkedString[] = [value as string, new MarkdownString(`*File Variable* \`${name}\``)];
                 return new Hover(contents, wordRange);

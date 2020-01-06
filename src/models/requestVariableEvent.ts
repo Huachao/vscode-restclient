@@ -1,6 +1,6 @@
-import { TextDocument } from 'vscode';
+import { DocumentWrapper } from "../utils/DocumentWrapper";
 
 export interface RequestVariableEvent {
     name: string;
-    document: TextDocument;
+    document: DocumentWrapper;
 }
