@@ -1,4 +1,9 @@
 'use strict';
+// Initialize RestClientSettings very early: some static configuration
+// deep in some classes read the settings.
+import { RestClientSettings } from './models/configurationSettings';
+import { RestClientSettingsVS } from './models/restClientSettingsVS';
+RestClientSettings.Instance = new RestClientSettingsVS();
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import { commands, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
@@ -7,8 +12,6 @@ import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
 import { RequestController } from './controllers/requestController';
 import { ResponseController } from './controllers/responseController';
-import { RestClientSettings } from './models/configurationSettings';
-import { RestClientSettingsVS } from './models/restClientSettingsVS';
 import { CustomVariableDiagnosticsProvider } from "./providers/customVariableDiagnosticsProvider";
 import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
 import { EnvironmentOrFileVariableHoverProvider } from './providers/environmentOrFileVariableHoverProvider';
@@ -27,7 +30,6 @@ import { ConfigurationDependentRegistration } from './utils/dependentRegistratio
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: ExtensionContext) {
-    RestClientSettings.Instance = new RestClientSettingsVS();
     const requestController = new RequestController(context);
     const historyController = new HistoryController();
     const responseController = new ResponseController();
