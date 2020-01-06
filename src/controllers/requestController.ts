@@ -5,6 +5,7 @@ import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
+import { RestClientSettingsVS } from '../models/restClientSettingsVS';
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
 import { PersistUtility } from '../utils/persistUtility';
@@ -19,7 +20,7 @@ import { HttpResponseWebview } from '../views/httpResponseWebview';
 const uuidv4 = require('uuid/v4');
 
 export class RequestController {
-    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
+    private readonly _restClientSettings: RestClientSettingsVS = RestClientSettings.Instance as RestClientSettingsVS;
     private readonly _requestStore: RequestStore = RequestStore.Instance;
     private _requestStatusEntry: RequestStatusEntry;
     private _httpClient: HttpClient;

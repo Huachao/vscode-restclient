@@ -1,5 +1,6 @@
 import { Disposable } from 'vscode';
 import { RestClientSettings } from '../models/configurationSettings';
+import { RestClientSettingsVS } from '../models/restClientSettingsVS';
 
 class ConditionalRegistration {
     private registration: Disposable | undefined;
@@ -29,7 +30,7 @@ class ConditionalRegistration {
 }
 
 export class ConfigurationDependentRegistration {
-    private readonly settings: RestClientSettings = RestClientSettings.Instance;
+    private readonly settings: RestClientSettingsVS = RestClientSettings.Instance as RestClientSettingsVS;
     private readonly registration: ConditionalRegistration;
 
     public constructor(register: () => Disposable, private readonly settingValueFunc: (settings: RestClientSettings) => boolean) {
