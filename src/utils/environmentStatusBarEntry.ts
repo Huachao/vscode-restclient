@@ -1,5 +1,5 @@
 import { languages, StatusBarAlignment, StatusBarItem, window } from 'vscode';
-import { getCurrentTextDocument } from './workspaceUtility';
+import { RestClientSettingsVS } from '../models/restClientSettingsVS';
 
 export class EnvironmentStatusEntry {
     private readonly environmentEntry: StatusBarItem;
@@ -23,7 +23,7 @@ export class EnvironmentStatusEntry {
     }
 
     private showHideStatusBar() {
-        const document = getCurrentTextDocument();
+        const document = RestClientSettingsVS.getCurrentTextDocument();
         if (document && languages.match(['http', 'plaintext'], document)) {
             this.environmentEntry.show();
         } else {

@@ -1,9 +1,8 @@
 import * as path from 'path';
-import { CharacterPair, Event, EventEmitter, languages, ViewColumn, window, workspace } from 'vscode';
+import { CharacterPair, Event, EventEmitter, languages, TextDocument, ViewColumn, window, workspace } from 'vscode';
 import configuration from '../../language-configuration.json';
 import { DocumentWrapper } from "../utils/DocumentWrapper";
 import { DocumentWrapperVS } from '../utils/documentWrapperVS';
-import { getCurrentTextDocument } from "../utils/workspaceUtility";
 import { RequestHeaders } from "./base";
 import { RestClientSettings } from "./configurationSettings";
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
@@ -62,7 +61,7 @@ export class RestClientSettingsVS implements RestClientSettings {
     }
 
     getRootFsPath(): string | undefined {
-        const document = getCurrentTextDocument();
+        const document = RestClientSettingsVS.getCurrentTextDocument();
         if (document) {
             const fileUri = document.uri;
             const workspaceFolder = workspace.getWorkspaceFolder(fileUri);
@@ -73,7 +72,7 @@ export class RestClientSettingsVS implements RestClientSettings {
     }
     // FIXME: do we really need to get both .uri.toString() and .uri.fsPath?
     getRootPath(): string | undefined {
-        const document = getCurrentTextDocument();
+        const document = RestClientSettingsVS.getCurrentTextDocument();
         if (document) {
             const fileUri = document.uri;
             const workspaceFolder = workspace.getWorkspaceFolder(fileUri);
@@ -84,16 +83,21 @@ export class RestClientSettingsVS implements RestClientSettings {
     }
 
     getCurrentHttpFileName(): string | undefined {
-        const document = getCurrentTextDocument();
+        const document = RestClientSettingsVS.getCurrentTextDocument();
         if (document) {
             const filePath = document.fileName;
             return path.basename(filePath, path.extname(filePath));
         }
     }
 
+    public static getCurrentTextDocument(): TextDocument | undefined {
+        return window.activeTextEditor?.document;
+    }
+
     getCurrentDocumentWrapper(): DocumentWrapper | undefined {
-        if (window.activeTextEditor) {
-            return new DocumentWrapperVS(window.activeTextEditor!.document);
+        const textDocument = RestClientSettingsVS.getCurrentTextDocument();
+        if (textDocument) {
+            return new DocumentWrapperVS(textDocument);
         } else {
             return undefined;
         }
@@ -120,7 +124,7 @@ export class RestClientSettingsVS implements RestClientSettings {
     }
 
     private initializeSettings() {
-        const document = getCurrentTextDocument();
+        const document = RestClientSettingsVS.getCurrentTextDocument();
         const restClientSettings = workspace.getConfiguration("rest-client", document?.uri);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultHeaders = restClientSettings.get<RequestHeaders>("defaultHeaders",

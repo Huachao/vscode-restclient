@@ -5,11 +5,11 @@ import { logger } from '../logger';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
+import { RestClientSettingsVS } from '../models/restClientSettingsVS';
 import { trace } from "../utils/decorator";
 import { base64 } from '../utils/misc';
 import { Selector } from '../utils/selector';
 import { Telemetry } from '../utils/telemetry';
-import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
 const encodeUrl = require('encodeurl');
@@ -47,7 +47,7 @@ export class CodeSnippetController {
 
     public async run() {
         const editor = window.activeTextEditor;
-        const document = getCurrentTextDocument();
+        const document = RestClientSettingsVS.getCurrentTextDocument();
         if (!editor || !document) {
             return;
         }
@@ -127,7 +127,7 @@ export class CodeSnippetController {
     @trace('Copy Request As cURL')
     public async copyAsCurl() {
         const editor = window.activeTextEditor;
-        const document = getCurrentTextDocument();
+        const document = RestClientSettingsVS.getCurrentTextDocument();
         if (!editor || !document) {
             return;
         }
