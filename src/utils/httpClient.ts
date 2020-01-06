@@ -4,7 +4,6 @@ import * as path from 'path';
 import { Readable, Stream } from 'stream';
 import { CookieJar } from 'tough-cookie';
 import * as url from 'url';
-import { window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HostCertificate } from '../models/hostCertificate';
@@ -298,7 +297,7 @@ export class HttpClient {
     private resolveCertificateFullPath(absoluteOrRelativePath: string, certName: string): string | undefined {
         if (path.isAbsolute(absoluteOrRelativePath)) {
             if (!fs.existsSync(absoluteOrRelativePath)) {
-                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
+                this._settings.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
                 return undefined;
             } else {
                 return absoluteOrRelativePath;
@@ -313,7 +312,7 @@ export class HttpClient {
             if (fs.existsSync(absolutePath)) {
                 return absolutePath;
             } else {
-                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
+                this._settings.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
                 return undefined;
             }
         }
@@ -327,7 +326,7 @@ export class HttpClient {
         if (fs.existsSync(absolutePath)) {
             return absolutePath;
         } else {
-            window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
+            this._settings.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
             return undefined;
         }
     }

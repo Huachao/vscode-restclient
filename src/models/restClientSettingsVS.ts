@@ -80,6 +80,10 @@ export class RestClientSettingsVS implements RestClientSettings {
         }
     }
 
+    showWarningMessage(message: string): void {
+        window.showWarningMessage(message);
+    }
+
     public constructor() {
         this.brackets = configuration.brackets as CharacterPair[];
         workspace.onDidChangeConfiguration(() => {

@@ -39,5 +39,6 @@ export abstract class RestClientSettings {
     static Instance: RestClientSettings;
     abstract getRootFsPath(): string | undefined;
     abstract getRootPath(): string | undefined;
+    abstract showWarningMessage(message: string) : void;
 }
 
