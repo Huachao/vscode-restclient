@@ -1,12 +1,11 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { Uri } from 'vscode';
 import { RequestHeaders } from '../models/base';
+import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { IRequestParser } from '../models/IRequestParser';
 import { base64, hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
-import { getWorkspaceRootPath } from './workspaceUtility';
 
 const yargsParser = require('yargs-parser');
 
@@ -87,10 +86,10 @@ export class CurlRequestParser implements IRequestParser {
             return fs.existsSync(refPath) ? refPath : undefined;
         }
 
-        const rootPath = getWorkspaceRootPath();
+        const rootFsPath = RestClientSettings.Instance.getRootFsPath();
         let absolutePath: string;
-        if (rootPath) {
-            absolutePath = path.join(Uri.parse(rootPath).fsPath, refPath);
+        if (rootFsPath) {
+            absolutePath = path.join(rootFsPath, refPath);
             if (fs.existsSync(absolutePath)) {
                 return absolutePath;
             }

@@ -2,7 +2,6 @@ import * as fs from 'fs-extra';
 import { EOL } from 'os';
 import * as path from 'path';
 import { Stream } from 'stream';
-import { Uri } from 'vscode';
 import { ArrayUtility } from '../common/arrayUtility';
 import { RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
@@ -12,7 +11,6 @@ import { IRequestParser } from '../models/IRequestParser';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
-import { getWorkspaceRootPath } from './workspaceUtility';
 
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');
@@ -105,9 +103,9 @@ export class HttpRequestParser implements IRequestParser {
 
         // parse body
         const contentTypeHeader = getContentType(headers) || getContentType(this._restClientSettings.defaultHeaders);
-        body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
+        body = this.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
         if (isGraphQlRequest) {
-            variables = HttpRequestParser.parseRequestBody(variableLines, requestAbsoluteFilePath, contentTypeHeader);
+            variables = this.parseRequestBody(variableLines, requestAbsoluteFilePath, contentTypeHeader);
 
             const graphQlPayload = {
                 query: body,
@@ -158,7 +156,7 @@ export class HttpRequestParser implements IRequestParser {
         };
     }
 
-    private static parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string | undefined): string | Stream | undefined {
+    private parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string | undefined): string | Stream | undefined {
         if (lines.length === 0) {
             return undefined;
         }
@@ -185,7 +183,7 @@ export class HttpRequestParser implements IRequestParser {
                     const groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
                     if (groups?.length === 2) {
                         const fileUploadPath = groups[1];
-                        const fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
+                        const fileAbsolutePath = this.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
                         if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
                             combinedStream.append(fs.createReadStream(fileAbsolutePath));
                         } else {
@@ -209,15 +207,15 @@ export class HttpRequestParser implements IRequestParser {
         return MimeUtility.isMultiPartFormData(contentTypeHeader) ? '\r\n' : EOL;
     }
 
-    private static resolveFilePath(refPath: string, httpFilePath: string): string | null {
+    private resolveFilePath(refPath: string, httpFilePath: string): string | null {
         if (path.isAbsolute(refPath)) {
             return fs.existsSync(refPath) ? refPath : null;
         }
 
         let absolutePath;
-        const rootPath = getWorkspaceRootPath();
-        if (rootPath) {
-            absolutePath = path.join(Uri.parse(rootPath).fsPath, refPath);
+        const rootFsPath = this._restClientSettings.getRootFsPath();
+        if (rootFsPath) {
+            absolutePath = path.join(rootFsPath, refPath);
             if (fs.existsSync(absolutePath)) {
                 return absolutePath;
             }

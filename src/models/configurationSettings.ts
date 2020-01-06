@@ -36,6 +36,8 @@ export abstract class RestClientSettings {
     enableSendRequestCodeLens: boolean;
     enableCustomVariableReferencesCodeLens: boolean;
 
-    static Instance : RestClientSettings;
+    static Instance: RestClientSettings;
+    abstract getRootFsPath(): string | undefined;
+    abstract getRootPath(): string | undefined;
 }
 

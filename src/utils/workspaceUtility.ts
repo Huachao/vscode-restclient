@@ -1,16 +1,5 @@
 import * as path from 'path';
-import { TextDocument, window, workspace } from 'vscode';
-
-export function getWorkspaceRootPath(): string | undefined {
-    const document = getCurrentTextDocument();
-    if (document) {
-        const fileUri = document.uri;
-        const workspaceFolder = workspace.getWorkspaceFolder(fileUri);
-        if (workspaceFolder) {
-            return workspaceFolder.uri.toString();
-        }
-    }
-}
+import { TextDocument, window } from 'vscode';
 
 export function getCurrentHttpFileName(): string | undefined {
     const document = getCurrentTextDocument();

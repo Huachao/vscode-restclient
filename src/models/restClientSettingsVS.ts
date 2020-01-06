@@ -58,7 +58,29 @@ export class RestClientSettingsVS implements RestClientSettings {
         return this.configurationUpdateEventEmitter.event;
     }
 
-    private constructor() {
+    getRootFsPath(): string | undefined {
+        const document = getCurrentTextDocument();
+        if (document) {
+            const fileUri = document.uri;
+            const workspaceFolder = workspace.getWorkspaceFolder(fileUri);
+            if (workspaceFolder) {
+                return workspaceFolder.uri.fsPath;
+            }
+        }
+    }
+    // FIXME: do we really need to get both .uri.toString() and .uri.fsPath?
+    getRootPath(): string | undefined {
+        const document = getCurrentTextDocument();
+        if (document) {
+            const fileUri = document.uri;
+            const workspaceFolder = workspace.getWorkspaceFolder(fileUri);
+            if (workspaceFolder) {
+                return workspaceFolder.uri.toString();
+            }
+        }
+    }
+
+    public constructor() {
         this.brackets = configuration.brackets as CharacterPair[];
         workspace.onDidChangeConfiguration(() => {
             this.initializeSettings();
@@ -79,9 +101,9 @@ export class RestClientSettingsVS implements RestClientSettings {
         const restClientSettings = workspace.getConfiguration("rest-client", document?.uri);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultHeaders = restClientSettings.get<RequestHeaders>("defaultHeaders",
-                                                                     {
-                                                                         "User-Agent": "vscode-restclient"
-                                                                     });
+            {
+                "User-Agent": "vscode-restclient"
+            });
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
         this.requestNameAsResponseTabTitle = restClientSettings.get<boolean>("requestNameAsResponseTabTitle", false);
         this.rememberCookiesForSubsequentRequests = restClientSettings.get<boolean>("rememberCookiesForSubsequentRequests", true);

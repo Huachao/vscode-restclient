@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as url from 'url';
 import { CancellationToken, DocumentLink, DocumentLinkProvider, Position, Range, TextDocument, Uri } from 'vscode';
 import * as Constants from '../common/constants';
-import { getWorkspaceRootPath } from '../utils/workspaceUtility';
+import { RestClientSettings } from '../models/configurationSettings';
 
 export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
 
@@ -38,7 +38,7 @@ export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
         if (path.isAbsolute(link)) {
             resourcePath = Uri.file(link);
         } else {
-            let rootPath = getWorkspaceRootPath();
+            let rootPath = RestClientSettings.Instance.getRootPath();
             if (rootPath) {
                 rootPath = rootPath.replace(/\/?$/, '/');
                 let resourcePathString = url.resolve(rootPath, link);

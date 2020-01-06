@@ -4,7 +4,7 @@ import * as path from 'path';
 import { Readable, Stream } from 'stream';
 import { CookieJar } from 'tough-cookie';
 import * as url from 'url';
-import { Uri, window } from 'vscode';
+import { window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HostCertificate } from '../models/hostCertificate';
@@ -15,7 +15,7 @@ import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
 import { base64, getHeader, hasHeader, removeHeader } from './misc';
 import { PersistUtility } from './persistUtility';
-import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
+import { getCurrentHttpFileName } from './workspaceUtility';
 
 import got = require('got');
 
@@ -243,19 +243,19 @@ export class HttpClient {
                 key: Buffer | undefined,
                 pfx: Buffer | undefined;
             if (certificate.cert) {
-                const certPath = HttpClient.resolveCertificateFullPath(certificate.cert, "cert");
+                const certPath = this.resolveCertificateFullPath(certificate.cert, "cert");
                 if (certPath) {
                     cert = fs.readFileSync(certPath);
                 }
             }
             if (certificate.key) {
-                const keyPath = HttpClient.resolveCertificateFullPath(certificate.key, "key");
+                const keyPath = this.resolveCertificateFullPath(certificate.key, "key");
                 if (keyPath) {
                     key = fs.readFileSync(keyPath);
                 }
             }
             if (certificate.pfx) {
-                const pfxPath = HttpClient.resolveCertificateFullPath(certificate.pfx, "pfx");
+                const pfxPath = this.resolveCertificateFullPath(certificate.pfx, "pfx");
                 if (pfxPath) {
                     pfx = fs.readFileSync(pfxPath);
                 }
@@ -295,7 +295,7 @@ export class HttpClient {
         return false;
     }
 
-    private static resolveCertificateFullPath(absoluteOrRelativePath: string, certName: string): string | undefined {
+    private resolveCertificateFullPath(absoluteOrRelativePath: string, certName: string): string | undefined {
         if (path.isAbsolute(absoluteOrRelativePath)) {
             if (!fs.existsSync(absoluteOrRelativePath)) {
                 window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
@@ -306,10 +306,10 @@ export class HttpClient {
         }
 
         // the path should be relative path
-        const rootPath = getWorkspaceRootPath();
+        const rootFsPath = this._settings.getRootFsPath();
         let absolutePath = '';
-        if (rootPath) {
-            absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
+        if (rootFsPath) {
+            absolutePath = path.join(rootFsPath, absoluteOrRelativePath);
             if (fs.existsSync(absolutePath)) {
                 return absolutePath;
             } else {
