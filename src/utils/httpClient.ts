@@ -14,7 +14,6 @@ import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
 import { base64, getHeader, hasHeader, removeHeader } from './misc';
 import { PersistUtility } from './persistUtility';
-import { getCurrentHttpFileName } from './workspaceUtility';
 
 import got = require('got');
 
@@ -317,7 +316,7 @@ export class HttpClient {
             }
         }
 
-        const currentFilePath = getCurrentHttpFileName();
+        const currentFilePath = this._settings.getCurrentHttpFileName();
         if (!currentFilePath) {
             return undefined;
         }

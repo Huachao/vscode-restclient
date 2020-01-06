@@ -40,5 +40,6 @@ export abstract class RestClientSettings {
     abstract getRootFsPath(): string | undefined;
     abstract getRootPath(): string | undefined;
     abstract showWarningMessage(message: string) : void;
+    abstract getCurrentHttpFileName(): string | undefined;
 }
 

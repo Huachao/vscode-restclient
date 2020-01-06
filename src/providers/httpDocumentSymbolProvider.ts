@@ -2,10 +2,10 @@ import { EOL } from 'os';
 import * as url from 'url';
 import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument, window } from 'vscode';
 import * as Constants from '../common/constants';
+import { RestClientSettings } from '../models/configurationSettings';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { Selector } from '../utils/selector';
 import { VariableProcessor } from '../utils/variableProcessor';
-import { getCurrentHttpFileName } from '../utils/workspaceUtility';
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     private static requestParserFactory = new RequestParserFactory();
@@ -64,7 +64,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     }
 
     private getFileVariableSymbolInfo(line: string): [string, string] {
-        const fileName = getCurrentHttpFileName();
+        const fileName = RestClientSettings.Instance.getCurrentHttpFileName();
         line = line.trim();
         return [line.substring(1, line.indexOf('=')).trim(), fileName!];
     }
@@ -72,7 +72,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     private async getRequestSymbolInfo(rawText: string, name: string | undefined): Promise<[string, string]> {
         // For request with name, return the request name and file name instead
         if (name) {
-            return [name, getCurrentHttpFileName()!];
+            return [name, RestClientSettings.Instance.getCurrentHttpFileName()!];
         }
 
         const text = await VariableProcessor.processRawRequest(rawText);

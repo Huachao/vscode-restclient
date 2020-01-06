@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { CharacterPair, Event, EventEmitter, languages, ViewColumn, window, workspace } from 'vscode';
 import configuration from '../../language-configuration.json';
 import { getCurrentTextDocument } from "../utils/workspaceUtility";
@@ -77,6 +78,14 @@ export class RestClientSettingsVS implements RestClientSettings {
             if (workspaceFolder) {
                 return workspaceFolder.uri.toString();
             }
+        }
+    }
+
+    getCurrentHttpFileName(): string | undefined {
+        const document = getCurrentTextDocument();
+        if (document) {
+            const filePath = document.fileName;
+            return path.basename(filePath, path.extname(filePath));
         }
     }
 
