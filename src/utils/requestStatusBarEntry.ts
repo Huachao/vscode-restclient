@@ -1,29 +1,10 @@
 import { EOL } from 'os';
 import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
-import { HttpResponse } from '../models/httpResponse';
+import { RequestState, RequestStatusEntry, RequestStaus } from './requestStatusEntry';
 
 const filesize = require('filesize');
 
-type NonReceivedRequestStatus = {
-    state: RequestState.Closed | RequestState.Cancelled | RequestState.Error | RequestState.Pending
-};
-
-type ReceivedRequestStatus = {
-    state: RequestState.Received,
-    response: HttpResponse
-};
-
-type RequestStaus = ReceivedRequestStatus | NonReceivedRequestStatus;
-
-export enum RequestState {
-    Closed,
-    Pending,
-    Received,
-    Cancelled,
-    Error,
-}
-
-export class RequestStatusEntry {
+export class RequestStatusBarEntry implements RequestStatusEntry {
     private readonly durationEntry: StatusBarItem;
 
     private readonly sizeEntry: StatusBarItem;

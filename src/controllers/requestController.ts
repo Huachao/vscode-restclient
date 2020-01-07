@@ -9,7 +9,7 @@ import { RestClientSettingsVS } from '../models/restClientSettingsVS';
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
 import { PersistUtility } from '../utils/persistUtility';
-import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
+import { RequestState, RequestStatusEntry } from '../utils/requestStatusEntry';
 import { RequestStore } from '../utils/requestStore';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
@@ -27,7 +27,7 @@ export class RequestController {
     private _textDocumentView: HttpResponseTextDocumentView;
 
     public constructor(context: ExtensionContext) {
-        this._requestStatusEntry = new RequestStatusEntry();
+        this._requestStatusEntry = this._restClientSettings.getRequestStatusEntry();
         this._httpClient = new HttpClient();
         this._webview = new HttpResponseWebview(context);
         this._webview.onDidCloseAllWebviewPanels(() => {

@@ -5,6 +5,8 @@ import { DocumentWrapper } from "../utils/DocumentWrapper";
 import { DocumentWrapperVS } from '../utils/documentWrapperVS';
 import { EventEmitterVS } from '../utils/eventEmitterVS';
 import { MyEventEmitter } from '../utils/myEventEmitter';
+import { RequestStatusBarEntry } from '../utils/requestStatusBarEntry';
+import { RequestStatusEntry } from '../utils/requestStatusEntry';
 import { RequestHeaders } from "./base";
 import { RestClientSettings } from "./configurationSettings";
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
@@ -111,6 +113,10 @@ export class RestClientSettingsVS implements RestClientSettings {
 
     getEmitter<T>(): MyEventEmitter<T> {
         return new EventEmitterVS<T>(new EventEmitter<T>());
+    }
+
+    getRequestStatusEntry(): RequestStatusEntry {
+        return new RequestStatusBarEntry();
     }
 
     public constructor() {
