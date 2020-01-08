@@ -12,7 +12,7 @@ import { PersistUtility } from '../utils/persistUtility';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusEntry';
 import { RequestStore } from '../utils/requestStore';
 import { RequestVariableCache } from "../utils/requestVariableCache";
-import { Selector } from '../utils/selector';
+import { SelectorVS } from '../utils/selectorVS';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
@@ -44,7 +44,7 @@ export class RequestController {
             return;
         }
 
-        const selectedRequest = await Selector.getRequest(editor, range);
+        const selectedRequest = await SelectorVS.getRequest(editor, range);
         if (!selectedRequest) {
             return;
         }
@@ -136,7 +136,7 @@ export class RequestController {
             } else if (error.code === 'ENETUNREACH') {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
-            this._requestStatusEntry.update({ state: RequestState.Error});
+            this._requestStatusEntry.update({ state: RequestState.Error });
             logger.error('Failed to send request:', error);
             window.showErrorMessage(error.message);
         } finally {

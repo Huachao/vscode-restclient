@@ -8,7 +8,7 @@ import { RequestParserFactory } from '../models/requestParserFactory';
 import { RestClientSettingsVS } from '../models/restClientSettingsVS';
 import { trace } from "../utils/decorator";
 import { base64 } from '../utils/misc';
-import { Selector } from '../utils/selector';
+import { SelectorVS } from '../utils/selectorVS';
 import { Telemetry } from '../utils/telemetry';
 import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 
@@ -52,7 +52,7 @@ export class CodeSnippetController {
             return;
         }
 
-        const selectedRequest = await Selector.getRequest(editor);
+        const selectedRequest = await SelectorVS.getRequest(editor);
         if (!selectedRequest) {
             return;
         }
@@ -132,7 +132,7 @@ export class CodeSnippetController {
             return;
         }
 
-        const selectedRequest = await Selector.getRequest(editor);
+        const selectedRequest = await SelectorVS.getRequest(editor);
         if (!selectedRequest) {
             return;
         }

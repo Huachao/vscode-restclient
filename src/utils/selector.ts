@@ -1,5 +1,4 @@
 import { EOL } from 'os';
-import { Range, TextEditor } from 'vscode';
 import { ArrayUtility } from '../common/arrayUtility';
 import * as Constants from '../common/constants';
 import { VariableProcessor } from './variableProcessor';
@@ -19,23 +18,7 @@ export interface SelectedRequest {
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
-        if (!editor.document) {
-            return null;
-        }
-
-        let selectedText: string | null;
-        if (editor.selection.isEmpty || range) {
-            const activeLine = !range ? editor.selection.active.line : range.start.line;
-            selectedText = Selector.getDelimitedText(editor.document.getText(), activeLine);
-        } else {
-            selectedText = editor.document.getText(editor.selection);
-        }
-
-        if (selectedText === null) {
-            return null;
-        }
-
+    public static async getRequestFromText(selectedText: string): Promise<SelectedRequest | null> {
         // parse request variable definition name
         const requestVariable = Selector.getRequestVariableDefinitionName(selectedText);
 
@@ -60,10 +43,10 @@ export class Selector {
 
     public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
         options = {
-                ignoreCommentLine: true,
-                ignoreEmptyLine: true,
-                ignoreFileVariableDefinitionLine: true,
-                ignoreResponseRange: true,
+            ignoreCommentLine: true,
+            ignoreEmptyLine: true,
+            ignoreFileVariableDefinitionLine: true,
+            ignoreResponseRange: true,
             ...options};
         const requestRanges: [number, number][] = [];
         const delimitedLines = Selector.getDelimiterRows(lines);
@@ -127,7 +110,7 @@ export class Selector {
         return matched?.[1];
     }
 
-    private static getDelimitedText(fullText: string, currentLine: number): string | null {
+    public static getDelimitedText(fullText: string, currentLine: number): string | null {
         const lines: string[] = fullText.split(Constants.LineSplitterRegex);
         const delimiterLineNumbers: number[] = Selector.getDelimiterRows(lines);
         if (delimiterLineNumbers.length === 0) {
