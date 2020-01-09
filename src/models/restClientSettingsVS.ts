@@ -111,6 +111,10 @@ export class RestClientSettingsVS implements RestClientSettings {
         window.showWarningMessage(message);
     }
 
+    showErrorMessage(message: string): void {
+        window.showErrorMessage(message);
+    }
+
     getEmitter<T>(): MyEventEmitter<T> {
         return new EventEmitterVS<T>(new EventEmitter<T>());
     }

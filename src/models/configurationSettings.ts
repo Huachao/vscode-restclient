@@ -43,6 +43,7 @@ export abstract class RestClientSettings {
     abstract getRootFsPath(): string | undefined;
     abstract getRootPath(): string | undefined;
     abstract showWarningMessage(message: string): void;
+    abstract showErrorMessage(message: string): void;
     abstract getCurrentHttpFileName(): string | undefined;
     abstract getCurrentDocumentWrapper(): DocumentWrapper | undefined;
     abstract getEmitter<T>(): MyEventEmitter<T>;
