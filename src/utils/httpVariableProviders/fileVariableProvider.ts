@@ -3,10 +3,10 @@ import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { DocumentWrapper } from "../DocumentWrapper";
+import { DummyVariableProvider } from './dummyVariableProvider';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
-import { SystemVariableProvider } from './systemVariableProvider';
 
 type FileVariableValue = Record<'name' | 'value', string>;
 
@@ -28,10 +28,14 @@ export class FileVariableProvider implements HttpVariableProvider {
     ]);
 
     private readonly innerVariableProviders: HttpVariableProvider[] = [
-        SystemVariableProvider.Instance,
+        DummyVariableProvider.Instance,
         RequestVariableProvider.Instance,
         EnvironmentVariableProvider.Instance,
     ];
+
+    public set systemVariableProvider(systemVariableProvider: HttpVariableProvider) {
+        this.innerVariableProviders[0] = systemVariableProvider;
+    }
 
     private readonly fileVariableCache = new DocumentCache<FileVariableValue[]>();
 

@@ -26,12 +26,14 @@ import { RequestVariableDefinitionProvider } from './providers/requestVariableDe
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
 import { AadTokenCache } from './utils/aadTokenCache';
 import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
+import { FileVariableProvider } from './utils/httpVariableProviders/fileVariableProvider';
 import { SystemVariableProvider } from './utils/httpVariableProviders/systemVariableProvider';
 import { VariableProcessor } from './utils/variableProcessor';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: ExtensionContext) {
+    FileVariableProvider.Instance.systemVariableProvider = SystemVariableProvider.Instance;
     VariableProcessor.systemVariableProvider = SystemVariableProvider.Instance;
     const requestController = new RequestController(context);
     const historyController = new HistoryController();
