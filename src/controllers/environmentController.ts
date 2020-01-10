@@ -4,13 +4,12 @@ import { RestClientSettings } from '../models/configurationSettings';
 import { EnvironmentPickItem } from '../models/environmentPickItem';
 import { trace } from "../utils/decorator";
 import { EnvironmentStatusEntry } from '../utils/environmentStatusBarEntry';
+import { EnvironmentVariableProvider } from '../utils/httpVariableProviders/environmentVariableProvider';
 import { PersistUtility } from '../utils/persistUtility';
 
 export class EnvironmentController {
     private static readonly noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
         'No Environment', Constants.NoEnvironmentSelectedName, 'You Can Still Use Variables Defined In $shared Environment');
-
-    public static readonly sharedEnvironmentName: string = '$shared';
 
     private static readonly _onDidChangeEnvironment = new EventEmitter<string>();
 
@@ -21,6 +20,7 @@ export class EnvironmentController {
     private environmentStatusEntry: EnvironmentStatusEntry;
 
     public constructor(initEnvironment: EnvironmentPickItem) {
+        EnvironmentVariableProvider.Instance.currentEnvironment = initEnvironment.label;
         this.environmentStatusEntry = new EnvironmentStatusEntry(initEnvironment.label);
     }
 
@@ -30,7 +30,7 @@ export class EnvironmentController {
         const itemPickList: EnvironmentPickItem[] = [];
         itemPickList.push(EnvironmentController.noEnvironmentPickItem);
         for (const name in EnvironmentController.settings.environmentVariables) {
-            if (name === EnvironmentController.sharedEnvironmentName) {
+            if (name === EnvironmentVariableProvider.sharedEnvironmentName) {
                 continue;
             }
             const item = new EnvironmentPickItem(name, name);
@@ -45,6 +45,7 @@ export class EnvironmentController {
             return;
         }
 
+        EnvironmentVariableProvider.Instance.currentEnvironment = item.label;
         EnvironmentController._onDidChangeEnvironment.fire(item.label);
         this.environmentStatusEntry.update(item.label);
 

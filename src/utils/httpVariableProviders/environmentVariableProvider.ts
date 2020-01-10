@@ -1,12 +1,13 @@
 import * as Constants from '../../common/constants';
-import { EnvironmentController } from '../../controllers/environmentController';
 import { RestClientSettings } from '../../models/configurationSettings';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 
 export class EnvironmentVariableProvider implements HttpVariableProvider {
+    public static readonly sharedEnvironmentName: string = '$shared';
     private static _instance: EnvironmentVariableProvider;
+    public currentEnvironment: string = Constants.NoEnvironmentSelectedName;
 
     private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
@@ -43,13 +44,13 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
     }
 
     private async getAvailableVariables(): Promise<{ [key: string]: string }> {
-        let { name: environmentName } = await EnvironmentController.getCurrentEnvironment();
+        let environmentName = this.currentEnvironment;
         if (environmentName === Constants.NoEnvironmentSelectedName) {
-            environmentName = EnvironmentController.sharedEnvironmentName;
+            environmentName = EnvironmentVariableProvider.sharedEnvironmentName;
         }
         const variables = this._settings.environmentVariables;
         const currentEnvironmentVariables = variables[environmentName];
-        const sharedEnvironmentVariables = variables[EnvironmentController.sharedEnvironmentName];
+        const sharedEnvironmentVariables = variables[EnvironmentVariableProvider.sharedEnvironmentName];
         this.mapEnvironmentVariables(currentEnvironmentVariables, sharedEnvironmentVariables);
         return {...sharedEnvironmentVariables, ...currentEnvironmentVariables};
     }
