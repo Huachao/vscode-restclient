@@ -1,6 +1,4 @@
-import { EOL } from 'os';
 import { languages, Position, Range, TextDocument, ViewColumn, window, workspace } from 'vscode';
-import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
@@ -23,7 +21,7 @@ export class HttpResponseTextDocumentView {
     }
 
     public async render(response: HttpResponse, column?: ViewColumn) {
-        const content = this.getTextDocumentContent(response);
+        const content = ResponseFormatUtility.getTextDocumentContent(response);
         const language = this.getVSCodeDocumentLanguageId(response);
         let document: TextDocument;
         if (this.settings.showResponseInDifferentTab || this.documents.length === 0) {
@@ -40,46 +38,6 @@ export class HttpResponseTextDocumentView {
                 edit.replace(new Range(startPosition, endPosition), content);
             });
         }
-    }
-
-    private getTextDocumentContent(response: HttpResponse): string {
-        let content = '';
-        const previewOption = this.settings.previewOption;
-        if (previewOption === PreviewOption.Exchange) {
-            // for add request details
-            const request = response.request;
-            content += `${request.method} ${request.url} HTTP/1.1${EOL}`;
-            content += this.formatHeaders(request.headers);
-            if (request.body) {
-                if (typeof request.body !== 'string') {
-                    request.body = 'NOTE: Request Body From Is File Not Shown';
-                }
-                content += `${EOL}${ResponseFormatUtility.formatBody(request.body.toString(), request.contentType, true)}${EOL}`;
-            }
-
-            content += EOL.repeat(2);
-        }
-
-        if (previewOption !== PreviewOption.Body) {
-            content += `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${EOL}`;
-            content += this.formatHeaders(response.headers);
-        }
-
-        if (previewOption !== PreviewOption.Headers) {
-            const prefix = previewOption === PreviewOption.Body ? '' : EOL;
-            content += `${prefix}${ResponseFormatUtility.formatBody(response.body, response.contentType, true)}`;
-        }
-
-        return content;
-    }
-
-    private formatHeaders(headers: RequestHeaders | ResponseHeaders): string {
-        let headerString = '';
-        for (const header in headers) {
-            const value = headers[header] as string;
-            headerString += `${header}: ${value}${EOL}`;
-        }
-        return headerString;
     }
 
     private getVSCodeDocumentLanguageId(response: HttpResponse) {
