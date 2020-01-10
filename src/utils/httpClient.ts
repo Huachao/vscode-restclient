@@ -136,7 +136,7 @@ export class HttpClient {
                     res => {
                         if (this._settings.rememberCookiesForSubsequentRequests) {
                             const setCookie = getHeader(res.headers, 'set-cookie') as string[] | undefined;
-                            setCookie?.map(rawCookie => this.cookieJar.setCookieSync(rawCookie, res.url));
+                            setCookie?.map(rawCookie => this.cookieJar.setCookieSync(rawCookie, res.url, { ignoreError: true }));
                         }
                         return res;
                     }
