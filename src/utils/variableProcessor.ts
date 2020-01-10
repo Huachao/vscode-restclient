@@ -1,20 +1,24 @@
 import { RestClientSettings } from '../models/configurationSettings';
 import { VariableType } from "../models/variableType";
 import { DocumentWrapper } from './DocumentWrapper';
+import { DummyVariableProvider } from './httpVariableProviders/dummyVariableProvider';
 import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
 import { HttpVariableProvider } from './httpVariableProviders/httpVariableProvider';
 import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
-import { SystemVariableProvider } from './httpVariableProviders/systemVariableProvider';
 
 export class VariableProcessor {
 
     private static readonly providers: [HttpVariableProvider, boolean][] = [
-        [SystemVariableProvider.Instance, false],
+        [DummyVariableProvider.Instance, false],
         [RequestVariableProvider.Instance, true],
         [FileVariableProvider.Instance, true],
         [EnvironmentVariableProvider.Instance, true],
     ];
+
+    public static set systemVariableProvider(systemVariableProvider: HttpVariableProvider) {
+        VariableProcessor.providers[0][0] = systemVariableProvider;
+    }
 
     public static async processRawRequest(request: string) {
         const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;

@@ -1,4 +1,3 @@
-import { logger } from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
@@ -123,7 +122,7 @@ export abstract class RestClient {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
             this._requestStatusEntry.update({ state: RequestState.Error });
-            logger.error('Failed to send request:', error);
+            // logger.error('Failed to send request:', error);
             this._restClientSettings.showErrorMessage(error.message);
         } finally {
             this._requestStore.complete(<string>requestId);
