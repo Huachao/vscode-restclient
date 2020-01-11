@@ -21,7 +21,7 @@ export abstract class RestClientSettings {
     fontSize?: number;
     fontFamily?: string;
     fontWeight?: string;
-    environmentVariables: Map<string, Map<string, string>>;
+    environmentVariables: object;
     mimeAndFileExtensionMapping: Map<string, string>;
     previewResponseInUntitledDocument: boolean;
     hostCertificates: Map<string, HostCertificate>;

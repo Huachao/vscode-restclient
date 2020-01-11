@@ -28,7 +28,7 @@ export class RestClientSettingsVS implements RestClientSettings {
     public fontSize?: number;
     public fontFamily?: string;
     public fontWeight?: string;
-    public environmentVariables: Map<string, Map<string, string>>;
+    public environmentVariables: object;
     public mimeAndFileExtensionMapping: Map<string, string>;
     public previewResponseInUntitledDocument: boolean;
     public hostCertificates: Map<string, HostCertificate>;
