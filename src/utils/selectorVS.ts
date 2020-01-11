@@ -1,17 +1,5 @@
 import { Range, TextEditor } from 'vscode';
-import { Selector } from './selector';
-
-export interface RequestRangeOptions {
-    ignoreCommentLine?: boolean;
-    ignoreEmptyLine?: boolean;
-    ignoreFileVariableDefinitionLine?: boolean;
-    ignoreResponseRange?: boolean;
-}
-
-export interface SelectedRequest {
-    text: string;
-    name?: string;
-}
+import { SelectedRequest, Selector } from './selector';
 
 export class SelectorVS {
     public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {

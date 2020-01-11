@@ -43,6 +43,16 @@ export class RequestController extends RestClient {
         await this.runText(selectedText);
     }
 
+    @trace('Rerun Request')
+    public async rerun() {
+        await super.rerun();
+    }
+
+    @trace('Cancel Request')
+    public async cancel() {
+        await super.cancel();
+    }
+
     renderResponse(response: HttpResponse): void {
         try {
             const activeColumn = window.activeTextEditor!.viewColumn;
@@ -58,16 +68,6 @@ export class RequestController extends RestClient {
             logger.error('Unable to preview response:', reason);
             window.showErrorMessage(reason);
         }
-    }
-
-    @trace('Rerun Request')
-    public async rerun() {
-        await super.rerun();
-    }
-
-    @trace('Cancel Request')
-    public async cancel() {
-        await super.cancel();
     }
 
     public dispose() {

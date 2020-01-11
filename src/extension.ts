@@ -33,6 +33,7 @@ import { VariableProcessor } from './utils/variableProcessor';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: ExtensionContext) {
+    // SystemVariableProvider depends on vscode... configure it here.
     FileVariableProvider.Instance.systemVariableProvider = SystemVariableProvider.Instance;
     VariableProcessor.systemVariableProvider = SystemVariableProvider.Instance;
     const requestController = new RequestController(context);

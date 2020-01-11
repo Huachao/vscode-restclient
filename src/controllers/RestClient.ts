@@ -90,20 +90,6 @@ export abstract class RestClient {
             }
 
             this.renderResponse(response);
-            // try {
-            //     const activeColumn = window.activeTextEditor!.viewColumn;
-            //     const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
-            //         ? activeColumn
-            //         : ((activeColumn as number) + 1) as ViewColumn;
-            //     if (this._restClientSettings.previewResponseInUntitledDocument) {
-            //         this._textDocumentView.render(response, previewColumn);
-            //     } else if (previewColumn) {
-            //         this._webview.render(response, previewColumn);
-            //     }
-            // } catch (reason) {
-            //     logger.error('Unable to preview response:', reason);
-            //     window.showErrorMessage(reason);
-            // }
 
             // persist to history json file
             const serializedRequest = SerializedHttpRequest.convertFromHttpRequest(httpRequest);
@@ -128,7 +114,8 @@ export abstract class RestClient {
             this._requestStore.complete(<string>requestId);
         }
     }
-    public abstract renderResponse(response: HttpResponse);
+
+    public abstract renderResponse(response: HttpResponse): void;
 
     public dispose() {
         this._requestStatusEntry.dispose();

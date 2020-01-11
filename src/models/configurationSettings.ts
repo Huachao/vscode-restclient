@@ -30,7 +30,6 @@ export abstract class RestClientSettings {
     disableHighlightResonseBodyForLargeResponse: boolean;
     disableAddingHrefLinkForLargeResponse: boolean;
     largeResponseBodySizeLimitInMB: number;
-    // previewColumn: ViewColumn;
     previewResponsePanelTakeFocus: boolean;
     formParamEncodingStrategy: FormParamEncodingStrategy;
     addRequestBodyLineIndentationAroundBrackets: boolean;

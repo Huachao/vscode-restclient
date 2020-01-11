@@ -76,13 +76,13 @@ export class CustomVariableDiagnosticsProvider {
 
     public async checkVariables() {
         for (const document of this.pendingHttpDocuments) {
-            const documentWrapper = new DocumentWrapperVS(document);
             this.pendingHttpDocuments.delete(document);
             if (document.isClosed) {
                 continue;
             }
 
             const diagnostics: Diagnostic[] = [];
+            const documentWrapper = new DocumentWrapperVS(document);
 
             const allAvailableVariables = await VariableProcessor.getAllVariablesDefinitions(documentWrapper);
             const variableReferences = this.findVariableReferences(documentWrapper);
