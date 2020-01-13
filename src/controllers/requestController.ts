@@ -9,22 +9,20 @@ import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
 import { PersistUtility } from '../utils/persistUtility';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
-import { RequestStore } from '../utils/requestStore';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
-const uuidv4 = require('uuid/v4');
-
 export class RequestController {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
-    private readonly _requestStore: RequestStore = RequestStore.Instance;
     private _requestStatusEntry: RequestStatusEntry;
     private _httpClient: HttpClient;
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
+    private _lastRequest?: HttpRequest;
+    private _lastPendingRequest?: HttpRequest;
 
     public constructor(context: ExtensionContext) {
         this._requestStatusEntry = new RequestStatusEntry();
@@ -63,39 +61,33 @@ export class RequestController {
 
     @trace('Rerun Request')
     public async rerun() {
-        const httpRequest = this._requestStore.getLatest();
-        if (!httpRequest) {
+        if (!this._lastRequest) {
             return;
         }
 
-        await this.runCore(httpRequest);
+        await this.runCore(this._lastRequest);
     }
 
     @trace('Cancel Request')
     public async cancel() {
-        if (this._requestStore.isCompleted()) {
-            return;
-        }
-
-        // cancel current request
-        this._requestStore.cancel();
+        this._lastPendingRequest?.cancel();
 
         this._requestStatusEntry.update({ state: RequestState.Cancelled });
     }
 
     private async runCore(httpRequest: HttpRequest) {
-        const requestId = uuidv4();
-        this._requestStore.add(<string>requestId, httpRequest);
-
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
+
+        // set last request and last pending request
+        this._lastPendingRequest = this._lastRequest = httpRequest;
 
         // set http request
         try {
             const response = await this._httpClient.send(httpRequest);
 
             // check cancel
-            if (this._requestStore.isCancelled(<string>requestId)) {
+            if (httpRequest.isCancelled) {
                 return;
             }
 
@@ -125,7 +117,7 @@ export class RequestController {
             await PersistUtility.saveRequest(serializedRequest);
         } catch (error) {
             // check cancel
-            if (this._requestStore.isCancelled(<string>requestId)) {
+            if (httpRequest.isCancelled) {
                 return;
             }
 
@@ -140,7 +132,9 @@ export class RequestController {
             logger.error('Failed to send request:', error);
             window.showErrorMessage(error.message);
         } finally {
-            this._requestStore.complete(<string>requestId);
+            if (this._lastPendingRequest === httpRequest) {
+                this._lastPendingRequest = undefined;
+            }
         }
     }
 
