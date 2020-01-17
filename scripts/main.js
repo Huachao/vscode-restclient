@@ -5,95 +5,55 @@
 
   function onLoad() {
     const code = document.getElementsByTagName('code')[0];
-    let [...childs] = code.childNodes;
+    const [...childs] = code.childNodes;
     childs.filter(n => n.nodeType === 1).forEach(n => {
       n.addEventListener('click', toggleLines);
     });
   }
 
-  function toggleLines(e) {
-    const iconSpan = e.target;
-    const lineSpan = iconSpan.parentNode;
-    const blockEndNum = getFoldingRangeEnd(lineSpan);
-    const isExpandAction = lineSpan.classList.contains('collapsed');
-    if (isExpandAction) {
-      lineSpan.classList.remove('collapsed');
+  function toggleLines(e, collapse) {
+    let lineSpan, recursive, isExpandAction;
+    if (arguments.length === 2) {
+      lineSpan = e;
+      recursive = true;
+      isExpandAction = !collapse
+      if (isExpandAction) {
+        lineSpan.classList.remove('collapsed');
+      } else {
+        lineSpan.classList.add('collapsed');
+      }
     } else {
-      lineSpan.classList.add('collapsed');
+      lineSpan = e.target.parentNode;
+      recursive = e.shiftKey;
+      isExpandAction = isCollapspedLine(lineSpan);
+      lineSpan.classList.toggle('collapsed');
     }
+    const blockEndNum = getFoldingRangeEnd(lineSpan);
 
     let span = lineSpan;
-    let excludeEndLineNum = -1;
-    while (span = span.nextElementSibling) {
-      const currentLineNum = getLineNum(span);
-      if (currentLineNum > blockEndNum) {
-        break;
-      }
-
-      if (currentLineNum <= excludeEndLineNum) {
-        continue;
-      }
-
-      if (isCollapsedStartLineSpan(span)) {
-        excludeEndLineNum = getFoldingRangeEnd(span);
-      }
-
-      span.classList.toggle('hidden-line');
+    let currentLineNum = getLineNum(lineSpan);
+    let skipLineEndNum = -1;
+    while ((span = span.nextElementSibling) && ++currentLineNum <= blockEndNum) {
       if (isExpandAction) {
-        span.nextSibling.textContent = '\n';
+        if (currentLineNum > skipLineEndNum || recursive) {
+          span.classList.remove('hidden-line');
+          span.nextSibling.textContent = '\n';
+
+          if (isCollapspedLine(span)) {
+            skipLineEndNum = getFoldingRangeEnd(span);
+            if (recursive) {
+              span.classList.remove('collapsed');
+            }
+          }
+        }
       } else {
+        if (isRangeStartLine(span) && recursive) {
+          span.classList.add('collapsed');
+        }
+
+        span.classList.add('hidden-line');
         span.nextSibling.textContent = '';
       }
-    }
-  }
-
-  function foldLineSpan(lineSpan) {
-    const blockEndNum = getFoldingRangeEnd(lineSpan);
-    lineSpan.classList.add('collapsed');
-
-    let span = lineSpan;
-    let excludeEndLineNum = -1;
-    while (span = span.nextElementSibling) {
-      const currentLineNum = getLineNum(span);
-      if (currentLineNum > blockEndNum) {
-        break;
-      }
-
-      if (currentLineNum <= excludeEndLineNum) {
-        continue;
-      }
-
-      if (isCollapsedStartLineSpan(span)) {
-        excludeEndLineNum = getFoldingRangeEnd(span);
-      }
-
-      span.classList.add('hidden-line');
-      span.nextSibling.textContent = '';
-    }
-  }
-
-  function unfoldLineSpan(lineSpan) {
-    const blockEndNum = getFoldingRangeEnd(lineSpan);
-    lineSpan.classList.remove('collapsed');
-
-    let span = lineSpan;
-    let excludeEndLineNum = -1;
-    while (span = span.nextElementSibling) {
-      const currentLineNum = getLineNum(span);
-      if (currentLineNum > blockEndNum) {
-        break;
-      }
-
-      if (currentLineNum <= excludeEndLineNum) {
-        continue;
-      }
-
-      if (isCollapsedStartLineSpan(span)) {
-        excludeEndLineNum = getFoldingRangeEnd(span);
-      }
-
-      span.classList.remove('hidden-line');
-      span.nextSibling.textContent = '\n';
     }
   }
 
@@ -101,12 +61,16 @@
     return parseInt(element.attributes.getNamedItem('start').value);
   }
 
-  function getFoldingRangeEnd(element) {
-    return parseInt(element.attributes.getNamedItem('range-end').value);
+  function isRangeStartLine(element) {
+    return element.hasAttribute('range-start');
   }
 
-  function isCollapsedStartLineSpan(element) {
+  function isCollapspedLine(element) {
     return element.classList.contains('collapsed');
+  }
+
+  function getFoldingRangeEnd(element) {
+    return parseInt(element.attributes.getNamedItem('range-end').value);
   }
 
   window.addEventListener('message', event => {
@@ -114,16 +78,8 @@
     const code = document.getElementsByTagName('code')[0];
     const [...childs] = code.childNodes;
     // @ts-ignore
-    const lineSpans = childs.filter(n => n.nodeType === 1 && n.hasAttribute('range-start'));
-    switch (message.command) {
-      case 'foldAll':
-        lineSpans.forEach(foldLineSpan);
-        break;
-
-      case 'unfoldAll':
-        lineSpans.forEach(unfoldLineSpan);
-        break;
-    }
+    const lineSpan = childs.find(n => n.nodeType === 1 && n.hasAttribute('range-start'));
+    toggleLines(lineSpan, message.command === 'foldAll');
   });
 
   if (document.readyState === 'loading') {
