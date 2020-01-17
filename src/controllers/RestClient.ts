@@ -7,17 +7,15 @@ import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
 import { HttpClient } from '../utils/httpClient';
 import { PersistUtility } from '../utils/persistUtility';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusEntry';
-import { RequestStore } from '../utils/requestStore';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
 
-const uuidv4 = require('uuid/v4');
-
 export abstract class RestClient {
     protected readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
-    protected readonly _requestStore: RequestStore = RequestStore.Instance;
-    protected  _requestStatusEntry: RequestStatusEntry;
+    protected _requestStatusEntry: RequestStatusEntry;
     private _httpClient: HttpClient;
+    private _lastRequest?: HttpRequest;
+    private _lastPendingRequest?: HttpRequest;
 
     public constructor() {
         this._requestStatusEntry = this._restClientSettings.getRequestStatusEntry();
@@ -48,38 +46,32 @@ export abstract class RestClient {
     }
 
     public async rerun() {
-        const httpRequest = this._requestStore.getLatest();
-        if (!httpRequest) {
+        if (!this._lastRequest) {
             return;
         }
 
-        await this.runCore(httpRequest);
+        await this.runCore(this._lastRequest);
     }
 
     public async cancel() {
-        if (this._requestStore.isCompleted()) {
-            return;
-        }
-
-        // cancel current request
-        this._requestStore.cancel();
+        this._lastPendingRequest?.cancel();
 
         this._requestStatusEntry.update({ state: RequestState.Cancelled });
     }
 
     protected async runCore(httpRequest: HttpRequest) {
-        const requestId = uuidv4();
-        this._requestStore.add(<string>requestId, httpRequest);
-
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
+
+        // set last request and last pending request
+        this._lastPendingRequest = this._lastRequest = httpRequest;
 
         // set http request
         try {
             const response = await this._httpClient.send(httpRequest);
 
             // check cancel
-            if (this._requestStore.isCancelled(<string>requestId)) {
+            if (httpRequest.isCancelled) {
                 return;
             }
 
@@ -96,7 +88,7 @@ export abstract class RestClient {
             await PersistUtility.saveRequest(serializedRequest);
         } catch (error) {
             // check cancel
-            if (this._requestStore.isCancelled(<string>requestId)) {
+            if (httpRequest.isCancelled) {
                 return;
             }
 
@@ -107,11 +99,13 @@ export abstract class RestClient {
             } else if (error.code === 'ENETUNREACH') {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
-            this._requestStatusEntry.update({ state: RequestState.Error });
+            this._requestStatusEntry.update({ state: RequestState.Error});
             // logger.error('Failed to send request:', error);
             this._restClientSettings.showErrorMessage(error.message);
         } finally {
-            this._requestStore.complete(<string>requestId);
+            if (this._lastPendingRequest === httpRequest) {
+                this._lastPendingRequest = undefined;
+            }
         }
     }
 

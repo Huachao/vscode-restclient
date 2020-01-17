@@ -1,5 +1,7 @@
+import * as fs from 'fs-extra';
+import * as os from 'os';
 import * as path from 'path';
-import { commands, ExtensionContext, Uri, ViewColumn, WebviewPanel, window } from 'vscode';
+import { Clipboard, commands, env, ExtensionContext, Uri, ViewColumn, WebviewPanel, window, workspace } from 'vscode';
 import * as Constants from '../common/constants';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
@@ -9,10 +11,14 @@ import { trace } from '../utils/decorator';
 import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
 import { base64, isJSONString } from '../utils/misc';
+import { PersistUtility } from '../utils/persistUtility';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 import { BaseWebview } from './baseWebview';
 
 const hljs = require('highlight.js');
+
+const OPEN = 'Open';
+const COPYPATH = 'Copy Path';
 
 export class HttpResponseWebview extends BaseWebview {
 
@@ -24,13 +30,19 @@ export class HttpResponseWebview extends BaseWebview {
 
     private readonly iconFilePath: Uri;
 
+    private readonly clipboard: Clipboard = env.clipboard;
+
+    private readonly responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
+
+    private readonly responseBodySaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseBodyDownloadFolderName);
+
     protected get viewType(): string {
         return 'rest-response';
     }
 
     private activePanel: WebviewPanel | undefined;
 
-    public static activePreviewResponse: HttpResponse | undefined;
+    private static activePreviewResponse: HttpResponse | undefined;
 
     public constructor(private readonly context: ExtensionContext) {
         super();
@@ -41,6 +53,13 @@ export class HttpResponseWebview extends BaseWebview {
 
         this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', () => this.foldResponseBody()));
         this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', () => this.unfoldResponseBody()));
+
+        this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-body', () => this.copyBody()));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.save-response', () => this.save()));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', () => this.saveBody()));
+
+        fs.ensureDir(this.responseSaveFolderPath);
+        fs.ensureDir(this.responseBodySaveFolderPath);
     }
 
     public async render(response: HttpResponse, column: ViewColumn) {
@@ -55,36 +74,36 @@ export class HttpResponseWebview extends BaseWebview {
                     enableFindWidget: true,
                     enableScripts: true,
                     retainContextWhenHidden: true,
-                    localResourceRoots: [ this.styleFolderPath, this.scriptFolderPath ]
+                    localResourceRoots: [this.styleFolderPath, this.scriptFolderPath]
                 });
 
-                panel.onDidDispose(() => {
-                    const response = this.panelResponses.get(panel);
-                    if (response === HttpResponseWebview.activePreviewResponse) {
-                        commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, false);
-                        this.activePanel = undefined;
-                        HttpResponseWebview.activePreviewResponse = undefined;
-                    }
+            panel.onDidDispose(() => {
+                const response = this.panelResponses.get(panel);
+                if (response === HttpResponseWebview.activePreviewResponse) {
+                    commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, false);
+                    this.activePanel = undefined;
+                    HttpResponseWebview.activePreviewResponse = undefined;
+                }
 
-                    const index = this.panels.findIndex(v => v === panel);
-                    if (index !== -1) {
-                        this.panels.splice(index, 1);
-                        this.panelResponses.delete(panel);
-                    }
-                    if (this.panels.length === 0) {
-                        this._onDidCloseAllWebviewPanels.fire();
-                    }
-                });
+                const index = this.panels.findIndex(v => v === panel);
+                if (index !== -1) {
+                    this.panels.splice(index, 1);
+                    this.panelResponses.delete(panel);
+                }
+                if (this.panels.length === 0) {
+                    this._onDidCloseAllWebviewPanels.fire();
+                }
+            });
 
-                panel.iconPath = this.iconFilePath;
+            panel.iconPath = this.iconFilePath;
 
-                panel.onDidChangeViewState(({ webviewPanel }) => {
-                    commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, webviewPanel.active);
-                    this.activePanel = webviewPanel.active ? webviewPanel : undefined;
-                    HttpResponseWebview.activePreviewResponse = webviewPanel.active ? this.panelResponses.get(webviewPanel) : undefined;
-                });
+            panel.onDidChangeViewState(({ webviewPanel }) => {
+                commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, webviewPanel.active);
+                this.activePanel = webviewPanel.active ? webviewPanel : undefined;
+                HttpResponseWebview.activePreviewResponse = webviewPanel.active ? this.panelResponses.get(webviewPanel) : undefined;
+            });
 
-                this.panels.push(panel);
+            this.panels.push(panel);
         } else {
             panel = this.panels[this.panels.length - 1];
             panel.title = `${tabTitle}(${response.timingPhases.total}ms)`;
@@ -107,15 +126,80 @@ export class HttpResponseWebview extends BaseWebview {
 
     @trace('Fold Response')
     private foldResponseBody() {
-        if (this.activePanel) {
-            this.activePanel.webview.postMessage({ 'command': 'foldAll' });
-        }
+        this.activePanel?.webview.postMessage({ 'command': 'foldAll' });
     }
 
     @trace('Unfold Response')
     private unfoldResponseBody() {
-        if (this.activePanel) {
-            this.activePanel.webview.postMessage({ 'command': 'unfoldAll' });
+        this.activePanel?.webview.postMessage({ 'command': 'unfoldAll' });
+    }
+
+    @trace('Copy Response Body')
+    private async copyBody() {
+        const response = HttpResponseWebview.activePreviewResponse;
+        if (response) {
+            await this.clipboard.writeText(response.body);
+        }
+    }
+
+    @trace('Save Response')
+    private async save() {
+        const response = HttpResponseWebview.activePreviewResponse;
+        if (response) {
+            const fullResponse = this.getFullResponseString(response);
+            const defaultFilePath = path.join(this.responseSaveFolderPath, `Response-${Date.now()}.http`);
+            try {
+                await this.openSaveDialog(defaultFilePath, fullResponse);
+            } catch {
+                window.showErrorMessage('Failed to save latest response to disk.');
+            }
+        }
+    }
+
+    @trace('Save Response Body')
+    public async saveBody() {
+        const response = HttpResponseWebview.activePreviewResponse;
+        if (response) {
+            const extension = MimeUtility.getExtension(response.contentType, '');
+            const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
+            const defaultFilePath = path.join(this.responseBodySaveFolderPath, fileName);
+            try {
+                await this.openSaveDialog(defaultFilePath, response.bodyBuffer);
+            } catch {
+                window.showErrorMessage('Failed to save latest response body to disk');
+            }
+        }
+    }
+
+    private getFullResponseString(response: HttpResponse): string {
+        const statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
+        let headerString = '';
+        for (const header in response.headers) {
+            if (response.headers.hasOwnProperty(header)) {
+                headerString += `${header}: ${response.headers[header]}${os.EOL}`;
+            }
+        }
+        let body = '';
+        if (response.body) {
+            body = `${os.EOL}${response.body}`;
+        }
+        return `${statusLine}${headerString}${body}`;
+    }
+
+    private async openSaveDialog(path: string, content: string | Buffer) {
+        const uri = await window.showSaveDialog({ defaultUri: Uri.file(path) });
+        if (!uri) {
+            return;
+        }
+
+        const filePath = uri.fsPath;
+        await PersistUtility.ensureFileAsync(filePath);
+        await fs.writeFile(filePath, content);
+        const btn = await window.showInformationMessage(`Saved to ${filePath}`, { title: OPEN }, { title: COPYPATH });
+        if (btn?.title === OPEN) {
+            workspace.openTextDocument(filePath).then(window.showTextDocument);
+        } else if (btn?.title === COPYPATH) {
+            await this.clipboard.writeText(filePath);
         }
     }
 

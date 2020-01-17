@@ -4,6 +4,7 @@ import { RequestHeaders } from './base';
 import { RequestVariableCacheKey } from './requestVariableCacheKey';
 
 export class HttpRequest {
+    public isCancelled: boolean;
     public constructor(
         public method: string,
         public url: string,
@@ -12,10 +13,15 @@ export class HttpRequest {
         public rawBody: string | undefined,
         public requestVariableCacheKey?: RequestVariableCacheKey) {
             this.method = method.toLocaleUpperCase();
+            this.isCancelled = false;
     }
 
     public get contentType(): string | undefined {
         return getContentType(this.headers);
+    }
+
+    public cancel(): void {
+        this.isCancelled = true;
     }
 }
 
