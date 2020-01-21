@@ -123,6 +123,7 @@ export class HttpClient {
             followRedirect: this._settings.followRedirect,
             rejectUnauthorized: false,
             throwHttpErrors: false,
+            retry: 0,
             hooks: {
                 beforeRequest: [
                     opts => {
