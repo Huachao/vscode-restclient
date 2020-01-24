@@ -103,6 +103,17 @@ export class HttpRequestParser implements IRequestParser {
             requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
+        // shorthand syntax for localhost
+        if (requestLine.url[0] === ':') {
+            if (requestLine.url[1] === '/') {
+                requestLine.url = `http://localhost:80${requestLine.url.slice(1)}`;
+            } else {
+                const [port] = requestLine.url.slice(1).split("/", 1);
+                const scheme = port === '443' || port === '8443' ? 'https' : 'http';
+                requestLine.url = `${scheme}://localhost${requestLine.url}`;
+            }
+        }
+
         // parse body
         const contentTypeHeader = getContentType(headers) || getContentType(this._restClientSettings.defaultHeaders);
         body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
