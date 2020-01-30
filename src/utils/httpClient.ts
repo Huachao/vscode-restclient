@@ -141,6 +141,16 @@ export class HttpClient {
                         }
                         return res;
                     }
+                ],
+                // Following port reset on redirect can be removed after upgrade got to version 10.0
+                // https://github.com/sindresorhus/got/issues/719
+                beforeRedirect: [
+                    opts => {
+                        const redirectHost = ((opts as any).href as string).split('/')[2];
+                        if (!redirectHost.includes(':')) {
+                            delete opts.port;
+                        }
+                    }
                 ]
             }
         };
