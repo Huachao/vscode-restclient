@@ -127,10 +127,13 @@ export class HttpClient {
             hooks: {
                 beforeRequest: [
                     opts => {
-                        const cookieString = this.cookieJar.getCookieStringSync(httpRequest.url, { expire: true });
-                        if (cookieString) {
-                            opts.headers!.cookie = [cookieString, getHeader(httpRequest.headers, 'cookie')].filter(Boolean).join('; ');
+                        if (this._settings.rememberCookiesForSubsequentRequests) {
+                            const cookieString = this.cookieJar.getCookieStringSync(httpRequest.url, { expire: true });
+                            if (cookieString) {
+                                opts.headers!.cookie = [cookieString, getHeader(httpRequest.headers, 'cookie')].filter(Boolean).join('; ');
+                            }
                         }
+
                     }
                 ],
                 afterResponse: [
