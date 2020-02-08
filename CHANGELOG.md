@@ -1,3 +1,18 @@
+## 0.23.1 (2020/1/21)
+* __Bug Fix__: [Respect user provided cookie headers](https://github.com/Huachao/vscode-restclient/issues/465)
+* __Bug Fix__: [Cannot read property `toFixed` of null](https://github.com/Huachao/vscode-restclient/issues/450)
+* __Bug Fix__: [Fix incorrect RFC 1123 date time format in datetime system variable](https://github.com/Huachao/vscode-restclient/issues/464)
+* __Bug Fix__: [Ignore cookie domain mismatch error in `SetCookie` header](https://github.com/Huachao/vscode-restclient/issues/470)
+* __Bug Fix__: [Set correct line ending character for multipart/form-data MIME type](https://github.com/Huachao/vscode-restclient/issues/456)
+* __Bug Fix__: [Disable automatical retry on failure](https://github.com/Huachao/vscode-restclient/issues/490)
+* __Bug Fix__: [fix command `rest-client-*` not found error](https://github.com/Huachao/vscode-restclient/pull/449) ([@stegano](stegano))
+* __Improvement__: [Support empty value for file varaible](https://github.com/Huachao/vscode-restclient/issues/322)
+* __Improvement__: [Collapse/Expand children recursively in response webview with `Shift` modifier key](https://github.com/Huachao/vscode-restclient/issues/484)
+* __Improvement__: [Show request name if available in symbol list](https://github.com/Huachao/vscode-restclient/issues/461)
+* __Improvement__: [Use document level cache to improve parsing performance](https://github.com/Huachao/vscode-restclient/issues/463)
+* __Improvement__: Support cancelling an outgoing request by clicking the spin icon
+* __Improvement__: Refresh diagnostic information when switching environment
+
 ## 0.23.0 (2019/11/20)
 * __Feature__: [Add new system varaible - .env file variable](https://github.com/Huachao/vscode-restclient/issues/418)
 * __Feature__: [Add new system varaible - local datetime](https://github.com/Huachao/vscode-restclient/issues/433)
