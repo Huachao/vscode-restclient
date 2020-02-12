@@ -6,7 +6,8 @@
   function onLoad() {
     const code = document.getElementsByTagName('code')[0];
     const [...childs] = code.childNodes;
-    childs.filter(n => n.nodeType === 1).forEach(n => {
+    // @ts-ignore
+    childs.filter(n => n.nodeType === 1 && n.hasAttribute('range-start')).forEach(n => {
       n.addEventListener('click', toggleLines);
     });
   }
