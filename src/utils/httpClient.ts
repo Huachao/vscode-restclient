@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';
 import { Readable, Stream } from 'stream';
-import { CookieJar } from 'tough-cookie';
+import { Cookie, CookieJar, Store } from 'tough-cookie';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
@@ -22,14 +22,18 @@ import got = require('got');
 const encodeUrl = require('encodeurl');
 const cookieStore = require('tough-cookie-file-store-bugfix');
 
+type SetCookieCallback = (err: Error | null, cookie: Cookie) => void;
+type SetCookieCallbackWithoutOptions = (err: Error, cookie: Cookie) => void;
+type GetCookieStringCallback = (err: Error | null, cookies: string) => void;
+
 export class HttpClient {
     private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
-    private readonly cookieJar: CookieJar;
+    private readonly cookieStore: Store;
 
     public constructor() {
         PersistUtility.ensureCookieFile();
-        this.cookieJar = new CookieJar(new cookieStore(PersistUtility.cookieFilePath));
+        this.cookieStore = new cookieStore(PersistUtility.cookieFilePath) as Store;
     }
 
     public async send(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -123,28 +127,10 @@ export class HttpClient {
             followRedirect: this._settings.followRedirect,
             rejectUnauthorized: false,
             throwHttpErrors: false,
+            cookieJar: this._settings.rememberCookiesForSubsequentRequests ? new CookieJar(this.cookieStore) : undefined,
             retry: 0,
             hooks: {
-                beforeRequest: [
-                    opts => {
-                        if (this._settings.rememberCookiesForSubsequentRequests) {
-                            const cookieString = this.cookieJar.getCookieStringSync(httpRequest.url, { expire: true });
-                            if (cookieString) {
-                                opts.headers!.cookie = [cookieString, getHeader(httpRequest.headers, 'cookie')].filter(Boolean).join('; ');
-                            }
-                        }
-
-                    }
-                ],
-                afterResponse: [
-                    res => {
-                        if (this._settings.rememberCookiesForSubsequentRequests) {
-                            const setCookie = getHeader(res.headers, 'set-cookie') as string[] | undefined;
-                            setCookie?.map(rawCookie => this.cookieJar.setCookieSync(rawCookie, res.url, { ignoreError: true }));
-                        }
-                        return res;
-                    }
-                ],
+                afterResponse: [],
                 // Following port reset on redirect can be removed after upgrade got to version 10.0
                 // https://github.com/sindresorhus/got/issues/719
                 beforeRedirect: [
@@ -216,6 +202,46 @@ export class HttpClient {
                 if (value) {
                     options.headers[header] = value;
                 }
+            }
+        }
+
+        // set cookie jar
+        if (options.cookieJar) {
+            const { getCookieString: originalGetCookieString, setCookie: originalSetCookie } = options.cookieJar;
+
+            function _setCookie(cookieOrString: Cookie | string, currentUrl: string, opts: CookieJar.SetCookieOptions, cb: SetCookieCallback): void;
+            function _setCookie(cookieOrString: Cookie | string, currentUrl: string, cb: SetCookieCallbackWithoutOptions): void;
+            function _setCookie(cookieOrString: Cookie | string, currentUrl: string, opts: CookieJar.SetCookieOptions | SetCookieCallbackWithoutOptions, cb?: SetCookieCallback): void {
+                if (opts instanceof Function) {
+                    cb = opts;
+                    opts = {};
+                }
+                opts.ignoreError = true;
+                originalSetCookie.call(options.cookieJar, cookieOrString, currentUrl, opts, cb!);
+            }
+            options.cookieJar.setCookie = _setCookie;
+
+            if (hasHeader(options.headers, 'cookie')) {
+                let count = 0;
+
+                function _getCookieString(currentUrl: string, opts: CookieJar.GetCookiesOptions, cb: GetCookieStringCallback): void;
+                function _getCookieString(currentUrl: string, cb: GetCookieStringCallback): void;
+                function _getCookieString(currentUrl: string, opts: CookieJar.GetCookiesOptions | GetCookieStringCallback, cb?: GetCookieStringCallback): void {
+                    if (opts instanceof Function) {
+                        cb = opts;
+                        opts = {};
+                    }
+
+                    originalGetCookieString.call(options.cookieJar, currentUrl, opts, (err, cookies) => {
+                        if (err || count > 0 || !cookies) {
+                            cb!(err, cookies);
+                        }
+
+                        count++;
+                        cb!(null, [cookies, getHeader(httpRequest.headers, 'cookie')].filter(Boolean).join('; '));
+                    });
+                }
+                options.cookieJar.getCookieString = _getCookieString;
             }
         }
 
