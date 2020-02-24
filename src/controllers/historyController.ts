@@ -1,5 +1,6 @@
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import * as fs from 'fs-extra';
-import moment from 'moment';
 import { EOL } from 'os';
 import { window, workspace } from 'vscode';
 import { logger } from '../logger';
@@ -7,6 +8,8 @@ import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
 import { PersistUtility } from '../utils/persistUtility';
+
+dayjs.extend(relativeTime);
 
 const tmp = require('tmp');
 
@@ -30,7 +33,7 @@ export class HistoryController {
                     item.description = `${request.body.length} body bytes`;
                 }
                 if (request.startTime) {
-                    item.detail = `${moment().to(request.startTime)}`;
+                    item.detail = `${dayjs().to(request.startTime)}`;
                 }
                 item.rawRequest = request;
                 return item;

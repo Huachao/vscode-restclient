@@ -1,7 +1,8 @@
 import * as adal from 'adal-node';
+import dayjs, { Dayjs, OpUnitType } from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
-import { DurationInputArg2, Moment, utc } from 'moment';
 import * as path from 'path';
 import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
@@ -14,6 +15,8 @@ import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
 
 const uuidv4 = require('uuid/v4');
+
+dayjs.extend(utc);
 
 type SystemVariableValue = Pick<HttpVariable, Exclude<keyof HttpVariable, 'name'>>;
 type ResolveSystemVariableFunc = (name: string, document: TextDocument, context: HttpVariableContext) => Promise<SystemVariableValue>;
@@ -84,8 +87,8 @@ export class SystemVariableProvider implements HttpVariableProvider {
             if (groups !== null && groups.length === 3) {
                 const [, offset, option] = groups;
                 const ts = offset && option
-                    ? utc().add(offset, option as DurationInputArg2).unix()
-                    : utc().unix();
+                    ? dayjs.utc().add(+offset, option as OpUnitType).unix()
+                    : dayjs.utc().unix();
                 return { value: ts.toString() };
             }
 
@@ -98,11 +101,11 @@ export class SystemVariableProvider implements HttpVariableProvider {
             const groups = this.datetimeRegex.exec(name);
             if (groups !== null && groups.length === 4) {
                 const [, type, offset, option] = groups;
-                let date: Moment;
+                let date: Dayjs;
                 if (offset && option) {
-                    date = utc().add(offset, option as DurationInputArg2);
+                    date = dayjs.utc().add(+offset, option as OpUnitType);
                 } else {
-                    date = utc();
+                    date = dayjs.utc();
                 }
 
                 if (type === 'rfc1123') {
@@ -123,15 +126,15 @@ export class SystemVariableProvider implements HttpVariableProvider {
             const groups = this.localDatetimeRegex.exec(name);
             if (groups !== null && groups.length === 4) {
                 const [, type, offset, option] = groups;
-                let date: Moment = utc().local();
+                let date = dayjs.utc().local();
                 if (offset && option) {
-                    date = date.add(offset, option as DurationInputArg2);
+                    date = date.add(+offset, option as OpUnitType);
                 }
 
                 if (type === 'rfc1123') {
                     return { value: date.locale('en').format('ddd, DD MMM YYYY HH:mm:ss ZZ') };
                 } else if (type === 'iso8601') {
-                    return { value: date.toISOString(true) };
+                    return { value: date.toISOString() };
                 } else {
                     return { value: date.format(type.slice(1, type.length - 1)) };
                 }
