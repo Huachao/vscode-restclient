@@ -28,7 +28,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private readonly randomIntegerRegex: RegExp = new RegExp(`\\${Constants.RandomIntVariableName}\\s(\\-?\\d+)\\s(\\-?\\d+)`);
     private readonly processEnvRegex: RegExp = new RegExp(`\\${Constants.ProcessEnvVariableName}\\s(\\%)?(\\w+)`);
 
-    private readonly dotenvRegex: RegExp = new RegExp(`\\${Constants.DotenvVariableName}\\s([\\w-.]+)`);
+    private readonly dotenvRegex: RegExp = new RegExp(`\\${Constants.DotenvVariableName}\\s(\\%)?([\\w-.]+)`);
 
     private readonly requestUrlRegex: RegExp = /^(?:[^\s]+\s+)([^:]*:\/\/\/?[^/\s]*\/?)/;
 
@@ -160,20 +160,6 @@ export class SystemVariableProvider implements HttpVariableProvider {
             return { warning: ResolveWarningMessage.IncorrectRandomIntegerVariableFormat };
         });
     }
-
-    private async resolveSettingsEnvironmentVariable (name: string) {
-        if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
-            const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);
-            if (!error && !warning) {
-                return value!.toString();
-            } else {
-                return name;
-            }
-        } else {
-            return name;
-        }
-    }
-
     private registerProcessEnvVariable() {
         this.resolveFuncs.set(Constants.ProcessEnvVariableName, async name => {
             const groups = this.processEnvRegex.exec(name);
@@ -200,15 +186,19 @@ export class SystemVariableProvider implements HttpVariableProvider {
             if (!await fs.pathExists(absolutePath)) {
                 return { warning: ResolveWarningMessage.DotenvFileNotFound };
             }
-            const parsed = dotenv.parse(fs.readFileSync(absolutePath));
             const groups = this.dotenvRegex.exec(name);
-            if (groups !== null && groups.length === 2) {
-                const [, key] = groups;
-                if (!(key in parsed)) {
+            if (groups !== null && groups.length === 3) {
+                const parsed = dotenv.parse(await fs.readFile(absolutePath));
+                const [, refToggle, key] = groups;
+                let dotEnvVarName = key;
+                if (refToggle !== undefined) {
+                    dotEnvVarName = await this.resolveSettingsEnvironmentVariable(key);
+                }
+                if (!(dotEnvVarName in parsed)) {
                     return { warning: ResolveWarningMessage.DotenvVariableNotFound };
                 }
 
-                return { value: parsed[key] };
+                return { value: parsed[dotEnvVarName] };
             }
 
             return { warning: ResolveWarningMessage.IncorrectDotenvVariableFormat };
@@ -283,6 +273,19 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 acquireToken();
             });
         });
+    }
+
+    private async resolveSettingsEnvironmentVariable(name: string) {
+        if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
+            const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);
+            if (!error && !warning) {
+                return value!.toString();
+            } else {
+                return name;
+            }
+        } else {
+            return name;
+        }
     }
 
     // #region AAD
