@@ -1,5 +1,4 @@
 import * as appInsights from "applicationinsights";
-import packageLockJson from '../../package-lock.json';
 import packageJson from '../../package.json';
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
@@ -23,7 +22,6 @@ export class Telemetry {
         Telemetry.defaultClient = appInsights.defaultClient;
         const context = Telemetry.defaultClient.context;
         context.tags[context.keys.applicationVersion] = packageJson.version;
-        context.tags[context.keys.internalSdkVersion] = `node:${packageLockJson.dependencies.applicationinsights.version}`;
     }
 
     public static sendEvent(eventName: string, properties?: { [key: string]: string }) {
