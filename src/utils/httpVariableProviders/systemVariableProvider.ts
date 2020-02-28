@@ -4,6 +4,7 @@ import utc from 'dayjs/plugin/utc';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as util from 'util';
 import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
 import { HttpRequest } from '../../models/httpRequest';
@@ -14,6 +15,7 @@ import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
 
+const exec = util.promisify(require('child_process').exec);
 const uuidv4 = require('uuid/v4');
 
 dayjs.extend(utc);
@@ -30,6 +32,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private readonly localDatetimeRegex: RegExp = new RegExp(`\\${Constants.LocalDateTimeVariableName}\\s(rfc1123|iso8601|\'.+\'|\".+\")(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly randomIntegerRegex: RegExp = new RegExp(`\\${Constants.RandomIntVariableName}\\s(\\-?\\d+)\\s(\\-?\\d+)`);
     private readonly processEnvRegex: RegExp = new RegExp(`\\${Constants.ProcessEnvVariableName}\\s(\\%)?(\\w+)`);
+    private readonly evalRegex: RegExp = new RegExp(`\\${Constants.EvalEnvVariableName}\\s(.+)`);
 
     private readonly dotenvRegex: RegExp = new RegExp(`\\${Constants.DotenvVariableName}\\s(\\%)?([\\w-.]+)`);
 
@@ -56,6 +59,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerGuidVariable();
         this.registerRandomIntVariable();
         this.registerProcessEnvVariable();
+        this.registerEvalVariable();
         this.registerDotenvVariable();
         this.registerAadTokenVariable();
     }
@@ -180,6 +184,18 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 }
             }
             return { warning: ResolveWarningMessage.IncorrectProcessEnvVariableFormat };
+        });
+    }
+
+    private registerEvalVariable() {
+        this.resolveFuncs.set(Constants.EvalEnvVariableName, async name => {
+            const groups = this.evalRegex.exec(name);
+            if (groups !== null && groups.length === 2 ) {
+                const [, evalCommand] = groups;
+                const result = await exec(evalCommand);
+                return { value: result.stdout ? result.stdout.trim() : null };
+            }
+            return { warning: ResolveWarningMessage.IncorrectEvalVariableFormat };
         });
     }
 
