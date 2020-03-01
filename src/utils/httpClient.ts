@@ -127,7 +127,7 @@ export class HttpClient {
             followRedirect: this._settings.followRedirect,
             rejectUnauthorized: false,
             throwHttpErrors: false,
-            cookieJar: this._settings.rememberCookiesForSubsequentRequests ? new CookieJar(this.cookieStore) : undefined,
+            cookieJar: this._settings.rememberCookiesForSubsequentRequests ? new CookieJar(this.cookieStore, { rejectPublicSuffixes: false }) : undefined,
             retry: 0,
             hooks: {
                 afterResponse: [],
