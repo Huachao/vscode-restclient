@@ -17,7 +17,7 @@
     if (arguments.length === 2) {
       lineSpan = e;
       recursive = true;
-      isExpandAction = !collapse
+      isExpandAction = !collapse;
       if (isExpandAction) {
         lineSpan.classList.remove('collapsed');
       } else {
