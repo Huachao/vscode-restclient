@@ -140,7 +140,7 @@ export class HttpRequestParser implements IRequestParser {
         let url: string;
         if (words.length === 1) {
             // Only provides request url
-            method = HttpRequestParser.defaultMethod;
+            method = this.defaultMethod;
             url = words[0];
         } else {
             // Provides both request method and url
@@ -164,14 +164,14 @@ export class HttpRequestParser implements IRequestParser {
         }
 
         // Check if needed to upload file
-        if (lines.every(line => !HttpRequestParser.uploadFromFileSyntax.test(line))) {
+        if (lines.every(line => !this.uploadFromFileSyntax.test(line))) {
             if (MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
                 return lines.reduce((p, c, i) => {
                     p += `${(i === 0 || c.startsWith('&') ? '' : EOL)}${c}`;
                     return p;
                 }, '');
             } else {
-                const lineEnding = HttpRequestParser.getLineEnding(contentTypeHeader);
+                const lineEnding = this.getLineEnding(contentTypeHeader);
                 let result = lines.join(lineEnding);
                 if (MimeUtility.isNewlineDelimitedJSON(contentTypeHeader)) {
                     result += lineEnding;
@@ -181,11 +181,11 @@ export class HttpRequestParser implements IRequestParser {
         } else {
             const combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
             for (const [index, line] of lines.entries()) {
-                if (HttpRequestParser.uploadFromFileSyntax.test(line)) {
-                    const groups = HttpRequestParser.uploadFromFileSyntax.exec(line);
+                if (this.uploadFromFileSyntax.test(line)) {
+                    const groups = this.uploadFromFileSyntax.exec(line);
                     if (groups?.length === 2) {
                         const fileUploadPath = groups[1];
-                        const fileAbsolutePath = HttpRequestParser.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
+                        const fileAbsolutePath = this.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
                         if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
                             combinedStream.append(fs.createReadStream(fileAbsolutePath));
                         } else {
@@ -197,7 +197,7 @@ export class HttpRequestParser implements IRequestParser {
                 }
 
                 if (index !== lines.length - 1) {
-                    combinedStream.append(HttpRequestParser.getLineEnding(contentTypeHeader));
+                    combinedStream.append(this.getLineEnding(contentTypeHeader));
                 }
             }
 

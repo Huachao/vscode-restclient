@@ -11,11 +11,11 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
     private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
     public static get Instance(): EnvironmentVariableProvider {
-        if (!EnvironmentVariableProvider._instance) {
-            EnvironmentVariableProvider._instance = new EnvironmentVariableProvider();
+        if (!this._instance) {
+            this._instance = new EnvironmentVariableProvider();
         }
 
-        return EnvironmentVariableProvider._instance;
+        return this._instance;
     }
 
     private constructor() {

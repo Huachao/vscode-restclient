@@ -4,14 +4,14 @@ export class AadTokenCache {
     private static cache = new Map<string, adal.TokenResponse>();
 
     public static get(key: string): adal.TokenResponse | undefined {
-        return AadTokenCache.cache.get(key);
+        return this.cache.get(key);
     }
 
     public static set(key: string, value: adal.TokenResponse) {
-        AadTokenCache.cache.set(key, value);
+        this.cache.set(key, value);
     }
 
     public static clear(): void {
-        AadTokenCache.cache.clear();
+        this.cache.clear();
     }
 }

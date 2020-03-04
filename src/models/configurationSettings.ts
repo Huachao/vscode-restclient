@@ -77,11 +77,11 @@ export class RestClientSettings implements IRestClientSettings {
     private static _instance: RestClientSettings;
 
     public static get Instance(): RestClientSettings {
-        if (!RestClientSettings._instance) {
-            RestClientSettings._instance = new RestClientSettings();
+        if (!this._instance) {
+            this._instance = new RestClientSettings();
         }
 
-        return RestClientSettings._instance;
+        return this._instance;
     }
 
     public readonly configurationUpdateEventEmitter = new EventEmitter<void>();

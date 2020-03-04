@@ -14,11 +14,11 @@ export class FileVariableProvider implements HttpVariableProvider {
     private static _instance: FileVariableProvider;
 
     public static get Instance(): FileVariableProvider {
-        if (!FileVariableProvider._instance) {
-            FileVariableProvider._instance = new FileVariableProvider();
+        if (!this._instance) {
+            this._instance = new FileVariableProvider();
         }
 
-        return FileVariableProvider._instance;
+        return this._instance;
     }
 
     private readonly escapee: Map<string, string> = new Map<string, string>([

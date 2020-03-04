@@ -139,7 +139,7 @@ export class CustomVariableDiagnosticsProvider {
 
         const vars = new Map<string, VariableWithPosition[]>();
         const lines = document.getText().split(Constants.LineSplitterRegex);
-        const pattern = /\{\{(\w+)(\..*?)*\}\}/g;
+        const pattern = /\{\{([^\s\.{}]+)(\..*?)*\}\}/g;
         lines.forEach((line, lineNumber) => {
             let match: RegExpExecArray | null;
             while (match = pattern.exec(line)) {

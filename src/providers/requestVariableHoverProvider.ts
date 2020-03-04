@@ -1,21 +1,17 @@
-import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, Range, TextDocument, TextLine } from 'vscode';
+import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, TextDocument } from 'vscode';
 import { RequestVariableProvider } from '../utils/httpVariableProviders/requestVariableProvider';
 import { VariableUtility } from '../utils/variableUtility';
 
 export class RequestVariableHoverProvider implements HoverProvider {
 
     public async provideHover(document: TextDocument, position: Position, token: CancellationToken): Promise<Hover | undefined> {
-        if (!VariableUtility.isRequestVariableReference(document, position)) {
+        const wordRange = VariableUtility.getRequestVariableReferencePathRange(document, position);
+        if (!wordRange) {
             return undefined;
         }
 
-        const wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
-        const lineRange = document.lineAt(position);
+        const fullPath = document.getText(wordRange);
 
-        const fullPath = this.getRequestVariableHoverPath(wordRange!, lineRange);
-        if (!fullPath) {
-            return undefined;
-        }
         const { name, value, warning, error } = await RequestVariableProvider.Instance.get(fullPath, document);
         if (!error && !warning) {
             const contents: MarkedString[] = [];
@@ -29,11 +25,5 @@ export class RequestVariableHoverProvider implements HoverProvider {
         }
 
         return undefined;
-    }
-
-    private getRequestVariableHoverPath(wordRange: Range, lineRange: TextLine) {
-        return wordRange && !wordRange.isEmpty
-            ? lineRange.text.substring(wordRange.start.character + 2, wordRange.end.character - 2)
-            : null;
     }
 }

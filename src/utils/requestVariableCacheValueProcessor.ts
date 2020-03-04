@@ -37,7 +37,7 @@ export class RequestVariableCacheValueProcessor {
             return { state: ResolveState.Warning, value: httpEntity, message: ResolveWarningMessage.MissingRequestEntityPart };
         }
 
-        return RequestVariableCacheValueProcessor.resolveHttpPart(httpEntity, httpPart as HttpPart, nameOrPath);
+        return this.resolveHttpPart(httpEntity, httpPart as HttpPart, nameOrPath);
     }
 
     private static resolveHttpPart(http: HttpRequest | HttpResponse, httpPart: HttpPart, nameOrPath?: string): ResolveResult {
@@ -61,9 +61,9 @@ export class RequestVariableCacheValueProcessor {
             if (MimeUtility.isJSON(contentTypeHeader)) {
                 const parsedBody = JSON.parse(body as string);
 
-                return RequestVariableCacheValueProcessor.resolveJsonHttpBody(parsedBody, nameOrPath);
+                return this.resolveJsonHttpBody(parsedBody, nameOrPath);
             } else if (MimeUtility.isXml(contentTypeHeader)) {
-                return RequestVariableCacheValueProcessor.resolveXmlHttpBody(body, nameOrPath);
+                return this.resolveXmlHttpBody(body, nameOrPath);
             } else {
                 return { state: ResolveState.Warning, value: body, message: ResolveWarningMessage.UnsupportedBodyContentType };
             }

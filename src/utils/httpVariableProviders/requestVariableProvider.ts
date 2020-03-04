@@ -12,11 +12,11 @@ export class RequestVariableProvider implements HttpVariableProvider {
     private static _instance: RequestVariableProvider;
 
     public static get Instance(): RequestVariableProvider {
-        if (!RequestVariableProvider._instance) {
-            RequestVariableProvider._instance = new RequestVariableProvider();
+        if (!this._instance) {
+            this._instance = new RequestVariableProvider();
         }
 
-        return RequestVariableProvider._instance;
+        return this._instance;
     }
 
     private readonly requestVariableCache = new DocumentCache<string[]>();
