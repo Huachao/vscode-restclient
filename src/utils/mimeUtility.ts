@@ -34,7 +34,7 @@ export class MimeUtility {
             return defaultExtension;
         }
 
-        const mimeType = MimeUtility.parse(contentTypeString);
+        const mimeType = this.parse(contentTypeString);
         const contentTypeWithoutCharsets = `${mimeType.type}${mimeType.suffix}`;
         const restClientSettings = RestClientSettings.Instance;
 
@@ -56,8 +56,8 @@ export class MimeUtility {
             return false;
         }
 
-        const type = MimeUtility.parse(contentTypeString).type;
-        return MimeUtility.supportedImagesFormats.includes(type);
+        const type = this.parse(contentTypeString).type;
+        return this.supportedImagesFormats.includes(type);
     }
 
     public static isJSON(contentTypeString: string | undefined): boolean {
@@ -65,7 +65,7 @@ export class MimeUtility {
             return false;
         }
 
-        const { type, suffix } = MimeUtility.parse(contentTypeString);
+        const { type, suffix } = this.parse(contentTypeString);
         return type === 'application/json' || suffix === '+json';
     }
 
@@ -74,7 +74,7 @@ export class MimeUtility {
             return false;
         }
 
-        const { type, suffix } = MimeUtility.parse(contentTypeString);
+        const { type, suffix } = this.parse(contentTypeString);
         return type === 'application/xml' || type === 'text/xml' || suffix === '+xml';
     }
 
@@ -83,7 +83,7 @@ export class MimeUtility {
             return false;
         }
 
-        return MimeUtility.parse(contentTypeString).type === 'text/html';
+        return this.parse(contentTypeString).type === 'text/html';
     }
 
     public static isJavaScript(contentTypeString: string | undefined): boolean {
@@ -91,7 +91,7 @@ export class MimeUtility {
             return false;
         }
 
-        return MimeUtility.parse(contentTypeString).type === 'application/javascript';
+        return this.parse(contentTypeString).type === 'application/javascript';
     }
 
     public static isCSS(contentTypeString: string | undefined): boolean {
@@ -99,7 +99,7 @@ export class MimeUtility {
             return false;
         }
 
-        return MimeUtility.parse(contentTypeString).type === 'text/css';
+        return this.parse(contentTypeString).type === 'text/css';
     }
 
     public static isMultiPartMixed(contentTypeString: string | undefined): boolean {
@@ -107,7 +107,7 @@ export class MimeUtility {
             return false;
         }
 
-        return MimeUtility.parse(contentTypeString).type === 'multipart/mixed';
+        return this.parse(contentTypeString).type === 'multipart/mixed';
     }
 
     public static isMultiPartFormData(contentTypeString: string | undefined): boolean {
@@ -115,7 +115,7 @@ export class MimeUtility {
             return false;
         }
 
-        return MimeUtility.parse(contentTypeString).type === 'multipart/form-data';
+        return this.parse(contentTypeString).type === 'multipart/form-data';
     }
 
     public static isMultiPart(contentTypeString: string | undefined): boolean {
@@ -123,7 +123,7 @@ export class MimeUtility {
             return false;
         }
 
-        const type = MimeUtility.parse(contentTypeString).type;
+        const type = this.parse(contentTypeString).type;
         return type.startsWith('multipart/');
     }
 
@@ -132,7 +132,7 @@ export class MimeUtility {
             return false;
         }
 
-        return MimeUtility.parse(contentTypeString).type === 'application/x-www-form-urlencoded';
+        return this.parse(contentTypeString).type === 'application/x-www-form-urlencoded';
     }
 
     public static isNewlineDelimitedJSON(contentTypeString: string | undefined): boolean {
@@ -140,6 +140,6 @@ export class MimeUtility {
             return false;
         }
 
-        return MimeUtility.parse(contentTypeString).type === 'application/x-ndjson';
+        return this.parse(contentTypeString).type === 'application/x-ndjson';
     }
 }

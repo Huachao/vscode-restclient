@@ -29,7 +29,7 @@ export class VariableProcessor {
             const name = match[1].trim();
             const document = getCurrentTextDocument();
             const context = { rawRequest: request, parsedRequest: result };
-            for (const [provider, cacheable] of VariableProcessor.providers) {
+            for (const [provider, cacheable] of this.providers) {
                 if (resolvedVariables.has(name)) {
                     result += resolvedVariables.get(name);
                     continue variable;
@@ -55,7 +55,7 @@ export class VariableProcessor {
     }
 
     public static async getAllVariablesDefinitions(document: TextDocument): Promise<Map<string, VariableType[]>> {
-        const [, [requestProvider], [fileProvider], [environmentProvider]] = VariableProcessor.providers;
+        const [, [requestProvider], [fileProvider], [environmentProvider]] = this.providers;
         const requestVariables = await (requestProvider as RequestVariableProvider).getAll(document);
         const fileVariables = await (fileProvider as FileVariableProvider).getAll(document);
         const environmentVariables = await (environmentProvider as EnvironmentVariableProvider).getAll();

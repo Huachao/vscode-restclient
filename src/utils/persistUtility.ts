@@ -12,31 +12,31 @@ export class PersistUtility {
     private static emptyHttpRequestItems: SerializedHttpRequest[] = [];
 
     public static async saveRequest(httpRequest: SerializedHttpRequest): Promise<void> {
-        let requests = await PersistUtility.deserializeFromFileAsync(PersistUtility.historyFilePath, PersistUtility.emptyHttpRequestItems);
+        let requests = await this.deserializeFromFileAsync(this.historyFilePath, this.emptyHttpRequestItems);
         requests.unshift(httpRequest);
         requests = requests.slice(0, Constants.HistoryItemsMaxCount);
-        await fs.writeJson(PersistUtility.historyFilePath, requests);
+        await fs.writeJson(this.historyFilePath, requests);
     }
 
     public static loadRequests(): Promise<SerializedHttpRequest[]> {
-        return PersistUtility.deserializeFromFileAsync(PersistUtility.historyFilePath, PersistUtility.emptyHttpRequestItems);
+        return this.deserializeFromFileAsync(this.historyFilePath, this.emptyHttpRequestItems);
     }
 
     public static clearRequests(): Promise<void> {
-        return fs.writeJson(PersistUtility.historyFilePath, PersistUtility.emptyHttpRequestItems);
+        return fs.writeJson(this.historyFilePath, this.emptyHttpRequestItems);
     }
 
     public static async saveEnvironment(environment: EnvironmentPickItem): Promise<void> {
-        await PersistUtility.ensureFileAsync(PersistUtility.environmentFilePath);
-        await fs.writeJson(PersistUtility.environmentFilePath, environment);
+        await this.ensureFileAsync(this.environmentFilePath);
+        await fs.writeJson(this.environmentFilePath, environment);
     }
 
     public static loadEnvironment(): Promise<EnvironmentPickItem | undefined> {
-        return PersistUtility.deserializeFromFileAsync<EnvironmentPickItem>(PersistUtility.environmentFilePath);
+        return this.deserializeFromFileAsync<EnvironmentPickItem>(this.environmentFilePath);
     }
 
     public static ensureCookieFile() {
-        fs.ensureFileSync(PersistUtility.cookieFilePath);
+        fs.ensureFileSync(this.cookieFilePath);
     }
 
     public static ensureFileAsync(path: string): Promise<void> {

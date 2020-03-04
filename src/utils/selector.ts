@@ -27,7 +27,7 @@ export class Selector {
         let selectedText: string | null;
         if (editor.selection.isEmpty || range) {
             const activeLine = !range ? editor.selection.active.line : range.start.line;
-            selectedText = Selector.getDelimitedText(editor.document.getText(), activeLine);
+            selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
         } else {
             selectedText = editor.document.getText(editor.selection);
         }
@@ -37,13 +37,13 @@ export class Selector {
         }
 
         // parse request variable definition name
-        const requestVariable = Selector.getRequestVariableDefinitionName(selectedText);
+        const requestVariable = this.getRequestVariableDefinitionName(selectedText);
 
         // remove comment lines
         let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Selector.isCommentLine(l));
 
         // remove file variables definition lines and leading empty lines
-        lines = ArrayUtility.skipWhile(lines, l => Selector.isFileVariableDefinitionLine(l) || Selector.isEmptyLine(l));
+        lines = ArrayUtility.skipWhile(lines, l => this.isFileVariableDefinitionLine(l) || this.isEmptyLine(l));
 
         if (lines.length === 0) {
             return null;
@@ -66,7 +66,7 @@ export class Selector {
                 ignoreResponseRange: true,
             ...options};
         const requestRanges: [number, number][] = [];
-        const delimitedLines = Selector.getDelimiterRows(lines);
+        const delimitedLines = this.getDelimiterRows(lines);
         delimitedLines.push(lines.length);
 
         let prev = -1;
@@ -75,20 +75,20 @@ export class Selector {
             let end = current - 1;
             while (start <= end) {
                 const startLine = lines[start];
-                if (options.ignoreResponseRange && Selector.isResponseStatusLine(startLine)) {
+                if (options.ignoreResponseRange && this.isResponseStatusLine(startLine)) {
                     break;
                 }
 
-                if (options.ignoreCommentLine && Selector.isCommentLine(startLine)
-                    || options.ignoreEmptyLine && Selector.isEmptyLine(startLine)
-                    || options.ignoreFileVariableDefinitionLine && Selector.isFileVariableDefinitionLine(startLine)) {
+                if (options.ignoreCommentLine && this.isCommentLine(startLine)
+                    || options.ignoreEmptyLine && this.isEmptyLine(startLine)
+                    || options.ignoreFileVariableDefinitionLine && this.isFileVariableDefinitionLine(startLine)) {
                     start++;
                     continue;
                 }
 
                 const endLine = lines[end];
-                if (options.ignoreCommentLine && Selector.isCommentLine(endLine)
-                    || options.ignoreEmptyLine && Selector.isEmptyLine(endLine)) {
+                if (options.ignoreCommentLine && this.isCommentLine(endLine)
+                    || options.ignoreEmptyLine && this.isEmptyLine(endLine)) {
                     end--;
                     continue;
                 }
@@ -119,7 +119,7 @@ export class Selector {
     }
 
     public static isResponseStatusLine(line: string): boolean {
-        return Selector.responseStatusLineRegex.test(line);
+        return this.responseStatusLineRegex.test(line);
     }
 
     public static getRequestVariableDefinitionName(text: string): string | undefined {
@@ -129,7 +129,7 @@ export class Selector {
 
     private static getDelimitedText(fullText: string, currentLine: number): string | null {
         const lines: string[] = fullText.split(Constants.LineSplitterRegex);
-        const delimiterLineNumbers: number[] = Selector.getDelimiterRows(lines);
+        const delimiterLineNumbers: number[] = this.getDelimiterRows(lines);
         if (delimiterLineNumbers.length === 0) {
             return fullText;
         }

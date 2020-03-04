@@ -9,24 +9,24 @@ export class RequestVariableCache {
     private static readonly eventEmitter = new EventEmitter<RequestVariableEvent>();
 
     public static get onDidCreateNewRequestVariable(): Event<RequestVariableEvent> {
-        return RequestVariableCache.eventEmitter.event;
+        return this.eventEmitter.event;
     }
 
     public static add(cacheKey: RequestVariableCacheKey, value: RequestVariableCacheValue) {
-        RequestVariableCache.cache.set(cacheKey.getCacheKey(), value);
+        this.cache.set(cacheKey.getCacheKey(), value);
         const { key: name, document } = cacheKey;
-        RequestVariableCache.eventEmitter.fire({ name, document });
+        this.eventEmitter.fire({ name, document });
     }
 
     public static has(cacheKey: RequestVariableCacheKey): boolean {
-        return RequestVariableCache.cache.has(cacheKey.getCacheKey());
+        return this.cache.has(cacheKey.getCacheKey());
     }
 
     public static get(cacheKey: RequestVariableCacheKey): RequestVariableCacheValue | undefined {
-        return RequestVariableCache.cache.get(cacheKey.getCacheKey());
+        return this.cache.get(cacheKey.getCacheKey());
     }
 
     public static remove(cacheKey: RequestVariableCacheKey) {
-        RequestVariableCache.cache.delete(cacheKey.getCacheKey());
+        this.cache.delete(cacheKey.getCacheKey());
     }
 }

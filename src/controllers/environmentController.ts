@@ -54,7 +54,7 @@ export class EnvironmentController {
     public static async getCurrentEnvironment(): Promise<EnvironmentPickItem> {
         let currentEnvironment = await PersistUtility.loadEnvironment();
         if (!currentEnvironment) {
-            currentEnvironment = EnvironmentController.noEnvironmentPickItem;
+            currentEnvironment = this.noEnvironmentPickItem;
             await PersistUtility.saveEnvironment(currentEnvironment);
         }
         return currentEnvironment;

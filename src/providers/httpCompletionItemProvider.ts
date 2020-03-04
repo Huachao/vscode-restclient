@@ -5,7 +5,7 @@ import { VariableUtility } from "../utils/variableUtility";
 
 export class HttpCompletionItemProvider implements CompletionItemProvider {
     public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[] | undefined> {
-        if (VariableUtility.isPartialRequestVariableReference(document, position)) {
+        if (!!VariableUtility.getPartialRequestVariableReferencePathRange(document, position)) {
             return undefined;
         }
 

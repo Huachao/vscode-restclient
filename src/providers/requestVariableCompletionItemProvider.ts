@@ -1,4 +1,4 @@
-import { CancellationToken, CompletionItem, CompletionItemKind, CompletionItemProvider, MarkdownString, Position, Range, TextDocument, TextLine } from 'vscode';
+import { CancellationToken, CompletionItem, CompletionItemKind, CompletionItemProvider, MarkdownString, Position, TextDocument } from 'vscode';
 import * as Constants from "../common/constants";
 import { ElementType } from "../models/httpElement";
 import { ResolveState, ResolveWarningMessage } from "../models/httpVariableResolveResult";
@@ -12,24 +12,14 @@ const firstPartRegex: RegExp = /^(\w+)\.$/;
 const secondPartRegex: RegExp = /^(\w+)\.(request|response)\.$/;
 
 export class RequestVariableCompletionItemProvider implements CompletionItemProvider {
-    public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[]> {
-        if (!VariableUtility.isPartialRequestVariableReference(document, position)) {
-            return [];
-        }
+    public async provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken): Promise<CompletionItem[] | undefined> {
+        const wordRange = VariableUtility.getPartialRequestVariableReferencePathRange(document, position);
 
-
-        const wordRange = document.getWordRangeAtPosition(position, /\{\{(\w+)\.(.*?)?\}\}/);
-        const lineRange = document.lineAt(position);
-
-        let fullPath = this.getRequestVariableCompletionPath(wordRange!, lineRange, position);
-
-        if (!fullPath) {
-            return [];
-        }
+        let fullPath = document.getText(wordRange);
 
         const match = fullPath.match(/(\w+)\.(.*?)?/);
         if (!match || !this.checkIfRequestVariableDefined(document, match[1])) {
-            return [];
+            return undefined;
         }
 
         if (firstPartRegex.test(fullPath)) {
@@ -67,40 +57,12 @@ export class RequestVariableCompletionItemProvider implements CompletionItemProv
             }
         }
 
-        return [];
+        return undefined;
     }
 
     private checkIfRequestVariableDefined(document: TextDocument, variableName: string) {
         const text = document.getText();
         const regex = new RegExp(Constants.RequestVariableDefinitionWithNameRegexFactory(variableName, "m"));
         return regex.test(text);
-    }
-
-    private getRequestVariableCompletionPath(wordRange: Range, lineRange: TextLine, position: Position) {
-        // Look behind for start of variable or first dot
-        let isFirst = false;
-        let index = position.character;
-        let forwardIndex = position.character;
-        for (; index >= 0; index--) {
-            if (lineRange.text[index - 1] === "{" && lineRange.text[index - 2] === "{") {
-                isFirst = true;
-                // Is first word, find end of word
-                for (; forwardIndex <= wordRange.end.character; forwardIndex++) {
-                    if (lineRange.text[forwardIndex] === ".") {
-                        break;
-                    }
-                }
-                break;
-            }
-            if (lineRange.text[index - 1] === ".") {
-                break;
-            }
-        }
-
-        if (isFirst) {
-            return lineRange.text.substring(index, forwardIndex);
-        } else {
-            return lineRange.text.substring(wordRange.start.character + 2, index);
-        }
     }
 }

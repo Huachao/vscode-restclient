@@ -19,15 +19,15 @@ export class Telemetry {
     private static defaultClient: appInsights.TelemetryClient;
 
     public static initialize() {
-        Telemetry.defaultClient = appInsights.defaultClient;
-        const context = Telemetry.defaultClient.context;
+        this.defaultClient = appInsights.defaultClient;
+        const context = this.defaultClient.context;
         context.tags[context.keys.applicationVersion] = packageJson.version;
     }
 
     public static sendEvent(eventName: string, properties?: { [key: string]: string }) {
         try {
-            if (Telemetry.restClientSettings.enableTelemetry) {
-                Telemetry.defaultClient.trackEvent({ name: eventName, properties });
+            if (this.restClientSettings.enableTelemetry) {
+                this.defaultClient.trackEvent({ name: eventName, properties });
             }
         } catch {
         }

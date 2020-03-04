@@ -41,11 +41,11 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private static _instance: SystemVariableProvider;
 
     public static get Instance(): SystemVariableProvider {
-        if (!SystemVariableProvider._instance) {
-            SystemVariableProvider._instance = new SystemVariableProvider();
+        if (!this._instance) {
+            this._instance = new SystemVariableProvider();
         }
 
-        return SystemVariableProvider._instance;
+        return this._instance;
     }
 
     private constructor() {
