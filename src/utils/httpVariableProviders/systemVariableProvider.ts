@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as util from 'util';
-import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
+import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window, workspace } from 'vscode';
 import * as Constants from '../../common/constants';
 import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
@@ -191,9 +191,18 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.resolveFuncs.set(Constants.EvalEnvVariableName, async name => {
             const groups = this.evalRegex.exec(name);
             if (groups !== null && groups.length === 2 ) {
-                const [, evalCommand] = groups;
-                const result = await exec(evalCommand);
-                return { value: result.stdout ? result.stdout.trim() : null };
+                let [, evalCommand] = groups;
+                const refMatches = evalCommand.match(/\%([^\s]+)/g);
+                if (refMatches) {
+                    for (const match of refMatches) {
+                        const variable = await this.resolveSettingsEnvironmentVariable(match.slice(1));
+                        evalCommand = evalCommand.replace(match, variable);
+                    }
+                }
+
+                const workspaceDir = workspace.rootPath;
+                const result = await exec(evalCommand, { cwd: workspaceDir });
+                return { value: result.stdout ? result.stdout.trim() : result.stderr };
             }
             return { warning: ResolveWarningMessage.IncorrectEvalVariableFormat };
         });
