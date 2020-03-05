@@ -165,6 +165,9 @@ export class HttpClient {
                     removeHeader(options.headers, 'Authorization');
                     options.hooks!.afterResponse!.push(digest(user, pass));
                 }
+            } else if (scheme === 'Basic' && user.includes(':')) {
+                removeHeader(options.headers, 'Authorization');
+                options.auth = user;
             }
         }
 

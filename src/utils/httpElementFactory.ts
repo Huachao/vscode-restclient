@@ -81,7 +81,8 @@ export class HttpElementFactory {
 
         // add Basic, Digest Authentication snippet
         originalElements.push(new HttpElement("Basic Base64", ElementType.Authentication, '^\\s*Authorization\\s*\\:\\s*', "Base64 encoded username and password", new SnippetString(`Basic \${1:base64-user-password}`)));
-        originalElements.push(new HttpElement("Basic Raw Credential", ElementType.Authentication, '^\\s*Authorization\\s*\\:\\s*', "Raw username and password", new SnippetString(`Basic \${1:username} \${2:password}`)));
+        originalElements.push(new HttpElement("Basic Raw Credential (Colon Separated)", ElementType.Authentication, '^\\s*Authorization\\s*\\:\\s*', "Raw username and password", new SnippetString(`Basic \${1:username}:\${2:password}`)));
+        originalElements.push(new HttpElement("Basic Raw Credential (Space Separated)", ElementType.Authentication, '^\\s*Authorization\\s*\\:\\s*', "Raw username and password", new SnippetString(`Basic \${1:username} \${2:password}`)));
         originalElements.push(new HttpElement("Digest", ElementType.Authentication, '^\\s*Authorization\\s*\\:\\s*', "Raw username and password", new SnippetString(`Digest \${1:username} \${2:password}`)));
 
         // add global variables
