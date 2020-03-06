@@ -1,15 +1,15 @@
 import * as fs from 'fs-extra';
-import * as path from 'path';
 import { EOL } from 'os';
+import * as path from 'path';
 import { Uri } from 'vscode';
-import { StringUtility } from './../common/stringUtility';
 import { RequestHeaders } from '../models/base';
+import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
-import { IRequestParser, confirmSendRegex } from '../models/IRequestParser';
+import { confirmSendRegex, IRequestParser } from '../models/IRequestParser';
+import { StringUtility } from './../common/stringUtility';
 import { base64, hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
-import { RestClientSettings } from '../models/configurationSettings';
 
 const yargsParser = require('yargs-parser');
 
@@ -27,10 +27,10 @@ export class CurlRequestParser implements IRequestParser {
         let requestText = this.requestRawText.trim();
         if (confirmSend) {
             confirmSendMsg = requestText[2] || RestClientSettings.Instance.defaultConfirmationMsg;
-            
+
             requestText = StringUtility.getFrom(this.requestRawText, EOL).trim();
         }
-        
+
         requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(requestText));
         requestText = requestText

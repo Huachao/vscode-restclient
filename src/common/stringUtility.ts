@@ -3,7 +3,7 @@ export class StringUtility {
     const index = source.indexOf(separator);
     return -1 === index ? source : source.substr(0, index);
   }
-  
+
   public static getFrom(source: string, separator: string): string {
     const index = source.indexOf(separator);
     return -1 === index ? '' : source.substr(index);

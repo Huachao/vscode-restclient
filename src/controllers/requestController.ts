@@ -82,13 +82,13 @@ export class RequestController {
               return;
             }
         }
-        
+
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
 
         // set last request and last pending request
         this._lastPendingRequest = this._lastRequest = httpRequest;
-        
+
         // set http request
         try {
             const response = await this._httpClient.send(httpRequest);
