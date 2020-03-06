@@ -608,7 +608,7 @@
           "type": "string",
           "default": "Are you sure?",
           "scope": "resource",
-          "description": "The default message used for send (e.g @confirm-send or @confirm-send())"
+          "description": "The default message used for send confirmation (e.g @confirm-send or @confirm-send())"
         }
       }
     },
