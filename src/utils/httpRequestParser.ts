@@ -32,13 +32,16 @@ export class HttpRequestParser implements IRequestParser {
         const lines: string[] = this.requestRawText.split(EOL);
 
         let confirmSendMsg: string | null = null;
+        let requestLineIndex = 0;
         const confirmSend = HttpRequestParser.confirmSendLineRegex.exec(lines[0]);
         if (confirmSend) {
           confirmSendMsg = confirmSend.groups![1];
+          
+          requestLineIndex = 1;
         }
         
         // parse request line
-        const requestLine = HttpRequestParser.parseRequestLine(lines[0]);
+        const requestLine = HttpRequestParser.parseRequestLine(lines[requestLineIndex]);
 
         // get headers range
         let headers: RequestHeaders = {};
