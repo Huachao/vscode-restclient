@@ -76,12 +76,19 @@ export class RequestController {
     }
 
     private async runCore(httpRequest: HttpRequest) {
+        if (undefined !== httpRequest.confirmSendMsg) {
+            const userConfirmed = await window.showQuickPick(['Yes', 'No'], { canPickMany: false, placeHolder: httpRequest.confirmSendMsg });
+            if ('Yes' !== userConfirmed) {
+              return;
+            }
+        }
+        
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
 
         // set last request and last pending request
         this._lastPendingRequest = this._lastRequest = httpRequest;
-
+        
         // set http request
         try {
             const response = await this._httpClient.send(httpRequest);
