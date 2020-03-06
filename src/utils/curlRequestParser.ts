@@ -1,9 +1,11 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { EOL } from 'os';
 import { Uri } from 'vscode';
+import { StringUtility } from './../common/stringUtility';
 import { RequestHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
-import { IRequestParser } from '../models/IRequestParser';
+import { IRequestParser, confirmSendRegex, defaultConfirmMsg } from '../models/IRequestParser';
 import { base64, hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
@@ -18,8 +20,18 @@ export class CurlRequestParser implements IRequestParser {
     }
 
     public parseHttpRequest(requestAbsoluteFilePath: string): HttpRequest {
-        let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
-            CurlRequestParser.mergeIntoSingleLine(this.requestRawText.trim()));
+        const firstRequestLine = StringUtility.getUntil(this.requestRawText, EOL);
+        const confirmSend = confirmSendRegex.exec(firstRequestLine);
+        let confirmSendMsg: string | undefined = undefined;
+        let requestText = this.requestRawText.trim();
+        if (confirmSend) {
+            confirmSendMsg = requestText[2] || defaultConfirmMsg;
+            
+            requestText = StringUtility.getFrom(this.requestRawText, EOL).trim();
+        }
+        
+        requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
+            CurlRequestParser.mergeIntoSingleLine(requestText));
         requestText = requestText
             .replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2')
             .replace(/(-I|--head)(?=\s+)/, '-X HEAD');
@@ -79,7 +91,7 @@ export class CurlRequestParser implements IRequestParser {
             method = body ? "POST" : "GET";
         }
 
-        return new HttpRequest(method, url, headers, body, body);
+        return new HttpRequest(method, url, headers, body, body, undefined, confirmSendMsg);
     }
 
     private static resolveFilePath(refPath: string, httpFilePath: string): string | undefined {
