@@ -8,7 +8,7 @@ import { RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
-import { IRequestParser } from '../models/IRequestParser';
+import { IRequestParser, defaultConfirmMsg, confirmSendRegex } from '../models/IRequestParser';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
@@ -21,8 +21,6 @@ export class HttpRequestParser implements IRequestParser {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;
-    private static readonly confirmSendLineRegex = /^@confirm-send(\((.*)\))?$/;
-    private static readonly defaultConfirmMsg = 'Are you sure?';
 
     public constructor(public requestRawText: string) {
     }
@@ -34,9 +32,9 @@ export class HttpRequestParser implements IRequestParser {
 
         let confirmSendMsg: string | undefined = undefined;
         let requestLineIndex = 0;
-        const confirmSend = HttpRequestParser.confirmSendLineRegex.exec(lines[0]);
+        const confirmSend = confirmSendRegex.exec(lines[0]);
         if (confirmSend) {
-          confirmSendMsg = confirmSend[2] || HttpRequestParser.defaultConfirmMsg;
+          confirmSendMsg = confirmSend[2] || defaultConfirmMsg;
           
           requestLineIndex = 1;
         }
