@@ -21,7 +21,7 @@ export class HttpRequestParser implements IRequestParser {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;
-    private static readonly confirmSendLineRegex = /^@confirm-send(\((.*)\))?/;
+    private static readonly confirmSendLineRegex = /^@confirm-send(\((.*)\))?$/;
     private static readonly defaultConfirmMsg = 'Are you sure?';
 
     public constructor(public requestRawText: string) {
