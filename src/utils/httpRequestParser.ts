@@ -21,7 +21,7 @@ export class HttpRequestParser implements IRequestParser {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;
-    private static readonly confirmSendLine = /^@confirm-send\((.*)\)/;
+    private static readonly confirmSendLineRegex = /^@confirm-send\((.*)\)/;
 
     public constructor(public requestRawText: string) {
     }
@@ -31,6 +31,12 @@ export class HttpRequestParser implements IRequestParser {
         // split the request raw text into lines
         const lines: string[] = this.requestRawText.split(EOL);
 
+        let confirmSendMsg: string | null = null;
+        const confirmSend = HttpRequestParser.confirmSendLineRegex.exec(lines[0]);
+        if (confirmSend) {
+          confirmSendMsg = confirmSend.groups![1];
+        }
+        
         // parse request line
         const requestLine = HttpRequestParser.parseRequestLine(lines[0]);
 
