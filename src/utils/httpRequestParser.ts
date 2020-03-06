@@ -31,7 +31,7 @@ export class HttpRequestParser implements IRequestParser {
         // split the request raw text into lines
         const lines: string[] = this.requestRawText.split(EOL);
 
-        let confirmSendMsg: string | null = null;
+        let confirmSendMsg: string | undefined = undefined;
         let requestLineIndex = 0;
         const confirmSend = HttpRequestParser.confirmSendLineRegex.exec(lines[0]);
         if (confirmSend) {
@@ -139,7 +139,7 @@ export class HttpRequestParser implements IRequestParser {
             }
         }
 
-        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL));
+        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), undefined, confirmSendMsg);
     }
 
     private static parseRequestLine(line: string): { method: string, url: string } {
