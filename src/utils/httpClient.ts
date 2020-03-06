@@ -103,7 +103,8 @@ export class HttpClient {
                     Object.keys(httpRequest.headers)),
                 Buffer.isBuffer(requestBody) ? this.convertBufferToStream(requestBody) : requestBody,
                 httpRequest.rawBody,
-                httpRequest.requestVariableCacheKey
+                httpRequest.requestVariableCacheKey,
+                httpRequest.confirmSendMsg
             ));
     }
 
