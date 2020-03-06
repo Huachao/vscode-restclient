@@ -8,7 +8,7 @@ import { RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
-import { IRequestParser, defaultConfirmMsg, confirmSendRegex } from '../models/IRequestParser';
+import { IRequestParser, confirmSendRegex } from '../models/IRequestParser';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
@@ -34,7 +34,7 @@ export class HttpRequestParser implements IRequestParser {
         let requestLineIndex = 0;
         const confirmSend = confirmSendRegex.exec(lines[0]);
         if (confirmSend) {
-          confirmSendMsg = confirmSend[2] || defaultConfirmMsg;
+          confirmSendMsg = confirmSend[2] || RestClientSettings.Instance.defaultConfirmationMsg;
           
           requestLineIndex = 1;
         }

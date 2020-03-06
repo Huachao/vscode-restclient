@@ -5,10 +5,11 @@ import { Uri } from 'vscode';
 import { StringUtility } from './../common/stringUtility';
 import { RequestHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
-import { IRequestParser, confirmSendRegex, defaultConfirmMsg } from '../models/IRequestParser';
+import { IRequestParser, confirmSendRegex } from '../models/IRequestParser';
 import { base64, hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
+import { RestClientSettings } from '../models/configurationSettings';
 
 const yargsParser = require('yargs-parser');
 
@@ -25,7 +26,7 @@ export class CurlRequestParser implements IRequestParser {
         let confirmSendMsg: string | undefined = undefined;
         let requestText = this.requestRawText.trim();
         if (confirmSend) {
-            confirmSendMsg = requestText[2] || defaultConfirmMsg;
+            confirmSendMsg = requestText[2] || RestClientSettings.Instance.defaultConfirmationMsg;
             
             requestText = StringUtility.getFrom(this.requestRawText, EOL).trim();
         }

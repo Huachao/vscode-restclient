@@ -5,4 +5,3 @@ export interface IRequestParser {
 }
 
 export const confirmSendRegex = /^@confirm-send(\((.*)\))?$/;
-export const defaultConfirmMsg = 'Are you sure?';
