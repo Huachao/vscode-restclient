@@ -21,7 +21,8 @@ export class HttpRequestParser implements IRequestParser {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;
-    private static readonly confirmSendLineRegex = /^@confirm-send\((.*)\)/;
+    private static readonly confirmSendLineRegex = /^@confirm-send(\((.*)\))?/;
+    private static readonly defaultConfirmMsg = 'Are you sure?';
 
     public constructor(public requestRawText: string) {
     }
@@ -35,7 +36,7 @@ export class HttpRequestParser implements IRequestParser {
         let requestLineIndex = 0;
         const confirmSend = HttpRequestParser.confirmSendLineRegex.exec(lines[0]);
         if (confirmSend) {
-          confirmSendMsg = confirmSend.groups![1];
+          confirmSendMsg = confirmSend[2] || HttpRequestParser.defaultConfirmMsg;
           
           requestLineIndex = 1;
         }
