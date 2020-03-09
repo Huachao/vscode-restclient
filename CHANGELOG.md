@@ -1,3 +1,16 @@
+## 0.23.2 (2020/3/9)
+* __Bug Fix__: [Redirect 303 use port of original request](https://github.com/Huachao/vscode-restclient/issues/502)
+* __Bug Fix__: [Cookie header not respected when `rest-client.rememberCookiesForSubsequentRequest` is set to `false`](https://github.com/Huachao/vscode-restclient/issues/507)
+* __Bug Fix__: [Fix cookies not sent when redirection happens](https://github.com/Huachao/vscode-restclient/issues/513)
+* __Bug Fix__: Disable folding on non range start line in webview
+* __Bug Fix__: Fix Basic auth not working in auth challenge case
+* __Bug Fix__: [Hover peeking doesn't work for variables with hyphen](https://github.com/Huachao/vscode-restclient/issues/534)
+* __Bug Fix__: [Textmate lexer file is invalid](https://github.com/Huachao/vscode-restclient/issues/517)
+* __Improvement__: [Add `[%]envVarName` option to `{{$dotenv}}`](https://github.com/Huachao/vscode-restclient/issues/512)
+* __Improvement__: [Basic authentication encoding doesn't support empty password](https://github.com/Huachao/vscode-restclient/issues/533)
+* __Improvement__: Decrease bundled size from *2.6M* to *2.3M*
+* __Improvement__: Allow public prefix for cookiJar
+
 ## 0.23.1 (2020/1/21)
 * __Bug Fix__: [Respect user provided cookie headers](https://github.com/Huachao/vscode-restclient/issues/465)
 * __Bug Fix__: [Cannot read property `toFixed` of null](https://github.com/Huachao/vscode-restclient/issues/450)
