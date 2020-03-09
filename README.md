@@ -439,8 +439,8 @@ Content-Type: {{contentType}}
 
 {
     "content": "foo bar",
-    "created_at": {{createdAt}},
-    "modified_by": {{modifiedBy}}
+    "created_at": "{{createdAt}}",
+    "modified_by": "{{modifiedBy}}"
 }
 
 ```
