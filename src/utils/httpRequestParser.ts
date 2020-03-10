@@ -146,8 +146,7 @@ export class HttpRequestParser implements IRequestParser {
             // Provides both request method and url
             method = words.shift()!;
             url = line.trim().substring(method.length).trim();
-            const match = words[words.length - 1].match(/HTTP\/.*/gi);
-            if (match) {
+            if (/^HTTP\/.*$/i.test(words[words.length - 1])) {
                 url = url.substring(0, url.lastIndexOf(words[words.length - 1])).trim();
             }
         }
