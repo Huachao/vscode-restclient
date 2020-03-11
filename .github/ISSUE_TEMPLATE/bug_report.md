@@ -1,14 +1,14 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a report to help REST Client improve
 
 ---
 
+- REST Client Version:
 - VSCode Version:
 - OS Version:
-- REST Client Version:
 
 Steps to Reproduce:
 
-1. 
+1.
 2.
