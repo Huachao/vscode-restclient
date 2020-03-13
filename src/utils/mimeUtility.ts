@@ -1,7 +1,20 @@
-import { RestClientSettings } from '../models/configurationSettings';
-import { MIME } from '../models/mime';
 
 const mime = require('mime-types');
+
+class MimeType {
+    public readonly type: string;
+    public readonly subtype: string;
+    public readonly charset?: string;
+    public constructor(type: string, subtype: string, charset?: string) {
+        this.type = type.toLowerCase();
+        this.subtype = subtype.toLowerCase();
+        this.charset = charset;
+    }
+
+    public get essence(): string {
+        return `${this.type}/${this.subtype}`;
+    }
+}
 
 export class MimeUtility {
     private static readonly supportedImagesFormats = [
@@ -15,38 +28,25 @@ export class MimeUtility {
     public static parse(contentTypeString: string) {
         // application/json; charset=utf-8
         // application/vnd.github.chitauri-preview+sha
-        const params = contentTypeString.split(';');
-        const types = params[0].trim().split('+');
-        let charset: string | undefined;
-        if (params.length > 1) {
-            for (let i = 1; i < params.length; i++) {
-                const attributes = params[i].trim().split('=', 2);
-                if (attributes.length === 2 && attributes[0].toLowerCase() === 'charset') {
-                    charset = attributes[1].trim();
-                }
-            }
-        }
-        return new MIME(types[0].toLowerCase(), types[1] ? `+${types[1]}`.toLowerCase() : '', contentTypeString, charset);
+        const [essence, ...parameters] = contentTypeString.split(';').map(v => v.trim());
+        const [type, subtype] = essence.split('/');
+        const charset = parameters.find(p => p.startsWith('charset='))?.split('=')[1];
+        return new MimeType(type, subtype, charset);
     }
 
-    public static getExtension(contentTypeString: string | undefined, defaultExtension: string = 'http'): string {
+    public static getExtension(contentTypeString: string | undefined, mimeAndFileExtensionMapping: Map<string, string>): string {
         if (!contentTypeString) {
-            return defaultExtension;
+            return '';
         }
 
-        const mimeType = this.parse(contentTypeString);
-        const contentTypeWithoutCharsets = `${mimeType.type}${mimeType.suffix}`;
-        const restClientSettings = RestClientSettings.Instance;
+        const { essence } = this.parse(contentTypeString);
 
         // Check if user has custom mapping for this content type first
-        if (contentTypeWithoutCharsets in restClientSettings.mimeAndFileExtensionMapping) {
-            let ext = restClientSettings.mimeAndFileExtensionMapping[contentTypeWithoutCharsets];
-            ext = ext.replace(/^(\.)+/, "");
-            if (ext) {
-                return ext;
-            }
+        if (essence in mimeAndFileExtensionMapping) {
+            const ext = mimeAndFileExtensionMapping[essence];
+            return ext.replace(/^(\.)+/, '');
         }
-        return mime.extension(contentTypeString) || defaultExtension;
+        return mime.extension(contentTypeString) || '';
     }
 
     public static isBrowserSupportedImageFormat(contentTypeString: string | undefined): boolean {
@@ -56,8 +56,8 @@ export class MimeUtility {
             return false;
         }
 
-        const type = this.parse(contentTypeString).type;
-        return this.supportedImagesFormats.includes(type);
+        const { essence } = this.parse(contentTypeString);
+        return this.supportedImagesFormats.includes(essence);
     }
 
     public static isJSON(contentTypeString: string | undefined): boolean {
@@ -65,8 +65,8 @@ export class MimeUtility {
             return false;
         }
 
-        const { type, suffix } = this.parse(contentTypeString);
-        return type === 'application/json' || suffix === '+json';
+        const { subtype, essence } = this.parse(contentTypeString);
+        return essence === 'application/json' || subtype.endsWith('+json');
     }
 
     public static isXml(contentTypeString: string | undefined): boolean {
@@ -74,16 +74,16 @@ export class MimeUtility {
             return false;
         }
 
-        const { type, suffix } = this.parse(contentTypeString);
-        return type === 'application/xml' || type === 'text/xml' || suffix === '+xml';
+        const { subtype, essence } = this.parse(contentTypeString);
+        return essence === 'application/xml' || essence === 'text/xml' || subtype.endsWith('+xml');
     }
 
-    public static isHtml(contentTypeString: string | undefined): boolean {
+   public static isHtml(contentTypeString: string | undefined): boolean {
         if (!contentTypeString) {
             return false;
         }
 
-        return this.parse(contentTypeString).type === 'text/html';
+        return this.parse(contentTypeString).essence === 'text/html';
     }
 
     public static isJavaScript(contentTypeString: string | undefined): boolean {
@@ -91,7 +91,7 @@ export class MimeUtility {
             return false;
         }
 
-        return this.parse(contentTypeString).type === 'application/javascript';
+        return this.parse(contentTypeString).essence === 'application/javascript';
     }
 
     public static isCSS(contentTypeString: string | undefined): boolean {
@@ -99,7 +99,7 @@ export class MimeUtility {
             return false;
         }
 
-        return this.parse(contentTypeString).type === 'text/css';
+        return this.parse(contentTypeString).essence === 'text/css';
     }
 
     public static isMultiPartMixed(contentTypeString: string | undefined): boolean {
@@ -107,7 +107,7 @@ export class MimeUtility {
             return false;
         }
 
-        return this.parse(contentTypeString).type === 'multipart/mixed';
+        return this.parse(contentTypeString).essence === 'multipart/mixed';
     }
 
     public static isMultiPartFormData(contentTypeString: string | undefined): boolean {
@@ -115,7 +115,7 @@ export class MimeUtility {
             return false;
         }
 
-        return this.parse(contentTypeString).type === 'multipart/form-data';
+        return this.parse(contentTypeString).essence === 'multipart/form-data';
     }
 
     public static isMultiPart(contentTypeString: string | undefined): boolean {
@@ -123,8 +123,7 @@ export class MimeUtility {
             return false;
         }
 
-        const type = this.parse(contentTypeString).type;
-        return type.startsWith('multipart/');
+        return this.parse(contentTypeString).type === 'multipart';
     }
 
     public static isFormUrlEncoded(contentTypeString: string | undefined): boolean {
@@ -132,7 +131,7 @@ export class MimeUtility {
             return false;
         }
 
-        return this.parse(contentTypeString).type === 'application/x-www-form-urlencoded';
+        return this.parse(contentTypeString).essence === 'application/x-www-form-urlencoded';
     }
 
     public static isNewlineDelimitedJSON(contentTypeString: string | undefined): boolean {
@@ -140,6 +139,6 @@ export class MimeUtility {
             return false;
         }
 
-        return this.parse(contentTypeString).type === 'application/x-ndjson';
+        return this.parse(contentTypeString).essence === 'application/x-ndjson';
     }
 }

@@ -160,7 +160,7 @@ export class HttpResponseWebview extends BaseWebview {
     public async saveBody() {
         const response = HttpResponseWebview.activePreviewResponse;
         if (response) {
-            const extension = MimeUtility.getExtension(response.contentType, '');
+            const extension = MimeUtility.getExtension(response.contentType, this.settings.mimeAndFileExtensionMapping);
             const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
             const defaultFilePath = path.join(this.responseBodySaveFolderPath, fileName);
             try {
