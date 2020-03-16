@@ -34,7 +34,7 @@ export class MimeUtility {
         return new MimeType(type, subtype, charset);
     }
 
-    public static getExtension(contentTypeString: string | undefined, mimeAndFileExtensionMapping: Map<string, string>): string {
+    public static getExtension(contentTypeString: string | undefined, mimeAndFileExtensionMapping: { [key: string]: string }): string {
         if (!contentTypeString) {
             return '';
         }

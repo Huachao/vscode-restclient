@@ -438,6 +438,13 @@
           "type": "object",
           "default": {},
           "scope": "resource",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              }
+            ]
+          },
           "markdownDescription": "Sets the custom mapping of mime type and file extension of saved response body (e.g., `{\"application/atom+xml\": \"xml\"}`)"
         },
         "rest-client.previewResponseInUntitledDocument": {

@@ -7,7 +7,6 @@ import * as url from 'url';
 import { Uri, window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
-import { HostCertificate } from '../models/hostCertificate';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { HttpResponseTimingPhases } from '../models/httpResponseTimingPhases';
@@ -25,6 +24,12 @@ const cookieStore = require('tough-cookie-file-store-bugfix');
 type SetCookieCallback = (err: Error | null, cookie: Cookie) => void;
 type SetCookieCallbackWithoutOptions = (err: Error, cookie: Cookie) => void;
 type GetCookieStringCallback = (err: Error | null, cookies: string) => void;
+type Certificate = {
+    cert?: Buffer;
+    key?: Buffer;
+    pfx?: Buffer;
+    passphrase?: string;
+};
 
 export class HttpClient {
     private readonly _settings: RestClientSettings = RestClientSettings.Instance;
@@ -173,12 +178,7 @@ export class HttpClient {
 
         // set certificate
         const certificate = this.getRequestCertificate(httpRequest.url);
-        if (certificate) {
-            options.cert = certificate.cert;
-            options.key = certificate.key;
-            options.pfx = certificate.pfx;
-            options.passphrase = certificate.passphrase;
-        }
+        Object.assign(options, certificate);
 
         // set proxy
         if (this._settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, this._settings.excludeHostsForProxy)) {
@@ -274,39 +274,33 @@ export class HttpClient {
         return body.replace(/\\u([\d\w]{4})/gi, (_, g) => String.fromCharCode(parseInt(g, 16)));
     }
 
-    private getRequestCertificate(requestUrl: string): HostCertificate | null {
+    private getRequestCertificate(requestUrl: string): Certificate | null {
         const host = url.parse(requestUrl).host;
-        if (!host) {
+        if (!host || !(host in this._settings.hostCertificates)) {
             return null;
         }
 
-        if (host in this._settings.hostCertificates) {
-            const certificate = this._settings.hostCertificates[host];
-            let cert: Buffer | undefined,
-                key: Buffer | undefined,
-                pfx: Buffer | undefined;
-            if (certificate.cert) {
-                const certPath = HttpClient.resolveCertificateFullPath(certificate.cert, "cert");
-                if (certPath) {
-                    cert = fs.readFileSync(certPath);
-                }
+        const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = this._settings.hostCertificates[host];
+        let cert: Buffer | undefined, key: Buffer | undefined, pfx: Buffer | undefined;
+        if (certPath) {
+            const certFullPath = HttpClient.resolveCertificateFullPath(certPath, 'cert');
+            if (certFullPath) {
+                cert = fs.readFileSync(certFullPath);
             }
-            if (certificate.key) {
-                const keyPath = HttpClient.resolveCertificateFullPath(certificate.key, "key");
-                if (keyPath) {
-                    key = fs.readFileSync(keyPath);
-                }
-            }
-            if (certificate.pfx) {
-                const pfxPath = HttpClient.resolveCertificateFullPath(certificate.pfx, "pfx");
-                if (pfxPath) {
-                    pfx = fs.readFileSync(pfxPath);
-                }
-            }
-            return new HostCertificate(cert, key, pfx, certificate.passphrase);
         }
-
-        return null;
+        if (keyPath) {
+            const keyFullPath = HttpClient.resolveCertificateFullPath(keyPath, 'key');
+            if (keyFullPath) {
+                key = fs.readFileSync(keyFullPath);
+            }
+        }
+        if (pfxPath) {
+            const pfxFullPath = HttpClient.resolveCertificateFullPath(pfxPath, 'pfx');
+            if (pfxFullPath) {
+                pfx = fs.readFileSync(pfxFullPath);
+            }
+        }
+        return { cert, key, pfx, passphrase };
     }
 
     private static ignoreProxy(requestUrl: string, excludeHostsForProxy: string[]): Boolean {
