@@ -16,7 +16,7 @@ export class EnvironmentController {
 
     public static readonly onDidChangeEnvironment = EnvironmentController._onDidChangeEnvironment.event;
 
-    private static readonly settings: RestClientSettings = RestClientSettings.Instance;
+    private readonly settings: RestClientSettings = RestClientSettings.Instance;
 
     private environmentStatusEntry: EnvironmentStatusEntry;
 
@@ -29,7 +29,7 @@ export class EnvironmentController {
         const currentEnvironment = await EnvironmentController.getCurrentEnvironment();
         const itemPickList: EnvironmentPickItem[] = [];
         itemPickList.push(EnvironmentController.noEnvironmentPickItem);
-        for (const name in EnvironmentController.settings.environmentVariables) {
+        for (const name in this.settings.environmentVariables) {
             if (name === EnvironmentController.sharedEnvironmentName) {
                 continue;
             }
