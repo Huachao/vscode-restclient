@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Uri } from 'vscode';
 import { RequestHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
-import { IRequestParser } from '../models/IRequestParser';
+import { RequestParser } from '../models/requestParser';
 import { base64, hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
@@ -12,7 +12,7 @@ const yargsParser = require('yargs-parser');
 
 const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
-export class CurlRequestParser implements IRequestParser {
+export class CurlRequestParser implements RequestParser {
 
     public constructor(public requestRawText: string) {
     }
