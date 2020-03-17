@@ -38,6 +38,9 @@ export class Selector {
 
         // parse request variable definition name
         const requestVariable = this.getRequestVariableDefinitionName(selectedText);
+        
+        // parse #@note comment
+        const dangerousNote = this.getDangerousNoteDefinitionComment(selectedText);
 
         // remove comment lines
         let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Selector.isCommentLine(l));
@@ -124,6 +127,11 @@ export class Selector {
 
     public static getRequestVariableDefinitionName(text: string): string | undefined {
         const matched = text.match(Constants.RequestVariableDefinitionRegex);
+        return matched?.[1];
+    }
+
+    public static getDangerousNoteDefinitionComment(text: string): string | undefined {
+        const matched = text.match(Constants.DangerousNoteDefinitionRegex);
         return matched?.[1];
     }
 
