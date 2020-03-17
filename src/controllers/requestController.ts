@@ -47,7 +47,7 @@ export class RequestController {
             return;
         }
 
-        const { text, name } = selectedRequest;
+        const { text, name, dangerousNote } = selectedRequest;
 
         // parse http request
         const httpRequest = RequestParserFactory.createRequestParser(text).parseHttpRequest(document.fileName);
@@ -55,6 +55,8 @@ export class RequestController {
         if (name) {
             httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(name, document);
         }
+        
+        httpRequest.confirmSendMsg = dangerousNote;
 
         await this.runCore(httpRequest);
     }
