@@ -8,7 +8,7 @@ import { RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
-import { IRequestParser } from '../models/IRequestParser';
+import { RequestParser } from '../models/requestParser';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
@@ -17,7 +17,7 @@ import { getWorkspaceRootPath } from './workspaceUtility';
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');
 
-export class HttpRequestParser implements IRequestParser {
+export class HttpRequestParser implements RequestParser {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;

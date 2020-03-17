@@ -1,5 +1,5 @@
 import { HttpRequest } from './httpRequest';
 
-export interface IRequestParser {
+export interface RequestParser {
     parseHttpRequest(requestAbsoluteFilePath: string): HttpRequest;
 }
