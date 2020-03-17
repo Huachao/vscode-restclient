@@ -1,16 +1,9 @@
 import * as fs from 'fs-extra';
-import { EOL } from 'os';
 import * as path from 'path';
 import { Uri } from 'vscode';
 import { RequestHeaders } from '../models/base';
-import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
-<<<<<<< HEAD
-import { confirmSendRegex, IRequestParser } from '../models/IRequestParser';
-import { StringUtility } from './../common/stringUtility';
-=======
 import { RequestParser } from '../models/requestParser';
->>>>>>> master
 import { base64, hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
@@ -25,16 +18,7 @@ export class CurlRequestParser implements RequestParser {
     }
 
     public parseHttpRequest(requestAbsoluteFilePath: string): HttpRequest {
-        const firstRequestLine = StringUtility.getUntil(this.requestRawText, EOL);
-        const confirmSend = confirmSendRegex.exec(firstRequestLine);
-        let confirmSendMsg: string | undefined = undefined;
         let requestText = this.requestRawText.trim();
-        if (confirmSend) {
-            confirmSendMsg = requestText[2] || RestClientSettings.Instance.defaultConfirmationMsg;
-
-            requestText = StringUtility.getFrom(this.requestRawText, EOL).trim();
-        }
-
         requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(requestText));
         requestText = requestText
@@ -96,7 +80,7 @@ export class CurlRequestParser implements RequestParser {
             method = body ? "POST" : "GET";
         }
 
-        return new HttpRequest(method, url, headers, body, body, undefined, confirmSendMsg);
+        return new HttpRequest(method, url, headers, body, body, undefined);
     }
 
     private static resolveFilePath(refPath: string, httpFilePath: string): string | undefined {

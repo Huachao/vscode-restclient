@@ -8,11 +8,7 @@ import { RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
-<<<<<<< HEAD
-import { confirmSendRegex, IRequestParser } from '../models/IRequestParser';
-=======
 import { RequestParser } from '../models/requestParser';
->>>>>>> master
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
@@ -34,17 +30,8 @@ export class HttpRequestParser implements RequestParser {
         // split the request raw text into lines
         const lines: string[] = this.requestRawText.split(EOL);
 
-        let confirmSendMsg: string | undefined = undefined;
-        let requestLineIndex = 0;
-        const confirmSend = confirmSendRegex.exec(lines[0]);
-        if (confirmSend) {
-          confirmSendMsg = confirmSend[2] || RestClientSettings.Instance.defaultConfirmationMsg;
-
-          requestLineIndex = 1;
-        }
-
         // parse request line
-        const requestLine = HttpRequestParser.parseRequestLine(lines[requestLineIndex]);
+        const requestLine = HttpRequestParser.parseRequestLine(lines[0]);
 
         // get headers range
         let headers: RequestHeaders = {};
@@ -142,7 +129,7 @@ export class HttpRequestParser implements RequestParser {
             }
         }
 
-        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), undefined, confirmSendMsg);
+        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), undefined);
     }
 
     private static parseRequestLine(line: string): { method: string, url: string } {
