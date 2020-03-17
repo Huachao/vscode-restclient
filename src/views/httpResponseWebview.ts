@@ -98,7 +98,8 @@ export class HttpResponseWebview extends BaseWebview {
             panel.iconPath = this.iconFilePath;
 
             panel.onDidChangeViewState(({ webviewPanel }) => {
-                 commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, webviewPanel.active);
+                const active = this.panels.some(p => p.active);
+                commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, active);
                 this.activePanel = webviewPanel.active ? webviewPanel : undefined;
             });
 
