@@ -7,7 +7,6 @@ import * as url from 'url';
 import { Uri, window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
-import { HostCertificate } from '../models/hostCertificate';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { HttpResponseTimingPhases } from '../models/httpResponseTimingPhases';
@@ -25,6 +24,12 @@ const cookieStore = require('tough-cookie-file-store-bugfix');
 type SetCookieCallback = (err: Error | null, cookie: Cookie) => void;
 type SetCookieCallbackWithoutOptions = (err: Error, cookie: Cookie) => void;
 type GetCookieStringCallback = (err: Error | null, cookies: string) => void;
+type Certificate = {
+    cert?: Buffer;
+    key?: Buffer;
+    pfx?: Buffer;
+    passphrase?: string;
+};
 
 export class HttpClient {
     private readonly _settings: RestClientSettings = RestClientSettings.Instance;
@@ -174,12 +179,7 @@ export class HttpClient {
 
         // set certificate
         const certificate = this.getRequestCertificate(httpRequest.url);
-        if (certificate) {
-            options.cert = certificate.cert;
-            options.key = certificate.key;
-            options.pfx = certificate.pfx;
-            options.passphrase = certificate.passphrase;
-        }
+        Object.assign(options, certificate);
 
         // set proxy
         if (this._settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, this._settings.excludeHostsForProxy)) {
@@ -275,39 +275,17 @@ export class HttpClient {
         return body.replace(/\\u([\d\w]{4})/gi, (_, g) => String.fromCharCode(parseInt(g, 16)));
     }
 
-    private getRequestCertificate(requestUrl: string): HostCertificate | null {
+    private getRequestCertificate(requestUrl: string): Certificate | null {
         const host = url.parse(requestUrl).host;
-        if (!host) {
+        if (!host || !(host in this._settings.hostCertificates)) {
             return null;
         }
 
-        if (host in this._settings.hostCertificates) {
-            const certificate = this._settings.hostCertificates[host];
-            let cert: Buffer | undefined,
-                key: Buffer | undefined,
-                pfx: Buffer | undefined;
-            if (certificate.cert) {
-                const certPath = HttpClient.resolveCertificateFullPath(certificate.cert, "cert");
-                if (certPath) {
-                    cert = fs.readFileSync(certPath);
-                }
-            }
-            if (certificate.key) {
-                const keyPath = HttpClient.resolveCertificateFullPath(certificate.key, "key");
-                if (keyPath) {
-                    key = fs.readFileSync(keyPath);
-                }
-            }
-            if (certificate.pfx) {
-                const pfxPath = HttpClient.resolveCertificateFullPath(certificate.pfx, "pfx");
-                if (pfxPath) {
-                    pfx = fs.readFileSync(pfxPath);
-                }
-            }
-            return new HostCertificate(cert, key, pfx, certificate.passphrase);
-        }
-
-        return null;
+        const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = this._settings.hostCertificates[host];
+        const cert = this.resolveCertificate(certPath);
+        const key = this.resolveCertificate(keyPath);
+        const pfx = this.resolveCertificate(pfxPath);
+        return { cert, key, pfx, passphrase };
     }
 
     private static ignoreProxy(requestUrl: string, excludeHostsForProxy: string[]): Boolean {
@@ -339,13 +317,17 @@ export class HttpClient {
         return false;
     }
 
-    private static resolveCertificateFullPath(absoluteOrRelativePath: string, certName: string): string | undefined {
+    private resolveCertificate(absoluteOrRelativePath: string | undefined): Buffer | undefined {
+        if (absoluteOrRelativePath === undefined) {
+            return undefined;
+        }
+
         if (path.isAbsolute(absoluteOrRelativePath)) {
             if (!fs.existsSync(absoluteOrRelativePath)) {
-                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
+                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
                 return undefined;
             } else {
-                return absoluteOrRelativePath;
+                return fs.readFileSync(absoluteOrRelativePath);
             }
         }
 
@@ -355,9 +337,9 @@ export class HttpClient {
         if (rootPath) {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
             if (fs.existsSync(absolutePath)) {
-                return absolutePath;
+                return fs.readFileSync(absolutePath);
             } else {
-                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
+                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
                 return undefined;
             }
         }
@@ -369,9 +351,9 @@ export class HttpClient {
 
         absolutePath = path.join(path.dirname(currentFilePath), absoluteOrRelativePath);
         if (fs.existsSync(absolutePath)) {
-            return absolutePath;
+            return fs.readFileSync(absolutePath);
         } else {
-            window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
+            window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
             return undefined;
         }
     }

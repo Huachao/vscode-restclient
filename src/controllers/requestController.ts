@@ -50,7 +50,7 @@ export class RequestController {
         const { text, name } = selectedRequest;
 
         // parse http request
-        const httpRequest = new RequestParserFactory().createRequestParser(text).parseHttpRequest(document.fileName);
+        const httpRequest = RequestParserFactory.createRequestParser(text).parseHttpRequest(document.fileName);
 
         if (name) {
             httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(name, document);

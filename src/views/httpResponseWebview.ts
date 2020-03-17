@@ -42,7 +42,9 @@ export class HttpResponseWebview extends BaseWebview {
 
     private activePanel: WebviewPanel | undefined;
 
-    private static activePreviewResponse: HttpResponse | undefined;
+    private get activeResponse(): HttpResponse | undefined {
+        return this.activePanel ? this.panelResponses.get(this.activePanel) : undefined;
+    }
 
     public constructor(private readonly context: ExtensionContext) {
         super();
@@ -78,11 +80,9 @@ export class HttpResponseWebview extends BaseWebview {
                 });
 
             panel.onDidDispose(() => {
-                const response = this.panelResponses.get(panel);
-                if (response === HttpResponseWebview.activePreviewResponse) {
+                if (panel === this.activePanel) {
                     commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, false);
                     this.activePanel = undefined;
-                    HttpResponseWebview.activePreviewResponse = undefined;
                 }
 
                 const index = this.panels.findIndex(v => v === panel);
@@ -98,9 +98,9 @@ export class HttpResponseWebview extends BaseWebview {
             panel.iconPath = this.iconFilePath;
 
             panel.onDidChangeViewState(({ webviewPanel }) => {
-                commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, webviewPanel.active);
+                const active = this.panels.some(p => p.active);
+                commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, active);
                 this.activePanel = webviewPanel.active ? webviewPanel : undefined;
-                HttpResponseWebview.activePreviewResponse = webviewPanel.active ? this.panelResponses.get(webviewPanel) : undefined;
             });
 
             this.panels.push(panel);
@@ -117,7 +117,6 @@ export class HttpResponseWebview extends BaseWebview {
 
         this.panelResponses.set(panel, response);
         this.activePanel = panel;
-        HttpResponseWebview.activePreviewResponse = response;
     }
 
     public dispose() {
@@ -136,17 +135,15 @@ export class HttpResponseWebview extends BaseWebview {
 
     @trace('Copy Response Body')
     private async copyBody() {
-        const response = HttpResponseWebview.activePreviewResponse;
-        if (response) {
-            await this.clipboard.writeText(response.body);
+        if (this.activeResponse) {
+            await this.clipboard.writeText(this.activeResponse.body);
         }
     }
 
     @trace('Save Response')
     private async save() {
-        const response = HttpResponseWebview.activePreviewResponse;
-        if (response) {
-            const fullResponse = this.getFullResponseString(response);
+        if (this.activeResponse) {
+            const fullResponse = this.getFullResponseString(this.activeResponse);
             const defaultFilePath = path.join(this.responseSaveFolderPath, `Response-${Date.now()}.http`);
             try {
                 await this.openSaveDialog(defaultFilePath, fullResponse);
@@ -158,13 +155,12 @@ export class HttpResponseWebview extends BaseWebview {
 
     @trace('Save Response Body')
     public async saveBody() {
-        const response = HttpResponseWebview.activePreviewResponse;
-        if (response) {
-            const extension = MimeUtility.getExtension(response.contentType, '');
+        if (this.activeResponse) {
+            const extension = MimeUtility.getExtension(this.activeResponse.contentType, this.settings.mimeAndFileExtensionMapping);
             const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
             const defaultFilePath = path.join(this.responseBodySaveFolderPath, fileName);
             try {
-                await this.openSaveDialog(defaultFilePath, response.bodyBuffer);
+                await this.openSaveDialog(defaultFilePath, this.activeResponse.bodyBuffer);
             } catch {
                 window.showErrorMessage('Failed to save latest response body to disk');
             }

@@ -8,8 +8,6 @@ import { VariableProcessor } from '../utils/variableProcessor';
 import { getCurrentHttpFileName } from '../utils/workspaceUtility';
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
-    private static requestParserFactory = new RequestParserFactory();
-
     public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
         const symbols: SymbolInformation[] = [];
         const lines: string[] = document.getText().split(Constants.LineSplitterRegex);
@@ -76,7 +74,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
         }
 
         const text = await VariableProcessor.processRawRequest(rawText);
-        const parser = HttpDocumentSymbolProvider.requestParserFactory.createRequestParser(text);
+        const parser = RequestParserFactory.createRequestParser(text);
         const request = parser.parseHttpRequest(window.activeTextEditor!.document.fileName);
         const parsedUrl = url.parse(request.url);
         return [`${request.method} ${parsedUrl.path}`, parsedUrl.host || ''];

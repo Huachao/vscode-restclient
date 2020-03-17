@@ -5,8 +5,12 @@ import { Uri } from 'vscode';
 import { RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
+<<<<<<< HEAD
 import { confirmSendRegex, IRequestParser } from '../models/IRequestParser';
 import { StringUtility } from './../common/stringUtility';
+=======
+import { RequestParser } from '../models/requestParser';
+>>>>>>> master
 import { base64, hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
 import { getWorkspaceRootPath } from './workspaceUtility';
@@ -15,7 +19,7 @@ const yargsParser = require('yargs-parser');
 
 const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
-export class CurlRequestParser implements IRequestParser {
+export class CurlRequestParser implements RequestParser {
 
     public constructor(public requestRawText: string) {
     }

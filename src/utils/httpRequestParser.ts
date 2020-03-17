@@ -8,7 +8,11 @@ import { RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
+<<<<<<< HEAD
 import { confirmSendRegex, IRequestParser } from '../models/IRequestParser';
+=======
+import { RequestParser } from '../models/requestParser';
+>>>>>>> master
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
@@ -17,7 +21,7 @@ import { getWorkspaceRootPath } from './workspaceUtility';
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');
 
-export class HttpRequestParser implements IRequestParser {
+export class HttpRequestParser implements RequestParser {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
     private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;
@@ -155,8 +159,7 @@ export class HttpRequestParser implements IRequestParser {
             // Provides both request method and url
             method = words.shift()!;
             url = line.trim().substring(method.length).trim();
-            const match = words[words.length - 1].match(/HTTP\/.*/gi);
-            if (match) {
+            if (/^HTTP\/.*$/i.test(words[words.length - 1])) {
                 url = url.substring(0, url.lastIndexOf(words[words.length - 1])).trim();
             }
         }

@@ -2,9 +2,8 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
-import { window, workspace } from 'vscode';
+import { QuickPickItem, window, workspace } from 'vscode';
 import { logger } from '../logger';
-import { HistoryQuickPickItem } from '../models/historyQuickPickItem';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
 import { PersistUtility } from '../utils/persistUtility';
@@ -12,6 +11,10 @@ import { PersistUtility } from '../utils/persistUtility';
 dayjs.extend(relativeTime);
 
 const tmp = require('tmp');
+
+interface HistoryQuickPickItem extends QuickPickItem {
+    rawRequest: SerializedHttpRequest;
+}
 
 export class HistoryController {
     public constructor() {
@@ -25,17 +28,18 @@ export class HistoryController {
                 window.showInformationMessage("No request history items are found!");
                 return;
             }
+
             const itemPickList: HistoryQuickPickItem[] = requests.map(request => {
-                // TODO: add headers and body in pick item?
-                const item = new HistoryQuickPickItem();
-                item.label = `${request.method.toUpperCase()} ${request.url}`;
+                const item: HistoryQuickPickItem = {
+                    label: `${request.method.toUpperCase()} ${request.url}`,
+                    rawRequest: request
+                };
                 if (typeof request.body === 'string' && request.body.length > 0) {
                     item.description = `${request.body.length} body bytes`;
                 }
                 if (request.startTime) {
                     item.detail = `${dayjs().to(request.startTime)}`;
                 }
-                item.rawRequest = request;
                 return item;
             });
 

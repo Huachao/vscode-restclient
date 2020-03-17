@@ -3,11 +3,19 @@ import configuration from '../../language-configuration.json';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { RequestHeaders } from './base';
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
-import { HostCertificate } from './hostCertificate';
 import { fromString as ParseLogLevelStr, LogLevel } from './logLevel';
 import { fromString as ParsePreviewOptionStr, PreviewOption } from './previewOption';
 
-export interface IRestClientSettings {
+export type HostCertificates = {
+    [key: string]: {
+        cert?: string;
+        key?: string;
+        pfx?: string;
+        passphrase?: string;
+    }
+};
+
+interface IRestClientSettings {
     followRedirect: boolean;
     defaultHeaders: RequestHeaders;
     timeoutInMilliseconds: number;
@@ -21,10 +29,10 @@ export interface IRestClientSettings {
     fontSize?: number;
     fontFamily?: string;
     fontWeight?: string;
-    environmentVariables: Map<string, Map<string, string>>;
-    mimeAndFileExtensionMapping: Map<string, string>;
+    environmentVariables: { [key: string]: { [key: string]: string } };
+    mimeAndFileExtensionMapping: { [key: string]: string };
     previewResponseInUntitledDocument: boolean;
-    hostCertificates: Map<string, HostCertificate>;
+    hostCertificates: HostCertificates;
     suppressResponseBodyContentTypeValidationWarning: boolean;
     previewOption: PreviewOption;
     disableHighlightResonseBodyForLargeResponse: boolean;
@@ -55,10 +63,10 @@ export class RestClientSettings implements IRestClientSettings {
     public fontSize?: number;
     public fontFamily?: string;
     public fontWeight?: string;
-    public environmentVariables: Map<string, Map<string, string>>;
-    public mimeAndFileExtensionMapping: Map<string, string>;
+    public environmentVariables: { [key: string]: { [key: string]: string } };
+    public mimeAndFileExtensionMapping: { [key: string]: string };
     public previewResponseInUntitledDocument: boolean;
-    public hostCertificates: Map<string, HostCertificate>;
+    public hostCertificates: HostCertificates;
     public suppressResponseBodyContentTypeValidationWarning: boolean;
     public previewOption: PreviewOption;
     public disableHighlightResonseBodyForLargeResponse: boolean;
@@ -128,13 +136,13 @@ export class RestClientSettings implements IRestClientSettings {
         this.fontFamily = restClientSettings.get<string>("fontFamily");
         this.fontWeight = restClientSettings.get<string>("fontWeight");
 
-        this.environmentVariables = restClientSettings.get<Map<string, Map<string, string>>>("environmentVariables", new Map<string, Map<string, string>>());
-        this.mimeAndFileExtensionMapping = restClientSettings.get<Map<string, string>>("mimeAndFileExtensionMapping", new Map<string, string>());
+        this.environmentVariables = restClientSettings.get<{ [key: string]: { [key: string]: string } }>("environmentVariables", {});
+        this.mimeAndFileExtensionMapping = restClientSettings.get<{ [key: string]: string }>("mimeAndFileExtensionMapping", {});
 
         this.previewResponseInUntitledDocument = restClientSettings.get<boolean>("previewResponseInUntitledDocument", false);
         this.previewColumn = this.parseColumn(restClientSettings.get<string>("previewColumn", "two"));
         this.previewResponsePanelTakeFocus = restClientSettings.get<boolean>("previewResponsePanelTakeFocus", true);
-        this.hostCertificates = restClientSettings.get<Map<string, HostCertificate>>("certificates", new Map<string, HostCertificate>());
+        this.hostCertificates = restClientSettings.get<HostCertificates>("certificates", {});
         this.disableHighlightResonseBodyForLargeResponse = restClientSettings.get<boolean>("disableHighlightResonseBodyForLargeResponse", true);
         this.disableAddingHrefLinkForLargeResponse = restClientSettings.get<boolean>("disableAddingHrefLinkForLargeResponse", true);
         this.largeResponseBodySizeLimitInMB = restClientSettings.get<number>("largeResponseBodySizeLimitInMB", 5);
