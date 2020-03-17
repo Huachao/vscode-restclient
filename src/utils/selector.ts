@@ -14,6 +14,7 @@ export interface RequestRangeOptions {
 export interface SelectedRequest {
     text: string;
     name?: string;
+    dangerousNote?: string;
 }
 
 export class Selector {
@@ -57,7 +58,8 @@ export class Selector {
 
         return {
             text: selectedText,
-            name: requestVariable
+            name: requestVariable,
+            dangerousNote
         };
     }
 
