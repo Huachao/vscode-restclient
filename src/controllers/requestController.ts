@@ -55,7 +55,7 @@ export class RequestController {
         if (name) {
             httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(name, document);
         }
-        
+
         httpRequest.confirmSendMsg = dangerousNote;
 
         await this.runCore(httpRequest);

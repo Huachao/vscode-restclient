@@ -39,7 +39,7 @@ export class Selector {
 
         // parse request variable definition name
         const requestVariable = this.getRequestVariableDefinitionName(selectedText);
-        
+
         // parse #@note comment
         const dangerousNote = this.getDangerousNoteDefinitionComment(selectedText);
 
