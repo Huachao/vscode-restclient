@@ -281,25 +281,9 @@ export class HttpClient {
         }
 
         const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = this._settings.hostCertificates[host];
-        let cert: Buffer | undefined, key: Buffer | undefined, pfx: Buffer | undefined;
-        if (certPath) {
-            const certFullPath = HttpClient.resolveCertificateFullPath(certPath, 'cert');
-            if (certFullPath) {
-                cert = fs.readFileSync(certFullPath);
-            }
-        }
-        if (keyPath) {
-            const keyFullPath = HttpClient.resolveCertificateFullPath(keyPath, 'key');
-            if (keyFullPath) {
-                key = fs.readFileSync(keyFullPath);
-            }
-        }
-        if (pfxPath) {
-            const pfxFullPath = HttpClient.resolveCertificateFullPath(pfxPath, 'pfx');
-            if (pfxFullPath) {
-                pfx = fs.readFileSync(pfxFullPath);
-            }
-        }
+        const cert = this.resolveCertificate(certPath);
+        const key = this.resolveCertificate(keyPath);
+        const pfx = this.resolveCertificate(pfxPath);
         return { cert, key, pfx, passphrase };
     }
 
@@ -332,13 +316,17 @@ export class HttpClient {
         return false;
     }
 
-    private static resolveCertificateFullPath(absoluteOrRelativePath: string, certName: string): string | undefined {
+    private resolveCertificate(absoluteOrRelativePath: string | undefined): Buffer | undefined {
+        if (absoluteOrRelativePath === undefined) {
+            return undefined;
+        }
+
         if (path.isAbsolute(absoluteOrRelativePath)) {
             if (!fs.existsSync(absoluteOrRelativePath)) {
-                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
+                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
                 return undefined;
             } else {
-                return absoluteOrRelativePath;
+                return fs.readFileSync(absoluteOrRelativePath);
             }
         }
 
@@ -348,9 +336,9 @@ export class HttpClient {
         if (rootPath) {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
             if (fs.existsSync(absolutePath)) {
-                return absolutePath;
+                return fs.readFileSync(absolutePath);
             } else {
-                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
+                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
                 return undefined;
             }
         }
@@ -362,9 +350,9 @@ export class HttpClient {
 
         absolutePath = path.join(path.dirname(currentFilePath), absoluteOrRelativePath);
         if (fs.existsSync(absolutePath)) {
-            return absolutePath;
+            return fs.readFileSync(absolutePath);
         } else {
-            window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} of ${certName} doesn't exist, please make sure it exists.`);
+            window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
             return undefined;
         }
     }
