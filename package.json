@@ -610,12 +610,6 @@
           "default": true,
           "scope": "resource",
           "description": "Enable/disable custom variable references CodeLens in request file"
-        },
-        "rest-client.defaultConfirmationMessage": {
-          "type": "string",
-          "default": "Are you sure?",
-          "scope": "resource",
-          "description": "The default message used for send confirmation (e.g @confirm-send or @confirm-send())"
         }
       }
     },
