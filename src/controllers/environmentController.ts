@@ -7,8 +7,11 @@ import { EnvironmentStatusEntry } from '../utils/environmentStatusBarEntry';
 import { PersistUtility } from '../utils/persistUtility';
 
 export class EnvironmentController {
-    private static readonly noEnvironmentPickItem: EnvironmentPickItem = new EnvironmentPickItem(
-        'No Environment', Constants.NoEnvironmentSelectedName, 'You Can Still Use Variables Defined In $shared Environment');
+    private static readonly noEnvironmentPickItem: EnvironmentPickItem = {
+        label: 'No Environment',
+        name: Constants.NoEnvironmentSelectedName,
+        description: 'You can still use variables defined in the $shared environment'
+    };
 
     public static readonly sharedEnvironmentName: string = '$shared';
 
@@ -33,7 +36,7 @@ export class EnvironmentController {
             if (name === EnvironmentController.sharedEnvironmentName) {
                 continue;
             }
-            const item = new EnvironmentPickItem(name, name);
+            const item: EnvironmentPickItem = { name, label: name };
             if (item.name === currentEnvironment.name) {
                 item.description = '$(check)';
             }
