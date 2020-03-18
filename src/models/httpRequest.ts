@@ -1,7 +1,6 @@
 import { Stream } from 'stream';
 import { getContentType } from '../utils/misc';
 import { RequestHeaders } from './base';
-import { RequestVariableCacheKey } from './requestVariableCacheKey';
 
 export class HttpRequest {
     public isCancelled: boolean;
@@ -9,9 +8,9 @@ export class HttpRequest {
         public method: string,
         public url: string,
         public headers: RequestHeaders,
-        public body: string | Stream | undefined,
-        public rawBody: string | undefined,
-        public requestVariableCacheKey?: RequestVariableCacheKey) {
+        public body?: string | Stream,
+        public rawBody?: string,
+        public name?: string) {
             this.method = method.toLocaleUpperCase();
             this.isCancelled = false;
     }
