@@ -65,12 +65,11 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     public async render(response: HttpResponse, column: ViewColumn) {
-        const tabTitle = (this.settings.requestNameAsResponseTabTitle && response.request.requestVariableCacheKey?.key) || 'Response';
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
                 this.viewType,
-                `${tabTitle}(${response.timingPhases.total}ms)`,
+                this.getTitle(response),
                 { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus },
                 {
                     enableFindWidget: true,
@@ -106,7 +105,7 @@ export class HttpResponseWebview extends BaseWebview {
             this.panels.push(panel);
         } else {
             panel = this.panels[this.panels.length - 1];
-            panel.title = `${tabTitle}(${response.timingPhases.total}ms)`;
+            panel.title = this.getTitle(response);
         }
 
         panel.webview.html = this.getHtmlForWebview(panel, response);
@@ -154,7 +153,7 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     @trace('Save Response Body')
-    public async saveBody() {
+    private async saveBody() {
         if (this.activeResponse) {
             const extension = MimeUtility.getExtension(this.activeResponse.contentType, this.settings.mimeAndFileExtensionMapping);
             const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
@@ -167,18 +166,15 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
+    private getTitle(response: HttpResponse): string {
+        const prefix = (this.settings.requestNameAsResponseTabTitle && response.request.requestVariableCacheKey?.key) || 'Response';
+        return `${prefix}(${response.timingPhases.total}ms)`;
+    }
+
     private getFullResponseString(response: HttpResponse): string {
         const statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
-        let headerString = '';
-        for (const header in response.headers) {
-            if (response.headers.hasOwnProperty(header)) {
-                headerString += `${header}: ${response.headers[header]}${os.EOL}`;
-            }
-        }
-        let body = '';
-        if (response.body) {
-            body = `${os.EOL}${response.body}`;
-        }
+        const headerString = Object.entries(response.headers).map(([name, value]) => `${name}: ${value}${os.EOL}`);
+        const body = response.body ? `${os.EOL}${response.body}` : '';
         return `${statusLine}${headerString}${body}`;
     }
 
