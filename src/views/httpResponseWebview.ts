@@ -167,7 +167,7 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     private getTitle(response: HttpResponse): string {
-        const prefix = (this.settings.requestNameAsResponseTabTitle && response.request.requestVariableCacheKey?.key) || 'Response';
+        const prefix = (this.settings.requestNameAsResponseTabTitle && response.request.name) || 'Response';
         return `${prefix}(${response.timingPhases.total}ms)`;
     }
 

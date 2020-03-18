@@ -353,7 +353,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                             const client = new HttpClient();
                             const request = new HttpRequest(
                                 "GET", `${Constants.AzureClouds[cloud].arm}/tenants?api-version=2017-08-01`,
-                                { Authorization: this._getTokenString(tokenResponse) }, undefined, undefined);
+                                { Authorization: this._getTokenString(tokenResponse) });
                             return client.send(request).then(async value => {
                                 const items = JSON.parse(value.body).value;
                                 const directories: QuickPickItem[] = [];

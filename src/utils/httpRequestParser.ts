@@ -25,7 +25,7 @@ export class HttpRequestParser implements RequestParser {
     public constructor(public requestRawText: string) {
     }
 
-    public parseHttpRequest(requestAbsoluteFilePath: string): HttpRequest {
+    public parseHttpRequest(requestAbsoluteFilePath: string, name?: string): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
         // split the request raw text into lines
         const lines: string[] = this.requestRawText.split(EOL);
@@ -129,7 +129,7 @@ export class HttpRequestParser implements RequestParser {
             }
         }
 
-        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL));
+        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), name);
     }
 
     private static parseRequestLine(line: string): { method: string, url: string } {

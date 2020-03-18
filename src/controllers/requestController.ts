@@ -1,4 +1,4 @@
-import { ExtensionContext, Range, ViewColumn, window } from 'vscode';
+import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
 import { logger } from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
@@ -50,13 +50,9 @@ export class RequestController {
         const { text, name } = selectedRequest;
 
         // parse http request
-        const httpRequest = RequestParserFactory.createRequestParser(text).parseHttpRequest(document.fileName);
+        const httpRequest = RequestParserFactory.createRequestParser(text).parseHttpRequest(document.fileName, name);
 
-        if (name) {
-            httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(name, document);
-        }
-
-        await this.runCore(httpRequest);
+        await this.runCore(httpRequest, document);
     }
 
     @trace('Rerun Request')
@@ -75,7 +71,7 @@ export class RequestController {
         this._requestStatusEntry.update({ state: RequestState.Cancelled });
     }
 
-    private async runCore(httpRequest: HttpRequest) {
+    private async runCore(httpRequest: HttpRequest, document?: TextDocument) {
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
 
@@ -93,8 +89,8 @@ export class RequestController {
 
             this._requestStatusEntry.update({ state: RequestState.Received, response });
 
-            if (httpRequest.requestVariableCacheKey) {
-                RequestVariableCache.add(httpRequest.requestVariableCacheKey, new RequestVariableCacheValue(httpRequest, response));
+            if (httpRequest.name && document) {
+                RequestVariableCache.add(new RequestVariableCacheKey(httpRequest.name, document), new RequestVariableCacheValue(httpRequest, response));
             }
 
             try {

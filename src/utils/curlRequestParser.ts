@@ -17,7 +17,7 @@ export class CurlRequestParser implements RequestParser {
     public constructor(public requestRawText: string) {
     }
 
-    public parseHttpRequest(requestAbsoluteFilePath: string): HttpRequest {
+    public parseHttpRequest(requestAbsoluteFilePath: string, name?: string): HttpRequest {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(this.requestRawText.trim()));
         requestText = requestText
@@ -79,7 +79,7 @@ export class CurlRequestParser implements RequestParser {
             method = body ? "POST" : "GET";
         }
 
-        return new HttpRequest(method, url, headers, body, body);
+        return new HttpRequest(method, url, headers, body, body, name);
     }
 
     private static resolveFilePath(refPath: string, httpFilePath: string): string | undefined {
