@@ -3,8 +3,6 @@ import { logger } from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
-import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
-import { RequestVariableCacheValue } from "../models/requestVariableCacheValue";
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
 import { PersistUtility } from '../utils/persistUtility';
@@ -90,7 +88,7 @@ export class RequestController {
             this._requestStatusEntry.update({ state: RequestState.Received, response });
 
             if (httpRequest.name && document) {
-                RequestVariableCache.add(new RequestVariableCacheKey(httpRequest.name, document), new RequestVariableCacheValue(httpRequest, response));
+                RequestVariableCache.add(document, httpRequest.name, response);
             }
 
             try {

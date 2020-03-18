@@ -1,9 +1,8 @@
 import { TextDocument } from "vscode";
-import { RequestVariableCacheValue } from '../../models/requestVariableCacheValue';
+import { HttpResponse } from '../../models/httpResponse';
 import { VariableType } from "../../models/variableType";
 
-
-export type HttpVariableValue = string | {} | RequestVariableCacheValue;
+export type HttpVariableValue = string | {} | HttpResponse;
 
 export interface HttpVariable {
     name: string;

@@ -1,29 +1,23 @@
 import { TextDocument } from 'vscode';
 
-interface CacheValue<T> {
-    version: number;
-    value: T;
-}
-
 export class DocumentCache<T> {
-    private _cache: Map<string, CacheValue<T>>;
+    private _cache: Map<string, T>;
 
-    public constructor() {
-        this._cache = new Map<string, CacheValue<T>>();
+    public constructor(private readonly ignoreVersion: boolean = false) {
+        this._cache = new Map<string, T>();
     }
 
     public get(document: TextDocument): T | undefined {
-        const result = this._cache.get(this.getKey(document));
-        return result?.version === document.version ? result.value : undefined;
+        return this._cache.get(this.getKey(document));
     }
 
     public set(document: TextDocument, value: T): this {
-        this._cache.set(this.getKey(document), { version: document.version, value });
+        this._cache.set(this.getKey(document), value);
         return this;
     }
 
     public delete(document: TextDocument): boolean {
-        return this.has(document) && this._cache.delete(this.getKey(document));
+        return this._cache.delete(this.getKey(document));
     }
 
     public clear(): void {
@@ -31,12 +25,10 @@ export class DocumentCache<T> {
     }
 
     public has(document: TextDocument): boolean {
-        const key = this.getKey(document);
-        return this._cache.has(key)
-            && this._cache.get(key)!.version === document.version;
+        return this._cache.has(this.getKey(document));
     }
 
     private getKey(document: TextDocument): string {
-        return `${document.uri.toString()}`;
+        return `${document.uri.toString()}${!this.ignoreVersion ? `@${document.version}` : ''}`;
     }
 }
