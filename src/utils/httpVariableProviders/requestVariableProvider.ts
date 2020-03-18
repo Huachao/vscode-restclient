@@ -2,7 +2,6 @@ import { TextDocument } from 'vscode';
 import * as Constants from '../../common/constants';
 import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
-import { RequestVariableCacheKey } from '../../models/requestVariableCacheKey';
 import { VariableType } from '../../models/variableType';
 import { RequestVariableCache } from '../requestVariableCache';
 import { RequestVariableCacheValueProcessor } from '../requestVariableCacheValueProcessor';
@@ -38,7 +37,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
         if (!variables.includes(variableName)) {
             return { name: variableName, error: ResolveErrorMessage.RequestVariableNotExist };
         }
-        const value = RequestVariableCache.get(new RequestVariableCacheKey(variableName, document));
+        const value = RequestVariableCache.get(document, variableName);
         if (value === undefined) {
             return { name: variableName, warning: ResolveWarningMessage.RequestVariableNotSent };
         }
@@ -49,7 +48,7 @@ export class RequestVariableProvider implements HttpVariableProvider {
 
     public async getAll(document: TextDocument): Promise<HttpVariable[]> {
         const variables = this.getRequestVariables(document);
-        return variables.map(v => ({ name: v, value: RequestVariableCache.get(new RequestVariableCacheKey(v, document)) }));
+        return variables.map(v => ({ name: v, value: RequestVariableCache.get(document, v) }));
     }
 
     private getRequestVariables(document: TextDocument): string[] {

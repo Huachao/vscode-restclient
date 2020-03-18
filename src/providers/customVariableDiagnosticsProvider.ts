@@ -3,7 +3,6 @@ import * as Constants from '../common/constants';
 import { EnvironmentController } from '../controllers/environmentController';
 import { DocumentCache } from '../models/documentCache';
 import { ResolveState } from '../models/httpVariableResolveResult';
-import { RequestVariableCacheKey } from '../models/requestVariableCacheKey';
 import { VariableType } from '../models/variableType';
 import { disposeAll } from '../utils/dispose';
 import { RequestVariableCache } from "../utils/requestVariableCache";
@@ -99,7 +98,7 @@ export class CustomVariableDiagnosticsProvider {
                 .filter(([name]) =>
                     allAvailableVariables.has(name)
                     && allAvailableVariables.get(name)![0] === VariableType.Request
-                    && !RequestVariableCache.has(new RequestVariableCacheKey(name, document)))
+                    && !RequestVariableCache.has(document, name))
                 .forEach(([, variables]) => {
                     variables.forEach(({name, begin, end}) => {
                         diagnostics.push(
@@ -112,12 +111,12 @@ export class CustomVariableDiagnosticsProvider {
                 .filter(([name]) =>
                     allAvailableVariables.has(name)
                     && allAvailableVariables.get(name)![0] === VariableType.Request
-                    && RequestVariableCache.has(new RequestVariableCacheKey(name, document)))
+                    && RequestVariableCache.has(document, name))
                 .forEach(([name, variables]) => {
-                    const value = RequestVariableCache.get(new RequestVariableCacheKey(name, document));
+                    const value = RequestVariableCache.get(document, name);
                     variables.forEach(({path, begin, end}) => {
                         path = path.replace(/^\{{2}\s*/, '').replace(/\s*\}{2}$/, '');
-                        const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value!, path);
+                        const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value, path);
                         if (result.state !== ResolveState.Success) {
                             diagnostics.push(
                                 new Diagnostic(
