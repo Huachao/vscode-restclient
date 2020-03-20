@@ -23,35 +23,42 @@ export class EnvironmentController {
 
     private environmentStatusEntry: EnvironmentStatusEntry;
 
-    public constructor(initEnvironment: EnvironmentPickItem) {
+    private currentEnvironment: EnvironmentPickItem;
+
+    private constructor(initEnvironment: EnvironmentPickItem) {
+        this.currentEnvironment = initEnvironment;
         this.environmentStatusEntry = new EnvironmentStatusEntry(initEnvironment.label);
     }
 
     @trace('Switch Environment')
     public async switchEnvironment() {
-        const currentEnvironment = await EnvironmentController.getCurrentEnvironment();
-        const itemPickList: EnvironmentPickItem[] = [];
-        itemPickList.push(EnvironmentController.noEnvironmentPickItem);
-        for (const name in this.settings.environmentVariables) {
-            if (name === EnvironmentController.sharedEnvironmentName) {
-                continue;
-            }
-            const item: EnvironmentPickItem = { name, label: name };
-            if (item.name === currentEnvironment.name) {
-                item.description = '$(check)';
-            }
-            itemPickList.push(item);
-        }
+        // Add no environment at the top
+        const userEnvironments: EnvironmentPickItem[] =
+            Object.keys(this.settings.environmentVariables)
+                .filter(name => name !== EnvironmentController.sharedEnvironmentName)
+                .map(name => ({
+                    name,
+                    label: name,
+                    description: name === this.currentEnvironment.name ? '$(check)' : undefined
+                }));
 
+        const itemPickList: EnvironmentPickItem[] = [EnvironmentController.noEnvironmentPickItem, ...userEnvironments];
         const item = await window.showQuickPick(itemPickList, { placeHolder: "Select REST Client Environment" });
         if (!item) {
             return;
         }
 
+        this.currentEnvironment = item;
+
         EnvironmentController._onDidChangeEnvironment.fire(item.label);
         this.environmentStatusEntry.update(item.label);
 
         await PersistUtility.saveEnvironment(item);
+    }
+
+    public static async create(): Promise<EnvironmentController> {
+        const environment = await this.getCurrentEnvironment();
+        return new EnvironmentController(environment);
     }
 
     public static async getCurrentEnvironment(): Promise<EnvironmentPickItem> {
