@@ -1,5 +1,5 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
-import { logger } from '../logger';
+import Logger from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -102,7 +102,7 @@ export class RequestController {
                     this._webview.render(response, previewColumn);
                 }
             } catch (reason) {
-                logger.error('Unable to preview response:', reason);
+                Logger.error('Unable to preview response:', reason);
                 window.showErrorMessage(reason);
             }
 
@@ -123,7 +123,7 @@ export class RequestController {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
             this._requestStatusEntry.update({ state: RequestState.Error});
-            logger.error('Failed to send request:', error);
+            Logger.error('Failed to send request:', error);
             window.showErrorMessage(error.message);
         } finally {
             if (this._lastPendingRequest === httpRequest) {

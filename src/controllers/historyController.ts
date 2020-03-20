@@ -3,7 +3,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
 import { QuickPickItem, window, workspace } from 'vscode';
-import { logger } from '../logger';
+import Logger from '../logger';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
 import { PersistUtility } from '../utils/persistUtility';
@@ -99,7 +99,7 @@ export class HistoryController {
     }
 
     private errorHandler(error: any, message: string) {
-        logger.error(message, error);
+        Logger.error(message, error);
         window.showErrorMessage(message);
     }
 

@@ -1,7 +1,7 @@
 import { EOL } from 'os';
 import * as url from 'url';
 import { Clipboard, env, QuickInputButtons, window } from 'vscode';
-import { logger } from '../logger';
+import Logger from '../logger';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -99,7 +99,7 @@ export class CodeSnippetController {
                 try {
                     this._webview.render(result, `${tt}-${ct}`, tk);
                 } catch (reason) {
-                    logger.error('Unable to preview generated code snippet:', reason);
+                    Logger.error('Unable to preview generated code snippet:', reason);
                     window.showErrorMessage(reason);
                 }
             }
