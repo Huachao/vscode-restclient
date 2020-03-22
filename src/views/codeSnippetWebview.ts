@@ -37,7 +37,7 @@ export class CodeSnippetWebview extends BaseWebview {
                 });
 
                 panel.onDidChangeViewState(({ webviewPanel }) => {
-                    commands.executeCommand('setContext', this.codeSnippetPreviewActiveContextKey, webviewPanel.visible);
+                    commands.executeCommand('setContext', this.codeSnippetPreviewActiveContextKey, webviewPanel.active);
                 });
 
                 this.panels.push(panel);
