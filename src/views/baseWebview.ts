@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { Event, EventEmitter, extensions, Uri, WebviewPanel } from 'vscode';
+import { Event, EventEmitter, Uri, WebviewPanel } from 'vscode';
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
 
@@ -21,8 +21,8 @@ export abstract class BaseWebview {
 
     protected panels: WebviewPanel[];
 
-    protected constructor() {
-        this.extensionPath = extensions.getExtension(Constants.ExtensionId)!.extensionPath;
+    protected constructor(protected readonly context) {
+        this.extensionPath = context.extensionPath;
         this.panels = [];
         this.styleFilePath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName, Constants.CSSFileName));
         this.styleFolderPath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName));
