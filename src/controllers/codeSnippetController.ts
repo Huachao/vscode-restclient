@@ -1,6 +1,6 @@
 import { EOL } from 'os';
 import * as url from 'url';
-import { Clipboard, env, QuickInputButtons, window } from 'vscode';
+import { Clipboard, env, ExtensionContext, QuickInputButtons, window } from 'vscode';
 import Logger from '../logger';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
@@ -34,8 +34,8 @@ export class CodeSnippetController {
     private _convertedResult;
     private _webview: CodeSnippetWebview;
 
-    constructor() {
-        this._webview = new CodeSnippetWebview();
+    constructor(context: ExtensionContext) {
+        this._webview = new CodeSnippetWebview(context);
         this.clipboard = env.clipboard;
     }
 

@@ -1,4 +1,4 @@
-import { commands, ViewColumn, WebviewPanel, window } from 'vscode';
+import { commands, ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
 import { disposeAll } from '../utils/dispose';
 import { BaseWebview } from './baseWebview';
 
@@ -13,8 +13,8 @@ export class CodeSnippetWebview extends BaseWebview {
         return 'rest-code-snippet';
     }
 
-    public constructor() {
-        super();
+    public constructor(context: ExtensionContext) {
+        super(context);
     }
 
     public async render(convertResult: string, title: string, lang: string) {

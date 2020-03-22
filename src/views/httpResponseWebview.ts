@@ -46,8 +46,8 @@ export class HttpResponseWebview extends BaseWebview {
         return this.activePanel ? this.panelResponses.get(this.activePanel) : undefined;
     }
 
-    public constructor(private readonly context: ExtensionContext) {
-        super();
+    public constructor(context: ExtensionContext) {
+        super(context);
 
         // Init response webview map
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();

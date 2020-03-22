@@ -26,7 +26,7 @@ import { ConfigurationDependentRegistration } from './utils/dependentRegistratio
 export async function activate(context: ExtensionContext) {
     const requestController = new RequestController(context);
     const historyController = new HistoryController();
-    const codeSnippetController = new CodeSnippetController();
+    const codeSnippetController = new CodeSnippetController(context);
     const environmentController = await EnvironmentController.create();
     context.subscriptions.push(requestController);
     context.subscriptions.push(historyController);
