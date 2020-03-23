@@ -1,4 +1,4 @@
-import { commands, ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
+import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
 import { disposeAll } from '../utils/dispose';
 import { BaseWebview } from './baseWebview';
 
@@ -7,10 +7,12 @@ const codeHighlightLinenums = require('code-highlight-linenums');
 
 export class CodeSnippetWebview extends BaseWebview {
 
-    private readonly codeSnippetPreviewActiveContextKey = 'codeSnippetPreviewFocus';
-
     protected get viewType(): string {
         return 'rest-code-snippet';
+    }
+
+    protected get previewActiveContextKey(): string {
+        return 'codeSnippetPreviewFocus';
     }
 
     public constructor(context: ExtensionContext) {
@@ -31,13 +33,13 @@ export class CodeSnippetWebview extends BaseWebview {
                 });
 
                 panel.onDidDispose(() => {
-                    commands.executeCommand('setContext', this.codeSnippetPreviewActiveContextKey, false);
+                    this.setPrviewActiveContext(false);
                     this.panels.pop();
                     this._onDidCloseAllWebviewPanels.fire();
                 });
 
                 panel.onDidChangeViewState(({ webviewPanel }) => {
-                    commands.executeCommand('setContext', this.codeSnippetPreviewActiveContextKey, webviewPanel.active);
+                    this.setPrviewActiveContext(webviewPanel.active);
                 });
 
                 this.panels.push(panel);
@@ -48,7 +50,7 @@ export class CodeSnippetWebview extends BaseWebview {
 
         panel.webview.html = this.getHtmlForWebview(panel, convertResult, lang);
 
-        commands.executeCommand('setContext', this.codeSnippetPreviewActiveContextKey, true);
+        this.setPrviewActiveContext(true);
 
         panel.reveal(ViewColumn.Two);
     }

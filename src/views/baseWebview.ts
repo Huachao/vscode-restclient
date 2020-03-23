@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { Event, EventEmitter, Uri, WebviewPanel } from 'vscode';
+import { commands, Event, EventEmitter, Uri, WebviewPanel } from 'vscode';
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
 
@@ -34,5 +34,11 @@ export abstract class BaseWebview {
         return this._onDidCloseAllWebviewPanels.event;
     }
 
+    protected setPrviewActiveContext(value: boolean) {
+        commands.executeCommand('setContext', this.previewActiveContextKey, value);
+    }
+
     protected abstract get viewType(): string;
+
+    protected abstract get previewActiveContextKey(): string;
 }
