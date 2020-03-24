@@ -80,7 +80,7 @@ export class CurlRequestParser implements RequestParser {
             method = body ? "POST" : "GET";
         }
 
-        return new HttpRequest(method, url, headers, body, body, undefined);
+        return new HttpRequest(method, url, headers, body, body);
     }
 
     private static resolveFilePath(refPath: string, httpFilePath: string): string | undefined {

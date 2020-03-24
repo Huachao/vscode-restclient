@@ -11,8 +11,7 @@ export class HttpRequest {
         public headers: RequestHeaders,
         public body: string | Stream | undefined,
         public rawBody: string | undefined,
-        public requestVariableCacheKey?: RequestVariableCacheKey,
-        public confirmSendMsg?: string) {
+        public requestVariableCacheKey?: RequestVariableCacheKey) {
             this.method = method.toLocaleUpperCase();
             this.isCancelled = false;
     }
@@ -32,8 +31,7 @@ export class SerializedHttpRequest {
         public url: string,
         public headers: RequestHeaders,
         public body: string | undefined,
-        public startTime: number,
-        public confirmSendMsg?: string) {
+        public startTime: number) {
     }
 
     public static convertFromHttpRequest(httpRequest: HttpRequest, startTime: number = Date.now()): SerializedHttpRequest {
@@ -42,8 +40,7 @@ export class SerializedHttpRequest {
             httpRequest.url,
             httpRequest.headers,
             httpRequest.rawBody,
-            startTime,
-            httpRequest.confirmSendMsg
+            startTime
         );
     }
 }

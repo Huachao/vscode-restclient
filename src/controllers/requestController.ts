@@ -49,14 +49,19 @@ export class RequestController {
 
         const { text, name, dangerousNote } = selectedRequest;
 
+        if (dangerousNote) {
+            const userConfirmed = await window.showQuickPick(['Yes', 'No'], { canPickMany: false, placeHolder: confirmSendMsg });
+            if ('Yes' !== userConfirmed) {
+              return;
+            }
+        }
+
         // parse http request
         const httpRequest = RequestParserFactory.createRequestParser(text).parseHttpRequest(document.fileName);
 
         if (name) {
             httpRequest.requestVariableCacheKey = new RequestVariableCacheKey(name, document);
         }
-
-        httpRequest.confirmSendMsg = dangerousNote;
 
         await this.runCore(httpRequest);
     }
@@ -78,13 +83,6 @@ export class RequestController {
     }
 
     private async runCore(httpRequest: HttpRequest) {
-        if (undefined !== httpRequest.confirmSendMsg) {
-            const userConfirmed = await window.showQuickPick(['Yes', 'No'], { canPickMany: false, placeHolder: httpRequest.confirmSendMsg });
-            if ('Yes' !== userConfirmed) {
-              return;
-            }
-        }
-
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
 

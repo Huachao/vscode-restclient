@@ -129,7 +129,7 @@ export class HttpRequestParser implements RequestParser {
             }
         }
 
-        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), undefined);
+        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL));
     }
 
     private static parseRequestLine(line: string): { method: string, url: string } {
