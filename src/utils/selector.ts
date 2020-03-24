@@ -132,7 +132,7 @@ export class Selector {
         return matched?.[1];
     }
 
-    public static hasDangerousNoteDefinitionComment(text: string): bool {
+    public static hasDangerousNoteDefinitionComment(text: string): boolean {
         const matched = text.match(Constants.DangerousNoteDefinitionRegex);
         return !!matched;
     }
