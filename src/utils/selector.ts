@@ -59,7 +59,7 @@ export class Selector {
         return {
             text: selectedText,
             name: requestVariable,
-            warnBeforeSend: warnBeforeSend
+            warnBeforeSend
         };
     }
 

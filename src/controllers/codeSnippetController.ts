@@ -1,7 +1,7 @@
 import { EOL } from 'os';
 import * as url from 'url';
-import { Clipboard, env, QuickInputButtons, QuickPickItem, window } from 'vscode';
-import { logger } from '../logger';
+import { Clipboard, env, ExtensionContext, QuickInputButtons, window } from 'vscode';
+import Logger from '../logger';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -15,33 +15,27 @@ import { CodeSnippetWebview } from '../views/codeSnippetWebview';
 const encodeUrl = require('encodeurl');
 const HTTPSnippet = require('httpsnippet');
 
-interface CodeSnippetTargetQuickPickItem extends QuickPickItem {
-    target: {
-        key: string;
-        title: string;
-        clients: [{
-            title: string;
-            link: string,
-            description: string
-        }]
-    };
-}
+type CodeSnippetClient = {
+    key: string;
+    title: string;
+    link: string;
+    description: string;
+};
 
-interface CodeSnippetClientQuickPickItem extends CodeSnippetTargetQuickPickItem {
-    client: {
-        key: string;
-        title: string;
-    };
-}
+type CodeSnippetTarget = {
+    key: string;
+    title: string;
+    clients: CodeSnippetClient[];
+};
 
 export class CodeSnippetController {
-    private static _availableTargets = HTTPSnippet.availableTargets();
+    private readonly _availableTargets: CodeSnippetTarget[] = HTTPSnippet.availableTargets();
     private readonly clipboard: Clipboard;
     private _convertedResult;
     private _webview: CodeSnippetWebview;
 
-    constructor() {
-        this._webview = new CodeSnippetWebview();
+    constructor(context: ExtensionContext) {
+        this._webview = new CodeSnippetWebview(context);
         this.clipboard = env.clipboard;
     }
 
@@ -65,56 +59,52 @@ export class CodeSnippetController {
         const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         const snippet = new HTTPSnippet(harHttpRequest);
 
-        if (CodeSnippetController._availableTargets) {
-            const quickPick = window.createQuickPick();
-            const targetQuickPickItems: CodeSnippetTargetQuickPickItem[] = CodeSnippetController._availableTargets.map(target => ({ label: target.title, target }));
-            quickPick.title = 'Generate Code Snippet';
-            quickPick.step = 1;
-            quickPick.totalSteps = 2;
-            quickPick.items = targetQuickPickItems;
-            quickPick.matchOnDescription = true;
-            quickPick.matchOnDetail = true;
-            quickPick.onDidHide(() => quickPick.dispose());
-            quickPick.onDidTriggerButton(() => {
-                quickPick.step!--;
-                quickPick.buttons = [];
-                quickPick.items = targetQuickPickItems;
-            });
-            quickPick.onDidAccept(() => {
-                const selectedItem = quickPick.selectedItems[0];
-                if (selectedItem) {
-                    if (quickPick.step === 1) {
-                        quickPick.step++;
-                        quickPick.buttons = [QuickInputButtons.Back];
-                        const targetItem = selectedItem as CodeSnippetTargetQuickPickItem;
-                        quickPick.items = targetItem.target.clients.map(
-                            client => ({
-                                label: client.title,
-                                description: client.description,
-                                detail: client.link,
-                                target: targetItem.target,
-                                client
-                            })
-                        );
-                    } else if (quickPick.step === 2) {
-                        const { target: { key: tk, title: tt }, client: { key: ck, title: ct } } = (selectedItem as CodeSnippetClientQuickPickItem);
-                        Telemetry.sendEvent('Generate Code Snippet', { 'target': tk, 'client': ck });
-                        const result = snippet.convert(tk, ck);
-                        this._convertedResult = result;
+        let target: Pick<CodeSnippetTarget, 'key' | 'title'> | undefined = undefined;
 
-                        try {
-                            this._webview.render(result, `${tt}-${ct}`, tk);
-                        } catch (reason) {
-                            logger.error('Unable to preview generated code snippet:', reason);
-                            window.showErrorMessage(reason);
-                        }
-                    }
+        const quickPick = window.createQuickPick();
+        const targetQuickPickItems = this._availableTargets.map(target => ({ label: target.title, ...target }));
+        quickPick.title = 'Generate Code Snippet';
+        quickPick.step = 1;
+        quickPick.totalSteps = 2;
+        quickPick.items = targetQuickPickItems;
+        quickPick.matchOnDescription = true;
+        quickPick.matchOnDetail = true;
+        quickPick.onDidHide(() => quickPick.dispose());
+        quickPick.onDidTriggerButton(() => {
+            quickPick.step!--;
+            quickPick.buttons = [];
+            quickPick.items = targetQuickPickItems;
+            target = undefined;
+        });
+        quickPick.onDidAccept(() => {
+            const selectedItem = quickPick.selectedItems[0];
+            if (quickPick.step === 1) {
+                quickPick.step++;
+                quickPick.buttons = [QuickInputButtons.Back];
+                target = selectedItem as any as CodeSnippetTarget;
+                quickPick.items = (target as CodeSnippetTarget).clients.map(
+                    client => ({
+                        label: client.title,
+                        detail: client.link,
+                        ...client
+                    })
+                );
+            } else if (quickPick.step === 2) {
+                const { key: ck, title: ct } = selectedItem as any as CodeSnippetClient;
+                const { key: tk, title: tt } = target!;
+                Telemetry.sendEvent('Generate Code Snippet', { 'target': target!.key, 'client': ck });
+                const result = snippet.convert(tk, ck);
+                this._convertedResult = result;
+
+                try {
+                    this._webview.render(result, `${tt}-${ct}`, tk);
+                } catch (reason) {
+                    Logger.error('Unable to preview generated code snippet:', reason);
+                    window.showErrorMessage(reason);
                 }
-            });
-            quickPick.show();
-        } else {
-            window.showInformationMessage('No available code snippet convert targets');
-        }
+            }
+        });
+        quickPick.show();
     }
 
     @trace('Copy Code Snippet')

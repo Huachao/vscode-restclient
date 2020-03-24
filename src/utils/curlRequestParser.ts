@@ -17,10 +17,9 @@ export class CurlRequestParser implements RequestParser {
     public constructor(public requestRawText: string) {
     }
 
-    public parseHttpRequest(requestAbsoluteFilePath: string): HttpRequest {
-        let requestText = this.requestRawText.trim();
-        requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
-            CurlRequestParser.mergeIntoSingleLine(requestText));
+    public parseHttpRequest(requestAbsoluteFilePath: string, name?: string): HttpRequest {
+        let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
+            CurlRequestParser.mergeIntoSingleLine(this.requestRawText.trim()));
         requestText = requestText
             .replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)/, '$1 $2')
             .replace(/(-I|--head)(?=\s+)/, '-X HEAD');
@@ -80,7 +79,7 @@ export class CurlRequestParser implements RequestParser {
             method = body ? "POST" : "GET";
         }
 
-        return new HttpRequest(method, url, headers, body, body);
+        return new HttpRequest(method, url, headers, body, body, name);
     }
 
     private static resolveFilePath(refPath: string, httpFilePath: string): string | undefined {

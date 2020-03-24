@@ -20,11 +20,11 @@ const hljs = require('highlight.js');
 const OPEN = 'Open';
 const COPYPATH = 'Copy Path';
 
+type FoldingRange = [number, number];
+
 export class HttpResponseWebview extends BaseWebview {
 
     private readonly urlRegex = /(https?:\/\/[^\s"'<>\]\)]+)/gi;
-
-    private readonly httpResponsePreviewActiveContextKey = 'httpResponsePreviewFocus';
 
     private readonly panelResponses: Map<WebviewPanel, HttpResponse>;
 
@@ -40,14 +40,18 @@ export class HttpResponseWebview extends BaseWebview {
         return 'rest-response';
     }
 
+    protected get previewActiveContextKey(): string {
+        return 'httpResponsePreviewFocus';
+    }
+
     private activePanel: WebviewPanel | undefined;
 
     private get activeResponse(): HttpResponse | undefined {
         return this.activePanel ? this.panelResponses.get(this.activePanel) : undefined;
     }
 
-    public constructor(private readonly context: ExtensionContext) {
-        super();
+    public constructor(context: ExtensionContext) {
+        super(context);
 
         // Init response webview map
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();
@@ -65,12 +69,11 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     public async render(response: HttpResponse, column: ViewColumn) {
-        const tabTitle = (this.settings.requestNameAsResponseTabTitle && response.request.requestVariableCacheKey?.key) || 'Response';
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
                 this.viewType,
-                `${tabTitle}(${response.timingPhases.total}ms)`,
+                this.getTitle(response),
                 { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus },
                 {
                     enableFindWidget: true,
@@ -81,7 +84,7 @@ export class HttpResponseWebview extends BaseWebview {
 
             panel.onDidDispose(() => {
                 if (panel === this.activePanel) {
-                    commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, false);
+                    this.setPrviewActiveContext(false);
                     this.activePanel = undefined;
                 }
 
@@ -99,19 +102,19 @@ export class HttpResponseWebview extends BaseWebview {
 
             panel.onDidChangeViewState(({ webviewPanel }) => {
                 const active = this.panels.some(p => p.active);
-                commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, active);
+                this.setPrviewActiveContext(active);
                 this.activePanel = webviewPanel.active ? webviewPanel : undefined;
             });
 
             this.panels.push(panel);
         } else {
             panel = this.panels[this.panels.length - 1];
-            panel.title = `${tabTitle}(${response.timingPhases.total}ms)`;
+            panel.title = this.getTitle(response);
         }
 
         panel.webview.html = this.getHtmlForWebview(panel, response);
 
-        commands.executeCommand('setContext', this.httpResponsePreviewActiveContextKey, this.settings.previewResponsePanelTakeFocus);
+        this.setPrviewActiveContext(this.settings.previewResponsePanelTakeFocus);
 
         panel.reveal(column, !this.settings.previewResponsePanelTakeFocus);
 
@@ -154,7 +157,7 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     @trace('Save Response Body')
-    public async saveBody() {
+    private async saveBody() {
         if (this.activeResponse) {
             const extension = MimeUtility.getExtension(this.activeResponse.contentType, this.settings.mimeAndFileExtensionMapping);
             const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
@@ -167,18 +170,15 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
+    private getTitle(response: HttpResponse): string {
+        const prefix = (this.settings.requestNameAsResponseTabTitle && response.request.name) || 'Response';
+        return `${prefix}(${response.timingPhases.total}ms)`;
+    }
+
     private getFullResponseString(response: HttpResponse): string {
         const statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
-        let headerString = '';
-        for (const header in response.headers) {
-            if (response.headers.hasOwnProperty(header)) {
-                headerString += `${header}: ${response.headers[header]}${os.EOL}`;
-            }
-        }
-        let body = '';
-        if (response.body) {
-            body = `${os.EOL}${response.body}`;
-        }
+        const headerString = Object.entries(response.headers).map(([name, value]) => `${name}: ${value}${os.EOL}`);
+        const body = response.body ? `${os.EOL}${response.body}` : '';
         return `${statusLine}${headerString}${body}`;
     }
 
@@ -334,7 +334,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             .map(function (line, i) {
                 const lineNum = i + 1;
                 const range = foldingRanges.has(lineNum)
-                    ? ` range-start="${foldingRanges.get(lineNum)!.start}" range-end="${foldingRanges.get(lineNum)!.end}"`
+                    ? ` range-start="${foldingRanges.get(lineNum)![0]}" range-end="${foldingRanges.get(lineNum)![1]}"`
                     : '';
                 const folding = foldingRanges.has(lineNum) ? '<span class="icon"></span>' : '';
                 return `<span class="line width-${max}" start="${lineNum}"${range}>${line}${folding}</span>`;
@@ -389,7 +389,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
                 let prev;
                 while ((prev = stack.slice(-1)[0]) && (prev[1] >= count)) {
                     stack.pop();
-                    result.set(prev[0] + 1, new FoldingRange(prev[0] + 1, lineIndex));
+                    result.set(prev[0] + 1, [prev[0] + 1, lineIndex]);
                 }
             }
         }
@@ -434,10 +434,5 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
 
     private static isHeadRequest({ request: { method } }: { request: HttpRequest }): boolean {
         return method.toLowerCase() === 'head';
-    }
-}
-
-class FoldingRange {
-    public constructor(public start: number, public end: number) {
     }
 }

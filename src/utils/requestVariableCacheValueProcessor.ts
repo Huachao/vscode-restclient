@@ -1,7 +1,6 @@
 import { HttpRequest } from "../models/httpRequest";
 import { HttpResponse } from '../models/httpResponse';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from "../models/httpVariableResolveResult";
-import { RequestVariableCacheValue } from '../models/requestVariableCacheValue';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader } from './misc';
 
@@ -11,10 +10,11 @@ const { JSONPath } = require('jsonpath-plus');
 
 const requestVariablePathRegex: RegExp = /^(\w+)(?:\.(request|response)(?:\.(body|headers)(?:\.(.*))?)?)?$/;
 
+type HttpEntity = 'request' | 'response';
 type HttpPart = 'headers' | 'body';
 
 export class RequestVariableCacheValueProcessor {
-    public static resolveRequestVariable(value: RequestVariableCacheValue, path: string): ResolveResult {
+    public static resolveRequestVariable(value: HttpResponse | undefined, path: string): ResolveResult {
         if (!value || !path) {
             return { state: ResolveState.Error, message: ResolveErrorMessage.NoRequestVariablePath };
         }
@@ -31,7 +31,7 @@ export class RequestVariableCacheValueProcessor {
             return { state: ResolveState.Warning, value, message: ResolveWarningMessage.MissingRequestEntityName };
         }
 
-        const httpEntity = value[type];
+        const httpEntity = (type as HttpEntity) === 'request' ? value.request : value;
 
         if (!httpPart) {
             return { state: ResolveState.Warning, value: httpEntity, message: ResolveWarningMessage.MissingRequestEntityPart };
