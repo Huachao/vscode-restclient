@@ -50,7 +50,7 @@ export class RequestController {
         const { text, name, dangerousNote } = selectedRequest;
 
         if (dangerousNote) {
-            const userConfirmed = await window.showQuickPick(['Yes', 'No'], { canPickMany: false, placeHolder: confirmSendMsg });
+            const userConfirmed = await window.showWarningMessage(dangerousNote, 'Yes', 'No');
             if ('Yes' !== userConfirmed) {
               return;
             }
