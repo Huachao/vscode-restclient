@@ -77,6 +77,6 @@ export const RequestVariableDefinitionWithNameRegexFactory = (name: string, flag
 
 export const RequestVariableDefinitionRegex: RegExp = RequestVariableDefinitionWithNameRegexFactory("\\w+", "m");
 
-export const DangerousNoteDefinitionRegex = /^\s*(?:#{1,}|\/{2,})\s*@note\s+(.+)\s*$/m;
+export const DangerousNoteDefinitionRegex = /^\s*(?:#{1,}|\/{2,})\s*@note\s*$/m;
 
 export const LineSplitterRegex: RegExp = /\r?\n/g;

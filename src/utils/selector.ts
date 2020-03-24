@@ -14,7 +14,7 @@ export interface RequestRangeOptions {
 export interface SelectedRequest {
     text: string;
     name?: string;
-    dangerousNote?: string;
+    warnBeforeSend: boolean;
 }
 
 export class Selector {
@@ -41,7 +41,7 @@ export class Selector {
         const requestVariable = this.getRequestVariableDefinitionName(selectedText);
 
         // parse #@note comment
-        const dangerousNote = this.getDangerousNoteDefinitionComment(selectedText);
+        const warnBeforeSend = this.hasDangerousNoteDefinitionComment(selectedText);
 
         // remove comment lines
         let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Selector.isCommentLine(l));
@@ -59,7 +59,7 @@ export class Selector {
         return {
             text: selectedText,
             name: requestVariable,
-            dangerousNote
+            warnBeforeSend: warnBeforeSend
         };
     }
 
@@ -132,9 +132,9 @@ export class Selector {
         return matched?.[1];
     }
 
-    public static getDangerousNoteDefinitionComment(text: string): string | undefined {
+    public static hasDangerousNoteDefinitionComment(text: string): bool {
         const matched = text.match(Constants.DangerousNoteDefinitionRegex);
-        return matched?.[1];
+        return !!matched;
     }
 
     private static getDelimitedText(fullText: string, currentLine: number): string | null {

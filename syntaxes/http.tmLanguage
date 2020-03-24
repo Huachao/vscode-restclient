@@ -124,7 +124,7 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*#{1,}\s*(?:((@)(?:name|note))\s+(.+))?.*$</string>
+                <string>^\s*#{1,}\s*(?:((@)(?:name\s+(\S+)|note)))?.*$</string>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
