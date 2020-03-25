@@ -124,7 +124,7 @@ export class HttpClient {
         }
 
         const options: got.GotBodyOptions<null> = {
-            headers: httpRequest.headers,
+            headers: this.getRequestHeaders(httpRequest),
             method: httpRequest.method,
             body: requestBody,
             encoding: null,
@@ -153,25 +153,21 @@ export class HttpClient {
             options.timeout = this._settings.timeoutInMilliseconds;
         }
 
-        if (!options.headers) {
-            options.headers = httpRequest.headers = {};
-        }
-
         // TODO: refactor auth
-        const authorization = getHeader(options.headers, 'Authorization') as string | undefined;
+        const authorization = getHeader(options.headers!, 'Authorization') as string | undefined;
         if (authorization) {
             const [scheme, user, ...args] = authorization.split(/\s+/);
             if (args.length > 0) {
                 const pass = args.join(' ');
                 if (scheme === 'Basic') {
-                    removeHeader(options.headers, 'Authorization');
+                    removeHeader(options.headers!, 'Authorization');
                     options.auth = `${user}:${pass}`;
                 } else if (scheme === 'Digest') {
-                    removeHeader(options.headers, 'Authorization');
+                    removeHeader(options.headers!, 'Authorization');
                     options.hooks!.afterResponse!.push(digest(user, pass));
                 }
             } else if (scheme === 'Basic' && user.includes(':')) {
-                removeHeader(options.headers, 'Authorization');
+                removeHeader(options.headers!, 'Authorization');
                 options.auth = user;
             }
         }
@@ -198,16 +194,6 @@ export class HttpClient {
             }
         }
 
-        // add default headers if not specified
-        for (const header in this._settings.defaultHeaders) {
-            if (!hasHeader(options.headers, header) && (header.toLowerCase() !== 'host' || httpRequest.url[0] === '/')) {
-                const value = this._settings.defaultHeaders[header];
-                if (value) {
-                    options.headers[header] = value;
-                }
-            }
-        }
-
         // set cookie jar
         if (options.cookieJar) {
             const { getCookieString: originalGetCookieString, setCookie: originalSetCookie } = options.cookieJar;
@@ -224,7 +210,7 @@ export class HttpClient {
             }
             options.cookieJar.setCookie = _setCookie;
 
-            if (hasHeader(options.headers, 'cookie')) {
+            if (hasHeader(options.headers!, 'cookie')) {
                 let count = 0;
 
                 function _getCookieString(currentUrl: string, opts: CookieJar.GetCookiesOptions, cb: GetCookieStringCallback): void;
@@ -241,7 +227,7 @@ export class HttpClient {
                         }
 
                         count++;
-                        cb!(null, [cookies, getHeader(httpRequest.headers, 'cookie')].filter(Boolean).join('; '));
+                        cb!(null, [cookies, getHeader(options.headers!, 'cookie')].filter(Boolean).join('; '));
                     });
                 }
                 options.cookieJar.getCookieString = _getCookieString;
@@ -249,6 +235,11 @@ export class HttpClient {
         }
 
         return options;
+    }
+
+    private getRequestHeaders(httpRequest: HttpRequest): RequestHeaders {
+        removeHeader(this._settings.defaultHeaders, 'host');
+        return {...this._settings.defaultHeaders, ...httpRequest.headers};
     }
 
     private async convertStreamToBuffer(stream: Stream): Promise<Buffer> {
