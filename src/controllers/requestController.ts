@@ -51,7 +51,7 @@ export class RequestController {
             const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
             const userConfirmed = await window.showWarningMessage(note, 'Yes', 'No');
             if (userConfirmed !== 'Yes') {
-              return;
+                return;
             }
         }
 
@@ -130,7 +130,7 @@ export class RequestController {
             } else if (error.code === 'ENETUNREACH') {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
-            this._requestStatusEntry.update({ state: RequestState.Error});
+            this._requestStatusEntry.update({ state: RequestState.Error });
             Logger.error('Failed to send request:', error);
             window.showErrorMessage(error.message);
         } finally {
