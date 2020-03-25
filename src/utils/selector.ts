@@ -133,8 +133,7 @@ export class Selector {
     }
 
     public static hasDangerousNoteDefinitionComment(text: string): boolean {
-        const matched = text.match(Constants.DangerousNoteDefinitionRegex);
-        return !!matched;
+        return Constants.DangerousNoteDefinitionRegex.test(text);
     }
 
     private static getDelimitedText(fullText: string, currentLine: number): string | null {
