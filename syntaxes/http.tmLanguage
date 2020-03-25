@@ -124,7 +124,7 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*#{1,}\s*(?:((@)name)\s+(\S+))?.*$</string>
+                <string>^\s*#{1,}\s*(?:((@)name)\s+(\S.*))$</string>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
@@ -148,7 +148,7 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*/{2,}\s*(?:((@)name)\s+(\S+))?.*$</string>
+                <string>^\s*/{2,}\s*(?:((@)name)\s+(\S.*))$</string>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
@@ -172,7 +172,7 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*#{1,}\s*((@)note)?.*$</string>
+                <string>^\s*#{1,}\s*((@)note)\s*$</string>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
@@ -184,11 +184,6 @@
                     <dict>
                         <key>name</key>
                         <string>punctuation.definition.block.tag.metadata</string>
-                    </dict>
-                    <key>3</key>
-                    <dict>
-                        <key>name</key>
-                        <string>entity.name.type.instance.metadata</string>
                     </dict>
                 </dict>
                 <key>name</key>
@@ -196,7 +191,7 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*/{2,}\s*((@)note)?.*$</string>
+                <string>^\s*/{2,}\s*((@)note)\s*$</string>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
@@ -208,11 +203,6 @@
                     <dict>
                         <key>name</key>
                         <string>punctuation.definition.block.tag.metadata</string>
-                    </dict>
-                    <key>3</key>
-                    <dict>
-                        <key>name</key>
-                        <string>entity.name.type.instance.metadata</string>
                     </dict>
                 </dict>
                 <key>name</key>

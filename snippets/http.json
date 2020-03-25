@@ -75,5 +75,12 @@
             "# @name ${1:Request_Name}"
         ],
         "description": "Define Request Variable"
+    },
+    "Request confirmation": {
+        "prefix": "note",
+        "body": [
+            "# @note"
+        ],
+        "description": "Add sending request confirmation"
     }
 }
