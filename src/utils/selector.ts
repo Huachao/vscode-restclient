@@ -41,7 +41,7 @@ export class Selector {
         const requestVariable = this.getRequestVariableDefinitionName(selectedText);
 
         // parse #@note comment
-        const warnBeforeSend = this.hasDangerousNoteDefinitionComment(selectedText);
+        const warnBeforeSend = this.hasNoteComment(selectedText);
 
         // remove comment lines
         let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Selector.isCommentLine(l));
@@ -132,8 +132,8 @@ export class Selector {
         return matched?.[1];
     }
 
-    public static hasDangerousNoteDefinitionComment(text: string): boolean {
-        return Constants.DangerousNoteDefinitionRegex.test(text);
+    public static hasNoteComment(text: string): boolean {
+        return Constants.NoteCommentRegex.test(text);
     }
 
     private static getDelimitedText(fullText: string, currentLine: number): string | null {
