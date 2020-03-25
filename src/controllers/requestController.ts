@@ -45,7 +45,15 @@ export class RequestController {
             return;
         }
 
-        const { text, name } = selectedRequest;
+        const { text, name, warnBeforeSend } = selectedRequest;
+
+        if (warnBeforeSend) {
+            const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
+            const userConfirmed = await window.showWarningMessage(note, 'Yes', 'No');
+            if ('Yes' !== userConfirmed) {
+              return;
+            }
+        }
 
         // parse http request
         const httpRequest = RequestParserFactory.createRequestParser(text).parseHttpRequest(document.fileName, name);
