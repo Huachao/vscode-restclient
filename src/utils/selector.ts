@@ -14,6 +14,7 @@ export interface RequestRangeOptions {
 export interface SelectedRequest {
     text: string;
     name?: string;
+    warnBeforeSend: boolean;
 }
 
 export class Selector {
@@ -39,6 +40,9 @@ export class Selector {
         // parse request variable definition name
         const requestVariable = this.getRequestVariableDefinitionName(selectedText);
 
+        // parse #@note comment
+        const warnBeforeSend = this.hasNoteComment(selectedText);
+
         // remove comment lines
         let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Selector.isCommentLine(l));
 
@@ -54,7 +58,8 @@ export class Selector {
 
         return {
             text: selectedText,
-            name: requestVariable
+            name: requestVariable,
+            warnBeforeSend
         };
     }
 
@@ -125,6 +130,10 @@ export class Selector {
     public static getRequestVariableDefinitionName(text: string): string | undefined {
         const matched = text.match(Constants.RequestVariableDefinitionRegex);
         return matched?.[1];
+    }
+
+    public static hasNoteComment(text: string): boolean {
+        return Constants.NoteCommentRegex.test(text);
     }
 
     private static getDelimitedText(fullText: string, currentLine: number): string | null {

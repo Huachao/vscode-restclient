@@ -171,6 +171,54 @@
                 <string>comment.source.double-slash.http</string>
             </dict>
             <dict>
+                <key>match</key>
+                <string>^\s*#{1,}\s*((@)note)?.*$</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>storage.type.class.metadata</string>
+                    </dict>
+                    <key>2</key>
+                    <dict>
+                        <key>name</key>
+                        <string>punctuation.definition.block.tag.metadata</string>
+                    </dict>
+                    <key>3</key>
+                    <dict>
+                        <key>name</key>
+                        <string>entity.name.type.instance.metadata</string>
+                    </dict>
+                </dict>
+                <key>name</key>
+                <string>comment.source.sharp.http</string>
+            </dict>
+            <dict>
+                <key>match</key>
+                <string>^\s*/{2,}\s*((@)note)?.*$</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>storage.type.class.metadata</string>
+                    </dict>
+                    <key>2</key>
+                    <dict>
+                        <key>name</key>
+                        <string>punctuation.definition.block.tag.metadata</string>
+                    </dict>
+                    <key>3</key>
+                    <dict>
+                        <key>name</key>
+                        <string>entity.name.type.instance.metadata</string>
+                    </dict>
+                </dict>
+                <key>name</key>
+                <string>comment.source.double-slash.http</string>
+            </dict>
+            <dict>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
