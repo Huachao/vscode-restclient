@@ -124,7 +124,7 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*#{1,}\s*(?:((@)name)\s+(\S.*))$</string>
+                <string>^\s*\#{1,}\s+(?:((@)name)\s+([^\s\.]+))$</string>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
@@ -148,7 +148,7 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*/{2,}\s*(?:((@)name)\s+(\S.*))$</string>
+                <string>^\s*\/{2,}\s+(?:((@)name)\s+([^\s\.]+))$</string>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
@@ -172,7 +172,7 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*#{1,}\s*((@)note)\s*$</string>
+                <string>^\s*\#{1,}\s+((@)note)\s*$</string>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
@@ -191,7 +191,7 @@
             </dict>
             <dict>
                 <key>match</key>
-                <string>^\s*/{2,}\s*((@)note)\s*$</string>
+                <string>^\s*\/{2,}\s+((@)note)\s*$</string>
                 <key>captures</key>
                 <dict>
                     <key>1</key>
@@ -207,6 +207,18 @@
                 </dict>
                 <key>name</key>
                 <string>comment.source.double-slash.http</string>
+            </dict>
+            <dict>
+                <key>match</key>
+                <string>^\s*\#{1,}.*$</string>
+                <key>name</key>
+                <string>comment.source.sharp.http</string>
+            </dict>
+            <dict>
+                <key>match</key>
+                <string>^\s*\/{2,}.*$</string>
+                <key>name</key>
+                <string>comment.source.slasg.http</string>
             </dict>
             <dict>
                 <key>captures</key>
