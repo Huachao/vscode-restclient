@@ -250,6 +250,30 @@
                     <key>1</key>
                     <dict>
                         <key>name</key>
+                        <string>keyword.operator.http</string>
+                    </dict>
+                    <key>2</key>
+                    <dict>
+                        <key>name</key>
+                        <string>variable.other.http</string>
+                    </dict>
+                    <key>3</key>
+                    <dict>
+                        <key>name</key>
+                        <string>string.other.http</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>^\s*(\?|&)([^=\s]+)=(.*)$</string>
+                <key>name</key>
+                <string>http.query</string>
+            </dict>
+            <dict>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
                         <string>keyword.control.http</string>
                     </dict>
                     <key>2</key>
@@ -279,7 +303,7 @@
                     <key>1</key>
                     <dict>
                         <key>name</key>
-                        <string>support.variable.http</string>
+                        <string>entity.name.tag.http</string>
                     </dict>
                     <key>2</key>
                     <dict>
