@@ -3,10 +3,11 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
 import { QuickPickItem, window, workspace } from 'vscode';
+import * as Constants from '../common/constants';
 import Logger from '../logger';
 import { SerializedHttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
-import { PersistUtility } from '../utils/persistUtility';
+import { JsonFileUtility } from '../utils/jsonFileUtility';
 
 dayjs.extend(relativeTime);
 
@@ -23,7 +24,7 @@ export class HistoryController {
     @trace('History')
     public async save() {
         try {
-            const requests = await PersistUtility.loadRequests();
+            const requests = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.historyFilePath, []);
             if (requests.length === 0) {
                 window.showInformationMessage("No request history items are found!");
                 return;
@@ -61,7 +62,7 @@ export class HistoryController {
             window.showInformationMessage(`Do you really want to clear request history?`, { title: 'Yes' }, { title: 'No' })
                 .then(async function (btn) {
                     if (btn?.title === 'Yes') {
-                        await PersistUtility.clearRequests();
+                        await JsonFileUtility.serializeToFileAsync(Constants.historyFilePath, []);
                         window.showInformationMessage('Request history has been cleared');
                     }
                 });

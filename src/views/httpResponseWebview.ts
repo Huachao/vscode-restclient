@@ -11,7 +11,6 @@ import { trace } from '../utils/decorator';
 import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
 import { base64, isJSONString } from '../utils/misc';
-import { PersistUtility } from '../utils/persistUtility';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 import { BaseWebview } from './baseWebview';
 
@@ -189,7 +188,7 @@ export class HttpResponseWebview extends BaseWebview {
         }
 
         const filePath = uri.fsPath;
-        await PersistUtility.ensureFileAsync(filePath);
+        await fs.ensureFile(filePath);
         await fs.writeFile(filePath, content);
         const btn = await window.showInformationMessage(`Saved to ${filePath}`, { title: OPEN }, { title: COPYPATH });
         if (btn?.title === OPEN) {

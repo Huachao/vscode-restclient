@@ -1,10 +1,13 @@
-import { EventEmitter, window } from 'vscode';
+import { EventEmitter, QuickPickItem, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
-import { EnvironmentPickItem } from '../models/environmentPickItem';
 import { trace } from "../utils/decorator";
 import { EnvironmentStatusEntry } from '../utils/environmentStatusBarEntry';
-import { PersistUtility } from '../utils/persistUtility';
+import { JsonFileUtility } from '../utils/jsonFileUtility';
+
+interface EnvironmentPickItem extends QuickPickItem {
+    name: string;
+}
 
 export class EnvironmentController {
     private static readonly noEnvironmentPickItem: EnvironmentPickItem = {
@@ -53,7 +56,7 @@ export class EnvironmentController {
         EnvironmentController._onDidChangeEnvironment.fire(item.label);
         this.environmentStatusEntry.update(item.label);
 
-        await PersistUtility.saveEnvironment(item);
+        await JsonFileUtility.serializeToFileAsync(Constants.environmentFilePath, item);
     }
 
     public static async create(): Promise<EnvironmentController> {
@@ -62,10 +65,10 @@ export class EnvironmentController {
     }
 
     public static async getCurrentEnvironment(): Promise<EnvironmentPickItem> {
-        let currentEnvironment = await PersistUtility.loadEnvironment();
+        let currentEnvironment = await JsonFileUtility.deserializeFromFileAsync<EnvironmentPickItem>(Constants.environmentFilePath);
         if (!currentEnvironment) {
             currentEnvironment = this.noEnvironmentPickItem;
-            await PersistUtility.saveEnvironment(currentEnvironment);
+            await JsonFileUtility.serializeToFileAsync(Constants.environmentFilePath, currentEnvironment);
         }
         return currentEnvironment;
     }
