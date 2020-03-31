@@ -1,11 +1,12 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
+import * as Constants from '../common/constants';
 import Logger from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
-import { PersistUtility } from '../utils/persistUtility';
+import { JsonFileUtility } from '../utils/jsonFileUtility';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
@@ -115,8 +116,7 @@ export class RequestController {
             }
 
             // persist to history json file
-            const serializedRequest = SerializedHttpRequest.convertFromHttpRequest(httpRequest);
-            await PersistUtility.saveRequest(serializedRequest);
+            await this.addToHistory(httpRequest);
         } catch (error) {
             // check cancel
             if (httpRequest.isCancelled) {
@@ -143,5 +143,13 @@ export class RequestController {
     public dispose() {
         this._requestStatusEntry.dispose();
         this._webview.dispose();
+    }
+
+    private async addToHistory(request: HttpRequest) {
+        // persist to history json file
+        const serializedRequest = SerializedHttpRequest.convertFromHttpRequest(request);
+        const requests = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.historyFilePath, []);
+        requests.unshift(serializedRequest);
+        await JsonFileUtility.serializeToFileAsync(Constants.historyFilePath, requests.slice(0, Constants.HistoryItemsMaxCount));
     }
 }

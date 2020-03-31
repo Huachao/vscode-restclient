@@ -2,10 +2,11 @@ import * as url from 'url';
 import { MarkdownString, SnippetString, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { ElementType, HttpElement } from '../models/httpElement';
+import { SerializedHttpRequest } from '../models/httpRequest';
 import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
 import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
-import { PersistUtility } from './persistUtility';
+import { JsonFileUtility } from './jsonFileUtility';
 
 export class HttpElementFactory {
     public static async getHttpElements(document: TextDocument, line: string): Promise<HttpElement[]> {
@@ -175,7 +176,7 @@ export class HttpElementFactory {
         }
 
         // add urls from history
-        const historyItems = await PersistUtility.loadRequests();
+        const historyItems = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.historyFilePath, []);
         const distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));
         distinctRequestUrls.forEach(requestUrl => {
             const protocol = url.parse(requestUrl).protocol;
