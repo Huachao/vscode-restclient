@@ -148,8 +148,8 @@ export class RequestController {
     private async addToHistory(request: HttpRequest) {
         // persist to history json file
         const serializedRequest = SerializedHttpRequest.convertFromHttpRequest(request);
-        const requests = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.historyFilePath, []);
+        const requests = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.HistoryFilePath, []);
         requests.unshift(serializedRequest);
-        await JsonFileUtility.serializeToFileAsync(Constants.historyFilePath, requests.slice(0, Constants.HistoryItemsMaxCount));
+        await JsonFileUtility.serializeToFileAsync(Constants.HistoryFilePath, requests.slice(0, Constants.HistoryItemsMaxCount));
     }
 }

@@ -56,7 +56,7 @@ export class EnvironmentController {
         EnvironmentController._onDidChangeEnvironment.fire(item.label);
         this.environmentStatusEntry.update(item.label);
 
-        await JsonFileUtility.serializeToFileAsync(Constants.environmentFilePath, item);
+        await JsonFileUtility.serializeToFileAsync(Constants.EnvironmentFilePath, item);
     }
 
     public static async create(): Promise<EnvironmentController> {
@@ -65,10 +65,10 @@ export class EnvironmentController {
     }
 
     public static async getCurrentEnvironment(): Promise<EnvironmentPickItem> {
-        let currentEnvironment = await JsonFileUtility.deserializeFromFileAsync<EnvironmentPickItem>(Constants.environmentFilePath);
+        let currentEnvironment = await JsonFileUtility.deserializeFromFileAsync<EnvironmentPickItem>(Constants.EnvironmentFilePath);
         if (!currentEnvironment) {
             currentEnvironment = this.noEnvironmentPickItem;
-            await JsonFileUtility.serializeToFileAsync(Constants.environmentFilePath, currentEnvironment);
+            await JsonFileUtility.serializeToFileAsync(Constants.EnvironmentFilePath, currentEnvironment);
         }
         return currentEnvironment;
     }

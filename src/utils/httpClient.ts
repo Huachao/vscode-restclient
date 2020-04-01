@@ -37,8 +37,8 @@ export class HttpClient {
     private readonly cookieStore: Store;
 
     public constructor() {
-        fs.ensureFileSync(Constants.cookieFilePath);
-        this.cookieStore = new cookieStore(Constants.cookieFilePath) as Store;
+        fs.ensureFileSync(Constants.CookieFilePath);
+        this.cookieStore = new cookieStore(Constants.CookieFilePath) as Store;
     }
 
     public async send(httpRequest: HttpRequest): Promise<HttpResponse> {

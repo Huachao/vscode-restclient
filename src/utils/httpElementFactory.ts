@@ -176,7 +176,7 @@ export class HttpElementFactory {
         }
 
         // add urls from history
-        const historyItems = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.historyFilePath, []);
+        const historyItems = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.HistoryFilePath, []);
         const distinctRequestUrls = Array.from(new Set(historyItems.map(item => item.url)));
         distinctRequestUrls.forEach(requestUrl => {
             const protocol = url.parse(requestUrl).protocol;

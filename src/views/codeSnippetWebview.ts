@@ -28,21 +28,22 @@ export class CodeSnippetWebview extends BaseWebview {
                 ViewColumn.Two,
                 {
                     enableFindWidget: true,
-                    retainContextWhenHidden: true,
-                    localResourceRoots: [ this.styleFolderPath ]
+                    retainContextWhenHidden: true
                 });
 
-                panel.onDidDispose(() => {
-                    this.setPrviewActiveContext(false);
-                    this.panels.pop();
-                    this._onDidCloseAllWebviewPanels.fire();
-                });
+            panel.onDidDispose(() => {
+                this.setPrviewActiveContext(false);
+                this.panels.pop();
+                this._onDidCloseAllWebviewPanels.fire();
+            });
 
-                panel.onDidChangeViewState(({ webviewPanel }) => {
-                    this.setPrviewActiveContext(webviewPanel.active);
-                });
+            panel.onDidChangeViewState(({ webviewPanel }) => {
+                this.setPrviewActiveContext(webviewPanel.active);
+            });
 
-                this.panels.push(panel);
+            panel.iconPath = this.iconFilePath;
+
+            this.panels.push(panel);
         } else {
             panel = this.panels[0];
             panel.title = title;

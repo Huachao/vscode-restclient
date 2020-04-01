@@ -1,6 +1,5 @@
 import * as path from 'path';
-import { commands, Event, EventEmitter, Uri, WebviewPanel } from 'vscode';
-import * as Constants from '../common/constants';
+import { commands, Event, EventEmitter, ExtensionContext, Uri, WebviewPanel } from 'vscode';
 import { RestClientSettings } from '../models/configurationSettings';
 
 export abstract class BaseWebview {
@@ -9,25 +8,18 @@ export abstract class BaseWebview {
 
     protected readonly settings: RestClientSettings = RestClientSettings.Instance;
 
-    protected readonly extensionPath: string;
-
-    protected readonly styleFolderPath: Uri;
-
     protected readonly styleFilePath: Uri;
-
-    protected readonly scriptFolderPath: Uri;
 
     protected readonly scriptFilePath: Uri;
 
-    protected panels: WebviewPanel[];
+    protected readonly iconFilePath: Uri;
 
-    protected constructor(protected readonly context) {
-        this.extensionPath = context.extensionPath;
-        this.panels = [];
-        this.styleFilePath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName, Constants.CSSFileName));
-        this.styleFolderPath = Uri.file(path.join(this.extensionPath, Constants.CSSFolderName));
-        this.scriptFilePath = Uri.file(path.join(this.extensionPath, Constants.ScriptsFolderName, Constants.ScriptFileName));
-        this.scriptFolderPath = Uri.file(path.join(this.extensionPath, Constants.ScriptsFolderName));
+    protected panels: WebviewPanel[] = [];
+
+    protected constructor(protected readonly context: ExtensionContext) {
+        this.styleFilePath = Uri.file(this.context.asAbsolutePath(path.join('styles', 'rest-client.css')));
+        this.scriptFilePath = Uri.file(this.context.asAbsolutePath(path.join('scripts', 'main.js')));
+        this.iconFilePath = Uri.file(this.context.asAbsolutePath(path.join('images', 'rest_icon.png')));
     }
 
     public get onDidCloseAllWebviewPanels(): Event<void> {

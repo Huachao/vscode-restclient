@@ -27,8 +27,6 @@ export class HttpResponseWebview extends BaseWebview {
 
     private readonly panelResponses: Map<WebviewPanel, HttpResponse>;
 
-    private readonly iconFilePath: Uri;
-
     private readonly clipboard: Clipboard = env.clipboard;
 
     private readonly responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
@@ -54,7 +52,6 @@ export class HttpResponseWebview extends BaseWebview {
 
         // Init response webview map
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();
-        this.iconFilePath = Uri.file(path.join(this.extensionPath, Constants.ImagesFolderName, Constants.IconFileName));
 
         this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', () => this.foldResponseBody()));
         this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', () => this.unfoldResponseBody()));
@@ -77,8 +74,7 @@ export class HttpResponseWebview extends BaseWebview {
                 {
                     enableFindWidget: true,
                     enableScripts: true,
-                    retainContextWhenHidden: true,
-                    localResourceRoots: [this.styleFolderPath, this.scriptFolderPath]
+                    retainContextWhenHidden: true
                 });
 
             panel.onDidDispose(() => {

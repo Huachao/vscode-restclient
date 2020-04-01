@@ -24,7 +24,7 @@ export class HistoryController {
     @trace('History')
     public async save() {
         try {
-            const requests = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.historyFilePath, []);
+            const requests = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.HistoryFilePath, []);
             if (requests.length === 0) {
                 window.showInformationMessage("No request history items are found!");
                 return;
@@ -62,7 +62,7 @@ export class HistoryController {
             window.showInformationMessage(`Do you really want to clear request history?`, { title: 'Yes' }, { title: 'No' })
                 .then(async function (btn) {
                     if (btn?.title === 'Yes') {
-                        await JsonFileUtility.serializeToFileAsync(Constants.historyFilePath, []);
+                        await JsonFileUtility.serializeToFileAsync(Constants.HistoryFilePath, []);
                         window.showInformationMessage('Request history has been cleared');
                     }
                 });
