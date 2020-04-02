@@ -5,7 +5,6 @@ import { Readable, Stream } from 'stream';
 import { Cookie, CookieJar, Store } from 'tough-cookie';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
-import * as Constants from '../common/constants';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
@@ -14,6 +13,7 @@ import { HttpResponseTimingPhases } from '../models/httpResponseTimingPhases';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
 import { getHeader, hasHeader, removeHeader } from './misc';
+import { UserDataManager } from './userDataManager';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
 import got = require('got');
@@ -37,8 +37,8 @@ export class HttpClient {
     private readonly cookieStore: Store;
 
     public constructor() {
-        fs.ensureFileSync(Constants.CookieFilePath);
-        this.cookieStore = new cookieStore(Constants.CookieFilePath) as Store;
+        const cookieFilePath = UserDataManager.cookieFilePath;
+        this.cookieStore = new cookieStore(cookieFilePath) as Store;
     }
 
     public async send(httpRequest: HttpRequest): Promise<HttpResponse> {

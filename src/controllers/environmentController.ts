@@ -3,7 +3,7 @@ import * as Constants from '../common/constants';
 import { RestClientSettings } from '../models/configurationSettings';
 import { trace } from "../utils/decorator";
 import { EnvironmentStatusEntry } from '../utils/environmentStatusBarEntry';
-import { JsonFileUtility } from '../utils/jsonFileUtility';
+import { UserDataManager } from '../utils/userDataManager';
 
 interface EnvironmentPickItem extends QuickPickItem {
     name: string;
@@ -56,7 +56,7 @@ export class EnvironmentController {
         EnvironmentController._onDidChangeEnvironment.fire(item.label);
         this.environmentStatusEntry.update(item.label);
 
-        await JsonFileUtility.serializeToFileAsync(Constants.EnvironmentFilePath, item);
+        await UserDataManager.setEnvironment(item);
     }
 
     public static async create(): Promise<EnvironmentController> {
@@ -65,12 +65,8 @@ export class EnvironmentController {
     }
 
     public static async getCurrentEnvironment(): Promise<EnvironmentPickItem> {
-        let currentEnvironment = await JsonFileUtility.deserializeFromFileAsync<EnvironmentPickItem>(Constants.EnvironmentFilePath);
-        if (!currentEnvironment) {
-            currentEnvironment = this.noEnvironmentPickItem;
-            await JsonFileUtility.serializeToFileAsync(Constants.EnvironmentFilePath, currentEnvironment);
-        }
-        return currentEnvironment;
+        const currentEnvironment = await UserDataManager.getEnvironment() as EnvironmentPickItem | undefined;
+        return currentEnvironment || this.noEnvironmentPickItem;
     }
 
     public dispose() {

@@ -1,18 +1,6 @@
-import * as os from 'os';
-import * as path from 'path';
 
 export const ExtensionId: string = 'humao.rest-client';
 export const AiKey: string = 'ad746e27-4a36-441c-8b94-5db178f81ae3';
-export const ExtensionFolderName: string = '.rest-client';
-export const HistoryFileName: string = 'history.json';
-export const CookieFileName: string = 'cookie.json';
-export const EnvironmentFileName: string = 'environment.json';
-export const DefaultResponseDownloadFolderName: string = 'responses/raw';
-export const DefaultResponseBodyDownloadFolderName: string = 'responses/body';
-export const HistoryItemsMaxCount: number = 50;
-export const HistoryFilePath: string = path.join(os.homedir(), ExtensionFolderName, HistoryFileName);
-export const CookieFilePath: string = path.join(os.homedir(), ExtensionFolderName, CookieFileName);
-export const EnvironmentFilePath: string = path.join(os.homedir(), ExtensionFolderName, EnvironmentFileName);
 
 export const NoEnvironmentSelectedName: string = 'c0cfe680-4fcd-4b71-a4ba-8cfaee57680a';
 
