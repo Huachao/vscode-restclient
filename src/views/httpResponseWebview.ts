@@ -159,7 +159,7 @@ export class HttpResponseWebview extends BaseWebview {
 
     private getTitle(response: HttpResponse): string {
         const prefix = (this.settings.requestNameAsResponseTabTitle && response.request.name) || 'Response';
-        return `${prefix}(${response.timingPhases.total}ms)`;
+        return `${prefix}(${response.timingPhases.total ?? 0}ms)`;
     }
 
     private getFullResponseString(response: HttpResponse): string {
