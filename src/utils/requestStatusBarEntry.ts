@@ -63,15 +63,15 @@ export class RequestStatusEntry {
 
             case RequestState.Received:
                 const response = status.response;
-                this.durationEntry.text = `$(clock) ${response.timingPhases.total}ms`;
+                this.durationEntry.text = `$(clock) ${response.timingPhases.total ?? 0}ms`;
                 this.durationEntry.tooltip = [
                     'Breakdown of Duration:',
-                    `Socket: ${response.timingPhases.wait.toFixed(1)}ms`,
-                    `DNS: ${response.timingPhases.dns.toFixed(1)}ms`,
-                    `TCP: ${response.timingPhases.tcp.toFixed(1)}ms`,
-                    `Request: ${response.timingPhases.request.toFixed(1)}ms`,
-                    `FirstByte: ${response.timingPhases.firstByte.toFixed(1)}ms`,
-                    `Download: ${response.timingPhases.download.toFixed(1)}ms`
+                    `Socket: ${response.timingPhases.wait?.toFixed(1) ?? 0}ms`,
+                    `DNS: ${response.timingPhases.dns?.toFixed(1) ?? 0}ms`,
+                    `TCP: ${response.timingPhases.tcp?.toFixed(1) ?? 0}ms`,
+                    `Request: ${response.timingPhases.request?.toFixed(1) ?? 0}ms`,
+                    `FirstByte: ${response.timingPhases.firstByte?.toFixed(1) ?? 0}ms`,
+                    `Download: ${response.timingPhases.download?.toFixed(1) ?? 0}ms`
                 ].join(EOL);
                 this.durationEntry.command = undefined;
                 this.durationEntry.show();

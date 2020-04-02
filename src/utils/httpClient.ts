@@ -9,7 +9,6 @@ import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
-import { HttpResponseTimingPhases } from '../models/httpResponseTimingPhases';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
 import { getHeader, hasHeader, removeHeader } from './misc';
@@ -91,15 +90,7 @@ export class HttpClient {
             bodySize,
             headersSize,
             bodyBuffer,
-            new HttpResponseTimingPhases(
-                response.timings.phases.total || 0,
-                response.timings.phases.wait || 0,
-                response.timings.phases.dns || 0,
-                response.timings.phases.tcp || 0,
-                response.timings.phases.request || 0,
-                response.timings.phases.firstByte || 0,
-                response.timings.phases.download || 0
-            ),
+            response.timings.phases,
             new HttpRequest(
                 options.method!,
                 requestUrl,
