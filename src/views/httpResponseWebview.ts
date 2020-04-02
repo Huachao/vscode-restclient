@@ -1,8 +1,6 @@
 import * as fs from 'fs-extra';
 import * as os from 'os';
-import * as path from 'path';
 import { Clipboard, commands, env, ExtensionContext, Uri, ViewColumn, WebviewPanel, window, workspace } from 'vscode';
-import * as Constants from '../common/constants';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
@@ -12,6 +10,7 @@ import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
 import { base64, isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
+import { UserDataManager } from '../utils/userDataManager';
 import { BaseWebview } from './baseWebview';
 
 const hljs = require('highlight.js');
@@ -28,10 +27,6 @@ export class HttpResponseWebview extends BaseWebview {
     private readonly panelResponses: Map<WebviewPanel, HttpResponse>;
 
     private readonly clipboard: Clipboard = env.clipboard;
-
-    private readonly responseSaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseDownloadFolderName);
-
-    private readonly responseBodySaveFolderPath: string = path.join(os.homedir(), Constants.ExtensionFolderName, Constants.DefaultResponseBodyDownloadFolderName);
 
     protected get viewType(): string {
         return 'rest-response';
@@ -59,9 +54,6 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-body', () => this.copyBody()));
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response', () => this.save()));
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', () => this.saveBody()));
-
-        fs.ensureDir(this.responseSaveFolderPath);
-        fs.ensureDir(this.responseBodySaveFolderPath);
     }
 
     public async render(response: HttpResponse, column: ViewColumn) {
@@ -142,7 +134,7 @@ export class HttpResponseWebview extends BaseWebview {
     private async save() {
         if (this.activeResponse) {
             const fullResponse = this.getFullResponseString(this.activeResponse);
-            const defaultFilePath = path.join(this.responseSaveFolderPath, `Response-${Date.now()}.http`);
+            const defaultFilePath = UserDataManager.getResponseSaveFilePath(`Response-${Date.now()}.http`);
             try {
                 await this.openSaveDialog(defaultFilePath, fullResponse);
             } catch {
@@ -156,7 +148,7 @@ export class HttpResponseWebview extends BaseWebview {
         if (this.activeResponse) {
             const extension = MimeUtility.getExtension(this.activeResponse.contentType, this.settings.mimeAndFileExtensionMapping);
             const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
-            const defaultFilePath = path.join(this.responseBodySaveFolderPath, fileName);
+            const defaultFilePath = UserDataManager.getResponseBodySaveFilePath(fileName);
             try {
                 await this.openSaveDialog(defaultFilePath, this.activeResponse.bodyBuffer);
             } catch {

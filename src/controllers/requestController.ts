@@ -1,15 +1,14 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
-import * as Constants from '../common/constants';
 import Logger from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
-import { JsonFileUtility } from '../utils/jsonFileUtility';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
+import { UserDataManager } from '../utils/userDataManager';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
@@ -116,7 +115,7 @@ export class RequestController {
             }
 
             // persist to history json file
-            await this.addToHistory(httpRequest);
+            await UserDataManager.addToRequestHistory(SerializedHttpRequest.convertFromHttpRequest(httpRequest));
         } catch (error) {
             // check cancel
             if (httpRequest.isCancelled) {
@@ -143,13 +142,5 @@ export class RequestController {
     public dispose() {
         this._requestStatusEntry.dispose();
         this._webview.dispose();
-    }
-
-    private async addToHistory(request: HttpRequest) {
-        // persist to history json file
-        const serializedRequest = SerializedHttpRequest.convertFromHttpRequest(request);
-        const requests = await JsonFileUtility.deserializeFromFileAsync<SerializedHttpRequest[]>(Constants.HistoryFilePath, []);
-        requests.unshift(serializedRequest);
-        await JsonFileUtility.serializeToFileAsync(Constants.HistoryFilePath, requests.slice(0, Constants.HistoryItemsMaxCount));
     }
 }
