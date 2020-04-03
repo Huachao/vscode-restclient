@@ -1,6 +1,5 @@
 import { EOL } from 'os';
 import { Range, TextEditor } from 'vscode';
-import { ArrayUtility } from '../common/arrayUtility';
 import * as Constants from '../common/constants';
 import { VariableProcessor } from './variableProcessor';
 
@@ -43,18 +42,17 @@ export class Selector {
         // parse #@note comment
         const warnBeforeSend = this.hasNoteComment(selectedText);
 
-        // remove comment lines
-        let lines: string[] = selectedText.split(Constants.LineSplitterRegex).filter(l => !Selector.isCommentLine(l));
-
-        // remove file variables definition lines and leading empty lines
-        lines = ArrayUtility.skipWhile(lines, l => this.isFileVariableDefinitionLine(l) || this.isEmptyLine(l));
-
-        if (lines.length === 0) {
+        // parse actual request lines
+        const rawLines = selectedText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
+        const requestRange = this.getRequestRanges(rawLines)[0];
+        if (!requestRange) {
             return null;
         }
 
+        selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1).join(EOL);
+
         // variables replacement
-        selectedText = await VariableProcessor.processRawRequest(lines.join(EOL));
+        selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         return {
             text: selectedText,

@@ -1,27 +1,11 @@
 export class ArrayUtility {
-    public static skipWhile<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean): T[] {
-        let index = 0;
-        for (; index < items.length; index++) {
-            if (!callbackfn(items[index], index, items)) {
-                break;
+    public static firstIndexOf<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean, start: number = 0): number {
+        for (; start < items.length; start++) {
+            if (callbackfn(items[start], start, items)) {
+                return start;
             }
         }
 
-        return items.slice(index);
-    }
-
-    public static firstIndexOf<T>(items: T[], callbackfn: (value: T, index: number, array: T[]) => boolean, start?: number): number {
-        if (!start) {
-            start = 0;
-        }
-
-        let index = start;
-        for (; index < items.length; index++) {
-            if (callbackfn(items[index], index, items)) {
-                break;
-            }
-        }
-
-        return index >= items.length ? -1 : index;
+        return -1;
     }
 }
