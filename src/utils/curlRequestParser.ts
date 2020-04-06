@@ -14,7 +14,7 @@ const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
 export class CurlRequestParser implements RequestParser {
 
-    public constructor(public requestRawText: string) {
+    public constructor(private requestRawText: string) {
     }
 
     public parseHttpRequest(requestAbsoluteFilePath: string, name?: string): HttpRequest {
