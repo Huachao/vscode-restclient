@@ -166,12 +166,8 @@ export class Selector {
     }
 
     private static getDelimiterRows(lines: string[]): number[] {
-        const rows: number[] = [];
-        for (let index = 0; index < lines.length; index++) {
-            if (lines[index].match(/^#{3,}/)) {
-                rows.push(index);
-            }
-        }
-        return rows;
+        return Object.entries(lines)
+            .filter(([, value]) => /^#{3,}/.test(value))
+            .map(([index, ]) => +index);
     }
 }

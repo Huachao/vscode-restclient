@@ -3,8 +3,6 @@ import { EOL } from 'os';
 import * as path from 'path';
 import { Stream } from 'stream';
 import { Uri } from 'vscode';
-import { ArrayUtility } from '../common/arrayUtility';
-import { RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
@@ -17,81 +15,86 @@ import { getWorkspaceRootPath } from './workspaceUtility';
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');
 
+enum ParseState {
+    URL,
+    Header,
+    Body,
+}
+
 export class HttpRequestParser implements RequestParser {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
-    private static readonly uploadFromFileSyntax = /^<\s+(.+)\s*$/;
+    private static readonly queryStringLinePrefix = /^\s*[&\?]/;
+    private static readonly uploadFromFileSyntax = /^<\s+(.+?)\s*$/;
 
-    public constructor(public requestRawText: string) {
+    public constructor(private requestRawText: string) {
     }
 
     public parseHttpRequest(requestAbsoluteFilePath: string, name?: string): HttpRequest {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
         // split the request raw text into lines
         const lines: string[] = this.requestRawText.split(EOL);
+        const requestLines: string[] = [];
+        const headersLines: string[] = [];
+        const bodyLines: string[] = [];
+        const variableLines: string[] = [];
 
-        // parse request line
-        const requestLine = HttpRequestParser.parseRequestLine(lines[0]);
+        let isGraphQlRequest = false;
 
-        // get headers range
-        let headers: RequestHeaders = {};
-        let body: string | Stream | undefined;
-        let variables: string | Stream | undefined;
-        let bodyLines: string[] = [];
-        let variableLines: string[] = [];
-        let isGraphQlRequest: boolean = false;
-        const headerStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', 1);
-        if (headerStartLine !== -1) {
-            if (headerStartLine === 1) {
-                // parse request headers
-                let firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
-                const headerEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
-                const headerLines = lines.slice(headerStartLine, headerEndLine);
-                let index = 0;
-                let queryString = '';
-                for (; index < headerLines.length; ) {
-                    const headerLine = (headerLines[index]).trim();
-                    if (['?', '&'].includes(headerLine[0])) {
-                        queryString += headerLine;
-                        index++;
-                        continue;
+        let state = ParseState.URL;
+        let currentLine: string | undefined;
+        while ((currentLine = lines.shift()) !== undefined) {
+            const nextLine = lines[0];
+            switch (state) {
+                case ParseState.URL:
+                    requestLines.push(currentLine.trim());
+                    if (nextLine === undefined
+                        || HttpRequestParser.queryStringLinePrefix.test(nextLine)) {
+                        // request with request line only
+                    } else if (nextLine.trim()) {
+                        state = ParseState.Header;
+                    } else {
+                        // request with no headers but has body
+                        // remove the blank line before the body
+                        lines.shift();
+                        state = ParseState.Body;
                     }
                     break;
-                }
-
-                if (queryString !== '') {
-                    requestLine.url += queryString;
-                }
-                headers = RequestParserUtil.parseRequestHeaders(headerLines.slice(index));
-
-                // let underlying node.js module recalculate the content length
-                removeHeader(headers, 'content-length');
-
-                // get body range
-                const bodyStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', headerEndLine);
-                if (bodyStartLine !== -1) {
-                    const requestTypeHeader = getHeader(headers, 'x-request-type');
-                    const contentTypeHeader = getContentType(headers) || getContentType(this._restClientSettings.defaultHeaders);
-                    firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', bodyStartLine);
-                    const bodyEndLine = MimeUtility.isMultiPart(contentTypeHeader) || firstEmptyLine === -1 ? lines.length : firstEmptyLine;
-                    bodyLines = lines.slice(bodyStartLine, bodyEndLine);
-                    if (requestTypeHeader === 'GraphQL') {
-                        const variableStartLine = ArrayUtility.firstIndexOf(lines, value => value.trim() !== '', bodyEndLine);
-                        if (variableStartLine !== -1) {
-                            firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', variableStartLine);
-                            variableLines = lines.slice(variableStartLine, firstEmptyLine === -1 ? lines.length : firstEmptyLine);
-                        }
-                        // a request don't necessarily need variables
-                        // to be considered a GraphQL request
-                        isGraphQlRequest = true;
-                        removeHeader(headers, 'x-request-type');
+                case ParseState.Header:
+                    headersLines.push(currentLine.trim());
+                    if (nextLine?.trim() === '') {
+                        // request with no headers but has body
+                        // remove the blank line before the body
+                        lines.shift();
+                        state = ParseState.Body;
                     }
-                }
-            } else {
-                // parse body, since no headers provided
-                const firstEmptyLine = ArrayUtility.firstIndexOf(lines, value => value.trim() === '', headerStartLine);
-                const bodyEndLine = firstEmptyLine === -1 ? lines.length : firstEmptyLine;
-                bodyLines = lines.slice(headerStartLine, bodyEndLine);
+                    break;
+                case ParseState.Body:
+                    bodyLines.push(currentLine);
+                    break;
+            }
+        }
+
+        // parse request line
+        const requestLine = HttpRequestParser.parseRequestLine(requestLines.join(EOL));
+
+        // parse headers lines
+        const headers = RequestParserUtil.parseRequestHeaders(headersLines);
+
+        // let underlying node.js library recalculate the content length
+        removeHeader(headers, 'content-length');
+
+        const requestType = getHeader(headers, 'X-Request-Type');
+        if (requestType === 'GraphQL') {
+            // a request doesn't necessarily need variables
+            // to be considered a GraphQL request
+            isGraphQlRequest = true;
+            removeHeader(headers, 'X-Request-Type');
+
+            const firstEmptyLine = bodyLines.findIndex(value => value.trim() === '');
+            if (firstEmptyLine !== -1) {
+                variableLines.push(...bodyLines.splice(firstEmptyLine + 1));
+                bodyLines.pop();    // remove the empty line between body and variables
             }
         }
 
@@ -105,16 +108,16 @@ export class HttpRequestParser implements RequestParser {
 
         // parse body
         const contentTypeHeader = getContentType(headers) || getContentType(this._restClientSettings.defaultHeaders);
-        body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
+        let body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
         if (isGraphQlRequest) {
-            variables = HttpRequestParser.parseRequestBody(variableLines, requestAbsoluteFilePath, contentTypeHeader);
+            const variables = HttpRequestParser.parseRequestBody(variableLines, requestAbsoluteFilePath, contentTypeHeader);
 
             const graphQlPayload = {
                 query: body,
                 variables: variables ? JSON.parse(variables.toString()) : {}
             };
             body = JSON.stringify(graphQlPayload);
-        } else if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && body && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
+        } else if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             if (this._restClientSettings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
                 const stringPairs = body.split('&');
                 const encodedStringPairs: string[] = [];
