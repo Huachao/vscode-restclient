@@ -1,8 +1,6 @@
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
-import * as path from 'path';
 import { Stream } from 'stream';
-import { Uri } from 'vscode';
 import { RestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
@@ -10,7 +8,6 @@ import { RequestParser } from '../models/requestParser';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
-import { getWorkspaceRootPath } from './workspaceUtility';
 
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');
@@ -25,12 +22,12 @@ export class HttpRequestParser implements RequestParser {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private static readonly defaultMethod = 'GET';
     private static readonly queryStringLinePrefix = /^\s*[&\?]/;
-    private static readonly uploadFromFileSyntax = /^<\s+(.+?)\s*$/;
+    private static readonly inputFileSyntax = /^<\s+(.+?)\s*$/;
 
     public constructor(private requestRawText: string) {
     }
 
-    public parseHttpRequest(requestAbsoluteFilePath: string, name?: string): HttpRequest {
+    public async parseHttpRequest(name?: string): Promise<HttpRequest> {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
         // split the request raw text into lines
         const lines: string[] = this.requestRawText.split(EOL);
@@ -108,9 +105,9 @@ export class HttpRequestParser implements RequestParser {
 
         // parse body
         const contentTypeHeader = getContentType(headers) || getContentType(this._restClientSettings.defaultHeaders);
-        let body = HttpRequestParser.parseRequestBody(bodyLines, requestAbsoluteFilePath, contentTypeHeader);
+        let body = await HttpRequestParser.parseRequestBody(bodyLines, contentTypeHeader);
         if (isGraphQlRequest) {
-            const variables = HttpRequestParser.parseRequestBody(variableLines, requestAbsoluteFilePath, contentTypeHeader);
+            const variables = HttpRequestParser.parseRequestBody(variableLines, contentTypeHeader);
 
             const graphQlPayload = {
                 query: body,
@@ -160,13 +157,13 @@ export class HttpRequestParser implements RequestParser {
         };
     }
 
-    private static parseRequestBody(lines: string[], requestFileAbsolutePath: string, contentTypeHeader: string | undefined): string | Stream | undefined {
+    private static async parseRequestBody(lines: string[], contentTypeHeader: string | undefined): Promise<string | Stream | undefined> {
         if (lines.length === 0) {
             return undefined;
         }
 
         // Check if needed to upload file
-        if (lines.every(line => !this.uploadFromFileSyntax.test(line))) {
+        if (lines.every(line => !this.inputFileSyntax.test(line))) {
             if (MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
                 return lines.reduce((p, c, i) => {
                     p += `${(i === 0 || c.startsWith('&') ? '' : EOL)}${c}`;
@@ -183,12 +180,12 @@ export class HttpRequestParser implements RequestParser {
         } else {
             const combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
             for (const [index, line] of lines.entries()) {
-                if (this.uploadFromFileSyntax.test(line)) {
-                    const groups = this.uploadFromFileSyntax.exec(line);
+                if (this.inputFileSyntax.test(line)) {
+                    const groups = this.inputFileSyntax.exec(line);
                     if (groups?.length === 2) {
-                        const fileUploadPath = groups[1];
-                        const fileAbsolutePath = this.resolveFilePath(fileUploadPath, requestFileAbsolutePath);
-                        if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
+                        const inputFilePath = groups[1];
+                        const fileAbsolutePath = await RequestParserUtil.resolveRequestBodyPath(inputFilePath);
+                        if (fileAbsolutePath) {
                             combinedStream.append(fs.createReadStream(fileAbsolutePath));
                         } else {
                             combinedStream.append(line);
@@ -209,27 +206,5 @@ export class HttpRequestParser implements RequestParser {
 
     private static getLineEnding(contentTypeHeader: string | undefined) {
         return MimeUtility.isMultiPartFormData(contentTypeHeader) ? '\r\n' : EOL;
-    }
-
-    private static resolveFilePath(refPath: string, httpFilePath: string): string | null {
-        if (path.isAbsolute(refPath)) {
-            return fs.existsSync(refPath) ? refPath : null;
-        }
-
-        let absolutePath;
-        const rootPath = getWorkspaceRootPath();
-        if (rootPath) {
-            absolutePath = path.join(Uri.parse(rootPath).fsPath, refPath);
-            if (fs.existsSync(absolutePath)) {
-                return absolutePath;
-            }
-        }
-
-        absolutePath = path.join(path.dirname(httpFilePath), refPath);
-        if (fs.existsSync(absolutePath)) {
-            return absolutePath;
-        }
-
-        return null;
     }
 }
