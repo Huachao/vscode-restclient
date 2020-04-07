@@ -36,8 +36,6 @@ export class HttpRequestParser implements RequestParser {
         const bodyLines: string[] = [];
         const variableLines: string[] = [];
 
-        let isGraphQlRequest = false;
-
         let state = ParseState.URL;
         let currentLine: string | undefined;
         while ((currentLine = lines.shift()) !== undefined) {
@@ -81,11 +79,10 @@ export class HttpRequestParser implements RequestParser {
         // let underlying node.js library recalculate the content length
         removeHeader(headers, 'content-length');
 
-        const requestType = getHeader(headers, 'X-Request-Type');
-        if (requestType === 'GraphQL') {
-            // a request doesn't necessarily need variables
-            // to be considered a GraphQL request
-            isGraphQlRequest = true;
+        // check request type
+        const isGraphQlRequest = getHeader(headers, 'X-Request-Type') === 'GraphQL';
+        if (isGraphQlRequest) {
+            // a request doesn't necessarily need variables to be considered a GraphQL request
             removeHeader(headers, 'X-Request-Type');
 
             const firstEmptyLine = bodyLines.findIndex(value => value.trim() === '');
@@ -95,19 +92,11 @@ export class HttpRequestParser implements RequestParser {
             }
         }
 
-        // if Host header provided and url is relative path, change to absolute url
-        const host = getHeader(headers, 'Host') || getHeader(this._restClientSettings.defaultHeaders, 'host');
-        if (host && requestLine.url[0] === '/') {
-            const [, port] = host.toString().split(':');
-            const scheme = port === '443' || port === '8443' ? 'https' : 'http';
-            requestLine.url = `${scheme}://${host}${requestLine.url}`;
-        }
-
-        // parse body
+        // parse body lines
         const contentTypeHeader = getContentType(headers) || getContentType(this._restClientSettings.defaultHeaders);
         let body = await HttpRequestParser.parseRequestBody(bodyLines, contentTypeHeader);
         if (isGraphQlRequest) {
-            const variables = HttpRequestParser.parseRequestBody(variableLines, contentTypeHeader);
+            const variables = await HttpRequestParser.parseRequestBody(variableLines, contentTypeHeader);
 
             const graphQlPayload = {
                 query: body,
@@ -127,6 +116,14 @@ export class HttpRequestParser implements RequestParser {
             } else {
                 body = encodeurl(body);
             }
+        }
+
+        // if Host header provided and url is relative path, change to absolute url
+        const host = getHeader(headers, 'Host') || getHeader(this._restClientSettings.defaultHeaders, 'host');
+        if (host && requestLine.url[0] === '/') {
+            const [, port] = host.toString().split(':');
+            const scheme = port === '443' || port === '8443' ? 'https' : 'http';
+            requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
         return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), name);
@@ -151,10 +148,7 @@ export class HttpRequestParser implements RequestParser {
             }
         }
 
-        return {
-            method: method,
-            url: url
-        };
+        return { method, url };
     }
 
     private static async parseRequestBody(lines: string[], contentTypeHeader: string | undefined): Promise<string | Stream | undefined> {
