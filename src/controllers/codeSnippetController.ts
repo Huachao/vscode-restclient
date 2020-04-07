@@ -54,7 +54,7 @@ export class CodeSnippetController {
         const { text } = selectedRequest;
 
         // parse http request
-        const httpRequest = RequestParserFactory.createRequestParser(text).parseHttpRequest(document.fileName);
+        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest();
 
         const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         const snippet = new HTTPSnippet(harHttpRequest);
@@ -130,7 +130,7 @@ export class CodeSnippetController {
         const { text } = selectedRequest;
 
         // parse http request
-        const httpRequest = RequestParserFactory.createRequestParser(text).parseHttpRequest(document.fileName);
+        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest();
 
         const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         const addPrefix = !(url.parse(harHttpRequest.url).protocol);

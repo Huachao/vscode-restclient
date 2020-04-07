@@ -1,4 +1,8 @@
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import { Uri } from 'vscode';
 import { RequestHeaders } from "../models/base";
+import { getCurrentTextDocument, getWorkspaceRootPath } from './workspaceUtility';
 
 export class RequestParserUtil {
     public static parseRequestHeaders(headerLines: string[]): RequestHeaders {
@@ -28,5 +32,29 @@ export class RequestParserUtil {
         });
 
         return headers;
+    }
+
+    public static async resolveRequestBodyPath(refPath: string): Promise<string | undefined> {
+        if (path.isAbsolute(refPath)) {
+            return (await fs.pathExists(refPath)) ? refPath : undefined;
+        }
+
+        const workspaceRoot = getWorkspaceRootPath();
+        if (workspaceRoot) {
+            const absolutePath = path.join(Uri.parse(workspaceRoot).fsPath, refPath);
+            if (await fs.pathExists(absolutePath)) {
+                return absolutePath;
+            }
+        }
+
+        const currentFile = getCurrentTextDocument()?.fileName;
+        if (currentFile) {
+            const absolutePath = path.join(path.dirname(currentFile), refPath);
+            if (await fs.pathExists(absolutePath)) {
+                return absolutePath;
+            }
+        }
+
+        return undefined;
     }
 }

@@ -56,7 +56,7 @@ export class RequestController {
         }
 
         // parse http request
-        const httpRequest = RequestParserFactory.createRequestParser(text).parseHttpRequest(document.fileName, name);
+        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(name);
 
         await this.runCore(httpRequest, document);
     }

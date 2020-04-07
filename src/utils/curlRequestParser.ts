@@ -1,12 +1,9 @@
 import * as fs from 'fs-extra';
-import * as path from 'path';
-import { Uri } from 'vscode';
 import { RequestHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
 import { base64, hasHeader } from './misc';
 import { RequestParserUtil } from './requestParserUtil';
-import { getWorkspaceRootPath } from './workspaceUtility';
 
 const yargsParser = require('yargs-parser');
 
@@ -17,7 +14,7 @@ export class CurlRequestParser implements RequestParser {
     public constructor(private requestRawText: string) {
     }
 
-    public parseHttpRequest(requestAbsoluteFilePath: string, name?: string): HttpRequest {
+    public async parseHttpRequest(name?: string): Promise<HttpRequest> {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(this.requestRawText.trim()));
         requestText = requestText
@@ -60,8 +57,8 @@ export class CurlRequestParser implements RequestParser {
         }
 
         if (typeof body === 'string' && body[0] === '@') {
-            const fileAbsolutePath = CurlRequestParser.resolveFilePath(body.substring(1), requestAbsoluteFilePath);
-            if (fileAbsolutePath && fs.existsSync(fileAbsolutePath)) {
+            const fileAbsolutePath = await RequestParserUtil.resolveRequestBodyPath(body.substring(1));
+            if (fileAbsolutePath) {
                 body = fs.createReadStream(fileAbsolutePath);
             } else {
                 body = body.substring(1);
@@ -80,28 +77,6 @@ export class CurlRequestParser implements RequestParser {
         }
 
         return new HttpRequest(method, url, headers, body, body, name);
-    }
-
-    private static resolveFilePath(refPath: string, httpFilePath: string): string | undefined {
-        if (path.isAbsolute(refPath)) {
-            return fs.existsSync(refPath) ? refPath : undefined;
-        }
-
-        const rootPath = getWorkspaceRootPath();
-        let absolutePath: string;
-        if (rootPath) {
-            absolutePath = path.join(Uri.parse(rootPath).fsPath, refPath);
-            if (fs.existsSync(absolutePath)) {
-                return absolutePath;
-            }
-        }
-
-        absolutePath = path.join(path.dirname(httpFilePath), refPath);
-        if (fs.existsSync(absolutePath)) {
-            return absolutePath;
-        }
-
-        return undefined;
     }
 
     private static mergeIntoSingleLine(text: string): string {
