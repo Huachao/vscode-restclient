@@ -176,8 +176,7 @@ export class HttpResponseWebview extends BaseWebview {
         }
 
         const filePath = uri.fsPath;
-        await fs.ensureFile(filePath);
-        await fs.writeFile(filePath, content);
+        await fs.writeFile(filePath, content, { flag: 'w' });
         const btn = await window.showInformationMessage(`Saved to ${filePath}`, { title: OPEN }, { title: COPYPATH });
         if (btn?.title === OPEN) {
             workspace.openTextDocument(filePath).then(window.showTextDocument);
