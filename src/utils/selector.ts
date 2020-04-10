@@ -26,7 +26,7 @@ export class Selector {
 
         let selectedText: string | null;
         if (editor.selection.isEmpty || range) {
-            const activeLine = !range ? editor.selection.active.line : range.start.line;
+            const activeLine = range?.start.line ?? editor.selection.active.line;
             selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
         } else {
             selectedText = editor.document.getText(editor.selection);

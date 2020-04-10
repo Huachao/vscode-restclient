@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import * as fs from 'fs-extra';
-import { EOL } from 'os';
+import { EOL, tmpdir } from 'os';
+import * as path from 'path';
 import { QuickPickItem, window, workspace } from 'vscode';
 import Logger from '../logger';
 import { SerializedHttpRequest } from '../models/httpRequest';
@@ -10,7 +11,7 @@ import { UserDataManager } from '../utils/userDataManager';
 
 dayjs.extend(relativeTime);
 
-const tmp = require('tmp');
+const uuidv4 = require('uuid/v4');
 
 interface HistoryQuickPickItem extends QuickPickItem {
     rawRequest: SerializedHttpRequest;
@@ -71,31 +72,27 @@ export class HistoryController {
     }
 
     private async createRequestInTempFile(request: SerializedHttpRequest): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            tmp.file({ prefix: 'vscode-restclient-', postfix: ".http" }, function _tempFileCreated(err, tmpFilePath, fd) {
-                if (err) {
-                    reject(err);
-                    return;
+        const file = await this.createTempFile();
+        let output = `${request.method.toUpperCase()} ${request.url}${EOL}`;
+        if (request.headers) {
+            for (const header in request.headers) {
+                if (request.headers.hasOwnProperty(header)) {
+                    const value = request.headers[header];
+                    output += `${header}: ${value}${EOL}`;
                 }
-                let output = `${request.method.toUpperCase()} ${request.url}${EOL}`;
-                if (request.headers) {
-                    for (const header in request.headers) {
-                        if (request.headers.hasOwnProperty(header)) {
-                            const value = request.headers[header];
-                            output += `${header}: ${value}${EOL}`;
-                        }
-                    }
-                }
-                if (request.body) {
-                    output += `${EOL}${request.body}`;
-                }
-                fs.writeFile(tmpFilePath, output, error => {
-                    reject(error);
-                    return;
-                });
-                resolve(tmpFilePath);
-            });
-        });
+            }
+        }
+        if (request.body) {
+            output += `${EOL}${request.body}`;
+        }
+        await fs.writeFile(file, output);
+        return file;
+    }
+
+    private async createTempFile(): Promise<string> {
+        const file = path.join(tmpdir(), `vscode-restclient-${uuidv4()}.http`);
+        await fs.ensureFile(file);
+        return file;
     }
 
     private errorHandler(error: any, message: string) {

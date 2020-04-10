@@ -82,9 +82,9 @@ export class HttpRequestParser implements RequestParser {
         // check request type
         const isGraphQlRequest = getHeader(headers, 'X-Request-Type') === 'GraphQL';
         if (isGraphQlRequest) {
-            // a request doesn't necessarily need variables to be considered a GraphQL request
             removeHeader(headers, 'X-Request-Type');
 
+            // a request doesn't necessarily need variables to be considered a GraphQL request
             const firstEmptyLine = bodyLines.findIndex(value => value.trim() === '');
             if (firstEmptyLine !== -1) {
                 variableLines.push(...bodyLines.splice(firstEmptyLine + 1));

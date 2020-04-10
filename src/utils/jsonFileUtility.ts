@@ -12,7 +12,6 @@ export class JsonFileUtility {
         try {
             return await fs.readJson(path);
         } catch {
-            await fs.ensureFile(path);
             return defaultValue;
         }
     }
