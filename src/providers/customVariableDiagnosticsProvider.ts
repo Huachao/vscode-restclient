@@ -71,7 +71,7 @@ export class CustomVariableDiagnosticsProvider {
         this.disposables = [];
     }
 
-    public async checkVariables() {
+    private async checkVariables() {
         for (const document of this.pendingHttpDocuments) {
             this.pendingHttpDocuments.delete(document);
             if (document.isClosed) {

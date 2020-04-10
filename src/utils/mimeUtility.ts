@@ -1,4 +1,3 @@
-
 const mime = require('mime-types');
 
 class MimeType {
@@ -116,14 +115,6 @@ export class MimeUtility {
         }
 
         return this.parse(contentTypeString).essence === 'multipart/form-data';
-    }
-
-    public static isMultiPart(contentTypeString: string | undefined): boolean {
-        if (!contentTypeString) {
-            return false;
-        }
-
-        return this.parse(contentTypeString).type === 'multipart';
     }
 
     public static isFormUrlEncoded(contentTypeString: string | undefined): boolean {

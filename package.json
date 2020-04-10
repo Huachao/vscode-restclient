@@ -662,7 +662,6 @@
     "jsonpath-plus": "^0.20.1",
     "mime-types": "^2.1.14",
     "pretty-data": "^0.40.0",
-    "tmp": "^0.0.31",
     "tough-cookie": "^3.0.1",
     "tough-cookie-file-store-bugfix": "Huachao/tough-cookie-file-store-bugfix",
     "uuid": "^3.3.2",
