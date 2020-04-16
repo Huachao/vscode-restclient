@@ -48,23 +48,16 @@ export class RequestStatusEntry {
                 break;
 
             case RequestState.Pending:
-                this.durationEntry.text = `$(sync~spin) Waiting`;
-                this.durationEntry.tooltip = 'Click to cancel';
-                this.durationEntry.command = 'rest-client.cancel-request';
-                this.durationEntry.show();
+                this.showDurationEntry('$(sync~spin) Waiting', 'Click to cancel', 'rest-client.cancel-request');
                 break;
 
             case RequestState.Cancelled:
-                this.durationEntry.text = '$(circle-slash) Cancelled';
-                this.durationEntry.tooltip = undefined;
-                this.durationEntry.command = undefined;
-                this.durationEntry.show();
+                this.showDurationEntry('$(circle-slash) Cancelled');
                 break;
 
             case RequestState.Received:
                 const response = status.response;
-                this.durationEntry.text = `$(clock) ${response.timingPhases.total ?? 0}ms`;
-                this.durationEntry.tooltip = [
+                const tooltip = [
                     'Breakdown of Duration:',
                     `Socket: ${response.timingPhases.wait?.toFixed(1) ?? 0}ms`,
                     `DNS: ${response.timingPhases.dns?.toFixed(1) ?? 0}ms`,
@@ -73,17 +66,27 @@ export class RequestStatusEntry {
                     `FirstByte: ${response.timingPhases.firstByte?.toFixed(1) ?? 0}ms`,
                     `Download: ${response.timingPhases.download?.toFixed(1) ?? 0}ms`
                 ].join(EOL);
-                this.durationEntry.command = undefined;
-                this.durationEntry.show();
 
-                this.sizeEntry.text = `$(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
-                this.sizeEntry.tooltip = [
-                    'Breakdown of Response Size:',
-                    `Headers: ${filesize(response.headersSizeInBytes)}`,
-                    `Body: ${filesize(response.bodySizeInBytes)}`
-                ].join(EOL);
-                this.sizeEntry.show();
+                this.showDurationEntry(`$(clock) ${response.timingPhases.total ?? 0}ms`, tooltip);
+                this.showSizeEntry(response);
                 break;
         }
+    }
+
+    private showSizeEntry(response: HttpResponse) {
+        this.sizeEntry.text = `$(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
+        this.sizeEntry.tooltip = [
+            'Breakdown of Response Size:',
+            `Headers: ${filesize(response.headersSizeInBytes)}`,
+            `Body: ${filesize(response.bodySizeInBytes)}`
+        ].join(EOL);
+        this.sizeEntry.show();
+    }
+
+    private showDurationEntry(text: string, tooltip?: string, command?: string) {
+        this.durationEntry.text = text;
+        this.durationEntry.tooltip = tooltip;
+        this.durationEntry.command = command;
+        this.durationEntry.show();
     }
 }

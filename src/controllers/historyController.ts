@@ -13,10 +13,6 @@ dayjs.extend(relativeTime);
 
 const uuidv4 = require('uuid/v4');
 
-interface HistoryQuickPickItem extends QuickPickItem {
-    rawRequest: SerializedHttpRequest;
-}
-
 export class HistoryController {
     public constructor() {
     }
@@ -31,7 +27,7 @@ export class HistoryController {
             }
 
             const itemPickList = requests.map(request => {
-                const item: HistoryQuickPickItem = {
+                const item: QuickPickItem & { rawRequest: SerializedHttpRequest } = {
                     label: `${request.method.toUpperCase()} ${request.url}`,
                     rawRequest: request
                 };
