@@ -5,9 +5,7 @@ import { trace } from "../utils/decorator";
 import { EnvironmentStatusEntry } from '../utils/environmentStatusBarEntry';
 import { UserDataManager } from '../utils/userDataManager';
 
-interface EnvironmentPickItem extends QuickPickItem {
-    name: string;
-}
+type EnvironmentPickItem = QuickPickItem & { name: string };
 
 export class EnvironmentController {
     private static readonly noEnvironmentPickItem: EnvironmentPickItem = {
