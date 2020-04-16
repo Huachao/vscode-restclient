@@ -655,7 +655,7 @@
     "got": "^9.6.0",
     "highlight.js": "^9.6.0",
     "http-proxy-agent": "^2.1.0",
-    "https-proxy-agent": "^2.2.1",
+    "https-proxy-agent": "^2.2.3",
     "httpsnippet": "^1.19.1",
     "iconv-lite": "^0.4.15",
     "jsonc-parser": "^2.0.2",
