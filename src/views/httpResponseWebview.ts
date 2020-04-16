@@ -409,10 +409,8 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             return 'css';
         } else {
             // If content is provided, guess from content if not content type is matched
-            if (content) {
-                if (isJSONString(content)) {
-                    return 'json';
-                }
+            if (content && isJSONString(content)) {
+                return 'json';
             }
             return null;
         }
