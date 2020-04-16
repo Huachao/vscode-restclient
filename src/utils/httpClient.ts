@@ -148,16 +148,17 @@ export class HttpClient {
         const authorization = getHeader(options.headers!, 'Authorization') as string | undefined;
         if (authorization) {
             const [scheme, user, ...args] = authorization.split(/\s+/);
+            const normalizedScheme = scheme.toLowerCase();
             if (args.length > 0) {
                 const pass = args.join(' ');
-                if (scheme === 'Basic') {
+                if (normalizedScheme === 'basic') {
                     removeHeader(options.headers!, 'Authorization');
                     options.auth = `${user}:${pass}`;
-                } else if (scheme === 'Digest') {
+                } else if (normalizedScheme === 'digest') {
                     removeHeader(options.headers!, 'Authorization');
                     options.hooks!.afterResponse!.push(digest(user, pass));
                 }
-            } else if (scheme === 'Basic' && user.includes(':')) {
+            } else if (normalizedScheme === 'basic' && user.includes(':')) {
                 removeHeader(options.headers!, 'Authorization');
                 options.auth = user;
             }
