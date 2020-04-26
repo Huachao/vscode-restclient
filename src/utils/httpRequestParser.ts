@@ -7,7 +7,7 @@ import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
-import { RequestParserUtil } from './requestParserUtil';
+import { parseRequestHeaders, resolveRequestBodyPath } from './requestParserUtil';
 
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');
@@ -74,7 +74,7 @@ export class HttpRequestParser implements RequestParser {
         const requestLine = HttpRequestParser.parseRequestLine(requestLines.join(EOL));
 
         // parse headers lines
-        const headers = RequestParserUtil.parseRequestHeaders(headersLines);
+        const headers = parseRequestHeaders(headersLines);
 
         // let underlying node.js library recalculate the content length
         removeHeader(headers, 'content-length');
@@ -178,7 +178,7 @@ export class HttpRequestParser implements RequestParser {
                     const groups = this.inputFileSyntax.exec(line);
                     if (groups?.length === 2) {
                         const inputFilePath = groups[1];
-                        const fileAbsolutePath = await RequestParserUtil.resolveRequestBodyPath(inputFilePath);
+                        const fileAbsolutePath = await resolveRequestBodyPath(inputFilePath);
                         if (fileAbsolutePath) {
                             combinedStream.append(fs.createReadStream(fileAbsolutePath));
                         } else {
