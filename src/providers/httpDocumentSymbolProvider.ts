@@ -1,4 +1,3 @@
-import { EOL } from 'os';
 import * as url from 'url';
 import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
@@ -47,7 +46,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             }
 
             if (blockStart <= blockEnd) {
-                const [name, container] = await this.getRequestSymbolInfo(lines.slice(blockStart, blockEnd + 1).join(EOL), requestName);
+                const [name, container] = await this.getRequestSymbolInfo(lines[blockStart], requestName);
                 symbols.push(
                     new SymbolInformation(
                         name,

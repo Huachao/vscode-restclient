@@ -92,7 +92,7 @@ export class RestClientSettings implements IRestClientSettings {
         return this._instance;
     }
 
-    public readonly configurationUpdateEventEmitter = new EventEmitter<void>();
+    private readonly configurationUpdateEventEmitter = new EventEmitter<void>();
 
     public get onDidChangeConfiguration(): Event<void> {
         return this.configurationUpdateEventEmitter.event;

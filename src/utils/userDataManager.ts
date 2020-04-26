@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import * as path from 'path';
-import { SerializedHttpRequest } from '../models/httpRequest';
+import { HistoricalHttpRequest } from '../models/httpRequest';
 import { JsonFileUtility } from './jsonFileUtility';
 
 export class UserDataManager {
@@ -40,8 +40,8 @@ export class UserDataManager {
         ]);
     }
 
-    public static async addToRequestHistory(request: SerializedHttpRequest) {
-        const requests = await JsonFileUtility.deserializeFromFile<SerializedHttpRequest[]>(this.historyFilePath, []);
+    public static async addToRequestHistory(request: HistoricalHttpRequest) {
+        const requests = await JsonFileUtility.deserializeFromFile<HistoricalHttpRequest[]>(this.historyFilePath, []);
         requests.unshift(request);
         await JsonFileUtility.serializeToFile(this.historyFilePath, requests.slice(0, this.historyItemsMaxCount));
     }
@@ -50,7 +50,7 @@ export class UserDataManager {
         return JsonFileUtility.serializeToFile(this.historyFilePath, []);
     }
 
-    public static getRequestHistory(): Promise<SerializedHttpRequest[]> {
+    public static getRequestHistory(): Promise<HistoricalHttpRequest[]> {
         return JsonFileUtility.deserializeFromFile(this.historyFilePath, []);
     }
 

@@ -1,7 +1,7 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
 import Logger from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
-import { HttpRequest, SerializedHttpRequest } from '../models/httpRequest';
+import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
@@ -115,7 +115,7 @@ export class RequestController {
             }
 
             // persist to history json file
-            await UserDataManager.addToRequestHistory(SerializedHttpRequest.convertFromHttpRequest(httpRequest));
+            await UserDataManager.addToRequestHistory(HistoricalHttpRequest.convertFromHttpRequest(httpRequest));
         } catch (error) {
             // check cancel
             if (httpRequest.isCancelled) {

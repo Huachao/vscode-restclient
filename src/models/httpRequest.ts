@@ -24,7 +24,7 @@ export class HttpRequest {
     }
 }
 
-export class SerializedHttpRequest {
+export class HistoricalHttpRequest {
     public constructor(
         public method: string,
         public url: string,
@@ -33,8 +33,8 @@ export class SerializedHttpRequest {
         public startTime: number) {
     }
 
-    public static convertFromHttpRequest(httpRequest: HttpRequest, startTime: number = Date.now()): SerializedHttpRequest {
-        return new SerializedHttpRequest(
+    public static convertFromHttpRequest(httpRequest: HttpRequest, startTime: number = Date.now()): HistoricalHttpRequest {
+        return new HistoricalHttpRequest(
             httpRequest.method,
             httpRequest.url,
             httpRequest.headers,

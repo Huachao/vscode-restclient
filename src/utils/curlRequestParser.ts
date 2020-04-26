@@ -3,7 +3,7 @@ import { RequestHeaders } from '../models/base';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
 import { base64, hasHeader } from './misc';
-import { RequestParserUtil } from './requestParserUtil';
+import { parseRequestHeaders, resolveRequestBodyPath } from './requestParserUtil';
 
 const yargsParser = require('yargs-parser');
 
@@ -35,7 +35,7 @@ export class CurlRequestParser implements RequestParser {
             if (!Array.isArray(parsedHeaders)) {
                 parsedHeaders = [parsedHeaders];
             }
-            headers = RequestParserUtil.parseRequestHeaders(parsedHeaders);
+            headers = parseRequestHeaders(parsedHeaders);
         }
 
         // parse cookie
@@ -57,7 +57,7 @@ export class CurlRequestParser implements RequestParser {
         }
 
         if (typeof body === 'string' && body[0] === '@') {
-            const fileAbsolutePath = await RequestParserUtil.resolveRequestBodyPath(body.substring(1));
+            const fileAbsolutePath = await resolveRequestBodyPath(body.substring(1));
             if (fileAbsolutePath) {
                 body = fs.createReadStream(fileAbsolutePath);
             } else {
