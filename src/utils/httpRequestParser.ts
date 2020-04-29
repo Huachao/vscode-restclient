@@ -19,12 +19,11 @@ enum ParseState {
 }
 
 export class HttpRequestParser implements RequestParser {
-    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
-    private static readonly defaultMethod = 'GET';
-    private static readonly queryStringLinePrefix = /^\s*[&\?]/;
-    private static readonly inputFileSyntax = /^<\s+(.+?)\s*$/;
+    private readonly defaultMethod = 'GET';
+    private readonly queryStringLinePrefix = /^\s*[&\?]/;
+    private readonly inputFileSyntax = /^<\s+(.+?)\s*$/;
 
-    public constructor(private requestRawText: string) {
+    public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
     }
 
     public async parseHttpRequest(name?: string): Promise<HttpRequest> {
@@ -44,7 +43,7 @@ export class HttpRequestParser implements RequestParser {
                 case ParseState.URL:
                     requestLines.push(currentLine.trim());
                     if (nextLine === undefined
-                        || HttpRequestParser.queryStringLinePrefix.test(nextLine)) {
+                        || this.queryStringLinePrefix.test(nextLine)) {
                         // request with request line only
                     } else if (nextLine.trim()) {
                         state = ParseState.Header;
@@ -71,10 +70,10 @@ export class HttpRequestParser implements RequestParser {
         }
 
         // parse request line
-        const requestLine = HttpRequestParser.parseRequestLine(requestLines.join(EOL));
+        const requestLine = this.parseRequestLine(requestLines.join(EOL));
 
         // parse headers lines
-        const headers = parseRequestHeaders(headersLines);
+        const headers = parseRequestHeaders(headersLines, this.settings.defaultHeaders, requestLine.url);
 
         // let underlying node.js library recalculate the content length
         removeHeader(headers, 'content-length');
@@ -93,18 +92,18 @@ export class HttpRequestParser implements RequestParser {
         }
 
         // parse body lines
-        const contentTypeHeader = getContentType(headers) || getContentType(this._restClientSettings.defaultHeaders);
-        let body = await HttpRequestParser.parseRequestBody(bodyLines, contentTypeHeader);
+        const contentTypeHeader = getContentType(headers);
+        let body = await this.parseBody(bodyLines, contentTypeHeader);
         if (isGraphQlRequest) {
-            const variables = await HttpRequestParser.parseRequestBody(variableLines, contentTypeHeader);
+            const variables = await this.parseBody(variableLines, contentTypeHeader);
 
             const graphQlPayload = {
                 query: body,
                 variables: variables ? JSON.parse(variables.toString()) : {}
             };
             body = JSON.stringify(graphQlPayload);
-        } else if (this._restClientSettings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
-            if (this._restClientSettings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
+        } else if (this.settings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
+            if (this.settings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
                 const stringPairs = body.split('&');
                 const encodedStringPairs: string[] = [];
                 for (const stringPair of stringPairs) {
@@ -119,7 +118,7 @@ export class HttpRequestParser implements RequestParser {
         }
 
         // if Host header provided and url is relative path, change to absolute url
-        const host = getHeader(headers, 'Host') || getHeader(this._restClientSettings.defaultHeaders, 'host');
+        const host = getHeader(headers, 'Host');
         if (host && requestLine.url[0] === '/') {
             const [, port] = host.toString().split(':');
             const scheme = port === '443' || port === '8443' ? 'https' : 'http';
@@ -129,7 +128,7 @@ export class HttpRequestParser implements RequestParser {
         return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), name);
     }
 
-    private static parseRequestLine(line: string): { method: string, url: string } {
+    private parseRequestLine(line: string): { method: string, url: string } {
         // Request-Line = Method SP Request-URI SP HTTP-Version CRLF
         const words = line.split(' ').filter(Boolean);
 
@@ -151,7 +150,7 @@ export class HttpRequestParser implements RequestParser {
         return { method, url };
     }
 
-    private static async parseRequestBody(lines: string[], contentTypeHeader: string | undefined): Promise<string | Stream | undefined> {
+    private async parseBody(lines: string[], contentTypeHeader: string | undefined): Promise<string | Stream | undefined> {
         if (lines.length === 0) {
             return undefined;
         }
@@ -198,7 +197,7 @@ export class HttpRequestParser implements RequestParser {
         }
     }
 
-    private static getLineEnding(contentTypeHeader: string | undefined) {
+    private getLineEnding(contentTypeHeader: string | undefined) {
         return MimeUtility.isMultiPartFormData(contentTypeHeader) ? '\r\n' : EOL;
     }
 }

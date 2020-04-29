@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import { RequestHeaders } from '../models/base';
+import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
 import { base64, hasHeader } from './misc';
@@ -11,7 +12,7 @@ const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
 export class CurlRequestParser implements RequestParser {
 
-    public constructor(private requestRawText: string) {
+    public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
     }
 
     public async parseHttpRequest(name?: string): Promise<HttpRequest> {
@@ -35,7 +36,7 @@ export class CurlRequestParser implements RequestParser {
             if (!Array.isArray(parsedHeaders)) {
                 parsedHeaders = [parsedHeaders];
             }
-            headers = parseRequestHeaders(parsedHeaders);
+            headers = parseRequestHeaders(parsedHeaders, this.settings.defaultHeaders, url);
         }
 
         // parse cookie

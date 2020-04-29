@@ -115,7 +115,7 @@ export class HttpClient {
         }
 
         const options: got.GotBodyOptions<null> = {
-            headers: this.getRequestHeaders(httpRequest),
+            headers: httpRequest.headers,
             method: httpRequest.method,
             body: requestBody,
             encoding: null,
@@ -227,11 +227,6 @@ export class HttpClient {
         }
 
         return options;
-    }
-
-    private getRequestHeaders(httpRequest: HttpRequest): RequestHeaders {
-        removeHeader(this._settings.defaultHeaders, 'host');
-        return {...this._settings.defaultHeaders, ...httpRequest.headers};
     }
 
     private async convertStreamToBuffer(stream: Stream): Promise<Buffer> {
