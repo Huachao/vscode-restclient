@@ -1,12 +1,12 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2018",
+        "target": "es2019",
         "outDir": "dist",
         "noUnusedLocals": true,
         "experimentalDecorators": true,
         "lib": [
-            "es2018"
+            "es2019"
         ],
         "sourceMap": true,
         "alwaysStrict": true,
