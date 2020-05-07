@@ -16,6 +16,7 @@ import { UserDataManager } from './userDataManager';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
 import got = require('got');
+import aws4 = require('aws4');
 
 const encodeUrl = require('encodeurl');
 const cookieStore = require('tough-cookie-file-store-bugfix');
@@ -161,6 +162,26 @@ export class HttpClient {
             } else if (normalizedScheme === 'basic' && user.includes(':')) {
                 removeHeader(options.headers!, 'Authorization');
                 options.auth = user;
+            }
+        }
+
+        // set AWS authentication
+        const xAuthentication = getHeader(options.headers!, "X-Authentication-Type") as string
+        if (xAuthentication) {
+            const [ xAuthenticationType, ...rawCredentials ] = xAuthentication.split(" ")
+            removeHeader(options.headers!, 'X-Authentication-Type');
+            if (xAuthenticationType === "AWS" ) { // TODO: AWS as constant. Deal with region and service name.
+                const credentials = {
+                    accessKeyId: rawCredentials[0],
+                    secretAccessKey: rawCredentials[1],
+                    sessionToken: rawCredentials[2]
+                };
+
+                options.hooks!["beforeRequest"]= [
+                    async options => {
+                        aws4.sign(options, credentials);
+                    }
+                ]
             }
         }
 
