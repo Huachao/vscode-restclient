@@ -639,7 +639,7 @@
     "ts-loader": "^5.3.2",
     "tslint": "^6.1.2",
     "typescript": "^3.7.3",
-    "webpack": "^4.19.1",
+    "webpack": "^4.26.0",
     "webpack-cli": "^3.1.0"
   },
   "dependencies": {
