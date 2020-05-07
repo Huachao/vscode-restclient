@@ -162,7 +162,7 @@ export class HttpResponseWebview extends BaseWebview {
 
     private getFullResponseString(response: HttpResponse): string {
         const statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
-        const headerString = Object.entries(response.headers).map(([name, value]) => `${name}: ${value}${os.EOL}`);
+        const headerString = Object.entries(response.headers).reduce((acc, [name, value]) => acc + `${name}: ${value}${os.EOL}`, '');
         const body = response.body ? `${os.EOL}${response.body}` : '';
         return `${statusLine}${headerString}${body}`;
     }
