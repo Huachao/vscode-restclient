@@ -31,7 +31,6 @@ type CodeSnippetTarget = {
 export class CodeSnippetController {
     private readonly _availableTargets: CodeSnippetTarget[] = HTTPSnippet.availableTargets();
     private readonly clipboard: Clipboard;
-    private _convertedResult;
     private _webview: CodeSnippetWebview;
 
     constructor(context: ExtensionContext) {
@@ -94,7 +93,6 @@ export class CodeSnippetController {
                 const { key: tk, title: tt } = target!;
                 Telemetry.sendEvent('Generate Code Snippet', { 'target': target!.key, 'client': ck });
                 const result = snippet.convert(tk, ck);
-                this._convertedResult = result;
 
                 try {
                     this._webview.render(result, `${tt}-${ct}`, tk);
@@ -105,13 +103,6 @@ export class CodeSnippetController {
             }
         });
         quickPick.show();
-    }
-
-    @trace('Copy Code Snippet')
-    public async copy() {
-        if (this._convertedResult) {
-            await this.clipboard.writeText(this._convertedResult);
-        }
     }
 
     @trace('Copy Request As cURL')
