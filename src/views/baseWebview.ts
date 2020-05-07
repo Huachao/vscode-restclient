@@ -16,6 +16,8 @@ export abstract class BaseWebview {
 
     protected panels: WebviewPanel[] = [];
 
+    protected activePanel: WebviewPanel | undefined;
+
     protected constructor(protected readonly context: ExtensionContext) {
         this.styleFilePath = Uri.file(this.context.asAbsolutePath(path.join('styles', 'rest-client.css')));
         this.scriptFilePath = Uri.file(this.context.asAbsolutePath(path.join('scripts', 'main.js')));

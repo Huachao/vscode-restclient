@@ -1,4 +1,5 @@
-import { ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
+import { Clipboard, commands, env, ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
+import { trace } from '../utils/decorator';
 import { disposeAll } from '../utils/dispose';
 import { BaseWebview } from './baseWebview';
 
@@ -15,8 +16,14 @@ export class CodeSnippetWebview extends BaseWebview {
         return 'codeSnippetPreviewFocus';
     }
 
+    private readonly clipboard: Clipboard = env.clipboard;
+
+    private activeCodeSnippet: string | undefined;
+
     public constructor(context: ExtensionContext) {
         super(context);
+
+        this.context.subscriptions.push(commands.registerCommand('rest-client.copy-codesnippet', this.copy, this));
     }
 
     public async render(convertResult: string, title: string, lang: string) {
@@ -52,12 +59,20 @@ export class CodeSnippetWebview extends BaseWebview {
         panel.webview.html = this.getHtmlForWebview(panel, convertResult, lang);
 
         this.setPrviewActiveContext(true);
+        this.activeCodeSnippet = convertResult;
 
         panel.reveal(ViewColumn.Two);
     }
 
     public dispose() {
         disposeAll(this.panels);
+    }
+
+    @trace('Copy Code Snippet')
+    private async copy() {
+        if (this.activeCodeSnippet) {
+            await this.clipboard.writeText(this.activeCodeSnippet);
+        }
     }
 
     private getHtmlForWebview(panel: WebviewPanel, convertResult: string, lang: string): string {

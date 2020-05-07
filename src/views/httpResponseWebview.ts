@@ -36,8 +36,6 @@ export class HttpResponseWebview extends BaseWebview {
         return 'httpResponsePreviewFocus';
     }
 
-    private activePanel: WebviewPanel | undefined;
-
     private get activeResponse(): HttpResponse | undefined {
         return this.activePanel ? this.panelResponses.get(this.activePanel) : undefined;
     }
@@ -48,12 +46,12 @@ export class HttpResponseWebview extends BaseWebview {
         // Init response webview map
         this.panelResponses = new Map<WebviewPanel, HttpResponse>();
 
-        this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', () => this.foldResponseBody()));
-        this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', () => this.unfoldResponseBody()));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', this.foldResponseBody, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', this.unfoldResponseBody, this));
 
-        this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-body', () => this.copyBody()));
-        this.context.subscriptions.push(commands.registerCommand('rest-client.save-response', () => this.save()));
-        this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', () => this.saveBody()));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-body', this.copyBody, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.save-response', this.save, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', this.saveBody, this));
     }
 
     public async render(response: HttpResponse, column: ViewColumn) {
