@@ -14,7 +14,6 @@ export class HttpElement {
             } else if (type === ElementType.Method) {
                 this.text = `${this.text} `;
             }
-            this.text = this.text.replace(/[{}]/g, "\\$&");
         }
 
         if (type === ElementType.SystemVariable) {
