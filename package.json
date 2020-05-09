@@ -78,7 +78,7 @@
       {
         "language": "http",
         "scopeName": "source.http",
-        "path": "./syntaxes/http.tmLanguage"
+        "path": "./syntaxes/http.tmLanguage.json"
       }
     ],
     "snippets": [
