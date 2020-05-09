@@ -170,7 +170,7 @@ export class HttpClient {
         if (xAuthentication != null) {
             removeHeader(options.headers!, 'X-Authentication-Type');
             const [ xAuthenticationType, ...rawCredentials ] = xAuthentication.split(" ")
-            if (xAuthenticationType === "AWS" ) { // TODO: AWS as constant. Deal with region and service name.
+            if (xAuthenticationType === 'AWS' ) {
                 const credentials = {
                     accessKeyId: rawCredentials[0],
                     secretAccessKey: rawCredentials[1],
@@ -179,9 +179,15 @@ export class HttpClient {
 
                 const awsScope: { [key: string]: string } = {};
                 const region = getHeader(options.headers!, 'X-AWS-Region') as string | undefined;
-                if (region != null) { awsScope.region = region; }
+                if (region != null) {
+                    removeHeader(options.headers!, 'X-AWS-Region');
+                    awsScope.region = region;
+                }
                 const service = getHeader(options.headers!, 'X-AWS-Service') as string | undefined;
-                if (service != null) { awsScope.service = service; }
+                if (service != null) {
+                    removeHeader(options.headers!, 'X-AWS-Service')
+                    awsScope.service = service;
+                }
 
                 options.hooks!["beforeRequest"]= [
                     async options => {
