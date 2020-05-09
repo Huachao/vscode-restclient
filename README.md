@@ -345,10 +345,12 @@ Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like
 Azure AD is Microsoft’s multi-tenant, cloud-based directory and identity management service, you can refer to the [System Variables](#system-variables) section for more details.
 
 ### AWS Signature v4
-AWS Signature v4 is used to authenticate AWS requests. For more information, see [AWS documentation](https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html). `region` and `service name` are not yet supported. `sessionToken` is optional.
+AWS Signature version 4 is used to authenticate AWS requests. For more information, see [AWS documentation](https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html). `sessionToken` as well as the `X-AWS-Region` and `X-AWS-Service` headers are optional.
 ```http
 GET https://httpbin.org/aws-auth HTTP/1.1
 X-Authentication-Type: AWS accessId accessKey sessionToken
+X-AWS-Region: awsRegion
+X-AWS-Service: awsService
 ```
 
 ## Generate Code Snippet
