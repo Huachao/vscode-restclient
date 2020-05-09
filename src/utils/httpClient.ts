@@ -166,10 +166,9 @@ export class HttpClient {
         }
 
         // set AWS authentication
-        const xAuthentication = getHeader(options.headers!, 'X-Authentication-Type') as string | undefined;
-        if (xAuthentication != null) {
-            removeHeader(options.headers!, 'X-Authentication-Type');
-            const [ xAuthenticationType, ...rawCredentials ] = xAuthentication.split(" ")
+        const xAuthentication = extractHeader(options.headers!, 'X-Authentication-Type') as string | undefined;
+        if (xAuthentication) {
+            const [ xAuthenticationType, ...rawCredentials ] = xAuthentication.split(" ");
             if (xAuthenticationType === 'AWS' ) {
                 const credentials = {
                     accessKeyId: rawCredentials[0],
