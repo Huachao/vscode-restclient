@@ -15,8 +15,8 @@ import { extractHeader, getHeader, hasHeader, removeHeader } from './misc';
 import { UserDataManager } from './userDataManager';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
-import got = require('got');
 import aws4 = require('aws4');
+import got = require('got');
 
 const encodeUrl = require('encodeurl');
 const cookieStore = require('tough-cookie-file-store-bugfix');
@@ -182,11 +182,11 @@ export class HttpClient {
                 const service = extractHeader(options.headers!, 'X-AWS-Service') as string | undefined;
                 if (service) { awsScope.service = service; }
 
-                options.hooks!["beforeRequest"]= [
+                options.hooks!["beforeRequest"] = [
                     async options => {
                         aws4.sign({ ...options, ...awsScope }, credentials);
                     }
-                ]
+                ];
             }
         }
 

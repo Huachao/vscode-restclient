@@ -36,7 +36,7 @@ export function removeHeader(headers: RequestHeaders | ResponseHeaders, name: st
 export function extractHeader(headers: RequestHeaders, name: string): RequestHeaderValue {
     const value = getHeader(headers, name);
     removeHeader(headers, name);
-    return value
+    return value;
 }
 
 export function md5(text: string | Buffer): string {
