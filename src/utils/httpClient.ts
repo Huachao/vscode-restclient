@@ -11,7 +11,7 @@ import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
-import { getHeader, hasHeader, removeHeader } from './misc';
+import { extractHeader, getHeader, hasHeader, removeHeader } from './misc';
 import { UserDataManager } from './userDataManager';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
@@ -178,16 +178,10 @@ export class HttpClient {
                 };
 
                 const awsScope: { [key: string]: string } = {};
-                const region = getHeader(options.headers!, 'X-AWS-Region') as string | undefined;
-                if (region != null) {
-                    removeHeader(options.headers!, 'X-AWS-Region');
-                    awsScope.region = region;
-                }
-                const service = getHeader(options.headers!, 'X-AWS-Service') as string | undefined;
-                if (service != null) {
-                    removeHeader(options.headers!, 'X-AWS-Service')
-                    awsScope.service = service;
-                }
+                const region = extractHeader(options.headers!, 'X-AWS-Region') as string | undefined;
+                if (region) { awsScope.region = region; }
+                const service = extractHeader(options.headers!, 'X-AWS-Service') as string | undefined;
+                if (service) { awsScope.service = service; }
 
                 options.hooks!["beforeRequest"]= [
                     async options => {
