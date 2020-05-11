@@ -20,6 +20,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Digest Auth
     - SSL Client Certificates
     - Azure Active Directory
+    - AWS Signature v4
 * Environments and custom/system variables support
     - Use variables in any place of request(_URL_, _Headers_, _Body_)
     - Support both __environment__, __file__ and __request__ custom variables
@@ -345,12 +346,16 @@ Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like
 Azure AD is Microsoft’s multi-tenant, cloud-based directory and identity management service, you can refer to the [System Variables](#system-variables) section for more details.
 
 ### AWS Signature v4
-AWS Signature version 4 is used to authenticate requests to AWS services. For more information, see [AWS documentation](https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html). `sessionToken` as well as the `X-AWS-Region` and `X-AWS-Service` headers are optional.
+AWS Signature version 4 authenticates requests to AWS services. To use it you need to set the Authorization header schema to `AWS` and provide your AWS credentials separated by spaces:
+- `<accessId>`: AWS Access Key Id
+- `<accessKey>`: AWS Secret Access Key
+- `token:<sessionToken>`: AWS Session Token - required only for temporary credentials
+- `region:<regionName>`: AWS Region - required only if region can't be deduced from URL
+- `service:<serviceName>`: AWS Service - required only if service can't be deduced from URL
+
 ```http
 GET https://httpbin.org/aws-auth HTTP/1.1
-X-Authentication-Type: AWS accessId accessKey sessionToken
-X-AWS-Region: awsRegion
-X-AWS-Service: awsService
+Authorization: AWS <accessId> <accessKey> [token:<sessionToken>] [region:<regionName>] [service:<serviceName>]
 ```
 
 ## Generate Code Snippet

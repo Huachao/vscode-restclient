@@ -9,13 +9,13 @@ import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
+import { awsSignature } from './auth/awsSignature';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
-import { extractHeader, getHeader, hasHeader, removeHeader } from './misc';
+import { getHeader, hasHeader, removeHeader } from './misc';
 import { UserDataManager } from './userDataManager';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
-import aws4 = require('aws4');
 import got = require('got');
 
 const encodeUrl = require('encodeurl');
@@ -137,7 +137,8 @@ export class HttpClient {
                             delete opts.port;
                         }
                     }
-                ]
+                ],
+                beforeRequest: [],
             }
         };
 
@@ -158,35 +159,13 @@ export class HttpClient {
                 } else if (normalizedScheme === 'digest') {
                     removeHeader(options.headers!, 'Authorization');
                     options.hooks!.afterResponse!.push(digest(user, pass));
+                } else if (normalizedScheme === 'aws') {
+                    removeHeader(options.headers!, 'Authorization');
+                    options.hooks!.beforeRequest!.push(awsSignature(authorization));
                 }
             } else if (normalizedScheme === 'basic' && user.includes(':')) {
                 removeHeader(options.headers!, 'Authorization');
                 options.auth = user;
-            }
-        }
-
-        // set AWS authentication
-        const xAuthentication = extractHeader(options.headers!, 'X-Authentication-Type') as string | undefined;
-        if (xAuthentication) {
-            const [ xAuthenticationType, ...rawCredentials ] = xAuthentication.split(" ");
-            if (xAuthenticationType === 'AWS' ) {
-                const credentials = {
-                    accessKeyId: rawCredentials[0],
-                    secretAccessKey: rawCredentials[1],
-                    sessionToken: rawCredentials[2]
-                };
-
-                const awsScope: { [key: string]: string } = {};
-                const region = extractHeader(options.headers!, 'X-AWS-Region') as string | undefined;
-                if (region) { awsScope.region = region; }
-                const service = extractHeader(options.headers!, 'X-AWS-Service') as string | undefined;
-                if (service) { awsScope.service = service; }
-
-                options.hooks!["beforeRequest"] = [
-                    async options => {
-                        aws4.sign({ ...options, ...awsScope }, credentials);
-                    }
-                ];
             }
         }
 
