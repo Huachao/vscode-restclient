@@ -9,6 +9,7 @@ import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
+import { awsSignature } from './auth/awsSignature';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
 import { getHeader, hasHeader, removeHeader } from './misc';
@@ -136,7 +137,8 @@ export class HttpClient {
                             delete opts.port;
                         }
                     }
-                ]
+                ],
+                beforeRequest: [],
             }
         };
 
@@ -157,6 +159,9 @@ export class HttpClient {
                 } else if (normalizedScheme === 'digest') {
                     removeHeader(options.headers!, 'Authorization');
                     options.hooks!.afterResponse!.push(digest(user, pass));
+                } else if (normalizedScheme === 'aws') {
+                    removeHeader(options.headers!, 'Authorization');
+                    options.hooks!.beforeRequest!.push(awsSignature(authorization));
                 }
             } else if (normalizedScheme === 'basic' && user.includes(':')) {
                 removeHeader(options.headers!, 'Authorization');

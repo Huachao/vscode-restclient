@@ -20,6 +20,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Digest Auth
     - SSL Client Certificates
     - Azure Active Directory
+    - AWS Signature v4
 * Environments and custom/system variables support
     - Use variables in any place of request(_URL_, _Headers_, _Body_)
     - Support both __environment__, __file__ and __request__ custom variables
@@ -281,7 +282,7 @@ Another icon in the upper right corner of the response preview tab is the `Save 
 In the response webview panel, there are two options `Fold Response` and `Unfold Response` after clicking the `More Actions...` button. Sometimes you may want to fold or unfold the whole response body, these options provide a straightforward way to achieve this.
 
 ## Authentication
-We have supported some most common authentication schemes like _Basic Auth_, _Digest Auth_, _SSL Client Certificates_ and _Azure Active Directory(Azure AD)_.
+We have supported some most common authentication schemes like _Basic Auth_, _Digest Auth_, _SSL Client Certificates_, _Azure Active Directory(Azure AD)_ and _AWS Signature v4_.
 
 ### Basic Auth
 HTTP Basic Auth is a widely used protocol for simple username/password authentication. We support __three__ formats of Authorization header to use Basic Auth.
@@ -343,6 +344,19 @@ Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like
 
 ### Azure Active Directory(Azure AD)
 Azure AD is Microsoft’s multi-tenant, cloud-based directory and identity management service, you can refer to the [System Variables](#system-variables) section for more details.
+
+### AWS Signature v4
+AWS Signature version 4 authenticates requests to AWS services. To use it you need to set the Authorization header schema to `AWS` and provide your AWS credentials separated by spaces:
+- `<accessId>`: AWS Access Key Id
+- `<accessKey>`: AWS Secret Access Key
+- `token:<sessionToken>`: AWS Session Token - required only for temporary credentials
+- `region:<regionName>`: AWS Region - required only if region can't be deduced from URL
+- `service:<serviceName>`: AWS Service - required only if service can't be deduced from URL
+
+```http
+GET https://httpbin.org/aws-auth HTTP/1.1
+Authorization: AWS <accessId> <accessKey> [token:<sessionToken>] [region:<regionName>] [service:<serviceName>]
+```
 
 ## Generate Code Snippet
 ![Generate Code Snippet](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/code-snippet.gif)

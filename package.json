@@ -630,6 +630,7 @@
     "tslint": "tslint --project tsconfig.json"
   },
   "devDependencies": {
+    "@types/aws4": "^1.5.1",
     "@types/fs-extra": "^5.0.4",
     "@types/got": "^9.6.8",
     "@types/mocha": "^2.2.32",
@@ -645,6 +646,7 @@
   "dependencies": {
     "adal-node": "^0.1.26",
     "applicationinsights": "^1.0.5",
+    "aws4": "^1.9.1",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
     "dayjs": "^1.8.20",
