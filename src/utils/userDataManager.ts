@@ -4,30 +4,58 @@ import * as path from 'path';
 import { HistoricalHttpRequest } from '../models/httpRequest';
 import { JsonFileUtility } from './jsonFileUtility';
 
+const restClientDir = 'rest-client';
+const rootPath = path.join(os.homedir(), `.${restClientDir}`);
+
+function getCachePath(): string {
+    if (fs.existsSync(rootPath)) {
+        return rootPath;
+    }
+
+    if (process.env.XDG_CACHE_HOME !== undefined) {
+        return path.join(rootPath, process.env.XDG_CACHE_HOME);
+    }
+
+    return rootPath;
+}
+
+function getConfigPath(): string {
+    if (fs.existsSync(rootPath)) {
+        return rootPath;
+    }
+
+    if (process.env.XDG_CONFIG_HOME !== undefined) {
+        return path.join(rootPath, process.env.XDG_CONFIG_HOME);
+    }
+
+    return rootPath;
+}
+
 export class UserDataManager {
 
     private static readonly historyItemsMaxCount = 50;
 
-    private static readonly rootPath: string = path.join(os.homedir(), '.rest-client');
+    private static readonly cachePath: string = getCachePath();
+    private static readonly configPath: string = getConfigPath();
 
     public static get cookieFilePath() {
-        return path.join(this.rootPath, 'cookie.json');
+        return path.join(this.cachePath, 'cookie.json');
     }
 
     private static get historyFilePath() {
-        return path.join(this.rootPath, 'history.json');
+        return path.join(this.cachePath, 'history.json');
     }
 
     private static get environmentFilePath() {
-        return path.join(this.rootPath, 'environment.json');
+        return path.join(this.configPath, 'environment.json');
     }
 
     private static get responseSaveFolderPath() {
-        return path.join(this.rootPath, 'responses/raw');
+        return path.join(this.cachePath, 'responses/raw');
     }
 
     private static get responseBodySaveFolderPath() {
-        return path.join(this.rootPath, 'responses/body');
+        return path.join(this.cachePath, 'responses/body');
     }
 
     public static async initialize(): Promise<void> {
