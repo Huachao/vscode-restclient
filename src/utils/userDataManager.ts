@@ -13,7 +13,7 @@ function getCachePath(): string {
     }
 
     if (process.env.XDG_CACHE_HOME !== undefined) {
-        return path.join(rootPath, process.env.XDG_CACHE_HOME);
+        return path.join(process.env.XDG_CACHE_HOME, restClientDir);
     }
 
     return rootPath;
@@ -25,7 +25,7 @@ function getConfigPath(): string {
     }
 
     if (process.env.XDG_CONFIG_HOME !== undefined) {
-        return path.join(rootPath, process.env.XDG_CONFIG_HOME);
+        return path.join(process.env.XDG_CONFIG_HOME, restClientDir);
     }
 
     return rootPath;
