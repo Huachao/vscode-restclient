@@ -57,7 +57,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Fold/Unfold for request block
 
 ## Usage
-In editor, type an HTTP request as simple as below:
+In the editor create a new file, save it with `.http` extension, then type an HTTP request such as:
 ```http
 https://example.com/comments/1
 ```
