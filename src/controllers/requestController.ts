@@ -1,4 +1,5 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
+import * as Constants from '../common/constants';
 import Logger from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
@@ -9,7 +10,6 @@ import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
 import { UserDataManager } from '../utils/userDataManager';
-import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
@@ -30,20 +30,27 @@ export class RequestController {
         this._textDocumentView = new HttpResponseTextDocumentView();
     }
 
+
     @trace('Request')
-    public async run(range: Range) {
+    public async run(document: TextDocument, range: Range) {
         const editor = window.activeTextEditor;
-        const document = getCurrentTextDocument();
-        if (!editor || !document) {
+        if (!document) {
             return;
         }
-
-        const selectedRequest = await Selector.getRequest(editor, range);
-        if (!selectedRequest) {
-            return;
+        let text, name, warnBeforeSend;
+        if (editor) {
+            const selectedRequest = await Selector.getRequest(editor, range);
+            if (!selectedRequest) {
+                return;
+            }
+            text = selectedRequest.text;
+            name = selectedRequest.name;
+            warnBeforeSend = selectedRequest.warnBeforeSend;
+        } else {
+            text = document.getText();
+            name = Selector.getRequestVariableDefinitionName(text);
+            warnBeforeSend = Constants.NoteCommentRegex.test(text);
         }
-
-        const { text, name, warnBeforeSend } = selectedRequest;
 
         if (warnBeforeSend) {
             const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
@@ -98,10 +105,15 @@ export class RequestController {
             }
 
             try {
-                const activeColumn = window.activeTextEditor!.viewColumn;
-                const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
-                    ? activeColumn
-                    : ((activeColumn as number) + 1) as ViewColumn;
+                let previewColumn;
+                if (window.activeTextEditor) {
+                    const activeColumn = window.activeTextEditor!.viewColumn;
+                    previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
+                        ? activeColumn
+                        : ((activeColumn as number) + 1) as ViewColumn;
+                } else {
+                    previewColumn = this._restClientSettings.previewColumn;
+                }
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
                 } else if (previewColumn) {

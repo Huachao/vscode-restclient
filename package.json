@@ -54,7 +54,8 @@
     "onCommand:rest-client.copy-request-as-curl",
     "onCommand:rest-client.fold-response",
     "onCommand:rest-client.unfold-response",
-    "onLanguage:http"
+    "onLanguage:http",
+    "onView:httpRequest"
   ],
   "main": "./dist/extension",
   "contributes": {
@@ -178,6 +179,22 @@
         "command": "rest-client.unfold-response",
         "title": "Unfold Response",
         "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.refreshEntry",
+        "title": "Refresh",
+        "icon": {
+          "light": "images/refresh-light.svg",
+          "dark": "images/refresh-dark.svg"
+        }
+      },
+      {
+        "command": "rest-client.sendRequest",
+        "title": "Send Request",
+        "icon": {
+          "light": "images/run-light.svg",
+          "dark": "images/run-dark.svg"
+        }
       }
     ],
     "menus": {
@@ -254,6 +271,28 @@
           "command": "rest-client.copy-request-as-curl",
           "when": "editorTextFocus && editorLangId == http",
           "group": "rest-client@3"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "rest-client.refreshEntry",
+          "when": "view == httpRequest",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "rest-client.sendRequest",
+          "when": "view == httpRequest && viewItem == request",
+          "group": "inline"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "httpRequest",
+          "name": "Http Requests"
         }
       ]
     },
