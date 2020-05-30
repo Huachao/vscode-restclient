@@ -147,6 +147,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.previewOption = ParsePreviewOptionStr(restClientSettings.get<string>("previewOption", "full"));
         this.formParamEncodingStrategy = ParseFormParamEncodingStr(restClientSettings.get<string>("formParamEncodingStrategy", "automatic"));
         this.enableTelemetry = restClientSettings.get<boolean>('enableTelemetry', true);
+        this.suppressResponseBodyContentTypeValidationWarning = restClientSettings.get('suppressResponseBodyContentTypeValidationWarning', false);
         this.addRequestBodyLineIndentationAroundBrackets = restClientSettings.get<boolean>('addRequestBodyLineIndentationAroundBrackets', true);
         this.decodeEscapedUnicodeCharacters = restClientSettings.get<boolean>('decodeEscapedUnicodeCharacters', false);
         this.logLevel = ParseLogLevelStr(restClientSettings.get<string>('logLevel', 'error'));
