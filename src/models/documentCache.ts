@@ -1,7 +1,7 @@
 import { TextDocument } from 'vscode';
 
 export class DocumentCache<T> {
-    private _cache: Map<string, T>;
+    private readonly _cache: Map<string, T>;
 
     public constructor(private readonly ignoreVersion: boolean = false) {
         this._cache = new Map<string, T>();

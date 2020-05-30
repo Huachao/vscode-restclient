@@ -24,7 +24,7 @@ export class ResponseFormatUtility {
             if (MimeUtility.isJSON(contentType)) {
                 if (isJSONString(body)) {
                     body = this.jsonPrettify(body);
-                } else if (!suppressValidation) {
+                } else if (body && !suppressValidation) {
                     window.showWarningMessage('The content type of response is application/json, while response body is not a valid json string');
                 }
             } else if (MimeUtility.isXml(contentType)) {
