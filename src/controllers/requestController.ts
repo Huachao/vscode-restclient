@@ -26,9 +26,7 @@ export class RequestController {
         this._requestStatusEntry = new RequestStatusEntry();
         this._httpClient = new HttpClient();
         this._webview = new HttpResponseWebview(context);
-        this._webview.onDidCloseAllWebviewPanels(() => {
-            this._requestStatusEntry.update({ state: RequestState.Closed });
-        });
+        this._webview.onDidCloseAllWebviewPanels(() => this._requestStatusEntry.update({ state: RequestState.Closed }));
         this._textDocumentView = new HttpResponseTextDocumentView();
     }
 
