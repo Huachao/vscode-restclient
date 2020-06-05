@@ -95,6 +95,7 @@ export class CodeSnippetController {
                 const result = snippet.convert(tk, ck);
 
                 try {
+                    quickPick.hide();
                     this._webview.render(result, `${tt}-${ct}`, tk);
                 } catch (reason) {
                     Logger.error('Unable to preview generated code snippet:', reason);
