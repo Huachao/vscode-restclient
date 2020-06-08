@@ -254,7 +254,10 @@ export class HttpClient {
     }
 
     private decodeEscapedUnicodeCharacters(body: string): string {
-        return body.replace(/\\u([\d\w]{4})/gi, (_, g) => String.fromCharCode(parseInt(g, 16)));
+        return body.replace(/\\u([\d\w]{4})/gi, (_, g) => {
+            var char = String.fromCharCode(parseInt(g, 16));
+            return char == '\"' ? "\\\"" : char;
+        });
     }
 
     private getRequestCertificate(requestUrl: string): Certificate | null {
