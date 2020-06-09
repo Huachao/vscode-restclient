@@ -255,8 +255,8 @@ export class HttpClient {
 
     private decodeEscapedUnicodeCharacters(body: string): string {
         return body.replace(/\\u([\d\w]{4})/gi, (_, g) => {
-            var char = String.fromCharCode(parseInt(g, 16));
-            return char == '\"' ? "\\\"" : char;
+            const char = String.fromCharCode(parseInt(g, 16));
+            return char === '"' ? "\\\"" : char;
         });
     }
 
