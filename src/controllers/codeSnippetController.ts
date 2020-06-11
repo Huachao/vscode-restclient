@@ -94,8 +94,8 @@ export class CodeSnippetController {
                 Telemetry.sendEvent('Generate Code Snippet', { 'target': target!.key, 'client': ck });
                 const result = snippet.convert(tk, ck);
 
+                quickPick.hide();
                 try {
-                    quickPick.hide();
                     this._webview.render(result, `${tt}-${ct}`, tk);
                 } catch (reason) {
                     Logger.error('Unable to preview generated code snippet:', reason);
