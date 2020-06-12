@@ -1,3 +1,20 @@
+## 0.24.0 (2020/6/12)
+* __Feature__: [AWS Signature version 4 authentication](https://github.com/Huachao/vscode-restclient/pull/586) ([@sebastian-fredriksson-bernholtz](https://github.com/sebastian-fredriksson-bernholtz))
+* __Feature__: [Present an Option to Confirm Send](https://github.com/Huachao/vscode-restclient/pull/538) ([@ChayimFriedman2](https://github.com/ChayimFriedman2))
+* __Feature__: [Add support for the XDG directory specification](https://github.com/Huachao/vscode-restclient/pull/590) ([@tristan957](https://github.com/tristan957))
+* __Bug Fix__: [Fix request line parse error if url contains http](https://github.com/Huachao/vscode-restclient/issues/543)
+* __Bug Fix__: [$guid parameter reported as not found in editor](https://github.com/Huachao/vscode-restclient/issues/551)
+* __Bug Fix__: [Space in URL causes wrong colorization](https://github.com/Huachao/vscode-restclient/issues/584)
+* __Bug Fix__: [Suppress response body validation for empty JSON response](https://github.com/Huachao/vscode-restclient/issues/598)
+* __Bug Fix__: [Escape quotes for decodeEscapedUnicodeCharacters](https://github.com/Huachao/vscode-restclient/pull/602) ([@Treno1](https://github.com/Treno1))
+* __Bug Fix__: Fix Basic/Digest auth scheme not case-insensitive
+* __Bug Fix__: Fix incorrect header in saved response
+* __Improvement__: [Fix demo http request syntax in *README.md*](https://github.com/Huachao/vscode-restclient/pull/542) ([@Baoyx007](https://github.com/Baoyx007))
+* __Improvement__: [Refine *README.md* usage section](https://github.com/Huachao/vscode-restclient/pull/591) ([@matyasforian](https://github.com/matyasforian))
+* __Improvement__: Support query line syntax highlight
+* __Improvement__: Support more code snippet clients
+
+
 ## 0.23.2 (2020/3/9)
 * __Bug Fix__: [Redirect 303 use port of original request](https://github.com/Huachao/vscode-restclient/issues/502)
 * __Bug Fix__: [Cookie header not respected when `rest-client.rememberCookiesForSubsequentRequest` is set to `false`](https://github.com/Huachao/vscode-restclient/issues/507)

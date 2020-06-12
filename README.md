@@ -564,7 +564,6 @@ For example: Define a shell environment variable in `.bashrc` or similar on wind
 
   `%`: Optional. If specified, treats envVarName as an extension setting environment variable, and uses the value of that for the lookup.
 
-
 * `{{$dotenv [%]variableName}}`: Returns the environment value stored in the [`.env`](https://github.com/motdotla/dotenv) file which exists in the same directory of your `.http` file.
 * `{{$randomInt min max}}`: Returns a random integer between min (included) and max (excluded)
 * `{{$timestamp [offset option]}}`: Add UTC timestamp of now. You can even specify any date time based on current time in the format `{{$timestamp number option}}`, e.g., to represent 3 hours ago, simply `{{$timestamp -3 h}}`; to represent the day after tomorrow, simply `{{$timestamp 2 d}}`.
@@ -574,17 +573,17 @@ For example: Define a shell environment variable in `.bashrc` or similar on wind
 The offset options you can specify in `timestamp` and `datetime` are:
 
 Option | Description
------- | -----------
-y | Year
-M | Month
-w | Week
-d | Day
-h | Hour
-m | Minute
-s | Second
-ms | Millisecond
+-------|------------
+y      | Year
+M      | Month
+w      | Week
+d      | Day
+h      | Hour
+m      | Minute
+s      | Second
+ms     | Millisecond
 
-Below is a example using system variables:Da
+Below is a example using system variables:
 ```http
 POST https://api.example.com/comments HTTP/1.1
 Content-Type: application/xml
@@ -607,11 +606,11 @@ REST Client Extension adds the ability to control the font family, size and weig
 
 By default, REST Client Extension only previews the full response in preview panel(_status line_, _headers_ and _body_). You can control which part should be previewed via the `rest-client.previewOption` setting:
 
-Option | Description
------- | -----------
-full | Default. Full response is previewed
-headers | Only the response headers(including _status line_) are previewed
-body | Only the response body is previewed
+Option   | Description
+---------|-----------------------------------------------------------------
+full     | Default. Full response is previewed
+headers  | Only the response headers(including _status line_) are previewed
+body     | Only the response body is previewed
 exchange | Preview the whole HTTP exchange(request and response)
 
 ## Settings
@@ -645,6 +644,15 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.enableCustomVariableReferencesCodeLens`: Enable/disable custom variable references CodeLens in request file. (Default is __true__)
 
 Rest Client extension respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`). Only HTTP and HTTPS proxies are supported.
+
+### Per-request Settings
+REST Client Extension also supports request-level settings for each independent request. The syntax is similar with the request name definition, `# @settingName [settingValue]`, a required setting name as well as the optional setting vaule. Available settings are listed as following:
+
+Name | Syntax    | Description
+-----|-----------|--------------------------------------------------------------
+note | `# @note` | Use for request confirmation, especially for critical request
+
+> All the above leading `#` can be replaced with `//`
 
 ## License
 [MIT License](LICENSE)
