@@ -70,7 +70,7 @@ export class HttpRequestParser implements RequestParser {
         }
 
         // parse request line
-        const requestLine = this.parseRequestLine(requestLines.join(EOL));
+        const requestLine = this.parseRequestLine(requestLines.map(l => l.trim()).join(''));
 
         // parse headers lines
         const headers = parseRequestHeaders(headersLines, this.settings.defaultHeaders, requestLine.url);
