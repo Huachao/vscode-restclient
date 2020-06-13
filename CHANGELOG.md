@@ -1,3 +1,6 @@
+## 0.24.1 (2020/6/13)
+* __Bug Fix__: [Query strings not working on multiple lines](https://github.com/Huachao/vscode-restclient/issues/607)
+
 ## 0.24.0 (2020/6/12)
 * __Feature__: [AWS Signature version 4 authentication](https://github.com/Huachao/vscode-restclient/pull/586) ([@sebastian-fredriksson-bernholtz](https://github.com/sebastian-fredriksson-bernholtz))
 * __Feature__: [Present an Option to Confirm Send](https://github.com/Huachao/vscode-restclient/pull/538) ([@ChayimFriedman2](https://github.com/ChayimFriedman2))
