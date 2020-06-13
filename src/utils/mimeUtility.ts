@@ -6,7 +6,7 @@ class MimeType {
     public readonly charset?: string;
     public constructor(type: string, subtype: string, charset?: string) {
         this.type = type.toLowerCase();
-        this.subtype = subtype.toLowerCase();
+        this.subtype = subtype?.toLowerCase() ?? '';
         this.charset = charset;
     }
 
