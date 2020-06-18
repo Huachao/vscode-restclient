@@ -12,6 +12,7 @@ import { UserDataManager } from '../utils/userDataManager';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
+import { VariableProcessor } from '../utils/variableProcessor';
 
 export class RequestController {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
@@ -43,7 +44,19 @@ export class RequestController {
             return;
         }
 
-        const { text, name, warnBeforeSend } = selectedRequest;
+        const { text, name, warnBeforeSend, promptVariableNames } = selectedRequest;
+
+        const promptVariables = new Map<string, string>();
+        for (const promptVariableName of promptVariableNames) {
+            const promptValue = await window.showInputBox({
+                prompt: `Input value for "${promptVariableName}"`
+            })
+            if (promptValue !== undefined) {
+                promptVariables.set("$prompt." + promptVariableName, promptValue);
+            } else {
+                return;
+            }
+        }
 
         if (warnBeforeSend) {
             const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
@@ -53,8 +66,11 @@ export class RequestController {
             }
         }
 
+        // replace prompt variables if exists
+        const processedText = promptVariables.size > 0 ? await VariableProcessor.processRawRequest(text, promptVariables) : text;
+
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(name);
+        const httpRequest = await RequestParserFactory.createRequestParser(processedText).parseHttpRequest(name);
 
         await this.runCore(httpRequest, document);
     }

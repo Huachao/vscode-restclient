@@ -67,4 +67,6 @@ export const RequestVariableDefinitionRegex: RegExp = RequestVariableDefinitionW
 
 export const NoteCommentRegex = /^\s*(?:#{1,}|\/{2,})\s*@note\s*$/m;
 
+export const PromptCommentRegex = /^\s*(?:#{1,}|\/{2,})\s*@prompt\s*(.*?)\s*$/m;
+
 export const LineSplitterRegex: RegExp = /\r?\n/g;

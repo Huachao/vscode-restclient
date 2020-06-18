@@ -14,6 +14,7 @@ export interface SelectedRequest {
     text: string;
     name?: string;
     warnBeforeSend: boolean;
+    promptVariableNames: string[]
 }
 
 export class Selector {
@@ -42,6 +43,9 @@ export class Selector {
         // parse #@note comment
         const warnBeforeSend = this.hasNoteComment(selectedText);
 
+        // parse #@prompt comment
+        const promptVariableNames = this.hasPromptComment(selectedText) ? this.extractPromptCommentVariables(selectedText) : [];
+
         // parse actual request lines
         const rawLines = selectedText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
         const requestRange = this.getRequestRanges(rawLines)[0];
@@ -57,17 +61,19 @@ export class Selector {
         return {
             text: selectedText,
             name: requestVariable,
-            warnBeforeSend
+            warnBeforeSend,
+            promptVariableNames
         };
     }
 
     public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
         options = {
-                ignoreCommentLine: true,
-                ignoreEmptyLine: true,
-                ignoreFileVariableDefinitionLine: true,
-                ignoreResponseRange: true,
-            ...options};
+            ignoreCommentLine: true,
+            ignoreEmptyLine: true,
+            ignoreFileVariableDefinitionLine: true,
+            ignoreResponseRange: true,
+            ...options
+        };
         const requestRanges: [number, number][] = [];
         const delimitedLines = this.getDelimiterRows(lines);
         delimitedLines.push(lines.length);
@@ -134,6 +140,16 @@ export class Selector {
         return Constants.NoteCommentRegex.test(text);
     }
 
+    public static hasPromptComment(text: string): boolean {
+        return Constants.PromptCommentRegex.test(text);
+    }
+
+    public static extractPromptCommentVariables(text: string): string[] {
+        let matched = text.match(Constants.PromptCommentRegex);
+        let variables_text = matched?.[1] || '';
+        return variables_text.split(",");
+    }
+
     private static getDelimitedText(fullText: string, currentLine: number): string | null {
         const lines: string[] = fullText.split(Constants.LineSplitterRegex);
         const delimiterLineNumbers: number[] = this.getDelimiterRows(lines);
@@ -168,6 +184,6 @@ export class Selector {
     private static getDelimiterRows(lines: string[]): number[] {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
-            .map(([index, ]) => +index);
+            .map(([index,]) => +index);
     }
 }
