@@ -14,7 +14,7 @@ export interface SelectedRequest {
     text: string;
     name?: string;
     warnBeforeSend: boolean;
-    promptVariableNames: string[]
+    promptVariableNames: string[];
 }
 
 export class Selector {
@@ -145,8 +145,8 @@ export class Selector {
     }
 
     public static extractPromptCommentVariables(text: string): string[] {
-        let matched = text.match(Constants.PromptCommentRegex);
-        let variables_text = matched?.[1] || '';
+        const matched = text.match(Constants.PromptCommentRegex);
+        const variables_text = matched?.[1] || '';
         return variables_text.split(",");
     }
 
@@ -184,6 +184,6 @@ export class Selector {
     private static getDelimiterRows(lines: string[]): number[] {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
-            .map(([index,]) => +index);
+            .map(([index, ]) => +index);
     }
 }

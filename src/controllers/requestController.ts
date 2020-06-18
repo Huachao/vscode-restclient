@@ -9,10 +9,11 @@ import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
 import { UserDataManager } from '../utils/userDataManager';
+import { VariableProcessor } from '../utils/variableProcessor';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
-import { VariableProcessor } from '../utils/variableProcessor';
+
 
 export class RequestController {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
@@ -50,7 +51,7 @@ export class RequestController {
         for (const promptVariableName of promptVariableNames) {
             const promptValue = await window.showInputBox({
                 prompt: `Input value for "${promptVariableName}"`
-            })
+            });
             if (promptValue !== undefined) {
                 promptVariables.set("$prompt." + promptVariableName, promptValue);
             } else {
