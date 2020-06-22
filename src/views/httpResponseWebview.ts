@@ -351,7 +351,10 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     }
 
     private addUrlLinks(innerHtml: string) {
-        return innerHtml.replace(this.urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+        return innerHtml.replace(this.urlRegex, match => {
+            const parsedLink = JSON.parse(`"${match}"`);
+            return `<a href=${parsedLink} target="_blank" rel="noopener noreferrer">${match}</a>`;
+        });
     }
 
     private getFoldingRange(lines: string[]): Map<number, FoldingRange> {
