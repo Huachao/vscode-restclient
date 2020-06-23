@@ -182,12 +182,10 @@ export class HttpClient {
                     port: Number(proxyEndpoint.port),
                     rejectUnauthorized: this._settings.proxyStrictSSL
                 };
-
-                const ctor = (httpRequest.url.startsWith('http:')
-                    ? await import('http-proxy-agent')
-                    : await import('https-proxy-agent')).default;
-
-                options.agent = new ctor(proxyOptions);
+                const tunnel = (await import('tunnel')).default;
+                const hoh = tunnel.httpOverHttp({ proxy: proxyOptions });
+                const agentOptions: got.AgentOptions = { http: hoh, https: hoh };
+                options.agent = agentOptions;
             }
         }
 

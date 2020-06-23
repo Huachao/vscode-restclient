@@ -371,6 +371,12 @@
           "scope": "resource",
           "description": "Send out anonymous usage data"
         },
+        "rest-client.proxy": {
+          "type": "string",
+          "default": null,
+          "scope": "resource",
+          "description": "The proxy setting to use"
+        },
         "rest-client.excludeHostsForProxy": {
           "type": "array",
           "default": [],
@@ -666,6 +672,7 @@
     "pretty-data": "^0.40.0",
     "tough-cookie": "^3.0.1",
     "tough-cookie-file-store-bugfix": "Huachao/tough-cookie-file-store-bugfix",
+    "tunnel": "0.0.6",
     "uuid": "^3.3.2",
     "xmldom": "^0.1.27",
     "xpath": "^0.0.27",
