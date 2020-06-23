@@ -28,7 +28,7 @@ export abstract class BaseWebview {
         return this._onDidCloseAllWebviewPanels.event;
     }
 
-    protected setPrviewActiveContext(value: boolean) {
+    protected setPreviewActiveContext(value: boolean) {
         commands.executeCommand('setContext', this.previewActiveContextKey, value);
     }
 
