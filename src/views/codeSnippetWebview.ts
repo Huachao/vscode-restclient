@@ -39,13 +39,13 @@ export class CodeSnippetWebview extends BaseWebview {
                 });
 
             panel.onDidDispose(() => {
-                this.setPrviewActiveContext(false);
+                this.setPreviewActiveContext(false);
                 this.panels.pop();
                 this._onDidCloseAllWebviewPanels.fire();
             });
 
             panel.onDidChangeViewState(({ webviewPanel }) => {
-                this.setPrviewActiveContext(webviewPanel.active);
+                this.setPreviewActiveContext(webviewPanel.active);
             });
 
             panel.iconPath = this.iconFilePath;
@@ -58,7 +58,7 @@ export class CodeSnippetWebview extends BaseWebview {
 
         panel.webview.html = this.getHtmlForWebview(panel, convertResult, lang);
 
-        this.setPrviewActiveContext(true);
+        this.setPreviewActiveContext(true);
         this.activeCodeSnippet = convertResult;
 
         panel.reveal(ViewColumn.Two);
