@@ -25,7 +25,7 @@ export class CustomVariableDiagnosticsProvider {
 
     private timer: NodeJS.Timer | undefined;
 
-    private fileVaraibleReferenceCache = new DocumentCache<Map<string, VariableWithPosition[]>>();
+    private fileVariableReferenceCache = new DocumentCache<Map<string, VariableWithPosition[]>>();
 
     constructor() {
         this.disposables.push(
@@ -132,8 +132,8 @@ export class CustomVariableDiagnosticsProvider {
     }
 
     private findVariableReferences(document: TextDocument): Map<string, VariableWithPosition[]> {
-        if (this.fileVaraibleReferenceCache.has(document)) {
-            return this.fileVaraibleReferenceCache.get(document)!;
+        if (this.fileVariableReferenceCache.has(document)) {
+            return this.fileVariableReferenceCache.get(document)!;
         }
 
         const vars = new Map<string, VariableWithPosition[]>();
@@ -157,7 +157,7 @@ export class CustomVariableDiagnosticsProvider {
             }
         });
 
-        this.fileVaraibleReferenceCache.set(document, vars);
+        this.fileVariableReferenceCache.set(document, vars);
 
         return vars;
     }

@@ -69,7 +69,7 @@ export class HttpResponseWebview extends BaseWebview {
 
             panel.onDidDispose(() => {
                 if (panel === this.activePanel) {
-                    this.setPrviewActiveContext(false);
+                    this.setPreviewActiveContext(false);
                     this.activePanel = undefined;
                 }
 
@@ -87,7 +87,7 @@ export class HttpResponseWebview extends BaseWebview {
 
             panel.onDidChangeViewState(({ webviewPanel }) => {
                 const active = this.panels.some(p => p.active);
-                this.setPrviewActiveContext(active);
+                this.setPreviewActiveContext(active);
                 this.activePanel = webviewPanel.active ? webviewPanel : undefined;
             });
 
@@ -99,7 +99,7 @@ export class HttpResponseWebview extends BaseWebview {
 
         panel.webview.html = this.getHtmlForWebview(panel, response);
 
-        this.setPrviewActiveContext(this.settings.previewResponsePanelTakeFocus);
+        this.setPreviewActiveContext(this.settings.previewResponsePanelTakeFocus);
 
         panel.reveal(column, !this.settings.previewResponsePanelTakeFocus);
 

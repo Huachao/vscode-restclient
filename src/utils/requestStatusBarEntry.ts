@@ -13,7 +13,7 @@ type ReceivedRequestStatus = {
     response: HttpResponse
 };
 
-type RequestStaus = ReceivedRequestStatus | NonReceivedRequestStatus;
+type RequestStatus = ReceivedRequestStatus | NonReceivedRequestStatus;
 
 export enum RequestState {
     Closed,
@@ -38,7 +38,7 @@ export class RequestStatusEntry {
         this.sizeEntry.dispose();
     }
 
-    public update(status: RequestStaus) {
+    public update(status: RequestStatus) {
         this.sizeEntry.hide();
 
         switch (status.state) {
