@@ -157,7 +157,7 @@ Authorization: token xxx
 </request>
 ```
 
-You can also specify file path to use as a body, which starts with `< `, the file path(*whitepsaces* should be preserved) can be either in absolute or relative(relative to workspace root or current http file) formats:
+You can also specify file path to use as a body, which starts with `< `, the file path(*whitespaces* should be preserved) can be either in absolute or relative(relative to workspace root or current http file) formats:
 ```http
 POST https://example.com/comments HTTP/1.1
 Content-Type: application/xml
@@ -646,7 +646,7 @@ exchange | Preview the whole HTTP exchange(request and response)
 Rest Client extension respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`). Only HTTP and HTTPS proxies are supported.
 
 ### Per-request Settings
-REST Client Extension also supports request-level settings for each independent request. The syntax is similar with the request name definition, `# @settingName [settingValue]`, a required setting name as well as the optional setting vaule. Available settings are listed as following:
+REST Client Extension also supports request-level settings for each independent request. The syntax is similar with the request name definition, `# @settingName [settingValue]`, a required setting name as well as the optional setting value. Available settings are listed as following:
 
 Name | Syntax    | Description
 -----|-----------|--------------------------------------------------------------
