@@ -392,7 +392,7 @@ Environments give you the ability to customize requests using variables, and you
 Environments and including variables are defined directly in `Visual Studio Code` setting file, so you can create/update/delete environments and variables at any time you wish. If you __DO NOT__ want to use any environment, you can choose `No Environment` in the environment list. Notice that if you select `No Environment`, variables defined in shared environment are still available. See [Environment Variables](#environment-variables) for more details about environment variables.
 
 ## Variables
-We support two types of variables, one is __Custom Variables__ which is defined by user and can be further divided into __Environment Variables__, __Prompt Variables__, __File Variables__ and __Request Variables__, the other is __System Variables__ which is a predefined set of variables out-of-box.
+We support two types of variables, one is __Custom Variables__ which is defined by user and can be further divided into __Environment Variables__, __File Variables__, __Prompt Variables__, and __Request Variables__, the other is __System Variables__ which is a predefined set of variables out-of-box.
 
 The reference syntax of system and custom variables types has a subtle difference, for the former the syntax is `{{$SystemVariableName}}`, while for the latter the syntax is `{{CustomVariableName}}`, without preceding `$` before variable name. The definition syntax and location for different types of custom variables are different. Notice that when the same name used for custom variables, request variables takes higher resolving precedence over file variables, file variables takes higher precedence over environment variables.
 
@@ -427,27 +427,6 @@ GET https://{{host}}/api/{{version}}comments/1 HTTP/1.1
 Authorization: {{token}}
 ```
 
-#### Prompt Variables
-With prompt variables, user can input the variables to be used when sending a request. This give a flexibility to change most dynamic variables without having to change the `http` file. User can also specify more than one prompt variables. The definition syntax of prompt variables is just like a single-line comment, add follows __`// @prompt var1,var2`__ or __`# @prompt var1,var2`__ just before the desired request url. Then, user can assign the request body with the specified prompt variables with an additional prefix of `$prompt` so it can be replace with the user input value.
-
-```http
-@hostname = api.example.com
-@port = 8080
-@host = {{hostname}}:{{port}}
-@contentType = application/json
-
-###
-# @prompt refCode,otp
-POST https://{{host}}/verify-otp HTTP/1.1
-Content-Type: {{contentType}}
-
-{
-    "refCode": "{{$prompt.refCode}}",
-    "otp": "{{$prompt.otp}}"
-}
-
-```
-
 #### File Variables
 For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contain any spaces. As for variable value, it can consist of any characters, even whitespaces are allowed for them (leading and trailing whitespaces will be trimmed). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variable value can even contain references to all of other kinds of variables. For instance, you can create a file variable with value of other [request variables](#request-variables) like `@token = {{loginAPI.response.body.token}}`.
 
@@ -476,6 +455,27 @@ Content-Type: {{contentType}}
     "content": "foo bar",
     "created_at": "{{createdAt}}",
     "modified_by": "{{modifiedBy}}"
+}
+
+```
+
+#### Prompt Variables
+With prompt variables, user can input the variables to be used when sending a request. This give a flexibility to change most dynamic variables without having to change the `http` file. User can specify more than one prompt variables. The definition syntax of prompt variables is just like a single-line comment, by adding __`// @prompt {var1} {var1 description}`__ or __`# @prompt {var1} {var1 description}`__ just before the desired request url. The reference syntax is the same as others, follows __`{{var}}`__. The prompt variable will override any preceding assigned variable and will never be stored to be used in other requests.
+
+```http
+@hostname = api.example.com
+@port = 8080
+@host = {{hostname}}:{{port}}
+@contentType = application/json
+
+###
+# @prompt refCode Your reference code display on webpage
+# @prompt otp Your one-time password in your mailbox
+POST https://{{host}}/verify-otp/{{refCode}} HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "otp": "{{otp}}"
 }
 
 ```
