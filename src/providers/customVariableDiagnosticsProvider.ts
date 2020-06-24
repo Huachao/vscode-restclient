@@ -96,7 +96,7 @@ export class CustomVariableDiagnosticsProvider {
                 .filter(([name]) => !allAvailableVariables.has(name))
                 .forEach(([, variables]) => {
                     variables
-                        .filter((variable) => !this.hasPromptVariableDefintion(promptVariableDefinitions, variable))
+                        .filter(variable => !this.hasPromptVariableDefintion(promptVariableDefinitions, variable))
                         .forEach(({name, begin, end}) => {
                             diagnostics.push(
                                 new Diagnostic(new Range(begin, end), `${name} is not found`, DiagnosticSeverity.Error));
@@ -197,11 +197,12 @@ export class CustomVariableDiagnosticsProvider {
         }
         return defs;
     }
-    private hasPromptVariableDefintion(defs: Map<string, PromptVariableDefinitionWithRange[]>, { name, begin, end }: VariableWithPosition): boolean {
-        return defs.get(name)?.some(def => {
-            return def.name === name
-                && def.range[0] <= begin.line
-                && end.line <= def.range[1];
+    private hasPromptVariableDefintion(defs: Map<string, PromptVariableDefinitionWithRange[]>, variable: VariableWithPosition): boolean {
+        const { name, begin, end } = variable;
+        return defs.get(name)?.some(({name,  range: [rangeStart, rangeEnd]}) => {
+            return name === name
+                && rangeStart <= begin.line
+                && end.line <= rangeEnd;
         }) || false;
     }
 }
