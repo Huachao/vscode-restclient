@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { Range, TextEditor } from 'vscode';
+import { Range, TextEditor, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { VariableProcessor } from './variableProcessor';
 
@@ -14,7 +14,11 @@ export interface SelectedRequest {
     text: string;
     name?: string;
     warnBeforeSend: boolean;
-    promptVariableNames: string[];
+}
+
+interface PromptVariableDefinition {
+    name: string;
+    description?: string;
 }
 
 export class Selector {
@@ -44,7 +48,11 @@ export class Selector {
         const warnBeforeSend = this.hasNoteComment(selectedText);
 
         // parse #@prompt comment
-        const promptVariableNames = this.hasPromptComment(selectedText) ? this.extractPromptCommentVariables(selectedText) : [];
+        const promptVariablesDefinitions = this.extractPrompVariableDefinitions(selectedText);
+        const promptVariables = await this.promptForInput(promptVariablesDefinitions);
+        if (!promptVariables) {
+            return null;
+        }
 
         // parse actual request lines
         const rawLines = selectedText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
@@ -56,13 +64,12 @@ export class Selector {
         selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1).join(EOL);
 
         // variables replacement
-        selectedText = await VariableProcessor.processRawRequest(selectedText);
+        selectedText = await VariableProcessor.processRawRequest(selectedText, promptVariables);
 
         return {
             text: selectedText,
             name: requestVariable,
-            warnBeforeSend,
-            promptVariableNames
+            warnBeforeSend
         };
     }
 
@@ -140,14 +147,19 @@ export class Selector {
         return Constants.NoteCommentRegex.test(text);
     }
 
-    public static hasPromptComment(text: string): boolean {
-        return Constants.PromptCommentRegex.test(text);
-    }
+    public static extractPrompVariableDefinitions(text: string): PromptVariableDefinition[] {
+        const defs = new Array<PromptVariableDefinition>();
 
-    public static extractPromptCommentVariables(text: string): string[] {
-        const matched = text.match(Constants.PromptCommentRegex);
-        const variables_text = matched?.[1] || '';
-        return variables_text.split(",");
+        for (const line of text.split(Constants.LineSplitterRegex)) {
+            const matched = line.match(Constants.PromptCommentRegex);
+            if (matched) {
+                const name = matched[1];
+                const description = matched[2];
+                defs.push({ name, description });
+            }
+        }
+
+        return defs;
     }
 
     private static getDelimitedText(fullText: string, currentLine: number): string | null {
@@ -185,5 +197,20 @@ export class Selector {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
             .map(([index, ]) => +index);
+    }
+
+    private static async promptForInput(defs: PromptVariableDefinition[]): Promise<Map<string, string> | null> {
+        const promptVariables = new Map<string, string>();
+        for (const { name, description } of defs) {
+            const value = await window.showInputBox({
+                prompt: description ? `${description}` : `Input value for "${name}"`
+            });
+            if (value !== undefined) {
+                promptVariables.set(name, value);
+            } else {
+                return null;
+            }
+        }
+        return promptVariables;
     }
 }

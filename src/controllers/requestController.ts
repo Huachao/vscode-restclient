@@ -9,7 +9,6 @@ import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
 import { UserDataManager } from '../utils/userDataManager';
-import { VariableProcessor } from '../utils/variableProcessor';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
@@ -45,19 +44,7 @@ export class RequestController {
             return;
         }
 
-        const { text, name, warnBeforeSend, promptVariableNames } = selectedRequest;
-
-        const promptVariables = new Map<string, string>();
-        for (const promptVariableName of promptVariableNames) {
-            const promptValue = await window.showInputBox({
-                prompt: `Input value for "${promptVariableName}"`
-            });
-            if (promptValue !== undefined) {
-                promptVariables.set("$prompt." + promptVariableName, promptValue);
-            } else {
-                return;
-            }
-        }
+        const { text, name, warnBeforeSend } = selectedRequest;
 
         if (warnBeforeSend) {
             const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
@@ -67,11 +54,8 @@ export class RequestController {
             }
         }
 
-        // replace prompt variables if exists
-        const processedText = promptVariables.size > 0 ? await VariableProcessor.processRawRequest(text, promptVariables) : text;
-
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(processedText).parseHttpRequest(name);
+        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(name);
 
         await this.runCore(httpRequest, document);
     }
