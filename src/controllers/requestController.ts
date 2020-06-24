@@ -13,7 +13,6 @@ import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
-
 export class RequestController {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private _requestStatusEntry: RequestStatusEntry;
