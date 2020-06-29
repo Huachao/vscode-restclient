@@ -58,6 +58,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerProcessEnvVariable();
         this.registerDotenvVariable();
         this.registerAadTokenVariable();
+        this.registerGraphTokenVariable();
     }
 
     public readonly type: VariableType = VariableType.System;
@@ -278,6 +279,26 @@ export class SystemVariableProvider implements HttpVariableProvider {
         });
     }
 
+    private registerGraphTokenVariable() {
+        this.resolveFuncs.set(Constants.MicrosoftGraphTokenVariableName, 
+            (name, document, context) => {
+                return new Promise((resolve, reject) => {
+
+                    const scopes = "user.read%20openid%20profile";
+                    const client = new HttpClient();
+                    const request = new HttpRequest(
+                        "POST", `https://login.microsoftonline.com/common/oauth2/v2.0/devicecode`,
+                        { "Content-Type": "application/x-www-form-urlencoded" },
+                         `client_id=${Constants.AzureActiveDirectoryClientId}}&scope=${scopes}`);
+                    client.send(request).then(async value => {
+
+
+                     });
+
+                    resolve({ value: "eyJ0eXAiOiJKV1QiLCJub25jZSI6Im5XNHN1MGkyZnl2Y1F3MllGelgwSkR3aGtrOFIteUVfT1ZWWFNkTFNqV2MiLCJhbGciOiJSUzI1NiIsIng1dCI6IlNzWnNCTmhaY0YzUTlTNHRycFFCVEJ5TlJSSSIsImtpZCI6IlNzWnNCTmhaY0YzUTlTNHRycFFCVEJ5TlJSSSJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC84Y2VhMDJlYy05Nzg4LTRiYWMtYTE5Yi0zZTc4MmEzZTliYjAvIiwiaWF0IjoxNTkzMzk0OTkzLCJuYmYiOjE1OTMzOTQ5OTMsImV4cCI6MTU5MzM5ODg5MywiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkUyQmdZQ2h1S1UvUktLMFNNVk42YzhaQjExelBPVTNoMDhmTWN5RmRidjAzRlNNVFR3TUEiLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6IkdyYXBoIGV4cGxvcmVyIiwiYXBwaWQiOiJkZThiYzhiNS1kOWY5LTQ4YjEtYThhZC1iNzQ4ZGE3MjUwNjQiLCJhcHBpZGFjciI6IjAiLCJkZXZpY2VpZCI6IjNkMDgyNDY3LThhYWYtNGI5OS04MjVhLTE2NzBjMmY4Y2M2YiIsImZhbWlseV9uYW1lIjoiTWlsbGVyIiwiZ2l2ZW5fbmFtZSI6IkRhcnJlbCIsImlwYWRkciI6IjcwLjQ4LjExNy43NSIsIm5hbWUiOiJEYXJyZWwgTWlsbGVyIiwib2lkIjoiM2YwNTc5MDQtZjkzNi00YmYwLTlmY2MtYzFlNmY4NDI4OWQ4IiwicGxhdGYiOiIzIiwicHVpZCI6IjEwMDMwMDAwODdBRUJGQ0YiLCJyaCI6IjAuQVJvQTdBTHFqSWlYckV1aG16NTRLajZic0xYSWk5NzUyYkZJcUsyM1NOcHlVR1JGQU5vLiIsInNjcCI6IkFuYWx5dGljcy5SZWFkIEF1ZGl0TG9nLlJlYWQuQWxsIENhbGVuZGFycy5SZWFkIENhbGVuZGFycy5SZWFkLlNoYXJlZCBDYWxlbmRhcnMuUmVhZFdyaXRlIENoYXQuUmVhZFdyaXRlIENvbnRhY3RzLlJlYWRXcml0ZSBDb250YWN0cy5SZWFkV3JpdGUuU2hhcmVkIERldmljZU1hbmFnZW1lbnRBcHBzLlJlYWRXcml0ZS5BbGwgRGlyZWN0b3J5LkFjY2Vzc0FzVXNlci5BbGwgRGlyZWN0b3J5LlJlYWQuQWxsIERpcmVjdG9yeS5SZWFkV3JpdGUuQWxsIEZpbGVzLlJlYWRXcml0ZSBGaWxlcy5SZWFkV3JpdGUuQWxsIEZpbGVzLlJlYWRXcml0ZS5BcHBGb2xkZXIgRmlsZXMuUmVhZFdyaXRlLlNlbGVjdGVkIEZpbmFuY2lhbHMuUmVhZFdyaXRlLkFsbCBHcm91cC5SZWFkLkFsbCBHcm91cC5SZWFkV3JpdGUuQWxsIElkZW50aXR5UHJvdmlkZXIuUmVhZC5BbGwgSW5mb3JtYXRpb25Qcm90ZWN0aW9uUG9saWN5LlJlYWQgTWFpbC5SZWFkIE1haWwuUmVhZC5TaGFyZWQgTWFpbC5SZWFkQmFzaWMgTWFpbC5SZWFkV3JpdGUgTWFpbC5TZW5kIE1haWxib3hTZXR0aW5ncy5SZWFkV3JpdGUgTm90ZXMuUmVhZFdyaXRlLkFsbCBvcGVuaWQgUGVvcGxlLlJlYWQgUGxhY2UuUmVhZC5BbGwgcHJvZmlsZSBSZXBvcnRzLlJlYWQuQWxsIFNlY3VyaXR5RXZlbnRzLlJlYWQuQWxsIFNpdGVzLlJlYWRXcml0ZS5BbGwgVGFza3MuUmVhZFdyaXRlIFVzZXIuUmVhZCBVc2VyLlJlYWRCYXNpYy5BbGwgVXNlci5SZWFkV3JpdGUgZW1haWwiLCJzaWduaW5fc3RhdGUiOlsia21zaSJdLCJzdWIiOiJLdDVILWRXOEdVem9ldHlQT0dBbnlaRGwxd3FkYjlwQllZd3RWWXB1dWc0IiwidGVuYW50X3JlZ2lvbl9zY29wZSI6Ik5BIiwidGlkIjoiOGNlYTAyZWMtOTc4OC00YmFjLWExOWItM2U3ODJhM2U5YmIwIiwidW5pcXVlX25hbWUiOiJkYXJyZWxAdGF2aXMuY2EiLCJ1cG4iOiJkYXJyZWxAdGF2aXMuY2EiLCJ1dGkiOiJOaFZyc1EteFMwbTlXZG5YU2VFRkFBIiwidmVyIjoiMS4wIiwid2lkcyI6WyI2OTA5MTI0Ni0yMGU4LTRhNTYtYWE0ZC0wNjYwNzViMmE3YTgiLCJmZTkzMGJlNy01ZTYyLTQ3ZGItOTFhZi05OGMzYTQ5YTM4YjEiLCJmMDIzZmQ4MS1hNjM3LTRiNTYtOTVmZC03OTFhYzAyMjYwMzMiLCIyOTIzMmNkZi05MzIzLTQyZmQtYWRlMi0xZDA5N2FmM2U0ZGUiLCJmMjhhMWY1MC1mNmU3LTQ1NzEtODE4Yi02YTEyZjJhZjZiNmMiLCI2MmU5MDM5NC02OWY1LTQyMzctOTE5MC0wMTIxNzcxNDVlMTAiXSwieG1zX3N0Ijp7InN1YiI6InlUcktJaGVGYTUyMEFiMnlJUEFySnFYc0xocUhncHlwdjBvRnV5LXVFTU0ifSwieG1zX3RjZHQiOjEzODM2MTkyNjR9.U5_2bGymVMVXdL4Z7J6xqG2xN9dDyLWr7nt_0JxLfrPDr5gyk0L4ajw-IFFjF84Yej9eF9q9BCFMG8Ve6DgrrnHb-YYy8BH0c7LjWMkEQq1kLTj-l8EUGgONNeSfOfDSt1uprJ4Zowm6yu6YVceOptk8oED113oLe_HV_imhYSnx9SwR_7ZhoVmWo4GHufeG0XtCGNwJ1D6TNQCVR5asXPOmeQaBvQ_MTcipOza1clVC27E4zgG_8z5PrP9-3sAEBHa6ROhqhqH1Y4BsUSpRsS_QpsPeu9FJ80rNwUMBnM4EeeSZKN-OjFd1swzCge8kyWVsHKlQ7D_a0O1miH_5aQ" });
+                });
+        });
+    }
     private async resolveSettingsEnvironmentVariable(name: string) {
         if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
             const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);
@@ -452,6 +473,57 @@ export class SystemVariableProvider implements HttpVariableProvider {
             window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
         });
     }
+
+    private _acquireGraphToken(
+        resolve: (value?: adal.TokenResponse | PromiseLike<adal.TokenResponse>, cache?: boolean, copy?: boolean) => void,
+        reject: (reason?: any) => void,
+        authContext: adal.AuthenticationContext,
+        cloud: string,
+        tenantId: string,
+        targetApp: string,
+        clientId: string
+    ) {
+        const messageBoxOptions = { modal: true };
+        const signInFailed = (stage: string, message: string) => {
+            window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: ${stage}\r\n\r\n${message}`, messageBoxOptions);
+        };
+        _acquireDeviceCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: adal.UserCodeInfo) => {
+            if (codeError) {
+                signInFailed("acquireUserCode", codeError.message);
+                return reject(codeError);
+            }
+
+            const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${codeResponse.userCode}`;
+            const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n4. Token will be copied to the clipboard when finished\r\n\r\nCode: ${codeResponse.userCode}`;
+            const signIn = "Sign in";
+            const tryAgain = "Try again";
+            const done = "Done";
+            const signInPrompt = value => {
+                if (value === signIn || value === tryAgain) {
+                    this.clipboard.writeText(codeResponse.userCode).then(() => {
+                        commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
+                        window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
+                    });
+                } else if (value === done) {
+                    authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: adal.TokenResponse) => {
+                        if (tokenError) {
+                            signInFailed("acquireTokenWithDeviceCode", tokenError.message);
+                            return reject(tokenError);
+                        }
+
+                        // explicitly copy this token since we've informed the user in the dialog
+                        return resolve(tokenResponse, true, true);
+                    });
+                }
+            };
+            window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
+        });
+    }
+
+    private _acquireDeviceCode(targetApp :string, clientId:string, locale:string, something :any) {
+        
+    }
+
 
     private _getTokenString(token: adal.TokenResponse) {
         return token ? `${token.tokenType} ${token.accessToken}` : '';

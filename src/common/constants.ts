@@ -21,6 +21,9 @@ export const DotenvVariableName = "$dotenv";
 export const DotenvDescription = "Returns the environment value stored in a .env file";
 export const AzureActiveDirectoryVariableName = "$aadToken";
 export const AzureActiveDirectoryDescription = "Prompts to sign in to Azure AD and adds the token to the request";
+export const MicrosoftGraphTokenVariableName = "$graphToken";
+export const MicrosoftGraphTokenDescription = "Prompts to sign in to Microsft Graph and adds the token to the request";
+
 /**
  * NOTE: The client id represents an AAD app people sign in to. The client id is sent to AAD to indicate what app
  * is requesting a token for the user. When the user signs in, AAD shows the name of the app to confirm the user is
