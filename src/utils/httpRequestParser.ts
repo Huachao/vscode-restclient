@@ -8,6 +8,7 @@ import { RequestParser } from '../models/requestParser';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { parseRequestHeaders, resolveRequestBodyPath } from './requestParserUtil';
+import { VariableProcessor } from "./variableProcessor";
 
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');
@@ -179,7 +180,10 @@ export class HttpRequestParser implements RequestParser {
                         const inputFilePath = groups[1];
                         const fileAbsolutePath = await resolveRequestBodyPath(inputFilePath);
                         if (fileAbsolutePath) {
-                            combinedStream.append(fs.createReadStream(fileAbsolutePath));
+                            const buffer = await fs.readFile(fileAbsolutePath);
+                            const fileContent = buffer.toString('utf8');
+                            const resolvedContent = await VariableProcessor.processRawRequest(fileContent);
+                            combinedStream.append(resolvedContent);
                         } else {
                             combinedStream.append(line);
                         }
