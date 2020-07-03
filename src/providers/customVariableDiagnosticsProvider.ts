@@ -6,7 +6,7 @@ import { ResolveState } from '../models/httpVariableResolveResult';
 import { VariableType } from '../models/variableType';
 import { disposeAll } from '../utils/dispose';
 import { RequestVariableCache } from "../utils/requestVariableCache";
-import { RequestVariableCacheValueProcessor } from '../utils/requestVariableCacheValueProcessor';
+import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { Selector } from '../utils/selector';
 
 import { VariableProcessor } from "../utils/variableProcessor";
@@ -97,7 +97,7 @@ export class CustomVariableDiagnosticsProvider {
                 .forEach(([, variables]) => {
                     variables
                         .filter(variable => !this.hasPromptVariableDefintion(promptVariableDefinitions, variable))
-                        .forEach(({name, begin, end}) => {
+                        .forEach(({ name, begin, end }) => {
                             diagnostics.push(
                                 new Diagnostic(new Range(begin, end), `${name} is not found`, DiagnosticSeverity.Error));
 
@@ -111,7 +111,7 @@ export class CustomVariableDiagnosticsProvider {
                     && allAvailableVariables.get(name)![0] === VariableType.Request
                     && !RequestVariableCache.has(document, name))
                 .forEach(([, variables]) => {
-                    variables.forEach(({name, begin, end}) => {
+                    variables.forEach(({ name, begin, end }) => {
                         diagnostics.push(
                             new Diagnostic(new Range(begin, end), `Request '${name}' has not been sent`, DiagnosticSeverity.Information));
                     });
@@ -125,7 +125,7 @@ export class CustomVariableDiagnosticsProvider {
                     && RequestVariableCache.has(document, name))
                 .forEach(([name, variables]) => {
                     const value = RequestVariableCache.get(document, name);
-                    variables.forEach(({path, begin, end}) => {
+                    variables.forEach(({ path, begin, end }) => {
                         path = path.replace(/^\{{2}\s*/, '').replace(/\s*\}{2}$/, '');
                         const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value, path);
                         if (result.state !== ResolveState.Success) {
@@ -199,7 +199,7 @@ export class CustomVariableDiagnosticsProvider {
     }
     private hasPromptVariableDefintion(defs: Map<string, PromptVariableDefinitionWithRange[]>, variable: VariableWithPosition): boolean {
         const { name, begin, end } = variable;
-        return defs.get(name)?.some(({name,  range: [rangeStart, rangeEnd]}) => {
+        return defs.get(name)?.some(({ name, range: [rangeStart, rangeEnd] }) => {
             return name === name
                 && rangeStart <= begin.line
                 && end.line <= rangeEnd;
