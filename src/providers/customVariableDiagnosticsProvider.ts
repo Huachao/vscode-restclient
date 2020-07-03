@@ -7,6 +7,7 @@ import { VariableType } from '../models/variableType';
 import { disposeAll } from '../utils/dispose';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
+import { Selector } from '../utils/selector';
 import { VariableProcessor } from "../utils/variableProcessor";
 
 interface VariableWithPosition {
@@ -140,6 +141,10 @@ export class CustomVariableDiagnosticsProvider {
         const lines = document.getText().split(Constants.LineSplitterRegex);
         const pattern = /\{\{(\w[^\s\.{}]*)(\.[^\.]*?)*\}\}/g;
         lines.forEach((line, lineNumber) => {
+            if (Selector.isCommentLine(line)) {
+                return;
+            }
+
             let match: RegExpExecArray | null;
             while (match = pattern.exec(line)) {
                 const [path, name] = match;
