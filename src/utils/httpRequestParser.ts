@@ -8,6 +8,7 @@ import { RequestParser } from '../models/requestParser';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { parseRequestHeaders, resolveRequestBodyPath } from './requestParserUtil';
+import { VariableProcessor } from "./variableProcessor";
 
 const CombinedStream = require('combined-stream');
 const encodeurl = require('encodeurl');
@@ -21,7 +22,8 @@ enum ParseState {
 export class HttpRequestParser implements RequestParser {
     private readonly defaultMethod = 'GET';
     private readonly queryStringLinePrefix = /^\s*[&\?]/;
-    private readonly inputFileSyntax = /^<\s+(.+?)\s*$/;
+    private readonly inputFileSyntax = /^<(?:(?<processVariables>@)(?<encoding>\w+)?)?\s+(?<filepath>.+?)\s*$/;
+    private readonly defaultFileEncoding = 'utf8';
 
     public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
     }
@@ -130,21 +132,23 @@ export class HttpRequestParser implements RequestParser {
 
     private parseRequestLine(line: string): { method: string, url: string } {
         // Request-Line = Method SP Request-URI SP HTTP-Version CRLF
-        const words = line.split(' ').filter(Boolean);
-
         let method: string;
         let url: string;
-        if (words.length === 1) {
+
+        let match: RegExpExecArray | null;
+        if (match = /^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\s+/.exec(line)) {
+            method = match[1];
+            url = line.substr(match[0].length);
+        } else {
             // Only provides request url
             method = this.defaultMethod;
-            url = words[0];
-        } else {
-            // Provides both request method and url
-            method = words.shift()!;
-            url = line.trim().substring(method.length).trim();
-            if (/^HTTP\/.*$/i.test(words[words.length - 1])) {
-                url = url.substring(0, url.lastIndexOf(words[words.length - 1])).trim();
-            }
+            url = line;
+        }
+
+        url = url.trim();
+
+        if (match = /\s+HTTP\/.*$/i.exec(url)) {
+            url = url.substr(0, match.index);
         }
 
         return { method, url };
@@ -175,11 +179,19 @@ export class HttpRequestParser implements RequestParser {
             for (const [index, line] of lines.entries()) {
                 if (this.inputFileSyntax.test(line)) {
                     const groups = this.inputFileSyntax.exec(line);
-                    if (groups?.length === 2) {
-                        const inputFilePath = groups[1];
+                    const groupsValues = groups?.groups;
+                    if (groups?.length === 4 && !!groupsValues) {
+                        const inputFilePath = groupsValues.filepath;
                         const fileAbsolutePath = await resolveRequestBodyPath(inputFilePath);
                         if (fileAbsolutePath) {
-                            combinedStream.append(fs.createReadStream(fileAbsolutePath));
+                            if (groupsValues.processVariables) {
+                                const buffer = await fs.readFile(fileAbsolutePath);
+                                const fileContent = buffer.toString(groupsValues.encoding || this.defaultFileEncoding);
+                                const resolvedContent = await VariableProcessor.processRawRequest(fileContent);
+                                combinedStream.append(resolvedContent);
+                            } else {
+                                combinedStream.append(fs.createReadStream(fileAbsolutePath));
+                            }
                         } else {
                             combinedStream.append(line);
                         }

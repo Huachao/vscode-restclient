@@ -7,7 +7,7 @@ import { getWorkspaceRootPath } from '../utils/workspaceUtility';
 
 export class RequestBodyDocumentLinkProvider implements DocumentLinkProvider {
 
-    private _linkPattern = /^(\<\s+)(.+)(\s*)$/g;
+    private _linkPattern = /^(\<(?:@(?:\w+)?)?\s+)(.+)(\s*)$/g;
 
     public provideDocumentLinks(document: TextDocument, _token: CancellationToken): DocumentLink[] {
         const results: DocumentLink[] = [];
