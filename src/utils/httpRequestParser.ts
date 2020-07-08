@@ -130,21 +130,23 @@ export class HttpRequestParser implements RequestParser {
 
     private parseRequestLine(line: string): { method: string, url: string } {
         // Request-Line = Method SP Request-URI SP HTTP-Version CRLF
-        const words = line.split(' ').filter(Boolean);
-
         let method: string;
         let url: string;
-        if (words.length === 1) {
+
+        let match: RegExpExecArray | null;
+        if (match = /^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\s+/.exec(line)) {
+            method = match[1];
+            url = line.substr(match[0].length);
+        } else {
             // Only provides request url
             method = this.defaultMethod;
-            url = words[0];
-        } else {
-            // Provides both request method and url
-            method = words.shift()!;
-            url = line.trim().substring(method.length).trim();
-            if (/^HTTP\/.*$/i.test(words[words.length - 1])) {
-                url = url.substring(0, url.lastIndexOf(words[words.length - 1])).trim();
-            }
+            url = line;
+        }
+
+        url = url.trim();
+
+        if (match = /\s+HTTP\/.*$/i.exec(url)) {
+            url = url.substr(0, match.index);
         }
 
         return { method, url };
