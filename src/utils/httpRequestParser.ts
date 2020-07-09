@@ -136,7 +136,7 @@ export class HttpRequestParser implements RequestParser {
         let url: string;
 
         let match: RegExpExecArray | null;
-        if (match = /^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\s+/.exec(line)) {
+        if (match = /^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\s+/i.exec(line)) {
             method = match[1];
             url = line.substr(match[0].length);
         } else {
