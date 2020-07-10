@@ -173,6 +173,23 @@ Authorization: token xxx
 < ./demo.xml
 ```
 
+If you want to use variables in that file, you'll have to use an `@` to ensure variables are processed when referencing a file (UTF-8 is assumed as the default encoding)
+```http
+POST https://example.com/comments HTTP/1.1
+Content-Type: application/xml
+Authorization: token xxx
+
+<@ ./demo.xml
+```
+to override the default encoding, simply type it next to the `@` like the below example
+```http
+POST https://example.com/comments HTTP/1.1
+Content-Type: application/xml
+Authorization: token xxx
+
+<@latin1 ./demo.xml
+```
+
 When content type of request body is `multipart/form-data`, you may have the mixed format of the request body as follows:
 ```http
 POST https://api.example.com/user/upload
