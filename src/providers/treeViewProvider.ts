@@ -49,9 +49,7 @@ export class HttpClientItem extends vscode.TreeItem {
     selectedRequest: SelectedRequest;
     document: vscode.TextDocument;
 
-    private constructor(
-        public readonly uri: vscode.Uri
-    ) {
+    private constructor(public readonly uri: vscode.Uri) {
         super(uri);
     }
 
@@ -81,24 +79,4 @@ export class HttpClientItem extends vscode.TreeItem {
         item.selectedRequest = selectedRequest;
         return item;
     }
-
-    // get tooltip(): string {
-    //     return this.uri.path;
-    // }
-
-    // get description(): string {
-    //     return `(${this.uri.fsPath})`;
-    // }
-
-    // get command(): vscode.Command {
-    //     return {
-    //         command: 'rest-client._openDocumentLink',
-    //         title: 'open',
-    //         arguments: [this.uri]
-    //     };
-    // }
-
-    // iconPath = vscode.ThemeIcon.File;
-
-
 }
