@@ -30,6 +30,7 @@ export class RequestController {
         this._textDocumentView = new HttpResponseTextDocumentView();
     }
 
+    @trace('Request')
     public async run(range: Range) {
         const editor = window.activeTextEditor;
         const document = getCurrentTextDocument();
@@ -41,10 +42,11 @@ export class RequestController {
         if (!selectedRequest) {
             return;
         }
+
         return this.runRequest(selectedRequest, document);
     }
+    public async runRequest(selectedRequest: SelectedRequest, document: TextDocument) {
 
-    public async runRequest(selectedRequest : SelectedRequest, document: TextDocument) {
         const { text, name, warnBeforeSend } = selectedRequest;
 
         if (warnBeforeSend) {
@@ -100,15 +102,10 @@ export class RequestController {
             }
 
             try {
-                let previewColumn;
-                if (window.activeTextEditor) {
-                    const activeColumn = window.activeTextEditor!.viewColumn;
-                    previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
-                        ? activeColumn
-                        : ((activeColumn as number) + 1) as ViewColumn;
-                } else {
-                    previewColumn = this._restClientSettings.previewColumn;
-                }
+                const activeColumn = window.activeTextEditor!.viewColumn;
+                const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
+                    ? activeColumn
+                    : ((activeColumn as number) + 1) as ViewColumn;
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
                 } else if (previewColumn) {
