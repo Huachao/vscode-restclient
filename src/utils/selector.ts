@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { Range, TextEditor } from 'vscode';
+import { Range, TextEditor, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { VariableProcessor } from './variableProcessor';
 
@@ -19,6 +19,54 @@ export interface SelectedRequest {
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
+    public static getAllRequests(document: TextDocument): Promise<SelectedRequest[] | null> {
+
+        return new Promise(async (resolve, reject) => {
+
+            let selectedText = document.getText();
+
+            // parse actual request lines
+            const rawLines = selectedText.split(Constants.LineSplitterRegex);
+            const requestRanges = this.getRequestRanges(rawLines);
+            if (!requestRanges) {
+                resolve(null);
+            }
+
+            const res: SelectedRequest[] = [];
+
+            for (const requestRange of requestRanges) {
+                selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1).join(EOL);
+                const request = await this.createRequest(selectedText);
+                if (request) {
+                    res.push(request);
+                }
+            }
+
+            // requestRanges.forEach(async requestRange => {
+            //     selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1).join(EOL);
+            //     const request = await this.createRequest(selectedText);
+            //     if (request) {
+            //         res.push(request);
+            //     }
+            // });
+            resolve(res);
+        });
+    }
+
+    // public static async getRequestFromDocument(document: TextDocument, selectedRequest: SelectedRequest | null = null): Promise<SelectedRequest | null> {
+    //     let selectedText: string | null = document.getText();
+        
+    //     if (editor.selection.isEmpty || range) {
+    //         const activeLine = range?.start.line ?? editor.selection.active.line;
+    //         selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
+    //     } else {
+    //         selectedText = editor.document.getText(editor.selection);
+    //     }
+    //     selectedText.tex
+
+    //     return this.createRequest(selectedText);
+    // }
+
     public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
         if (!editor.document) {
             return null;
@@ -32,6 +80,10 @@ export class Selector {
             selectedText = editor.document.getText(editor.selection);
         }
 
+        return this.createRequest(selectedText);
+    }
+
+    public static async createRequest(selectedText: string | null): Promise<SelectedRequest | null> {
         if (selectedText === null) {
             return null;
         }
@@ -56,18 +108,20 @@ export class Selector {
 
         return {
             text: selectedText,
-            name: requestVariable,
+            name: requestVariable ? requestVariable : rawLines[0],
             warnBeforeSend
         };
     }
 
+
     public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
         options = {
-                ignoreCommentLine: true,
-                ignoreEmptyLine: true,
-                ignoreFileVariableDefinitionLine: true,
-                ignoreResponseRange: true,
-            ...options};
+            ignoreCommentLine: true,
+            ignoreEmptyLine: true,
+            ignoreFileVariableDefinitionLine: true,
+            ignoreResponseRange: true,
+            ...options
+        };
         const requestRanges: [number, number][] = [];
         const delimitedLines = this.getDelimiterRows(lines);
         delimitedLines.push(lines.length);
@@ -168,6 +222,6 @@ export class Selector {
     private static getDelimiterRows(lines: string[]): number[] {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
-            .map(([index, ]) => +index);
+            .map(([index,]) => +index);
     }
 }

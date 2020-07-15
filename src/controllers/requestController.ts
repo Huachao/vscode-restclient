@@ -1,5 +1,4 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
-import * as Constants from '../common/constants';
 import Logger from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
@@ -8,8 +7,9 @@ import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
 import { RequestVariableCache } from "../utils/requestVariableCache";
-import { Selector } from '../utils/selector';
+import { SelectedRequest, Selector } from '../utils/selector';
 import { UserDataManager } from '../utils/userDataManager';
+import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
@@ -30,27 +30,33 @@ export class RequestController {
         this._textDocumentView = new HttpResponseTextDocumentView();
     }
 
-
-    @trace('Request')
-    public async run(document: TextDocument, range: Range) {
+    public async run(requestRange: Range | SelectedRequest, document?: TextDocument) {
         const editor = window.activeTextEditor;
-        if (!document) {
-            return;
+        let selectedRequest;
+
+        if (document) {
+            // selectedRequest = await Selector.createRequest((requestRange as SelectedRequest).text);
+            // get the selected request from the document and ragne only.
+            // to do this, need the selector to accept document also and not just editor.
+            // const selectedRequest1 = await Selector.getRequest(document, range);
+        } else {
+            document = getCurrentTextDocument();
         }
-        let text, name, warnBeforeSend;
-        if (editor) {
-            const selectedRequest = await Selector.getRequest(editor, range);
-            if (!selectedRequest) {
+
+        
+        if (requestRange instanceof Range) {
+            if (!editor || !document) {
                 return;
             }
-            text = selectedRequest.text;
-            name = selectedRequest.name;
-            warnBeforeSend = selectedRequest.warnBeforeSend;
+            selectedRequest = await Selector.getRequest(editor, requestRange as Range);
         } else {
-            text = document.getText();
-            name = Selector.getRequestVariableDefinitionName(text);
-            warnBeforeSend = Constants.NoteCommentRegex.test(text);
+            selectedRequest = requestRange;
         }
+        if (!selectedRequest) {
+            return;
+        }
+
+        const { text, name, warnBeforeSend } = selectedRequest;
 
         if (warnBeforeSend) {
             const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';

@@ -2,7 +2,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import { commands, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
-import * as Constants from './common/constants';
 import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
@@ -22,7 +21,6 @@ import { RequestVariableHoverProvider } from './providers/requestVariableHoverPr
 import { HttpClientItem, HttpTreeProvider } from './providers/treeViewProvider';
 import { AadTokenCache } from './utils/aadTokenCache';
 import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
-import { Selector } from './utils/selector';
 import { UserDataManager } from './utils/userDataManager';
 
 // this method is called when your extension is activated
@@ -38,7 +36,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(historyController);
     context.subscriptions.push(codeSnippetController);
     context.subscriptions.push(environmentController);
-    context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, range: Range) => requestController.run(document, range))));
+    context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, range: Range) => requestController.run(range))));
     context.subscriptions.push(commands.registerCommand('rest-client.rerun-last-request', () => requestController.rerun()));
     context.subscriptions.push(commands.registerCommand('rest-client.cancel-request', () => requestController.cancel()));
     context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.save()));
@@ -79,17 +77,13 @@ export async function activate(context: ExtensionContext) {
     const diagnosticsProvider = new CustomVariableDiagnosticsProvider();
     context.subscriptions.push(diagnosticsProvider);
 
-    const nodeDependenciesProvider = new HttpTreeProvider();
-    window.registerTreeDataProvider('httpRequest', nodeDependenciesProvider);
-    commands.registerCommand('rest-client.refreshEntry', () => nodeDependenciesProvider.refresh());
-    commands.registerCommand('rest-client.sendRequest', (node: HttpClientItem) =>
-        workspace.openTextDocument(node.uri).then(async (doc: TextDocument) => {
-            const lines: string[] = doc.getText().split(Constants.LineSplitterRegex);
-            const requestRanges: [number, number][] = Selector.getRequestRanges(lines);
-            const range = new Range(requestRanges[0][0], 0, requestRanges[0][1], 0);
-            requestController.run(doc, range);
-        }));
+    const httpTreeProvider = new HttpTreeProvider();
+    window.registerTreeDataProvider('httpRequest', httpTreeProvider);
+    commands.registerCommand('rest-client.refreshEntry', () => httpTreeProvider.refresh());
+    commands.registerCommand('rest-client.sendRequest', (node: HttpClientItem) => requestController.run(node.selectedRequest, node.document));
 }
+
+
 
 // this method is called when your extension is deactivated
 export function deactivate() {
