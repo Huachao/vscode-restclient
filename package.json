@@ -195,7 +195,7 @@
           "light": "images/run-light.svg",
           "dark": "images/run-dark.svg"
         },
-        "when" : "viewItem == request"
+        "when": "viewItem == request"
       }
     ],
     "menus": {

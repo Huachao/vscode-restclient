@@ -30,32 +30,21 @@ export class RequestController {
         this._textDocumentView = new HttpResponseTextDocumentView();
     }
 
-    public async run(requestRange: Range | SelectedRequest, document?: TextDocument) {
+    public async run(range: Range) {
         const editor = window.activeTextEditor;
-        let selectedRequest;
-
-        if (document) {
-            // selectedRequest = await Selector.createRequest((requestRange as SelectedRequest).text);
-            // get the selected request from the document and ragne only.
-            // to do this, need the selector to accept document also and not just editor.
-            // const selectedRequest1 = await Selector.getRequest(document, range);
-        } else {
-            document = getCurrentTextDocument();
-        }
-
-        
-        if (requestRange instanceof Range) {
-            if (!editor || !document) {
-                return;
-            }
-            selectedRequest = await Selector.getRequest(editor, requestRange as Range);
-        } else {
-            selectedRequest = requestRange;
-        }
-        if (!selectedRequest) {
+        const document = getCurrentTextDocument();
+        if (!editor || !document) {
             return;
         }
 
+        const selectedRequest = await Selector.getRequest(editor, range);
+        if (!selectedRequest) {
+            return;
+        }
+        return this.runRequest(selectedRequest, document);
+    }
+
+    public async runRequest(selectedRequest : SelectedRequest, document: TextDocument) {
         const { text, name, warnBeforeSend } = selectedRequest;
 
         if (warnBeforeSend) {

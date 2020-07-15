@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { Range, TextEditor, TextDocument } from 'vscode';
+import { Range, TextDocument, TextEditor } from 'vscode';
 import * as Constants from '../common/constants';
 import { VariableProcessor } from './variableProcessor';
 
@@ -21,7 +21,7 @@ export class Selector {
 
     public static getAllRequests(document: TextDocument): Promise<SelectedRequest[] | null> {
 
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
 
             let selectedText = document.getText();
 
@@ -41,31 +41,9 @@ export class Selector {
                     res.push(request);
                 }
             }
-
-            // requestRanges.forEach(async requestRange => {
-            //     selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1).join(EOL);
-            //     const request = await this.createRequest(selectedText);
-            //     if (request) {
-            //         res.push(request);
-            //     }
-            // });
             resolve(res);
         });
     }
-
-    // public static async getRequestFromDocument(document: TextDocument, selectedRequest: SelectedRequest | null = null): Promise<SelectedRequest | null> {
-    //     let selectedText: string | null = document.getText();
-        
-    //     if (editor.selection.isEmpty || range) {
-    //         const activeLine = range?.start.line ?? editor.selection.active.line;
-    //         selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
-    //     } else {
-    //         selectedText = editor.document.getText(editor.selection);
-    //     }
-    //     selectedText.tex
-
-    //     return this.createRequest(selectedText);
-    // }
 
     public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
         if (!editor.document) {
@@ -222,6 +200,6 @@ export class Selector {
     private static getDelimiterRows(lines: string[]): number[] {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
-            .map(([index,]) => +index);
+            .map(([index, ]) => +index);
     }
 }
