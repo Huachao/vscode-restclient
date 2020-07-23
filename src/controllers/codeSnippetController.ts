@@ -104,8 +104,8 @@ export class CodeSnippetController {
 
     private async extrSnippet(text: string): Promise<any[]> {
 
-        const allSnippets = await text.split(/[\r\n]*[#]{3,}[\r\n]*/).map(async x => {
-            const httpRequest = await RequestParserFactory.createRequestParser(x).parseHttpRequest();
+        const allSnippets = text.split(/\r\n\r\n/).map(async x => {
+            const httpRequest = await RequestParserFactory.createRequestParser(x.trim()).parseHttpRequest();
             const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
             const snippet = new HTTPSnippet(harHttpRequest);
             return snippet;
