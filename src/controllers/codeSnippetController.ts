@@ -53,7 +53,10 @@ export class CodeSnippetController {
         const { text } = selectedRequest;
 
         // parse http request
-        const snippets = await this.extrSnippet(text);
+        const snippets = await this.extractSnippets(text);
+        if (snippets.length === 0) {
+            return;
+        }
 
         let target: Pick<CodeSnippetTarget, 'key' | 'title'> | undefined = undefined;
 
@@ -102,14 +105,18 @@ export class CodeSnippetController {
         quickPick.show();
     }
 
-    private async extrSnippet(text: string): Promise<any[]> {
-
-        const allSnippets = text.split(/\r\n\r\n/).map(async x => {
-            const httpRequest = await RequestParserFactory.createRequestParser(x.trim()).parseHttpRequest();
-            const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
-            const snippet = new HTTPSnippet(harHttpRequest);
-            return snippet;
-        });
+    private async extractSnippets(text: string): Promise<any[]> {
+        if (text.trim()?.length === 0) {
+            return [];
+        }
+        const allSnippets = text.split(/^(\s*\r\n){2,}/m)
+            .filter(x => x.trim().length)
+            .map(async x => {
+                const httpRequest = await RequestParserFactory.createRequestParser(x.trim()).parseHttpRequest();
+                const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
+                const snippet = new HTTPSnippet(harHttpRequest);
+                return snippet;
+            });
 
         return await Promise.all(allSnippets);
     }
