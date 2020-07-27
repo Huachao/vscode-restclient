@@ -1,5 +1,5 @@
 import * as url from 'url';
-import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument } from 'vscode';
+import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument, DocumentSymbol } from 'vscode';
 import * as Constants from '../common/constants';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { Selector } from '../utils/selector';
@@ -7,57 +7,67 @@ import { VariableProcessor } from '../utils/variableProcessor';
 import { getCurrentHttpFileName } from '../utils/workspaceUtility';
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
-    public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
-        const symbols: SymbolInformation[] = [];
-        const lines: string[] = document.getText().split(Constants.LineSplitterRegex);
-        const requestRange: [number, number][] = Selector.getRequestRanges(
-            lines,
-            { ignoreCommentLine: false , ignoreFileVariableDefinitionLine: false });
+    public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<DocumentSymbol[]> {
+        const symbols: DocumentSymbol[] = [];
+        const allLines: string[] = document.getText().split(Constants.LineSplitterRegex);
+        let sharps = 1;
+        let requestRange: number[] = this.GetSharpRows(allLines, sharps);
+        for (let i = 0; i < requestRange.length; i++) {
+            let blockStart = requestRange[i];
+            if (blockStart >= allLines.length) break;
 
-        for (let [blockStart, blockEnd] of requestRange) {
-            // get real start for current requestRange
-            let requestName: string | undefined;
-            while (blockStart <= blockEnd) {
-                const line = lines[blockStart];
-                if (Selector.isEmptyLine(line) ||
-                    Selector.isCommentLine(line)) {
-                    if (Selector.isRequestVariableDefinitionLine(line)) {
-                        requestName = Selector.getRequestVariableDefinitionName(line);
-                    }
-                    blockStart++;
-                } else if (Selector.isFileVariableDefinitionLine(line)) {
-                    const [name, container] = this.getFileVariableSymbolInfo(line);
-                    symbols.push(
-                        new SymbolInformation(
-                            name,
-                            SymbolKind.Variable,
-                            container,
-                            new Location(
-                                document.uri,
-                                new Range(blockStart, 0, blockStart, line.length))));
-                    blockStart++;
-                } else {
-                    break;
-                }
+            let blockEnd;
+            if (i == requestRange.length - 1)
+                blockEnd = allLines.length;
+            else
+                blockEnd = requestRange[i + 1] - 1;
+
+            const line = allLines[blockStart];
+            if (line == undefined) break;
+
+            let symbol: DocumentSymbol = new DocumentSymbol(
+                line,
+                '',
+                SymbolKind.String,
+                new Range(blockStart, 0, blockStart, line.length),
+                new Range(blockStart, 0, blockStart, line.length));
+
+            let blockLines: string[] = allLines.slice(blockStart, blockEnd);
+            sharps = sharps + 1;
+            let sharp2Range: number[] = this.GetSharpRows(blockLines, sharps);
+
+            let children: DocumentSymbol[] = [];
+            for (let j = 0; j < sharp2Range.length; j++) {
+                const blockStart2 = sharp2Range[j];
+
+                const sharp2Line = blockLines[blockStart2];
+                let child: DocumentSymbol = new DocumentSymbol(
+                    sharp2Line,
+                    '',
+                    SymbolKind.String,
+                    new Range(blockStart, 0, blockStart, sharp2Line.length),
+                    new Range(blockStart, 0, blockStart, sharp2Line.length));
+                children.push(child);
             }
 
-            if (Selector.isResponseStatusLine(lines[blockStart])) {
-                continue;
-            }
-
-            if (blockStart <= blockEnd) {
-                const [name, container] = await this.getRequestSymbolInfo(lines[blockStart], requestName);
-                symbols.push(
-                    new SymbolInformation(
-                        name,
-                        SymbolKind.Method,
-                        container,
-                        new Location(
-                            document.uri,
-                            new Range(blockStart, 0, blockEnd, lines[blockEnd].length))));
-            }
+            symbol.children = children;
+            symbols.push(symbol);
         }
+
         return symbols;
+    }
+
+    private GetSharpRows(allLines: string[], sharps: number): number[] {
+        let sharpRows: number[] = Selector.getSharpRanges(allLines, sharps, { ignoreCommentLine: false, ignoreFileVariableDefinitionLine: false });
+        if (sharpRows.length == 0) {
+            sharps = sharps + 1;
+            if (sharps >= 10)
+                return [];
+
+            return this.GetSharpRows(allLines, sharps);
+        }
+
+        return sharpRows;
     }
 
     private getFileVariableSymbolInfo(line: string): [string, string] {
