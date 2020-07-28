@@ -1,32 +1,126 @@
 import { HttpClient } from './httpClient';
 import { HttpRequest } from '../models/httpRequest';
-import { HttpResponse } from '../models/httpResponse';
 import { Clipboard, env, commands, Uri, window } from 'vscode';
 import * as Constants from '../common/constants';
 
+/*
+ AppId provisioned to allow users to explicitly consent to permissions that this app can call
+*/
 export const GraphTokenProviderClientId = "07f0a107-95c1-41ad-8f13-912eab68b93f";
-const UserCodeRequest: string = "UserCodeRequest"
-const TokenRequest: string = "TokenRequest"
-const messageBoxOptions = { modal: true };
 
 export class GraphTokenMachine {
-  
-
     private readonly _httpClient: HttpClient;
     private readonly clipboard: Clipboard;
-    private readonly clientId: string;
-    private readonly tenantId: string;
-    private readonly scopes: string[];
-    private success: (token:string) => void;
-    private fail: (message:string) => void;
-    private readonly graphTokenRegex: RegExp = new RegExp(`\\s*\\${Constants.MicrosoftGraphTokenVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+scopes:([\\w,.]+))?(\\s+tenantid:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+clientid:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
-    private cacheKey: string;
-    private forceNewToken: boolean;
 
-    public constructor(name: string ) {
+    public constructor() {
         this._httpClient = new HttpClient();
         this.clipboard = env.clipboard;
-        // Default values
+    }
+ 
+    public async AcquireToken(name : string): Promise<string> {
+
+        let authParams = new AuthParameters(name);
+
+        if (!authParams.forceNewToken) {
+            let tokenEntry = GraphTokenCache.GetToken(authParams.cacheKey);
+            if (tokenEntry && tokenEntry.SupportScopes(authParams.scopes)) {
+                return tokenEntry.Token;
+            }
+        }
+
+        let deviceCodeResponse: IDeviceCodeResponse = await this.GetDeviceCodeResponse(authParams);
+        let isDone = await this.promptForUserCode(deviceCodeResponse);
+        if (isDone) {
+            return await this.GetToken(deviceCodeResponse, authParams);
+        } else {
+            return "";
+        }
+    }
+
+    private async GetDeviceCodeResponse(authParams: AuthParameters) : Promise<IDeviceCodeResponse>  {
+        let request = this.createUserCodeRequest(authParams.clientId,authParams.tenantId,authParams.scopes);
+        let response = await this._httpClient.send(request);
+
+        let bodyObject = JSON.parse(response.body);
+
+        if (response.statusCode != 200) {
+            // Fail
+            this.processAuthError(bodyObject);
+        }
+
+        if (bodyObject.error) {  // really!?
+            this.processAuthError(bodyObject);
+        }
+
+        // Get userCode out of response body
+        let deviceCodeResponse: IDeviceCodeResponse = bodyObject
+        return deviceCodeResponse;
+    }
+
+    private async GetToken(deviceCodeResponse: IDeviceCodeResponse, authParams: AuthParameters) : Promise<string> {
+        let request = this.createAcquireTokenRequest(authParams.clientId, authParams.tenantId, deviceCodeResponse.device_code);
+        let response = await this._httpClient.send(request);
+
+        let bodyObject = JSON.parse(response.body);
+        
+        if (response.statusCode != 200) {
+            this.processAuthError(bodyObject);
+        }
+        let tokenResponse: ITokenResponse = bodyObject
+        GraphTokenCache.SetToken(authParams.cacheKey, tokenResponse.scope.split(' '), tokenResponse.access_token);
+
+        return tokenResponse.access_token;
+    }
+
+    private processAuthError(bodyObject: any) {
+        let errorResponse: IAuthError = bodyObject;
+        throw new Error(" Auth call failed. " + errorResponse.error_description);
+    }
+
+    private createUserCodeRequest(clientId: string, tenantId:string, scopes: string[]) : HttpRequest {
+        return new HttpRequest(
+            "POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/devicecode`,
+            { "Content-Type": "application/x-www-form-urlencoded" },
+             `client_id=${clientId}&scope=${scopes.join("%20")}`);
+    }
+
+    private createAcquireTokenRequest(clientId: string, tenantId:string, deviceCode: string) : HttpRequest {
+        return new HttpRequest("POST",`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+        { "Content-Type": "application/x-www-form-urlencoded" },
+         `grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=${clientId}&device_code=${deviceCode}`);
+    }
+    
+    private async promptForUserCode(deviceCodeResponse: IDeviceCodeResponse) : Promise<boolean>  {
+
+        const messageBoxOptions = { modal: true };
+        const signInPrompt = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${deviceCodeResponse.user_code}`;
+        const donePrompt = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n4. Token will be copied to the clipboard when finished\r\n\r\nCode: ${deviceCodeResponse.user_code}`;
+        const signIn = "Sign in";
+        const tryAgain = "Try again";
+        const done = "Done";
+
+        let value = await window.showInformationMessage(signInPrompt, messageBoxOptions, signIn);
+        if (value == signIn) {
+            do {
+                await this.clipboard.writeText(deviceCodeResponse.user_code);
+                commands.executeCommand("vscode.open", Uri.parse(deviceCodeResponse.verification_uri));
+                value = await window.showInformationMessage(donePrompt, messageBoxOptions, done, tryAgain);
+            } while(value == tryAgain);
+        }
+        return value == done;
+    };
+}
+
+class AuthParameters {
+    private readonly graphTokenRegex: RegExp = new RegExp(`\\s*\\${Constants.MicrosoftGraphTokenVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+scopes:([\\w,.]+))?(\\s+tenantid:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+clientid:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
+    public tenantId: string
+    public clientId: string
+    public scopes: string[]
+    public forceNewToken: boolean
+    public cacheKey: string
+
+    public constructor(name: string) {
+
         this.clientId = GraphTokenProviderClientId;
         this.tenantId = "common";
         let scopes = "openid,profile";
@@ -39,105 +133,13 @@ export class GraphTokenMachine {
             this.tenantId = groups[6] || this.tenantId;
             this.clientId = groups[8] || this.clientId;
         }
-        
+
         this.cacheKey = this.tenantId + "|" + this.clientId + "|";
-        this.scopes = scopes.split(",").map(s=>s.trim());
+        this.scopes = scopes.split(",").map(s => s.trim());
     }
- 
-    public AcquireToken(success: (token:string) => void,
-                        fail: (message:string) => void): void {
-        this.success = success;
-        this.fail = fail;
-
-        if (!this.forceNewToken) {
-            let tokenEntry = GraphTokenCache.GetToken(this.cacheKey);
-            if (tokenEntry && tokenEntry.SupportScopes(this.scopes)) {
-                this.success(tokenEntry.Token);
-                return;
-            }
-        }
-
-        this.MakeRequest(UserCodeRequest,this.CreateUserCodeRequest(this.scopes));
-    }
-
-    private MakeRequest(linkrelation: string, request: HttpRequest) : void  {
-        this._httpClient.send(request).then( value => {
-            this.HandleResponse(linkrelation,value);
-        });
-    }
-
-    private CreateUserCodeRequest(scopes: string[]) : HttpRequest {
-        return new HttpRequest(
-            "POST", `https://login.microsoftonline.com/${this.tenantId}/oauth2/v2.0/devicecode`,
-            { "Content-Type": "application/x-www-form-urlencoded" },
-             `client_id=${this.clientId}&scope=${scopes.join("%20")}`);
-    }
-
-    private CreateAcquireTokenRequest(deviceCode: string) : HttpRequest {
-        return new HttpRequest("POST",`https://login.microsoftonline.com/${this.tenantId}/oauth2/v2.0/token`,
-        { "Content-Type": "application/x-www-form-urlencoded" },
-         `grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=${this.clientId}&device_code=${deviceCode}`);
-    }
-    
-    private HandleResponse(linkRelation: string,  response: HttpResponse) : void {
-
-        if (response.statusCode != 200) {
-            // Fail
-            let errorResponse: IAuthError = JSON.parse(response.body);
-            this.fail(linkRelation + " : call failed. "+ errorResponse.error_description);
-        } else {
-
-            let bodyObject = JSON.parse(response.body);
-            if (bodyObject.error) {  // really!?
-                let authError: IAuthError  = bodyObject;
-                this.fail(authError.error_description);
-                return;
-            }
-            switch(linkRelation) {
-                case UserCodeRequest:
-                    // Get userCode out of response body
-                    let deviceCodeResponse: IDeviceCodeResponse = bodyObject
-                    this.promptForCode(deviceCodeResponse);
-                    break;
-                case TokenRequest:
-                    let tokenResponse: ITokenResponse = bodyObject
-                    this.handleTokenResponse(tokenResponse);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    private handleTokenResponse(tokenResponse: ITokenResponse) {
-        GraphTokenCache.SetToken(this.cacheKey, tokenResponse.scope.split(' '), tokenResponse.access_token);
-        this.success(tokenResponse.access_token);
-    }
-
-    private promptForCode(deviceCodeResponse: IDeviceCodeResponse) : void  {
-
-        const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${deviceCodeResponse.user_code}`;
-        const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n4. Token will be copied to the clipboard when finished\r\n\r\nCode: ${deviceCodeResponse.user_code}`;
-        const signIn = "Sign in";
-        const tryAgain = "Try again";
-        const done = "Done";
-        const signInPrompt = value => {
-            if (value === signIn || value === tryAgain) {
-                this.clipboard.writeText(deviceCodeResponse.user_code).then(() => {
-                    commands.executeCommand("vscode.open", Uri.parse(deviceCodeResponse.verification_uri));
-                    window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
-                });
-            }
-            else if (value === done) {
-                this.MakeRequest(TokenRequest, this.CreateAcquireTokenRequest(deviceCodeResponse.device_code));
-            }
-        };
-        window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
-    };
 }
 
-
-export class GraphTokenCache {
+ class GraphTokenCache {
 
     private static tokens : Map<string,GraphTokenCacheEntry> = new Map<string,GraphTokenCacheEntry>();
 

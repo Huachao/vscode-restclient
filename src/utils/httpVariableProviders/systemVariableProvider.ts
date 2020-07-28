@@ -13,7 +13,7 @@ import { AadTokenCache } from '../aadTokenCache';
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
-import { GraphTokenMachine, GraphTokenCache } from '../graphTokenMachine';
+import { GraphTokenMachine } from '../graphTokenMachine';
 
 const uuidv4 = require('uuid/v4');
 
@@ -282,15 +282,11 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private registerGraphTokenVariable() {
         this.resolveFuncs.set(Constants.MicrosoftGraphTokenVariableName, 
-            (name, document, context) => {
-                return new Promise((resolve, reject) => {
-
-                    let graphTokenMachine = new GraphTokenMachine(name);
-                    graphTokenMachine.AcquireToken(
-                                            (token) => resolve({ value: token}),
-                                            (message) => reject(message) );
-                });
-        });
+            async (name) => {
+                    let graphTokenMachine = new GraphTokenMachine();
+                    let token = await graphTokenMachine.AcquireToken(name);
+                    return { value: token};
+            });
     }
     private async resolveSettingsEnvironmentVariable(name: string) {
         if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
