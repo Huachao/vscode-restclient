@@ -2,13 +2,14 @@ import { HttpClient } from './httpClient';
 import { HttpRequest } from '../models/httpRequest';
 import { Clipboard, env, commands, Uri, window } from 'vscode';
 import * as Constants from '../common/constants';
+import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
 
 /*
  AppId provisioned to allow users to explicitly consent to permissions that this app can call
 */
-export const GraphTokenProviderClientId = "07f0a107-95c1-41ad-8f13-912eab68b93f";
+export const AadV2TokenProviderClientId = "07f0a107-95c1-41ad-8f13-912eab68b93f";
 
-export class GraphTokenMachine {
+export class AadV2TokenProvider {
     private readonly _httpClient: HttpClient;
     private readonly clipboard: Clipboard;
 
@@ -19,13 +20,18 @@ export class GraphTokenMachine {
  
     public async AcquireToken(name : string): Promise<string> {
 
-        let authParams = new AuthParameters(name);
+        let authParams = new AuthParameters();
+        await authParams.ParseName(name);
 
         if (!authParams.forceNewToken) {
-            let tokenEntry = GraphTokenCache.GetToken(authParams.cacheKey);
+            let tokenEntry = AadV2TokenCache.GetToken(authParams.GetCacheKey());
             if (tokenEntry && tokenEntry.SupportScopes(authParams.scopes)) {
                 return tokenEntry.Token;
             }
+        }
+
+        if (authParams.appOnly) {
+            return await this.GetConfidentialClientToken(authParams);
         }
 
         let deviceCodeResponse: IDeviceCodeResponse = await this.GetDeviceCodeResponse(authParams);
@@ -36,7 +42,7 @@ export class GraphTokenMachine {
             return "";
         }
     }
-
+    
     private async GetDeviceCodeResponse(authParams: AuthParameters) : Promise<IDeviceCodeResponse>  {
         let request = this.createUserCodeRequest(authParams.clientId,authParams.tenantId,authParams.scopes);
         let response = await this._httpClient.send(request);
@@ -67,10 +73,29 @@ export class GraphTokenMachine {
             this.processAuthError(bodyObject);
         }
         let tokenResponse: ITokenResponse = bodyObject
-        GraphTokenCache.SetToken(authParams.cacheKey, tokenResponse.scope.split(' '), tokenResponse.access_token);
+        AadV2TokenCache.SetToken(authParams.GetCacheKey(), tokenResponse.scope.split(' '), tokenResponse.access_token);
 
         return tokenResponse.access_token;
     }
+
+    private async GetConfidentialClientToken(authParams: AuthParameters): Promise<string> {
+        let request = this.createAcquireConfidentialClientTokenRequest(authParams.clientId, authParams.tenantId, authParams.clientSecret as string, authParams.appUri as string);
+        let response = await this._httpClient.send(request);
+
+        let bodyObject = JSON.parse(response.body);
+        
+        if (response.statusCode != 200) {
+            this.processAuthError(bodyObject);
+        }
+        let tokenResponse: ITokenResponse = bodyObject
+        let scopes : string[] = [];
+        if (tokenResponse.scope) {
+            tokenResponse.scope.split(' ');
+        } 
+        AadV2TokenCache.SetToken(authParams.GetCacheKey(), scopes, tokenResponse.access_token);
+        return tokenResponse.access_token;
+    }
+
 
     private processAuthError(bodyObject: any) {
         let errorResponse: IAuthError = bodyObject;
@@ -89,7 +114,13 @@ export class GraphTokenMachine {
         { "Content-Type": "application/x-www-form-urlencoded" },
          `grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=${clientId}&device_code=${deviceCode}`);
     }
-    
+
+    private createAcquireConfidentialClientTokenRequest(clientId: string, tenantId:string, clientSecret: string, appUri: string) : HttpRequest {
+        return new HttpRequest("POST",`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+        { "Content-Type": "application/x-www-form-urlencoded" },
+         `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&scope=${appUri}/.default`);
+    }
+
     private async promptForUserCode(deviceCodeResponse: IDeviceCodeResponse) : Promise<boolean>  {
 
         const messageBoxOptions = { modal: true };
@@ -111,51 +142,101 @@ export class GraphTokenMachine {
     };
 }
 
+
+/*
+  
+  ClientId: We use default clientId for all delegated access unless overridden in $appToken.  AppOnly access uses the one in the environment
+  TenantId: If not specified, we use common. If specified in environment, we use that. Value in $aadToken overrides
+  Scopes are always in $aadV2Token
+*/
 class AuthParameters {
-    private readonly graphTokenRegex: RegExp = new RegExp(`\\s*\\${Constants.MicrosoftGraphTokenVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+scopes:([\\w,.]+))?(\\s+tenantid:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+clientid:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
+
+    private readonly aadV2TokenRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryV2TokenVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(appOnly))?(\\s+scopes:([\\w,.]+))?(\\s+tenantId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+clientId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
     public tenantId: string
     public clientId: string
     public scopes: string[]
     public forceNewToken: boolean
-    public cacheKey: string
+    public clientSecret?: string
+    public appOnly: boolean
+    public appUri?: string
 
-    public constructor(name: string) {
-
-        this.clientId = GraphTokenProviderClientId;
+    public constructor() {
+        this.clientId = AadV2TokenProviderClientId;
         this.tenantId = "common";
-        let scopes = "openid,profile";
         this.forceNewToken = false;
+        this.appOnly = false;
+    }
+
+
+    async ReadEnvironmentVariable(variableName: string) : Promise<string | undefined> {
+        if (await EnvironmentVariableProvider.Instance.has(variableName)) {
+            const { value, error, warning } = await EnvironmentVariableProvider.Instance.get(variableName);
+            if (!warning && !error) {
+                return value as string;
+            } else {
+                return undefined;
+            }
+        }
+        return undefined;
+    }
+
+    GetCacheKey() : string {
+        return this.tenantId + "|" + this.clientId + "|" + this.appOnly as string;
+
+    }
+    async ParseName(name: string) {
+
+        // Update defaults based on environment
+        this.tenantId = (await this.ReadEnvironmentVariable("aadV2TenantId")) || this.tenantId;
+        
+        let scopes = "openid,profile";
+        let explicitClientId:string|undefined = undefined;
         // Parse variable parameters
-        const groups = this.graphTokenRegex.exec(name);
+        const groups = this.aadV2TokenRegex.exec(name);
         if (groups) {
             this.forceNewToken = groups[2] === Constants.AzureActiveDirectoryForceNewOption;
-            scopes = groups[4] || scopes;
-            this.tenantId = groups[6] || this.tenantId;
-            this.clientId = groups[8] || this.clientId;
+            this.appOnly = groups[4] === "appOnly";
+            scopes = groups[6] || scopes;
+            this.tenantId = groups[8] || this.tenantId;
+            explicitClientId = groups[10];
+        } else {
+            throw new Error("Failed to parse parameters: " + name);
         }
 
-        this.cacheKey = this.tenantId + "|" + this.clientId + "|";
         this.scopes = scopes.split(",").map(s => s.trim());
+
+        if (this.appOnly) {
+            this.clientId = explicitClientId || (await this.ReadEnvironmentVariable("aadV2ClientId")) || this.clientId;
+            this.clientSecret = (await this.ReadEnvironmentVariable("aadV2ClientSecret"));
+            this.appUri = (await this.ReadEnvironmentVariable("aadV2AppUri")); 
+            if (!(this.clientSecret && this.appUri)) {
+                throw new Error("For appOnly tokens, a environment variable aadV2ClientSecret and aadV2AppUri must be created.  aadV2ClientId and aadV2TenantId are optional environment variables.")
+            }
+        } else {
+            this.clientId = explicitClientId || this.clientId;
+        }
+
+
     }
 }
 
- class GraphTokenCache {
+ class AadV2TokenCache {
 
-    private static tokens : Map<string,GraphTokenCacheEntry> = new Map<string,GraphTokenCacheEntry>();
+    private static tokens : Map<string,AadV2TokenCacheEntry> = new Map<string,AadV2TokenCacheEntry>();
 
     static SetToken(cacheKey: string, scopes: string[], token:string) {
 
-        let entry : GraphTokenCacheEntry = new GraphTokenCacheEntry();
+        let entry : AadV2TokenCacheEntry = new AadV2TokenCacheEntry();
         entry.Token = token;
         entry.Scopes = scopes;
         this.tokens.set(cacheKey, entry);
     }
-    static GetToken(cacheKey: string) : GraphTokenCacheEntry | undefined {
+    static GetToken(cacheKey: string) : AadV2TokenCacheEntry | undefined {
         return this.tokens.get(cacheKey);
     }
 }
 
- class GraphTokenCacheEntry {
+ class AadV2TokenCacheEntry {
      public Token: string
      public Scopes: string[]
 

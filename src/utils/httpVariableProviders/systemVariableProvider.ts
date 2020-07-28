@@ -13,7 +13,7 @@ import { AadTokenCache } from '../aadTokenCache';
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
-import { GraphTokenMachine } from '../graphTokenMachine';
+import { AadV2TokenProvider } from '../aadV2TokenProvider';
 
 const uuidv4 = require('uuid/v4');
 
@@ -59,7 +59,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerProcessEnvVariable();
         this.registerDotenvVariable();
         this.registerAadTokenVariable();
-        this.registerGraphTokenVariable();
+        this.registerAadV2TokenVariable();
     }
 
     public readonly type: VariableType = VariableType.System;
@@ -280,12 +280,12 @@ export class SystemVariableProvider implements HttpVariableProvider {
         });
     }
 
-    private registerGraphTokenVariable() {
-        this.resolveFuncs.set(Constants.MicrosoftGraphTokenVariableName, 
+    private registerAadV2TokenVariable() {
+        this.resolveFuncs.set(Constants.AzureActiveDirectoryV2TokenVariableName, 
             async (name) => {
-                    let graphTokenMachine = new GraphTokenMachine();
-                    let token = await graphTokenMachine.AcquireToken(name);
-                    return { value: token};
+                    let aadV2TokenProvider = new AadV2TokenProvider();
+                    let token = await aadV2TokenProvider.AcquireToken(name);
+                    return {value: token};
             });
     }
     private async resolveSettingsEnvironmentVariable(name: string) {

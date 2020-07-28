@@ -522,6 +522,18 @@ System variables provide a pre-defined set of variables that can be used in any 
   `<domain|tenantId>`: Optional. Domain or tenant id for the directory to sign in to. Default: Pick a directory from a drop-down or press `Esc` to use the home directory (`common` for Microsoft Account).
 
   `aud:<domain|tenantId>`: Optional. Target Azure AD app id (aka client id) or domain the token should be created for (aka audience or resource). Default: Domain of the REST endpoint.
+* `{{$aadV2Token [new] [appOnly ][scopes:<scope[,]>] [tenantid:<domain|tenantId>] [clientid:<clientId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
+
+  `new`: Optional. Specify `new` to force re-authentication and get a new token for the specified directory. Default: Reuse previous token for the specified tenantId and clientId from an in-memory cache. Expired tokens are refreshed automatically. (Restart Visual Studio Code to clear the cache.)
+
+  `appOnly`: Optional. Specify appOnly to use make to use a client credentials flow to obtain a token.  `aadV2ClientSecret` and `aadV2AppUri`must be provided as REST Client environment variables.  `aadV2ClientId` and `aadV2TenantId` may also be optionally provided via the environment. `aadV2ClientId` in environment will only be used for `appOnly` calls.
+
+  `scopes:<scope[,]>`: Optional. Comma delimited list of scopes that must have consent to allow the call to be successful.  Not applicable for `appOnly` calls.
+  
+  `tenantId:<domain|tenantId>`: Optional. Domain or tenant id for the tenant to sign in to. (`common` to determine tenant from sign in).
+
+  `clientId:<clientid>`: Optional. Identifier of the application registration to use to obtain the token. Default uses an application registration created specifically for this plugin.
+
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$processEnv [%]envVarName}}`: Allows the resolution of a local machine environment variable to a string value. A typical use case is for secret keys that you don't want to commit to source control.
 For example: Define a shell environment variable in `.bashrc` or similar on windows
