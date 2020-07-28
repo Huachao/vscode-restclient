@@ -210,6 +210,7 @@ export class Selector {
         }
         else {
             return Object.entries(lines)
+                .filter(([, value]) => value.startsWith("#"))
                 .map(([index,]) => +index);
         }
     }
@@ -225,6 +226,21 @@ export class Selector {
         };
         const sharpLines = this.getSharpRows(lines, sharps);
         // sharpLines.push(lines.length);
+
+        return sharpLines;
+    }
+
+    public static getAllSharpRanges(lines: string[], options?: RequestRangeOptions): number[] {
+        options = {
+            ignoreCommentLine: true,
+            ignoreEmptyLine: true,
+            ignoreFileVariableDefinitionLine: true,
+            ignoreResponseRange: true,
+            ...options
+        };
+        const sharpLines = Object.entries(lines)
+            .filter(([, value]) => value.startsWith("#"))
+            .map(([index,]) => +index);
 
         return sharpLines;
     }
