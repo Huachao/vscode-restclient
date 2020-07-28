@@ -1,14 +1,16 @@
-import * as url from 'url';
-import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument, DocumentSymbol } from 'vscode';
+// import * as url from 'url';
+import { CancellationToken, DocumentSymbolProvider, Range, SymbolKind, TextDocument, DocumentSymbol } from 'vscode';
 import * as Constants from '../common/constants';
-import { RequestParserFactory } from '../models/requestParserFactory';
+// import { RequestParserFactory } from '../models/requestParserFactory';
 import { Selector } from '../utils/selector';
-import { VariableProcessor } from '../utils/variableProcessor';
-import { getCurrentHttpFileName } from '../utils/workspaceUtility';
+// import { VariableProcessor } from '../utils/variableProcessor';
+// import { getCurrentHttpFileName } from '../utils/workspaceUtility';
+
+let i;
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<DocumentSymbol[]> {
-        const symbols: DocumentSymbol[] = [];
+        let symbols: DocumentSymbol[] = [];
         const allLines: string[] = document.getText().split(Constants.LineSplitterRegex);
         // let sharps = 10;
         let allSharpRowIndexs: number[] = Selector.getAllSharpRanges(allLines);
@@ -16,91 +18,19 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
         // let preSharpStr = "";
         // let childing = false;
         // let needCreat = true;
-        let symbol;
-        let i = -1;
-        do {
-            i++;
-            if (i >= allSharpRowIndexs.length) break;
-
-            let blockStart = allSharpRowIndexs[i];
-
-            let line = allLines[allSharpRowIndexs[i]];
-            if (line == undefined) break;
-            let [sharpStr, sharpCount] = this.GetSharpString(line);//取出前面有一个#
-            let text = line.replace(sharpStr, "");//取出#后面的内容
-            symbol = new DocumentSymbol(
-                text,
-                '',
-                SymbolKind.String,
-                new Range(blockStart, 0, blockStart, line.length),
-                new Range(blockStart, 0, blockStart, line.length));
-            let children: DocumentSymbol[] = [];
-
-            blockStart = allSharpRowIndexs[i];
-            line = allLines[blockStart];
-            let [sharpStr2, sharpCount2] = this.GetSharpString(line);//取出前面有一个#
-            if (sharpCount2 > sharpCount) {
-                //上一级的子级
-                text = line.replace(sharpStr2, "");//取出#后面的内容
-                let child: DocumentSymbol = new DocumentSymbol(
-                    text,
-                    '',
-                    SymbolKind.String,
-                    new Range(blockStart, 0, blockStart, line.length),
-                    new Range(blockStart, 0, blockStart, line.length));
-                let children3: DocumentSymbol[] = [];
-                do {
-                    i++;
-                    if (i >= allSharpRowIndexs.length) break;
-
-                    blockStart = allSharpRowIndexs[i];
-                    line = allLines[blockStart];
-                    let [sharpStr3, sharpCount3] = this.GetSharpString(line);//取出前面有一个#
-                    if (sharpCount3 > sharpCount2) {
-                        //上一级的子级
-                        text = line.replace(sharpStr3, "");//取出#后面的内容
-                        let child3: DocumentSymbol = new DocumentSymbol(
-                            text,
-                            '',
-                            SymbolKind.String,
-                            new Range(blockStart, 0, blockStart, line.length),
-                            new Range(blockStart, 0, blockStart, line.length));
-
-
-                        children3.push(child3);
-                        sharpCount2 = sharpCount3;
-                        sharpStr2 = sharpStr3;
-                    }
-                    else {
-                        break;
-                    }
-                } while (true);
-                child.children = children3;
-
-                children.push(child);
-
-                sharpCount = sharpCount2;
-                sharpStr = sharpStr2;
-            }
-            else {
-                symbol.children = children;
-                symbols.push(symbol);
-            }
-
-        } while (true);
-
-
+        i = -1;
+        this.processTree(symbols, allLines, allSharpRowIndexs);
         return symbols;
     }
 
-    private processTree(symbols: DocumentSymbol[], allLines: string[], allSharpRowIndexs: number[], i: number) {
+    private processTree(symbols: DocumentSymbol[], allLines: string[], allSharpRowIndexs: number[]) {
         do {
             i++;
             if (i >= allSharpRowIndexs.length) break;
 
+            console.log('processTree i:' + i);
             let blockStart = allSharpRowIndexs[i];
-
-            let line = allLines[allSharpRowIndexs[i]];
+            let line = allLines[blockStart];
             if (line == undefined) break;
             let [sharpStr, sharpCount] = this.GetSharpString(line);//取出前面有一个#
             let text = line.replace(sharpStr, "");//取出#后面的内容
@@ -110,32 +40,33 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
                 SymbolKind.String,
                 new Range(blockStart, 0, blockStart, line.length),
                 new Range(blockStart, 0, blockStart, line.length));
-            this.processChild(symbol, allLines, allSharpRowIndexs, i);
+            let children: DocumentSymbol[] = [];
+            this.processChild(symbol, children, allLines, allSharpRowIndexs, sharpCount);
             symbols.push(symbol);
         } while (true);
 
         return symbols;
     }
 
-
-    private processChild(symbol: DocumentSymbol, allLines: string[], allSharpRowIndexs: number[], i: number) {
+    /**
+     * 
+     * @param symbol 当前级别，寻找它的孩子
+     * @param allLines 
+     * @param allSharpRowIndexs 
+     * @param parentSharpCount 当前级别#的数量
+     */
+    private processChild(symbol: DocumentSymbol, children: DocumentSymbol[], allLines: string[], allSharpRowIndexs: number[], parentSharpCount: number) {
         i++;
         if (i >= allSharpRowIndexs.length) return;
-
+        console.log('processChild i:' + i);
         let blockStart = allSharpRowIndexs[i];
-
-        let line = allLines[allSharpRowIndexs[i]];
+        let line = allLines[blockStart];
         if (line == undefined) return;
         let [sharpStr, sharpCount] = this.GetSharpString(line);//取出前面有一个#
         let text = line.replace(sharpStr, "");//取出#后面的内容
-
-        blockStart = allSharpRowIndexs[i];
-        line = allLines[blockStart];
-        let [sharpStr2, sharpCount2] = this.GetSharpString(line);//取出前面有一个#
-        let children: DocumentSymbol[] = [];
-        if (sharpCount2 > sharpCount) {
-            //上一级的子级
-            text = line.replace(sharpStr2, "");//取出#后面的内容
+        if (sharpCount > parentSharpCount) {
+            //当前一级是上一级的子级
+            text = line.replace(sharpStr, "");//取出#后面的内容
             let child: DocumentSymbol = new DocumentSymbol(
                 text,
                 '',
@@ -143,11 +74,16 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
                 new Range(blockStart, 0, blockStart, line.length),
                 new Range(blockStart, 0, blockStart, line.length));
 
-
-            this.processChild(child, allLines, allSharpRowIndexs, i);
+            //判断下一级是否是当前一级的子级
+            let children2: DocumentSymbol[] = [];
+            this.processChild(child, children2, allLines, allSharpRowIndexs, sharpCount);
 
             children.push(child);
             symbol.children = children;
+        }
+        else if (sharpCount == parentSharpCount) {
+            //当前一级和上一级的平级
+
         }
         else {
             i--;
