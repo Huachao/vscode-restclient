@@ -12,8 +12,9 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<DocumentSymbol[]> {
         let symbols: DocumentSymbol[] = [];
         const allLines: string[] = document.getText().split(Constants.LineSplitterRegex);
-        // let sharps = 10;
+        if (allLines.length <= 0) return symbols;
         let allSharpRowIndexs: number[] = Selector.getAllSharpRanges(allLines);
+        if (allSharpRowIndexs.length <= 0) return symbols;
         // let preLine = "";
         // let preSharpStr = "";
         // let childing = false;
