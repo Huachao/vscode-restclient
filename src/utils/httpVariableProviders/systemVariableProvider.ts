@@ -10,10 +10,10 @@ import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { AadTokenCache } from '../aadTokenCache';
+import { AadV2TokenProvider } from '../aadV2TokenProvider';
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
-import { AadV2TokenProvider } from '../aadV2TokenProvider';
 
 const uuidv4 = require('uuid/v4');
 
@@ -281,10 +281,10 @@ export class SystemVariableProvider implements HttpVariableProvider {
     }
 
     private registerAadV2TokenVariable() {
-        this.resolveFuncs.set(Constants.AzureActiveDirectoryV2TokenVariableName, 
+        this.resolveFuncs.set(Constants.AzureActiveDirectoryV2TokenVariableName,
             async (name) => {
-                    let aadV2TokenProvider = new AadV2TokenProvider();
-                    let token = await aadV2TokenProvider.AcquireToken(name);
+                    const aadV2TokenProvider = new AadV2TokenProvider();
+                    const token = await aadV2TokenProvider.AcquireToken(name);
                     return {value: token};
             });
     }

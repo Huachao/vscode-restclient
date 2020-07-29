@@ -1,7 +1,7 @@
-import { HttpClient } from './httpClient';
-import { HttpRequest } from '../models/httpRequest';
-import { Clipboard, env, commands, Uri, window } from 'vscode';
+import { Clipboard, commands, env, Uri, window } from 'vscode';
 import * as Constants from '../common/constants';
+import { HttpRequest } from '../models/httpRequest';
+import { HttpClient } from './httpClient';
 import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
 
 /*
@@ -17,14 +17,14 @@ export class AadV2TokenProvider {
         this._httpClient = new HttpClient();
         this.clipboard = env.clipboard;
     }
- 
+
     public async AcquireToken(name : string): Promise<string> {
 
-        let authParams = new AuthParameters();
+        const authParams = new AuthParameters();
         await authParams.ParseName(name);
 
         if (!authParams.forceNewToken) {
-            let tokenEntry = AadV2TokenCache.GetToken(authParams.GetCacheKey());
+            const tokenEntry = AadV2TokenCache.GetToken(authParams.GetCacheKey());
             if (tokenEntry && tokenEntry.SupportScopes(authParams.scopes)) {
                 return tokenEntry.Token;
             }
@@ -34,22 +34,22 @@ export class AadV2TokenProvider {
             return await this.GetConfidentialClientToken(authParams);
         }
 
-        let deviceCodeResponse: IDeviceCodeResponse = await this.GetDeviceCodeResponse(authParams);
-        let isDone = await this.promptForUserCode(deviceCodeResponse);
+        const deviceCodeResponse: IDeviceCodeResponse = await this.GetDeviceCodeResponse(authParams);
+        const isDone = await this.promptForUserCode(deviceCodeResponse);
         if (isDone) {
             return await this.GetToken(deviceCodeResponse, authParams);
         } else {
             return "";
         }
     }
-    
-    private async GetDeviceCodeResponse(authParams: AuthParameters) : Promise<IDeviceCodeResponse>  {
-        let request = this.createUserCodeRequest(authParams.clientId,authParams.tenantId,authParams.scopes);
-        let response = await this._httpClient.send(request);
 
-        let bodyObject = JSON.parse(response.body);
+    private async GetDeviceCodeResponse(authParams: AuthParameters) : Promise<IDeviceCodeResponse> {
+        const request = this.createUserCodeRequest(authParams.clientId, authParams.tenantId, authParams.scopes);
+        const response = await this._httpClient.send(request);
 
-        if (response.statusCode != 200) {
+        const bodyObject = JSON.parse(response.body);
+
+        if (response.statusCode !== 200) {
             // Fail
             this.processAuthError(bodyObject);
         }
@@ -59,64 +59,64 @@ export class AadV2TokenProvider {
         }
 
         // Get userCode out of response body
-        let deviceCodeResponse: IDeviceCodeResponse = bodyObject
+        const deviceCodeResponse: IDeviceCodeResponse = bodyObject;
         return deviceCodeResponse;
     }
 
     private async GetToken(deviceCodeResponse: IDeviceCodeResponse, authParams: AuthParameters) : Promise<string> {
-        let request = this.createAcquireTokenRequest(authParams.clientId, authParams.tenantId, deviceCodeResponse.device_code);
-        let response = await this._httpClient.send(request);
+        const request = this.createAcquireTokenRequest(authParams.clientId, authParams.tenantId, deviceCodeResponse.device_code);
+        const response = await this._httpClient.send(request);
 
-        let bodyObject = JSON.parse(response.body);
-        
-        if (response.statusCode != 200) {
+        const bodyObject = JSON.parse(response.body);
+
+        if (response.statusCode !== 200) {
             this.processAuthError(bodyObject);
         }
-        let tokenResponse: ITokenResponse = bodyObject
+        const tokenResponse: ITokenResponse = bodyObject;
         AadV2TokenCache.SetToken(authParams.GetCacheKey(), tokenResponse.scope.split(' '), tokenResponse.access_token);
 
         return tokenResponse.access_token;
     }
 
     private async GetConfidentialClientToken(authParams: AuthParameters): Promise<string> {
-        let request = this.createAcquireConfidentialClientTokenRequest(authParams.clientId, authParams.tenantId, authParams.clientSecret as string, authParams.appUri as string);
-        let response = await this._httpClient.send(request);
+        const request = this.createAcquireConfidentialClientTokenRequest(authParams.clientId, authParams.tenantId, authParams.clientSecret as string, authParams.appUri as string);
+        const response = await this._httpClient.send(request);
 
-        let bodyObject = JSON.parse(response.body);
-        
-        if (response.statusCode != 200) {
+        const bodyObject = JSON.parse(response.body);
+
+        if (response.statusCode !== 200) {
             this.processAuthError(bodyObject);
         }
-        let tokenResponse: ITokenResponse = bodyObject
-        let scopes : string[] = [];
+        const tokenResponse: ITokenResponse = bodyObject;
+        const scopes : string[] = [];
         if (tokenResponse.scope) {
             tokenResponse.scope.split(' ');
-        } 
+        }
         AadV2TokenCache.SetToken(authParams.GetCacheKey(), scopes, tokenResponse.access_token);
         return tokenResponse.access_token;
     }
 
 
     private processAuthError(bodyObject: any) {
-        let errorResponse: IAuthError = bodyObject;
+        const errorResponse: IAuthError = bodyObject;
         throw new Error(" Auth call failed. " + errorResponse.error_description);
     }
 
-    private createUserCodeRequest(clientId: string, tenantId:string, scopes: string[]) : HttpRequest {
+    private createUserCodeRequest(clientId: string, tenantId: string, scopes: string[]) : HttpRequest {
         return new HttpRequest(
             "POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/devicecode`,
             { "Content-Type": "application/x-www-form-urlencoded" },
              `client_id=${clientId}&scope=${scopes.join("%20")}`);
     }
 
-    private createAcquireTokenRequest(clientId: string, tenantId:string, deviceCode: string) : HttpRequest {
-        return new HttpRequest("POST",`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+    private createAcquireTokenRequest(clientId: string, tenantId: string, deviceCode: string) : HttpRequest {
+        return new HttpRequest("POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
         { "Content-Type": "application/x-www-form-urlencoded" },
          `grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=${clientId}&device_code=${deviceCode}`);
     }
 
-    private createAcquireConfidentialClientTokenRequest(clientId: string, tenantId:string, clientSecret: string, appUri: string) : HttpRequest {
-        return new HttpRequest("POST",`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+    private createAcquireConfidentialClientTokenRequest(clientId: string, tenantId: string, clientSecret: string, appUri: string) : HttpRequest {
+        return new HttpRequest("POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
         { "Content-Type": "application/x-www-form-urlencoded" },
          `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&scope=${appUri}/.default`);
     }
@@ -131,20 +131,20 @@ export class AadV2TokenProvider {
         const done = "Done";
 
         let value = await window.showInformationMessage(signInPrompt, messageBoxOptions, signIn);
-        if (value == signIn) {
+        if (value === signIn) {
             do {
                 await this.clipboard.writeText(deviceCodeResponse.user_code);
                 commands.executeCommand("vscode.open", Uri.parse(deviceCodeResponse.verification_uri));
                 value = await window.showInformationMessage(donePrompt, messageBoxOptions, done, tryAgain);
-            } while(value == tryAgain);
+            } while (value === tryAgain);
         }
-        return value == done;
-    };
+        return value === done;
+    }
 }
 
 
 /*
-  
+
   ClientId: We use default clientId for all delegated access unless overridden in $appToken.  AppOnly access uses the one in the environment
   TenantId: If not specified, we use common. If specified in environment, we use that. Value in $aadToken overrides
   Scopes are always in $aadV2Token
@@ -152,13 +152,13 @@ export class AadV2TokenProvider {
 class AuthParameters {
 
     private readonly aadV2TokenRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryV2TokenVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(appOnly))?(\\s+scopes:([\\w,.]+))?(\\s+tenantId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+clientId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
-    public tenantId: string
-    public clientId: string
-    public scopes: string[]
-    public forceNewToken: boolean
-    public clientSecret?: string
-    public appOnly: boolean
-    public appUri?: string
+    public tenantId: string;
+    public clientId: string;
+    public scopes: string[];
+    public forceNewToken: boolean;
+    public clientSecret?: string;
+    public appOnly: boolean;
+    public appUri?: string;
 
     public constructor() {
         this.clientId = AadV2TokenProviderClientId;
@@ -166,7 +166,6 @@ class AuthParameters {
         this.forceNewToken = false;
         this.appOnly = false;
     }
-
 
     async ReadEnvironmentVariable(variableName: string) : Promise<string | undefined> {
         if (await EnvironmentVariableProvider.Instance.has(variableName)) {
@@ -188,9 +187,9 @@ class AuthParameters {
 
         // Update defaults based on environment
         this.tenantId = (await this.ReadEnvironmentVariable("aadV2TenantId")) || this.tenantId;
-        
+
         let scopes = "openid,profile";
-        let explicitClientId:string|undefined = undefined;
+        let explicitClientId: string|undefined = undefined;
         // Parse variable parameters
         const groups = this.aadV2TokenRegex.exec(name);
         if (groups) {
@@ -208,25 +207,23 @@ class AuthParameters {
         if (this.appOnly) {
             this.clientId = explicitClientId || (await this.ReadEnvironmentVariable("aadV2ClientId")) || this.clientId;
             this.clientSecret = (await this.ReadEnvironmentVariable("aadV2ClientSecret"));
-            this.appUri = (await this.ReadEnvironmentVariable("aadV2AppUri")); 
+            this.appUri = (await this.ReadEnvironmentVariable("aadV2AppUri"));
             if (!(this.clientSecret && this.appUri)) {
-                throw new Error("For appOnly tokens, a environment variable aadV2ClientSecret and aadV2AppUri must be created.  aadV2ClientId and aadV2TenantId are optional environment variables.")
+                throw new Error("For appOnly tokens, a environment variable aadV2ClientSecret and aadV2AppUri must be created.  aadV2ClientId and aadV2TenantId are optional environment variables.");
             }
         } else {
             this.clientId = explicitClientId || this.clientId;
         }
-
-
     }
 }
 
  class AadV2TokenCache {
 
-    private static tokens : Map<string,AadV2TokenCacheEntry> = new Map<string,AadV2TokenCacheEntry>();
+    private static tokens : Map<string, AadV2TokenCacheEntry> = new Map<string, AadV2TokenCacheEntry>();
 
-    static SetToken(cacheKey: string, scopes: string[], token:string) {
+    static SetToken(cacheKey: string, scopes: string[], token: string) {
 
-        let entry : AadV2TokenCacheEntry = new AadV2TokenCacheEntry();
+        const entry : AadV2TokenCacheEntry = new AadV2TokenCacheEntry();
         entry.Token = token;
         entry.Scopes = scopes;
         this.tokens.set(cacheKey, entry);
@@ -237,10 +234,10 @@ class AuthParameters {
 }
 
  class AadV2TokenCacheEntry {
-     public Token: string
-     public Scopes: string[]
+     public Token: string;
+     public Scopes: string[];
 
-     SupportScopes(scopes :string[]) : boolean {
+     SupportScopes(scopes: string[]) : boolean {
          let found: boolean = true;
         scopes.forEach(element => {
             if (!this.Scopes.includes(element)) {
@@ -253,29 +250,29 @@ class AuthParameters {
  }
 
  interface IAuthError {
-     error: string
-     error_description: string
-     error_uri: string
-     error_codes: number[]
-     timestamp: string
-     trace_id: string
-     correlation_id: string
+     error: string;
+     error_description: string;
+     error_uri: string;
+     error_codes: number[];
+     timestamp: string;
+     trace_id: string;
+     correlation_id: string;
  }
 
 interface IDeviceCodeResponse {
-    user_code: string
-    device_code: string
-    verification_uri: string
-    expires_in: string
-    interval: string
-    message: string
+    user_code: string;
+    device_code: string;
+    verification_uri: string;
+    expires_in: string;
+    interval: string;
+    message: string;
 }
 
 interface ITokenResponse {
-    token_type: string
-    scope: string
-    expires_in: number
-    access_token: string
-    refresh_token: string
-    id_token: string
+    token_type: string;
+    scope: string;
+    expires_in: number;
+    access_token: string;
+    refresh_token: string;
+    id_token: string;
 }
