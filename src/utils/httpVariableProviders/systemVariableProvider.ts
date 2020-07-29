@@ -134,7 +134,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 if (type === 'rfc1123') {
                     return { value: date.locale('en').format('ddd, DD MMM YYYY HH:mm:ss ZZ') };
                 } else if (type === 'iso8601') {
-                    return { value: date.locale('en').format('YYYY-MM-DDTHH:mm:ss.SSSZ') };
+                    return { value: date.format() };
                 } else {
                     return { value: date.format(type.slice(1, type.length - 1)) };
                 }
