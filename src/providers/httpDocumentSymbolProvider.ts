@@ -1,10 +1,10 @@
-import { CancellationToken, DocumentSymbolProvider, Range, SymbolKind, TextDocument, DocumentSymbol } from 'vscode';
+import { CancellationToken, DocumentSymbol, DocumentSymbolProvider, Range, SymbolKind, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
 import { Selector } from '../utils/selector';
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
     public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<DocumentSymbol[]> {
-        let symbols: DocumentSymbol[] = [];
+        const symbols: DocumentSymbol[] = [];
         const allLines: string[] = document.getText().split(Constants.LineSplitterRegex);
         if (allLines.length <= 0) return symbols;
         let allSharpRowIndexs: number[] = Selector.getAllSharpRanges(allLines);
@@ -69,7 +69,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
                         blockStart = allSharpRowIndexs[i];
                         line = allLines[blockStart];
                         if (line == undefined) break;
-                        let [sharpStr1111, ] = this.GetSharpString(line);//取出前面有一个#
+                        let [sharpStr1111,] = this.GetSharpString(line);//取出前面有一个#
                         let text = line.replace(sharpStr1111, "");//取出#后面的内容
                         let symbol1111: DocumentSymbol = new DocumentSymbol(
                             text,
