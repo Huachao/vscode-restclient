@@ -69,7 +69,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
                         blockStart = allSharpRowIndexs[i];
                         line = allLines[blockStart];
                         if (line == undefined) break;
-                        let [sharpStr1111, sharpCount1111] = this.GetSharpString(line);//取出前面有一个#
+                        let [sharpStr1111, ] = this.GetSharpString(line);//取出前面有一个#
                         let text = line.replace(sharpStr1111, "");//取出#后面的内容
                         let symbol1111: DocumentSymbol = new DocumentSymbol(
                             text,
@@ -108,7 +108,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             let blockStart = allSharpRowIndexs[j];
             let line = allLines[blockStart];
             if (line == undefined) return childCount;
-            let [sharpStr, sharpCount] = this.GetSharpString(line);//取出前面有一个#
+            let [, sharpCount] = this.GetSharpString(line);//取出前面有一个#
             if (sharpCount <= parentSharpCount) {
                 //当前#数小于等于父级的#数，说明当前一级不是上一级的子级，本函数结束计算，返回结果
                 return childCount;
