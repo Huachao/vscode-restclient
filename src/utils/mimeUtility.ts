@@ -65,7 +65,7 @@ export class MimeUtility {
         }
 
         const { subtype, essence } = this.parse(contentTypeString);
-        return essence === 'application/json' || subtype.endsWith('+json');
+        return essence === 'application/json' || subtype.endsWith('+json') || essence.includes("text/javascript");
     }
 
     public static isXml(contentTypeString: string | undefined): boolean {
