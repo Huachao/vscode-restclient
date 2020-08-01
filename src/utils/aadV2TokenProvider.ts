@@ -18,32 +18,32 @@ export class AadV2TokenProvider {
         this.clipboard = env.clipboard;
     }
 
-    public async AcquireToken(name : string): Promise<string> {
+    public async acquireToken(name : string): Promise<string> {
 
         const authParams = new AuthParameters();
-        await authParams.ParseName(name);
+        await authParams.parseName(name);
 
         if (!authParams.forceNewToken) {
-            const tokenEntry = AadV2TokenCache.GetToken(authParams.GetCacheKey());
-            if (tokenEntry && tokenEntry.SupportScopes(authParams.scopes)) {
+            const tokenEntry = AadV2TokenCache.getToken(authParams.getCacheKey());
+            if (tokenEntry && tokenEntry.supportScopes(authParams.scopes)) {
                 return tokenEntry.Token;
             }
         }
 
         if (authParams.appOnly) {
-            return await this.GetConfidentialClientToken(authParams);
+            return await this.getConfidentialClientToken(authParams);
         }
 
-        const deviceCodeResponse: IDeviceCodeResponse = await this.GetDeviceCodeResponse(authParams);
+        const deviceCodeResponse: IDeviceCodeResponse = await this.getDeviceCodeResponse(authParams);
         const isDone = await this.promptForUserCode(deviceCodeResponse);
         if (isDone) {
-            return await this.GetToken(deviceCodeResponse, authParams);
+            return await this.getToken(deviceCodeResponse, authParams);
         } else {
             return "";
         }
     }
 
-    private async GetDeviceCodeResponse(authParams: AuthParameters) : Promise<IDeviceCodeResponse> {
+    private async getDeviceCodeResponse(authParams: AuthParameters) : Promise<IDeviceCodeResponse> {
         const request = this.createUserCodeRequest(authParams.clientId, authParams.tenantId, authParams.scopes);
         const response = await this._httpClient.send(request);
 
@@ -51,53 +51,48 @@ export class AadV2TokenProvider {
 
         if (response.statusCode !== 200) {
             // Fail
-            this.processAuthError(bodyObject);
+            this.processAuthErrorAndThrow(bodyObject);
         }
 
-        if (bodyObject.error) {  // really!?
-            this.processAuthError(bodyObject);
+        if (bodyObject.error) {  // This is only needed due to an error in AADV2 device code endpoint. An issue is filed.
+            this.processAuthErrorAndThrow(bodyObject);
         }
 
         // Get userCode out of response body
-        const deviceCodeResponse: IDeviceCodeResponse = bodyObject;
-        return deviceCodeResponse;
+        return bodyObject as IDeviceCodeResponse;
     }
 
-    private async GetToken(deviceCodeResponse: IDeviceCodeResponse, authParams: AuthParameters) : Promise<string> {
+    private async getToken(deviceCodeResponse: IDeviceCodeResponse, authParams: AuthParameters) : Promise<string> {
         const request = this.createAcquireTokenRequest(authParams.clientId, authParams.tenantId, deviceCodeResponse.device_code);
         const response = await this._httpClient.send(request);
 
         const bodyObject = JSON.parse(response.body);
 
         if (response.statusCode !== 200) {
-            this.processAuthError(bodyObject);
+            this.processAuthErrorAndThrow(bodyObject);
         }
         const tokenResponse: ITokenResponse = bodyObject;
-        AadV2TokenCache.SetToken(authParams.GetCacheKey(), tokenResponse.scope.split(' '), tokenResponse.access_token);
+        AadV2TokenCache.setToken(authParams.getCacheKey(), tokenResponse.scope.split(' '), tokenResponse.access_token);
 
         return tokenResponse.access_token;
     }
 
-    private async GetConfidentialClientToken(authParams: AuthParameters): Promise<string> {
+    private async getConfidentialClientToken(authParams: AuthParameters): Promise<string> {
         const request = this.createAcquireConfidentialClientTokenRequest(authParams.clientId, authParams.tenantId, authParams.clientSecret as string, authParams.appUri as string);
         const response = await this._httpClient.send(request);
 
         const bodyObject = JSON.parse(response.body);
 
         if (response.statusCode !== 200) {
-            this.processAuthError(bodyObject);
+            this.processAuthErrorAndThrow(bodyObject);
         }
         const tokenResponse: ITokenResponse = bodyObject;
-        const scopes : string[] = [];
-        if (tokenResponse.scope) {
-            tokenResponse.scope.split(' ');
-        }
-        AadV2TokenCache.SetToken(authParams.GetCacheKey(), scopes, tokenResponse.access_token);
+        const scopes : string[] = []; // Confidential Client tokens are limited to scopes defined in the app registration portal
+        AadV2TokenCache.setToken(authParams.getCacheKey(), scopes, tokenResponse.access_token);
         return tokenResponse.access_token;
     }
 
-
-    private processAuthError(bodyObject: any) {
+    private processAuthErrorAndThrow(bodyObject: any) {
         const errorResponse: IAuthError = bodyObject;
         throw new Error(" Auth call failed. " + errorResponse.error_description);
     }
@@ -142,12 +137,11 @@ export class AadV2TokenProvider {
     }
 }
 
-
 /*
 
   ClientId: We use default clientId for all delegated access unless overridden in $appToken.  AppOnly access uses the one in the environment
   TenantId: If not specified, we use common. If specified in environment, we use that. Value in $aadToken overrides
-  Scopes are always in $aadV2Token
+  Scopes are always in $aadV2Token for delegated access. They are not used for appOnly.
 */
 class AuthParameters {
 
@@ -167,7 +161,7 @@ class AuthParameters {
         this.appOnly = false;
     }
 
-    async ReadEnvironmentVariable(variableName: string) : Promise<string | undefined> {
+    async readEnvironmentVariable(variableName: string) : Promise<string | undefined> {
         if (await EnvironmentVariableProvider.Instance.has(variableName)) {
             const { value, error, warning } = await EnvironmentVariableProvider.Instance.get(variableName);
             if (!warning && !error) {
@@ -179,14 +173,14 @@ class AuthParameters {
         return undefined;
     }
 
-    GetCacheKey() : string {
+    getCacheKey() : string {
         return this.tenantId + "|" + this.clientId + "|" + this.appOnly as string;
-
     }
-    async ParseName(name: string) {
+
+    async parseName(name: string) {
 
         // Update defaults based on environment
-        this.tenantId = (await this.ReadEnvironmentVariable("aadV2TenantId")) || this.tenantId;
+        this.tenantId = (await this.readEnvironmentVariable("aadV2TenantId")) || this.tenantId;
 
         let scopes = "openid,profile";
         let explicitClientId: string|undefined = undefined;
@@ -202,14 +196,14 @@ class AuthParameters {
             throw new Error("Failed to parse parameters: " + name);
         }
 
-        this.scopes = scopes.split(",").map(s => s.trim());
+        this.scopes = (scopes + ",openid,profile").split(",").map(s => s.trim());
 
         if (this.appOnly) {
-            this.clientId = explicitClientId || (await this.ReadEnvironmentVariable("aadV2ClientId")) || this.clientId;
-            this.clientSecret = (await this.ReadEnvironmentVariable("aadV2ClientSecret"));
-            this.appUri = (await this.ReadEnvironmentVariable("aadV2AppUri"));
+            this.clientId = explicitClientId || (await this.readEnvironmentVariable("aadV2ClientId")) || this.clientId;
+            this.clientSecret = (await this.readEnvironmentVariable("aadV2ClientSecret"));
+            this.appUri = (await this.readEnvironmentVariable("aadV2AppUri"));
             if (!(this.clientSecret && this.appUri)) {
-                throw new Error("For appOnly tokens, a environment variable aadV2ClientSecret and aadV2AppUri must be created.  aadV2ClientId and aadV2TenantId are optional environment variables.");
+                throw new Error("For appOnly tokens, environment variables aadV2ClientSecret and aadV2AppUri must be created.  aadV2ClientId and aadV2TenantId are optional environment variables.");
             }
         } else {
             this.clientId = explicitClientId || this.clientId;
@@ -221,14 +215,14 @@ class AuthParameters {
 
     private static tokens : Map<string, AadV2TokenCacheEntry> = new Map<string, AadV2TokenCacheEntry>();
 
-    static SetToken(cacheKey: string, scopes: string[], token: string) {
-
+    public static setToken(cacheKey: string, scopes: string[], token: string) {
         const entry : AadV2TokenCacheEntry = new AadV2TokenCacheEntry();
         entry.Token = token;
         entry.Scopes = scopes;
         this.tokens.set(cacheKey, entry);
     }
-    static GetToken(cacheKey: string) : AadV2TokenCacheEntry | undefined {
+
+    public static getToken(cacheKey: string) : AadV2TokenCacheEntry | undefined {
         return this.tokens.get(cacheKey);
     }
 }
@@ -236,16 +230,8 @@ class AuthParameters {
  class AadV2TokenCacheEntry {
      public Token: string;
      public Scopes: string[];
-
-     SupportScopes(scopes: string[]) : boolean {
-         let found: boolean = true;
-        scopes.forEach(element => {
-            if (!this.Scopes.includes(element)) {
-                found = false;
-                return;
-            }
-        });
-        return found;
+     public supportScopes(scopes: string[]) : boolean {
+        return scopes.every((scope) => this.Scopes.includes(scope));
      }
  }
 
