@@ -283,9 +283,9 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private registerAadV2TokenVariable() {
         this.resolveFuncs.set(Constants.AzureActiveDirectoryV2TokenVariableName,
             async (name) => {
-                    const aadV2TokenProvider = new AadV2TokenProvider();
-                    const token = await aadV2TokenProvider.acquireToken(name);
-                    return {value: token};
+                const aadV2TokenProvider = new AadV2TokenProvider();
+                const token = await aadV2TokenProvider.acquireToken(name);
+                return {value: token};
             });
     }
     private async resolveSettingsEnvironmentVariable(name: string) {

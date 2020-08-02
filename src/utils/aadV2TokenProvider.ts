@@ -25,7 +25,7 @@ export class AadV2TokenProvider {
 
         if (!authParams.forceNewToken) {
             const tokenEntry = AadV2TokenCache.getToken(authParams.getCacheKey());
-            if (tokenEntry && tokenEntry.supportScopes(authParams.scopes)) {
+            if (tokenEntry?.supportScopes(authParams.scopes)) {
                 return tokenEntry.Token;
             }
         }
@@ -183,7 +183,7 @@ class AuthParameters {
         this.tenantId = (await this.readEnvironmentVariable("aadV2TenantId")) || this.tenantId;
 
         let scopes = "openid,profile";
-        let explicitClientId: string|undefined = undefined;
+        let explicitClientId: string | undefined = undefined;
         // Parse variable parameters
         const groups = this.aadV2TokenRegex.exec(name);
         if (groups) {
