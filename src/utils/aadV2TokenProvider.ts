@@ -78,7 +78,7 @@ export class AadV2TokenProvider {
     }
 
     private async getConfidentialClientToken(authParams: AuthParameters): Promise<string> {
-        const request = this.createAcquireConfidentialClientTokenRequest(authParams.clientId, authParams.tenantId, authParams.clientSecret as string, authParams.appUri as string);
+        const request = this.createAcquireConfidentialClientTokenRequest(authParams.clientId, authParams.tenantId, authParams.clientSecret!, authParams.appUri!);
         const response = await this._httpClient.send(request);
 
         const bodyObject = JSON.parse(response.body);
