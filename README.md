@@ -526,9 +526,9 @@ System variables provide a pre-defined set of variables that can be used in any 
 
   `new`: Optional. Specify `new` to force re-authentication and get a new token for the specified directory. Default: Reuse previous token for the specified tenantId and clientId from an in-memory cache. Expired tokens are refreshed automatically. (Restart Visual Studio Code to clear the cache.)
 
-  `appOnly`: Optional. Specify appOnly to use make to use a client credentials flow to obtain a token.  `aadV2ClientSecret` and `aadV2AppUri`must be provided as REST Client environment variables.  `aadV2ClientId` and `aadV2TenantId` may also be optionally provided via the environment. `aadV2ClientId` in environment will only be used for `appOnly` calls.
+  `appOnly`: Optional. Specify `appOnly` to use make to use a client credentials flow to obtain a token. `aadV2ClientSecret` and `aadV2AppUri`must be provided as REST Client environment variables. `aadV2ClientId` and `aadV2TenantId` may also be optionally provided via the environment. `aadV2ClientId` in environment will only be used for `appOnly` calls.
 
-  `scopes:<scope[,]>`: Optional. Comma delimited list of scopes that must have consent to allow the call to be successful.  Not applicable for `appOnly` calls.
+  `scopes:<scope[,]>`: Optional. Comma delimited list of scopes that must have consent to allow the call to be successful. Not applicable for `appOnly` calls.
   
   `tenantId:<domain|tenantId>`: Optional. Domain or tenant id for the tenant to sign in to. (`common` to determine tenant from sign in).
 

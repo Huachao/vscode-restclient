@@ -18,7 +18,7 @@ export class AadV2TokenProvider {
         this.clipboard = env.clipboard;
     }
 
-    public async acquireToken(name : string): Promise<string> {
+    public async acquireToken(name: string): Promise<string> {
 
         const authParams = new AuthParameters();
         await authParams.parseName(name);
