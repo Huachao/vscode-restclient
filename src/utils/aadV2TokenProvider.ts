@@ -7,7 +7,7 @@ import { EnvironmentVariableProvider } from './httpVariableProviders/environment
 /*
  AppId provisioned to allow users to explicitly consent to permissions that this app can call
 */
-export const AadV2TokenProviderClientId = "07f0a107-95c1-41ad-8f13-912eab68b93f";
+const AadV2TokenProviderClientId = "07f0a107-95c1-41ad-8f13-912eab68b93f";
 
 export class AadV2TokenProvider {
     private readonly _httpClient: HttpClient;
@@ -26,7 +26,7 @@ export class AadV2TokenProvider {
         if (!authParams.forceNewToken) {
             const tokenEntry = AadV2TokenCache.getToken(authParams.getCacheKey());
             if (tokenEntry?.supportScopes(authParams.scopes)) {
-                return tokenEntry.Token;
+                return tokenEntry.token;
             }
         }
 
@@ -94,7 +94,7 @@ export class AadV2TokenProvider {
 
     private processAuthErrorAndThrow(bodyObject: any) {
         const errorResponse: IAuthError = bodyObject;
-        throw new Error(" Auth call failed. " + errorResponse.error_description);
+        throw new Error("Auth call failed. " + errorResponse.error_description);
     }
 
     private createUserCodeRequest(clientId: string, tenantId: string, scopes: string[]) : HttpRequest {
@@ -138,7 +138,6 @@ export class AadV2TokenProvider {
 }
 
 /*
-
   ClientId: We use default clientId for all delegated access unless overridden in $appToken.  AppOnly access uses the one in the environment
   TenantId: If not specified, we use common. If specified in environment, we use that. Value in $aadToken overrides
   Scopes are always in $aadV2Token for delegated access. They are not used for appOnly.
@@ -196,12 +195,18 @@ class AuthParameters {
             throw new Error("Failed to parse parameters: " + name);
         }
 
-        this.scopes = (scopes + ",openid,profile").split(",").map(s => s.trim());
+        // if scopes does not contain openid or profile, add it
+        // Using /common endpoint with only organizational scopes causes device code to fail.
+        // Adding openid and/or profile prevents this failure from occuring
+        if (!scopes.indexOf("openid")) {
+            scopes += ",openid,profile";
+        }
+        this.scopes = scopes.split(",").map(s => s.trim());
 
         if (this.appOnly) {
             this.clientId = explicitClientId || (await this.readEnvironmentVariable("aadV2ClientId")) || this.clientId;
-            this.clientSecret = (await this.readEnvironmentVariable("aadV2ClientSecret"));
-            this.appUri = (await this.readEnvironmentVariable("aadV2AppUri"));
+            this.clientSecret = await this.readEnvironmentVariable("aadV2ClientSecret");
+            this.appUri = await this.readEnvironmentVariable("aadV2AppUri");
             if (!(this.clientSecret && this.appUri)) {
                 throw new Error("For appOnly tokens, environment variables aadV2ClientSecret and aadV2AppUri must be created.  aadV2ClientId and aadV2TenantId are optional environment variables.");
             }
@@ -213,12 +218,12 @@ class AuthParameters {
 
  class AadV2TokenCache {
 
-    private static tokens : Map<string, AadV2TokenCacheEntry> = new Map<string, AadV2TokenCacheEntry>();
+    private static tokens: Map<string, AadV2TokenCacheEntry> = new Map<string, AadV2TokenCacheEntry>();
 
     public static setToken(cacheKey: string, scopes: string[], token: string) {
-        const entry : AadV2TokenCacheEntry = new AadV2TokenCacheEntry();
-        entry.Token = token;
-        entry.Scopes = scopes;
+        const entry: AadV2TokenCacheEntry = new AadV2TokenCacheEntry();
+        entry.token = token;
+        entry.scopes = scopes;
         this.tokens.set(cacheKey, entry);
     }
 
@@ -228,10 +233,10 @@ class AuthParameters {
 }
 
  class AadV2TokenCacheEntry {
-     public Token: string;
-     public Scopes: string[];
+     public token: string;
+     public scopes: string[];
      public supportScopes(scopes: string[]) : boolean {
-        return scopes.every((scope) => this.Scopes.includes(scope));
+        return scopes.every((scope) => this.scopes.includes(scope));
      }
  }
 
