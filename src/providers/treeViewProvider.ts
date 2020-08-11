@@ -26,18 +26,18 @@ export class HttpTreeProvider implements vscode.TreeDataProvider<HttpClientItem>
         if (element) {
             return new Promise((resolve) => {
                 vscode.workspace.openTextDocument(element.uri).then(async (document: vscode.TextDocument) => {
-                    const selectedRequests = await Selector.getAllRequests(document);
-                    if (selectedRequests) {
-                        const clients = selectedRequests.map(selectedRequest => {
-                            return HttpClientItem.createRequestItem(document, element.uri, selectedRequest, selectedRequest.name);
+                    const selectedRanges = await Selector.getAllRequests(document);
+                    if (selectedRanges) {
+                        const clients = selectedRanges.map(selectedRange => {
+                            return HttpClientItem.createRequestItem(document, element.uri, selectedRange.range, selectedRange.name);
                         });
                         resolve(clients);
                     }
                 });
             });
         } else {
-            return vscode.workspace.findFiles("**/*.http").then(async (values: vscode.Uri[]) => {
-                return await values.map((uri: vscode.Uri) => {
+            return vscode.workspace.findFiles("**/*.http").then((values: vscode.Uri[]) => {
+                return values.map((uri: vscode.Uri) => {
                     return HttpClientItem.createFileItem(uri);
                 });
             });
@@ -46,6 +46,7 @@ export class HttpTreeProvider implements vscode.TreeDataProvider<HttpClientItem>
 }
 
 export class HttpClientItem extends vscode.TreeItem {
+    range : vscode.Range;
     selectedRequest: SelectedRequest;
     document: vscode.TextDocument;
 
@@ -65,7 +66,7 @@ export class HttpClientItem extends vscode.TreeItem {
         return item;
     }
 
-    public static createRequestItem(document: vscode.TextDocument, uri: vscode.Uri, selectedRequest: SelectedRequest, label?: string): HttpClientItem {
+    public static createRequestItem(document: vscode.TextDocument, uri: vscode.Uri, range: vscode.Range, label?: string): HttpClientItem {
         const item = new HttpClientItem(uri);
         item.collapsibleState = TreeItemCollapsibleState.None;
         if (label) { item.label = label; }
@@ -76,7 +77,7 @@ export class HttpClientItem extends vscode.TreeItem {
             arguments: [item.uri]
         };
         item.document = document;
-        item.selectedRequest = selectedRequest;
+        item.range = range;
         return item;
     }
 }

@@ -31,21 +31,27 @@ export class RequestController {
     }
 
     @trace('Request')
-    public async run(range: Range) {
+    public async run(range: Range, document?: TextDocument) {
         const editor = window.activeTextEditor;
-        const document = getCurrentTextDocument();
-        if (!editor || !document) {
-            return;
+        let selectedRequest: SelectedRequest | null;
+
+        // get request from known range & document
+        if (document) {
+            const selectedText = document.getText(range);
+            selectedRequest = await Selector.createRequest(selectedText);
+        } else {
+            // get request from opened editor
+            document = getCurrentTextDocument();
+            if (!editor || !document) {
+                return;
+            }
+
+            selectedRequest = await Selector.getRequest(editor, range);
         }
 
-        const selectedRequest = await Selector.getRequest(editor, range);
         if (!selectedRequest) {
             return;
         }
-
-        return this.runRequest(selectedRequest, document);
-    }
-    public async runRequest(selectedRequest: SelectedRequest, document: TextDocument) {
 
         const { text, name, warnBeforeSend } = selectedRequest;
 

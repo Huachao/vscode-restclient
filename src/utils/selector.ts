@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { Range, TextDocument, TextEditor } from 'vscode';
+import { Position, Range, TextDocument, TextEditor } from 'vscode';
 import * as Constants from '../common/constants';
 import { VariableProcessor } from './variableProcessor';
 
@@ -16,33 +16,40 @@ export interface SelectedRequest {
     warnBeforeSend: boolean;
 }
 
+export interface SelectedRange {
+    range: Range;
+    name: string;
+}
+
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public static getAllRequests(document: TextDocument): Promise<SelectedRequest[] | null> {
+    public static getAllRequests(document: TextDocument): SelectedRange[] | null {
 
-        return new Promise(async (resolve) => {
+        const selectedText = document.getText();
 
-            let selectedText = document.getText();
+        // parse actual request lines
+        const rawLines = selectedText.split(Constants.LineSplitterRegex);
+        const requestRanges = this.getRequestRanges(rawLines);
+        if (!requestRanges) {
+            return null;
+        }
 
-            // parse actual request lines
-            const rawLines = selectedText.split(Constants.LineSplitterRegex);
-            const requestRanges = this.getRequestRanges(rawLines);
-            if (!requestRanges) {
-                resolve(null);
-            }
+        const resRanges: SelectedRange[] = [];
 
-            const res: SelectedRequest[] = [];
+        for (const requestRange of requestRanges) {
+            const start: Position = new Position(requestRange[0], 0);
+            const end: Position = new Position(requestRange[1] + 1, 0);
+            const range: Range = new Range(start, end);
 
-            for (const requestRange of requestRanges) {
-                selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1).join(EOL);
-                const request = await this.createRequest(selectedText);
-                if (request) {
-                    res.push(request);
-                }
-            }
-            resolve(res);
-        });
+            const rangeText = document.getText(range)
+            const rawRangeText = rangeText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
+            const requestVariable = this.getRequestVariableDefinitionName(rangeText);
+            const name = requestVariable ? requestVariable : rawRangeText[0];
+
+            resRanges.push({ range: range, name: name });
+        }
+        return resRanges;
     }
 
     public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {

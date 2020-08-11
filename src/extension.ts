@@ -80,7 +80,7 @@ export async function activate(context: ExtensionContext) {
     const httpTreeProvider = new HttpTreeProvider();
     window.registerTreeDataProvider('httpRequest', httpTreeProvider);
     commands.registerCommand('rest-client.refreshEntry', () => httpTreeProvider.refresh());
-    commands.registerCommand('rest-client.sendRequest', (node: HttpClientItem) => requestController.runRequest(node.selectedRequest, node.document));
+    commands.registerCommand('rest-client.sendRequest', (node: HttpClientItem) => requestController.run(node.range, node.document));
 }
 
 
