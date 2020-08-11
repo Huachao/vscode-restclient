@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { Range, TextEditor } from 'vscode';
+import { Position, Range, TextDocument, TextEditor } from 'vscode';
 import * as Constants from '../common/constants';
 import { VariableProcessor } from './variableProcessor';
 
@@ -16,8 +16,41 @@ export interface SelectedRequest {
     warnBeforeSend: boolean;
 }
 
+export interface SelectedRange {
+    range: Range;
+    name: string;
+}
+
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
+
+    public static getAllRequests(document: TextDocument): SelectedRange[] | null {
+
+        const selectedText = document.getText();
+
+        // parse actual request lines
+        const rawLines = selectedText.split(Constants.LineSplitterRegex);
+        const requestRanges = this.getRequestRanges(rawLines);
+        if (!requestRanges) {
+            return null;
+        }
+
+        const resRanges: SelectedRange[] = [];
+
+        for (const requestRange of requestRanges) {
+            const start: Position = new Position(requestRange[0], 0);
+            const end: Position = new Position(requestRange[1] + 1, 0);
+            const range: Range = new Range(start, end);
+
+            const rangeText = document.getText(range);
+            const rawRangeText = rangeText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
+            const requestVariable = this.getRequestVariableDefinitionName(rangeText);
+            const name = requestVariable ? requestVariable : rawRangeText[0];
+
+            resRanges.push({ range: range, name: name });
+        }
+        return resRanges;
+    }
 
     public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
         if (!editor.document) {
@@ -32,6 +65,10 @@ export class Selector {
             selectedText = editor.document.getText(editor.selection);
         }
 
+        return this.createRequest(selectedText);
+    }
+
+    public static async createRequest(selectedText: string | null): Promise<SelectedRequest | null> {
         if (selectedText === null) {
             return null;
         }
@@ -56,18 +93,20 @@ export class Selector {
 
         return {
             text: selectedText,
-            name: requestVariable,
+            name: requestVariable ? requestVariable : rawLines[0],
             warnBeforeSend
         };
     }
 
+
     public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
         options = {
-                ignoreCommentLine: true,
-                ignoreEmptyLine: true,
-                ignoreFileVariableDefinitionLine: true,
-                ignoreResponseRange: true,
-            ...options};
+            ignoreCommentLine: true,
+            ignoreEmptyLine: true,
+            ignoreFileVariableDefinitionLine: true,
+            ignoreResponseRange: true,
+            ...options
+        };
         const requestRanges: [number, number][] = [];
         const delimitedLines = this.getDelimiterRows(lines);
         delimitedLines.push(lines.length);

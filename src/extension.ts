@@ -18,6 +18,7 @@ import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvid
 import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
 import { RequestVariableDefinitionProvider } from './providers/requestVariableDefinitionProvider';
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
+import { HttpClientItem, HttpTreeProvider } from './providers/treeViewProvider';
 import { AadTokenCache } from './utils/aadTokenCache';
 import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
 import { UserDataManager } from './utils/userDataManager';
@@ -75,7 +76,14 @@ export async function activate(context: ExtensionContext) {
 
     const diagnosticsProvider = new CustomVariableDiagnosticsProvider();
     context.subscriptions.push(diagnosticsProvider);
+
+    const httpTreeProvider = new HttpTreeProvider();
+    window.registerTreeDataProvider('httpRequest', httpTreeProvider);
+    commands.registerCommand('rest-client.refreshEntry', () => httpTreeProvider.refresh());
+    commands.registerCommand('rest-client.sendRequest', (node: HttpClientItem) => requestController.run(node.range, node.document));
 }
+
+
 
 // this method is called when your extension is deactivated
 export function deactivate() {

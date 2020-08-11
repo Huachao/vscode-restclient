@@ -7,7 +7,7 @@ import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
 import { RequestVariableCache } from "../utils/requestVariableCache";
-import { Selector } from '../utils/selector';
+import { SelectedRequest, Selector } from '../utils/selector';
 import { UserDataManager } from '../utils/userDataManager';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
@@ -31,14 +31,24 @@ export class RequestController {
     }
 
     @trace('Request')
-    public async run(range: Range) {
+    public async run(range: Range, document?: TextDocument) {
         const editor = window.activeTextEditor;
-        const document = getCurrentTextDocument();
-        if (!editor || !document) {
-            return;
+        let selectedRequest: SelectedRequest | null;
+
+        // get request from known range & document
+        if (document) {
+            const selectedText = document.getText(range);
+            selectedRequest = await Selector.createRequest(selectedText);
+        } else {
+            // get request from opened editor
+            document = getCurrentTextDocument();
+            if (!editor || !document) {
+                return;
+            }
+
+            selectedRequest = await Selector.getRequest(editor, range);
         }
 
-        const selectedRequest = await Selector.getRequest(editor, range);
         if (!selectedRequest) {
             return;
         }
