@@ -42,7 +42,7 @@ export class Selector {
             const end: Position = new Position(requestRange[1] + 1, 0);
             const range: Range = new Range(start, end);
 
-            const rangeText = document.getText(range)
+            const rangeText = document.getText(range);
             const rawRangeText = rangeText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
             const requestVariable = this.getRequestVariableDefinitionName(rangeText);
             const name = requestVariable ? requestVariable : rawRangeText[0];
