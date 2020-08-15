@@ -20,8 +20,7 @@ export class AadV2TokenProvider {
 
     public async acquireToken(name: string): Promise<string> {
 
-        const authParams = new AuthParameters();
-        await authParams.parseName(name);
+        const authParams = await AuthParameters.parseName(name);
 
         if (!authParams.forceNewToken) {
             const tokenEntry = AadV2TokenCache.getToken(authParams.getCacheKey());
@@ -176,20 +175,22 @@ class AuthParameters {
         return this.tenantId + "|" + this.clientId + "|" + this.appOnly as string;
     }
 
-    async parseName(name: string) {
+    static async parseName(name: string): Promise<AuthParameters> {
+
+        const authParameters = new AuthParameters();
 
         // Update defaults based on environment
-        this.tenantId = (await this.readEnvironmentVariable("aadV2TenantId")) || this.tenantId;
+        authParameters.tenantId = (await authParameters.readEnvironmentVariable("aadV2TenantId")) || authParameters.tenantId;
 
         let scopes = "openid,profile";
         let explicitClientId: string | undefined = undefined;
         // Parse variable parameters
-        const groups = this.aadV2TokenRegex.exec(name);
+        const groups = authParameters.aadV2TokenRegex.exec(name);
         if (groups) {
-            this.forceNewToken = groups[2] === Constants.AzureActiveDirectoryForceNewOption;
-            this.appOnly = groups[4] === "appOnly";
+            authParameters.forceNewToken = groups[2] === Constants.AzureActiveDirectoryForceNewOption;
+            authParameters.appOnly = groups[4] === "appOnly";
             scopes = groups[6] || scopes;
-            this.tenantId = groups[8] || this.tenantId;
+            authParameters.tenantId = groups[8] || authParameters.tenantId;
             explicitClientId = groups[10];
         } else {
             throw new Error("Failed to parse parameters: " + name);
@@ -198,21 +199,22 @@ class AuthParameters {
         // if scopes does not contain openid or profile, add it
         // Using /common endpoint with only organizational scopes causes device code to fail.
         // Adding openid and/or profile prevents this failure from occuring
-        if (!scopes.indexOf("openid")) {
+        if (scopes.indexOf("openid") == -1) {
             scopes += ",openid,profile";
         }
-        this.scopes = scopes.split(",").map(s => s.trim());
+        authParameters.scopes = scopes.split(",").map(s => s.trim());
 
-        if (this.appOnly) {
-            this.clientId = explicitClientId || (await this.readEnvironmentVariable("aadV2ClientId")) || this.clientId;
-            this.clientSecret = await this.readEnvironmentVariable("aadV2ClientSecret");
-            this.appUri = await this.readEnvironmentVariable("aadV2AppUri");
-            if (!(this.clientSecret && this.appUri)) {
+        if (authParameters.appOnly) {
+            authParameters.clientId = explicitClientId || (await authParameters.readEnvironmentVariable("aadV2ClientId")) || authParameters.clientId;
+            authParameters.clientSecret = await authParameters.readEnvironmentVariable("aadV2ClientSecret");
+            authParameters.appUri = await authParameters.readEnvironmentVariable("aadV2AppUri");
+            if (!(authParameters.clientSecret && authParameters.appUri)) {
                 throw new Error("For appOnly tokens, environment variables aadV2ClientSecret and aadV2AppUri must be created.  aadV2ClientId and aadV2TenantId are optional environment variables.");
             }
         } else {
-            this.clientId = explicitClientId || this.clientId;
+            authParameters.clientId = explicitClientId || authParameters.clientId;
         }
+        return authParameters;
     }
 }
 

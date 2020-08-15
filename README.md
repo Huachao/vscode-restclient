@@ -20,6 +20,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Digest Auth
     - SSL Client Certificates
     - Azure Active Directory
+    - Microsoft Identity Platform
     - AWS Signature v4
 * Environments and custom/system variables support
     - Use variables in any place of request(_URL_, _Headers_, _Body_)
@@ -344,6 +345,9 @@ Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like
 
 ### Azure Active Directory(Azure AD)
 Azure AD is Microsoft’s multi-tenant, cloud-based directory and identity management service, you can refer to the [System Variables](#system-variables) section for more details.
+
+### Microsoft Identity Platform(Azure AD V2)
+Microsoft identity platform is an evolution of the Azure Active Directory (Azure AD) developer platform. It allows developers to build applications that sign in all Microsoft identities and get tokens to call Microsoft APIs such as Microsoft Graph or APIs that developers have built. Microsoft Identity platform supports OAuth2 scopes, incremental consent and advanced features like multi-factor authentication and conditional access.
 
 ### AWS Signature v4
 AWS Signature version 4 authenticates requests to AWS services. To use it you need to set the Authorization header schema to `AWS` and provide your AWS credentials separated by spaces:
