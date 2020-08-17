@@ -12,7 +12,7 @@ import { EnvironmentOrFileVariableHoverProvider } from './providers/environmentO
 import { FileVariableDefinitionProvider } from './providers/fileVariableDefinitionProvider';
 import { FileVariableReferenceProvider } from './providers/fileVariableReferenceProvider';
 import { FileVariableReferencesCodeLensProvider } from './providers/fileVariableReferencesCodeLensProvider';
-import { EnvironmentCodeLensProvider } from './providers/EnvironmentCodeLensProvider';
+import { EnvironmentCodeLensProvider } from './providers/environmentCodeLensProvider';
 import { HttpCodeLensProvider } from './providers/httpCodeLensProvider';
 import { HttpCompletionItemProvider } from './providers/httpCompletionItemProvider';
 import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvider';
