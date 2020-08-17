@@ -1,9 +1,9 @@
-import { CancellationToken, CodeLens, CodeLensProvider, Command, Range, TextDocument, Event } from 'vscode';
+import { CancellationToken, CodeLens, CodeLensProvider, Command, Event, Range, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
-import { Selector } from '../utils/selector';
 import { EnvironmentController } from '../controllers/environmentController';
+import { Selector } from '../utils/selector';
 
-export class EnvironmentCodeLensProvider implements CodeLensProvider {   
+export class EnvironmentCodeLensProvider implements CodeLensProvider {
 
     readonly onDidChangeCodeLenses = EnvironmentController.onDidChangeEnvironment as unknown as Event<void>;
 
@@ -12,8 +12,8 @@ export class EnvironmentCodeLensProvider implements CodeLensProvider {
         const lines: string[] = document.getText().split(Constants.LineSplitterRegex);
         const requestRanges: [number, number][] = Selector.getRequestRanges(lines);
 
-        const environment = await EnvironmentController.getCurrentEnvironment(); 
-        const title = `Environment: ${environment.label}`
+        const environment = await EnvironmentController.getCurrentEnvironment();
+        const title = `Environment: ${environment.label}`;
 
         for (const [blockStart, blockEnd] of requestRanges) {
             const range = new Range(blockStart, 0, blockEnd, 0);
