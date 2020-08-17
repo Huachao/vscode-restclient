@@ -12,6 +12,7 @@ import { EnvironmentOrFileVariableHoverProvider } from './providers/environmentO
 import { FileVariableDefinitionProvider } from './providers/fileVariableDefinitionProvider';
 import { FileVariableReferenceProvider } from './providers/fileVariableReferenceProvider';
 import { FileVariableReferencesCodeLensProvider } from './providers/fileVariableReferencesCodeLensProvider';
+import { EnvironmentCodeLensProvider } from './providers/EnvironmentCodeLensProvider';
 import { HttpCodeLensProvider } from './providers/httpCodeLensProvider';
 import { HttpCompletionItemProvider } from './providers/httpCompletionItemProvider';
 import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvider';
@@ -59,6 +60,9 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new RequestVariableCompletionItemProvider(), '.'));
     context.subscriptions.push(languages.registerHoverProvider(documentSelector, new EnvironmentOrFileVariableHoverProvider()));
     context.subscriptions.push(languages.registerHoverProvider(documentSelector, new RequestVariableHoverProvider()));
+    context.subscriptions.push(new ConfigurationDependentRegistration(
+        () => languages.registerCodeLensProvider(documentSelector, new EnvironmentCodeLensProvider()),
+        s => s.enableSendRequestCodeLens));
     context.subscriptions.push(
         new ConfigurationDependentRegistration(
             () => languages.registerCodeLensProvider(documentSelector, new HttpCodeLensProvider()),
