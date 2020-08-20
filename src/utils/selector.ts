@@ -63,11 +63,12 @@ export class Selector {
 
     public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
         options = {
-                ignoreCommentLine: true,
-                ignoreEmptyLine: true,
-                ignoreFileVariableDefinitionLine: true,
-                ignoreResponseRange: true,
-            ...options};
+            ignoreCommentLine: true,
+            ignoreEmptyLine: true,
+            ignoreFileVariableDefinitionLine: true,
+            ignoreResponseRange: true,
+            ...options
+        };
         const requestRanges: [number, number][] = [];
         const delimitedLines = this.getDelimiterRows(lines);
         delimitedLines.push(lines.length);
@@ -168,6 +169,79 @@ export class Selector {
     private static getDelimiterRows(lines: string[]): number[] {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
-            .map(([index, ]) => +index);
+            .map(([index,]) => +index);
+    }
+
+    private static getSharpRows(lines: string[], sharps: number): number[] {
+        if (sharps === 1) {
+            return Object.entries(lines)
+                .filter(([, value]) => value.startsWith("# "))
+                .map(([index,]) => +index);
+        }
+        else if (sharps === 2) {
+            return Object.entries(lines)
+                .filter(([, value]) => value.startsWith("## "))
+                .map(([index,]) => +index);
+        }
+        else if (sharps === 3) {
+            return Object.entries(lines)
+                .filter(([, value]) => value.startsWith("### "))
+                .map(([index,]) => +index);
+        }
+        else if (sharps === 4) {
+            return Object.entries(lines)
+                .filter(([, value]) => value.startsWith("#### "))
+                .map(([index,]) => +index);
+        }
+        else if (sharps === 5) {
+            return Object.entries(lines)
+                .filter(([, value]) => value.startsWith("##### "))
+                .map(([index,]) => +index);
+        }
+        else if (sharps === 6) {
+            return Object.entries(lines)
+                .filter(([, value]) => /^#{6,}/.test(value))
+                .map(([index,]) => +index);
+        }
+        else if (sharps === 7) {
+            return Object.entries(lines)
+                .filter(([, value]) => /^#{7,}/.test(value))
+                .map(([index,]) => +index);
+        }
+        else {
+            return Object.entries(lines)
+                .filter(([, value]) => value.startsWith("#"))
+                .map(([index,]) => +index);
+        }
+    }
+
+
+    public static getSharpRanges(lines: string[], sharps: number, options?: RequestRangeOptions): number[] {
+        options = {
+            ignoreCommentLine: true,
+            ignoreEmptyLine: true,
+            ignoreFileVariableDefinitionLine: true,
+            ignoreResponseRange: true,
+            ...options
+        };
+        const sharpLines = this.getSharpRows(lines, sharps);
+        // sharpLines.push(lines.length);
+
+        return sharpLines;
+    }
+
+    public static getAllSharpRanges(lines: string[], options?: RequestRangeOptions): number[] {
+        options = {
+            ignoreCommentLine: true,
+            ignoreEmptyLine: true,
+            ignoreFileVariableDefinitionLine: true,
+            ignoreResponseRange: true,
+            ...options
+        };
+        const sharpLines = Object.entries(lines)
+            .filter(([, value]) => value.startsWith("#"))
+            .map(([index,]) => +index);
+
+        return sharpLines;
     }
 }

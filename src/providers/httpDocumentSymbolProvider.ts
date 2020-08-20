@@ -1,81 +1,138 @@
-import * as url from 'url';
-import { CancellationToken, DocumentSymbolProvider, Location, Range, SymbolInformation, SymbolKind, TextDocument } from 'vscode';
+import { CancellationToken, DocumentSymbol, DocumentSymbolProvider, Range, SymbolKind, TextDocument } from 'vscode';
 import * as Constants from '../common/constants';
-import { RequestParserFactory } from '../models/requestParserFactory';
 import { Selector } from '../utils/selector';
-import { VariableProcessor } from '../utils/variableProcessor';
-import { getCurrentHttpFileName } from '../utils/workspaceUtility';
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
-    public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
-        const symbols: SymbolInformation[] = [];
-        const lines: string[] = document.getText().split(Constants.LineSplitterRegex);
-        const requestRange: [number, number][] = Selector.getRequestRanges(
-            lines,
-            { ignoreCommentLine: false , ignoreFileVariableDefinitionLine: false });
+    public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<DocumentSymbol[]> {
+        const symbols: DocumentSymbol[] = [];
+        const allLines: string[] = document.getText().split(Constants.LineSplitterRegex);
+        if (allLines.length <= 0) return symbols;
+        let allSharpRowIndexs: number[] = Selector.getAllSharpRanges(allLines);
+        if (allSharpRowIndexs.length <= 0) return symbols;
+        for (let i = 0; i < allSharpRowIndexs.length; i++) {
+            console.log('i:' + i);
+            let blockStart = allSharpRowIndexs[i];
+            let line = allLines[blockStart];
+            if (line == undefined) break;
+            let [sharpStr1, sharpCount1] = this.GetSharpString(line);//取出前面有一个#
+            let text = line.replace(sharpStr1, "");//取出#后面的内容
+            let symbol1 = new DocumentSymbol(
+                text,
+                '',
+                SymbolKind.String,
+                new Range(blockStart, 0, blockStart, line.length),
+                new Range(blockStart, 0, blockStart, line.length));
+            let child1Count = this.GetChildRows(allLines, allSharpRowIndexs, sharpCount1, i);
+            let symbol1Children: DocumentSymbol[] = [];
+            for (let j = 0; j < child1Count; j++) {
+                i++;
+                if (i >= allSharpRowIndexs.length) break;
+                console.log('i:' + i);
+                blockStart = allSharpRowIndexs[i];
+                line = allLines[blockStart];
+                if (line == undefined) break;
+                let [sharpStr11, sharpCount11] = this.GetSharpString(line);//取出前面有一个#
+                let text = line.replace(sharpStr11, "");//取出#后面的内容
+                let symbol11: DocumentSymbol = new DocumentSymbol(
+                    text,
+                    '',
+                    SymbolKind.String,
+                    new Range(blockStart, 0, blockStart, line.length),
+                    new Range(blockStart, 0, blockStart, line.length));
 
-        for (let [blockStart, blockEnd] of requestRange) {
-            // get real start for current requestRange
-            let requestName: string | undefined;
-            while (blockStart <= blockEnd) {
-                const line = lines[blockStart];
-                if (Selector.isEmptyLine(line) ||
-                    Selector.isCommentLine(line)) {
-                    if (Selector.isRequestVariableDefinitionLine(line)) {
-                        requestName = Selector.getRequestVariableDefinitionName(line);
-                    }
-                    blockStart++;
-                } else if (Selector.isFileVariableDefinitionLine(line)) {
-                    const [name, container] = this.getFileVariableSymbolInfo(line);
-                    symbols.push(
-                        new SymbolInformation(
-                            name,
-                            SymbolKind.Variable,
-                            container,
-                            new Location(
-                                document.uri,
-                                new Range(blockStart, 0, blockStart, line.length))));
-                    blockStart++;
-                } else {
-                    break;
-                }
-            }
+                let child2Count = this.GetChildRows(allLines, allSharpRowIndexs, sharpCount11, i);
+                let symbol11Children: DocumentSymbol[] = [];
+                for (let k = 0; k < child2Count; k++) {
+                    i++;
+                    j++;
+                    if (i >= allSharpRowIndexs.length) break;
+                    console.log('i:' + i);
+                    blockStart = allSharpRowIndexs[i];
+                    line = allLines[blockStart];
+                    if (line == undefined) break;
+                    let [sharpStr111, sharpCount111] = this.GetSharpString(line);//取出前面有一个#
+                    let text = line.replace(sharpStr111, "");//取出#后面的内容
+                    let symbol111: DocumentSymbol = new DocumentSymbol(
+                        text,
+                        '',
+                        SymbolKind.String,
+                        new Range(blockStart, 0, blockStart, line.length),
+                        new Range(blockStart, 0, blockStart, line.length));
+                    let child3Count = this.GetChildRows(allLines, allSharpRowIndexs, sharpCount111, i);
+                    let symbol111Children: DocumentSymbol[] = [];
+                    for (let l = 0; l < child3Count; l++) {
+                        i++;
+                        j++;
+                        k++;
+                        if (i >= allSharpRowIndexs.length) break;
+                        console.log('i:' + i);
+                        blockStart = allSharpRowIndexs[i];
+                        line = allLines[blockStart];
+                        if (line == undefined) break;
+                        let [sharpStr1111,] = this.GetSharpString(line);//取出前面有一个#
+                        let text = line.replace(sharpStr1111, "");//取出#后面的内容
+                        let symbol1111: DocumentSymbol = new DocumentSymbol(
+                            text,
+                            '',
+                            SymbolKind.String,
+                            new Range(blockStart, 0, blockStart, line.length),
+                            new Range(blockStart, 0, blockStart, line.length));
 
-            if (Selector.isResponseStatusLine(lines[blockStart])) {
-                continue;
-            }
+                        symbol111Children.push(symbol1111);
+                    }//process children3
 
-            if (blockStart <= blockEnd) {
-                const [name, container] = await this.getRequestSymbolInfo(lines[blockStart], requestName);
-                symbols.push(
-                    new SymbolInformation(
-                        name,
-                        SymbolKind.Method,
-                        container,
-                        new Location(
-                            document.uri,
-                            new Range(blockStart, 0, blockEnd, lines[blockEnd].length))));
-            }
+                    symbol111.children = symbol111Children;
+                    symbol11Children.push(symbol111);
+                }//process children2
+
+                symbol11.children = symbol11Children;
+                symbol1Children.push(symbol11);
+            }//process children1
+            symbol1.children = symbol1Children;
+            symbols.push(symbol1);
         }
         return symbols;
     }
 
-    private getFileVariableSymbolInfo(line: string): [string, string] {
-        const fileName = getCurrentHttpFileName();
-        line = line.trim();
-        return [line.substring(1, line.indexOf('=')).trim(), fileName!];
+    /**
+     * 得到当前一级其后所有的子级，直到遇到比当前级大的
+     * @param allLines 
+     * @param allSharpRowIndexs 
+     * @param parentSharpCount 
+     */
+    private GetChildRows(allLines: string[], allSharpRowIndexs: number[], parentSharpCount: number, i: number): number {
+        if (i >= allSharpRowIndexs.length - 1) return 0;
+        //i表示当前行，从i+1后开始
+        let childCount = 0;
+        for (let j = i + 1; j < allSharpRowIndexs.length; j++) {
+            let blockStart = allSharpRowIndexs[j];
+            let line = allLines[blockStart];
+            if (line == undefined) return childCount;
+            let [, sharpCount] = this.GetSharpString(line);//取出前面有一个#
+            if (sharpCount <= parentSharpCount) {
+                //当前#数小于等于父级的#数，说明当前一级不是上一级的子级，本函数结束计算，返回结果
+                return childCount;
+            }
+
+            //当前#数大于父级的#数，说明当前一级是上一级的子级
+            childCount++;
+        }
+        return childCount;
     }
 
-    private async getRequestSymbolInfo(rawText: string, name: string | undefined): Promise<[string, string]> {
-        // For request with name, return the request name and file name instead
-        if (name) {
-            return [name, getCurrentHttpFileName()!];
-        }
+    /**
+     * 获取字符串最前面的#，如###test，输出###
+     * @param line 
+     */
+    private GetSharpString(line: string): [string, number] {
+        let sharp: string = "";
+        for (let index = 0; index < line.length; index++) {
+            const element = line.charAt(index);
+            if (element != "#")
+                return [sharp, index];
 
-        const text = await VariableProcessor.processRawRequest(rawText);
-        const parser = RequestParserFactory.createRequestParser(text);
-        const request = await parser.parseHttpRequest();
-        const parsedUrl = url.parse(request.url);
-        return [`${request.method} ${parsedUrl.path}`, parsedUrl.host || ''];
+            sharp = sharp + "#";
+        }
+        return ["", 0];
     }
 }
