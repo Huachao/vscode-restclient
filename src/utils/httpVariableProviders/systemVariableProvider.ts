@@ -10,6 +10,7 @@ import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { AadTokenCache } from '../aadTokenCache';
+import { AadV2TokenProvider } from '../aadV2TokenProvider';
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
@@ -58,6 +59,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerProcessEnvVariable();
         this.registerDotenvVariable();
         this.registerAadTokenVariable();
+        this.registerAadV2TokenVariable();
     }
 
     public readonly type: VariableType = VariableType.System;
@@ -278,6 +280,14 @@ export class SystemVariableProvider implements HttpVariableProvider {
         });
     }
 
+    private registerAadV2TokenVariable() {
+        this.resolveFuncs.set(Constants.AzureActiveDirectoryV2TokenVariableName,
+            async (name) => {
+                const aadV2TokenProvider = new AadV2TokenProvider();
+                const token = await aadV2TokenProvider.acquireToken(name);
+                return {value: token};
+            });
+    }
     private async resolveSettingsEnvironmentVariable(name: string) {
         if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
             const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);
