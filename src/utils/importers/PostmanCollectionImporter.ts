@@ -1,19 +1,15 @@
 import { EOL } from 'os';
-import { Collection, PostmanRequest, VariableList, PostmanPropertyList } from 'postman-collection';
+import { Collection, PropertyList, Request, VariableList } from 'postman-collection';
 import { ImporterUtilities } from './ImporterUtilities';
 
-export interface PostmanItemGroup {
-
-}
 
 export class PostmanImporter {
-    import(collection: any): string {
+    import(collection: PostmanCollection): string {
         let sb = '';
-        const importedCollection = new Collection(collection);
 
-        sb += this.prepareDocumentHeader(importedCollection.name, importedCollection.description.content);
-        sb += this.defineDocumentVariables(importedCollection.variables);
-        importedCollection.items.each(entry => {
+        sb += this.prepareDocumentHeader(collection.name, collection.description.content);
+        sb += this.defineDocumentVariables(collection.variables);
+        collection.items.each(entry => {
             sb += this.prepareGroupHeader(entry.name, entry.description.content);
             sb += this.writeAllRequestsInGroup(entry.items);
         }, this);
@@ -23,9 +19,9 @@ export class PostmanImporter {
     prepareGroupHeader(name: string, content: string): string {
         return '#\t' + name + EOL + '#\t' + ImporterUtilities.parseStringAsComment(content);
     }
-    writeAllRequestsInGroup(items: PostmanPropertyList): string {
+    writeAllRequestsInGroup(items: PropertyList): string {
         let sb = '';
-        items.each(element => {
+        items.each((element: { id: string; name: string; request: any; }) => {
             sb += this.writeRequestHeader(element.id, element.name);
             const req = element.request;
             sb += this.writeRequest(req);
@@ -39,10 +35,10 @@ export class PostmanImporter {
             `# ${name}` + EOL;
     }
 
-    writeRequest(req: PostmanRequest): string {
+    writeRequest(req: Request): string {
         let sb = `${req.method} ${req.url.getPath()}${EOL}`;
 
-        req.headers.each(header => {
+        req.headers.each((header: { key: any; value: any; }) => {
             sb += `${header.key}: ${header.value}` + EOL;
         }, this);
 
@@ -72,4 +68,8 @@ export class PostmanImporter {
         }, this);
         return sb;
     }
+}
+
+export class PostmanCollection extends Collection {
+    description: { content: string };
 }
