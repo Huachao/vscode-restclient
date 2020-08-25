@@ -669,6 +669,7 @@
     "jsonc-parser": "^2.0.2",
     "jsonpath-plus": "^0.20.1",
     "mime-types": "^2.1.14",
+    "postman-collection": "^3.6.5",
     "pretty-data": "^0.40.0",
     "tough-cookie": "^3.0.1",
     "tough-cookie-file-store-bugfix": "Huachao/tough-cookie-file-store-bugfix",
