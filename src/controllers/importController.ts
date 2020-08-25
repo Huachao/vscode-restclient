@@ -1,6 +1,7 @@
-import { window, workspace } from 'vscode';
+import { Collection } from 'postman-collection';
+import { CancellationToken, Uri, window, workspace } from 'vscode';
 import { trace } from '../utils/decorator';
-import { PostmanImporter } from './../utils/importers/PostmanCollectionImporter';
+import { PostmanCollection, PostmanImporter } from './../utils/importers/PostmanCollectionImporter';
 
 export class ImportController {
 
@@ -25,12 +26,13 @@ export class ImportController {
             const jsonObj = JSON.parse(fileContent.toString());
 
             const importer = new PostmanImporter();
-            const parsedContent = importer.import(jsonObj);
+            const collection = new Collection(jsonObj);
+            const parsedContent = importer.import(<PostmanCollection>collection);
             const document = await workspace.openTextDocument({ language: 'http', content: parsedContent });
             await window.showTextDocument(document, { preview: false });
         }
 
-        /* 
+        /*
         1. resolve importer based on option.
         2. map content from imported file to text in specific format.
         3. open new document with text (maybe we can use httpResponseTextDocumentView.ts)
