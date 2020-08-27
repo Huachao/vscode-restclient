@@ -17,7 +17,7 @@ export class PostmanImporter {
         return sb;
     }
     prepareGroupHeader(name: string, content: string): string {
-        return '#\t' + name + EOL + '#\t' + ImporterUtilities.parseStringAsComment(content);
+        return '#\t' + name + EOL + '#\t' + ImporterUtilities.parseMultiLineStringAsMultiLineComment(content);
     }
     writeAllRequestsInGroup(items: PropertyList): string {
         let sb = '';
@@ -53,7 +53,7 @@ export class PostmanImporter {
     prepareDocumentHeader(name: string, description: string): string {
         return `# ${name}` + EOL +
             `#` + EOL +
-            `# ${ImporterUtilities.parseStringAsComment(description)}` + EOL;
+            `# ${ImporterUtilities.parseMultiLineStringAsMultiLineComment(description)}` + EOL;
     }
 
     defineDocumentVariables(variables: VariableList): string {
@@ -61,7 +61,7 @@ export class PostmanImporter {
 
         variables.each(variable => {
             if (variable.description.content.length > 0) {
-                sb += `// ${ImporterUtilities.parseStringAsComment(variable.description.content)}` + EOL;
+                sb += `// ${ImporterUtilities.parseMultiLineStringAsMultiLineComment(variable.description.content)}` + EOL;
             }
 
             sb += `@${variable.key} = ${variable.value}` + EOL;
