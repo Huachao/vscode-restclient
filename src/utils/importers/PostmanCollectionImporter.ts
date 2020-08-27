@@ -38,9 +38,6 @@ export class PostmanImporter {
 
     writeRequest(requestId: string, req: Request): string {
         let sb = '';
-        if (requestId === 'get3DRevisions') {
-            debugger;
-        }
 
         req.url.variables.each((variable) => {
             sb += `@${requestId + variable.key} = ` + variable.value + EOL;
