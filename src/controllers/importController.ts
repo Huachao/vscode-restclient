@@ -31,11 +31,5 @@ export class ImportController {
             const document = await workspace.openTextDocument({ language: 'http', content: parsedContent });
             await window.showTextDocument(document, { preview: false });
         }
-
-        /*
-        1. resolve importer based on option.
-        2. map content from imported file to text in specific format.
-        3. open new document with text (maybe we can use httpResponseTextDocumentView.ts)
-        */
     }
 }
