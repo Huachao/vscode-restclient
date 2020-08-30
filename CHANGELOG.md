@@ -1,3 +1,13 @@
+## 0.24.2 (2020/8/30)
+* __Feature__: [Add support for Microsoft Identity Platform aka Azure ActiveDirectory V2](https://github.com/Huachao/vscode-restclient/pull/649) ([@darrelmiller](https://github.com/darrelmiller))
+* __Feature__: [Processing variables from external file](https://github.com/Huachao/vscode-restclient/pull/632) ([@ricmrodrigues](https://github.com/ricmrodrigues))
+* __Bug Fix__: [Fix broken links in JSON responses](https://github.com/Huachao/vscode-restclient/pull/620) ([@jackbravo](https://github.com/jackbravo))
+* __Bug Fix__: [localDatetime timezone discrepancy in iso8601 format](https://github.com/Huachao/vscode-restclient/issues/648)
+* __Bug Fix__: [Allow {{...}} in comments and strings without linting error](https://github.com/Huachao/vscode-restclient/issues/631)
+* __Improvement__: [Fix some trivial errors in README.md](https://github.com/Huachao/vscode-restclient/pull/619) ([@wtetsu](https://github.com/wtetsu))
+* __Improvement__: [Support multiple line query string with spaces](https://github.com/Huachao/vscode-restclient/issues/635)
+* __Improvement__: [Add code snippet for request / request-promise or axios in NodeJS](https://github.com/Huachao/vscode-restclient/issues/428)
+
 ## 0.24.1 (2020/6/13)
 * __Bug Fix__: [Query strings not working on multiple lines](https://github.com/Huachao/vscode-restclient/issues/607)
 
