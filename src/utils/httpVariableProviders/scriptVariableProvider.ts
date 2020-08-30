@@ -1,21 +1,21 @@
 
 
-import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
-import { TextDocument } from 'vscode';
-import { VariableType } from '../../models/variableType';
-import vm from 'vm';
-import { dirname } from 'path';
-import Module from 'module';
-import { RequestVariableCache } from '../requestVariableCache';
-import { FileVariableProvider } from './fileVariableProvider';
-import { EnvironmentVariableProvider } from './environmentVariableProvider';
-import { SystemVariableProvider } from './systemVariableProvider';
-import { HttpClient } from '../httpClient';
-import { HttpRequest } from '../../models/httpRequest';
-import { DocumentCache } from '../../models/documentCache';
 import {OutgoingHttpHeaders} from 'http';
+import Module from 'module';
+import { dirname } from 'path';
+import vm from 'vm';
+import { TextDocument } from 'vscode';
+import { DocumentCache } from '../../models/documentCache';
+import { HttpRequest } from '../../models/httpRequest';
+import { VariableType } from '../../models/variableType';
+import { HttpClient } from '../httpClient';
+import { RequestVariableCache } from '../requestVariableCache';
+import { EnvironmentVariableProvider } from './environmentVariableProvider';
+import { FileVariableProvider } from './fileVariableProvider';
+import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
+import { SystemVariableProvider } from './systemVariableProvider';
 
-interface ScriptVariableFunction{
+interface ScriptVariableFunction {
   name: string;
   function: string;
   args: string[];
@@ -53,7 +53,7 @@ export class ScriptVariableProvider implements HttpVariableProvider {
       return {
         name,
         error: 'script variable not valid',
-      }
+      };
     }
   }
   public async getAll(document?: TextDocument, context?: HttpVariableContext | undefined): Promise<HttpVariable[]> {
@@ -64,7 +64,7 @@ export class ScriptVariableProvider implements HttpVariableProvider {
     const scriptDelimiter = "=>";
 
     const scriptDelimiterIndex = name.indexOf(scriptDelimiter);
-    if(scriptDelimiterIndex > 0){
+    if (scriptDelimiterIndex > 0) {
       return {
         name,
         function: name.substring(scriptDelimiterIndex + scriptDelimiter.length),
@@ -141,7 +141,7 @@ export class ScriptVariableProvider implements HttpVariableProvider {
     return {
         name: script.name,
         error,
-      }
+      };
     }
   }
 
@@ -159,7 +159,7 @@ export class ScriptVariableProvider implements HttpVariableProvider {
       return this.send;
     }
 
-    let result = RequestVariableCache.get(document, arg);
+    const result = RequestVariableCache.get(document, arg);
     if (result) {
       return {
         request: result.request,
@@ -199,7 +199,7 @@ export class ScriptVariableProvider implements HttpVariableProvider {
     name?: string | undefined
   }) {
     const client = new HttpClient();
-    return client.send(new HttpRequest(request.method || 'GET', request.url, request.headers, request.body,request.rawBody, request.name))
+    return client.send(new HttpRequest(request.method || 'GET', request.url, request.headers, request.body, request.rawBody, request.name));
   }
 
 }

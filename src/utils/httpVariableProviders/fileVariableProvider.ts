@@ -4,9 +4,9 @@ import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
-import { ScriptVariableProvider } from './scriptVariableProvider';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
+import { ScriptVariableProvider } from './scriptVariableProvider';
 import { SystemVariableProvider } from './systemVariableProvider';
 
 type FileVariableValue = Record<'name' | 'value', string>;

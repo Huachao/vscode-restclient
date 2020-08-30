@@ -4,8 +4,8 @@ import { EnvironmentVariableProvider } from './httpVariableProviders/environment
 import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
 import { HttpVariableProvider } from './httpVariableProviders/httpVariableProvider';
 import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
-import { SystemVariableProvider } from './httpVariableProviders/systemVariableProvider';
 import { ScriptVariableProvider } from './httpVariableProviders/scriptVariableProvider';
+import { SystemVariableProvider } from './httpVariableProviders/systemVariableProvider';
 import { getCurrentTextDocument } from './workspaceUtility';
 
 export class VariableProcessor {
@@ -58,7 +58,7 @@ export class VariableProcessor {
 
     public static async getAllVariablesDefinitions(document: TextDocument): Promise<Map<string, VariableType[]>> {
         const variableDefinitions = new Map<string, VariableType[]>();
-        for(const [httpVariableProvider, caching] of this.providers) {
+        for (const [httpVariableProvider, caching] of this.providers) {
             if (caching) {
                 const variables = await httpVariableProvider.getAll(document);
                 variables.forEach(({ name }) => {
