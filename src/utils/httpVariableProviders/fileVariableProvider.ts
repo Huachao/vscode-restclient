@@ -4,6 +4,7 @@ import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
+import { ScriptVariableProvider } from './scriptVariableProvider';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
 import { SystemVariableProvider } from './systemVariableProvider';
@@ -29,6 +30,7 @@ export class FileVariableProvider implements HttpVariableProvider {
 
     private readonly innerVariableProviders: HttpVariableProvider[] = [
         SystemVariableProvider.Instance,
+        ScriptVariableProvider.Instance,
         RequestVariableProvider.Instance,
         EnvironmentVariableProvider.Instance,
     ];
