@@ -1,21 +1,30 @@
 import { EOL } from 'os';
 import { Collection, PropertyList, Request, VariableList } from 'postman-collection';
+import { IAmImporter } from './IAmImporter';
 import { ImporterUtilities } from './ImporterUtilities';
 
 
-export class PostmanImporter {
-    import(collection: PostmanCollection): string {
+export class PostmanImporter implements IAmImporter {
+    import(source: Uint8Array): string {
+        const postmanCollection = this.getCollectionFromFileContent(source);
         let sb = '';
 
-        sb += this.prepareDocumentHeader(collection.name, collection.description.content);
-        sb += this.defineDocumentVariables(collection.variables);
-        collection.items.each(entry => {
+        sb += this.prepareDocumentHeader(postmanCollection.name, postmanCollection.description.content);
+        sb += this.defineDocumentVariables(postmanCollection.variables);
+        postmanCollection.items.each(entry => {
             sb += this.prepareGroupHeader(entry.name, entry.description.content);
             sb += this.writeAllRequestsInGroup(entry.items);
         }, this);
 
         return sb;
     }
+
+    private getCollectionFromFileContent(source: Uint8Array) {
+        const collection = new Collection(<any>JSON.parse(source.toString()));
+        const postmanCollection = <PostmanCollection>collection;
+        return postmanCollection;
+    }
+
     prepareGroupHeader(name: string, content: string): string {
         return '#\t' + name + EOL + '#\t' + ImporterUtilities.parseMultiLineStringAsMultiLineComment(content);
     }

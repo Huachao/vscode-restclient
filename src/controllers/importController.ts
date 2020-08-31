@@ -1,35 +1,47 @@
-import { Collection } from 'postman-collection';
 import { CancellationToken, Uri, window, workspace } from 'vscode';
+import { ImportOption } from '../models/enums/ImportOption';
 import { trace } from '../utils/decorator';
-import { PostmanCollection, PostmanImporter } from './../utils/importers/PostmanCollectionImporter';
+import { ImporterResolver } from './../utils/importers/ImporterResolver';
 
+const DocumentResultLanguage = 'http';
+const ImportDialogTitle = 'Choose file that you wish to import';
 export class ImportController {
+
+    private _resolver: ImporterResolver;
+
+    constructor() {
+        this._resolver = new ImporterResolver();
+    }
 
     @trace('Import Requests From Document')
     public async import(token: CancellationToken) {
-        const dialogOptions = { canSelectFiles: true, canSelectFolders: false, canSelectMany: false, title: 'Choose file that you wish to import' };
-        window.showQuickPick(['Postman'], { canPickMany: false }, token).then(option => {
-            window.showOpenDialog(dialogOptions).then(files => this.importFile(files?.pop(), option));
-        });
+        const options = Object.keys(ImportOption).map(k => ImportOption[k]);
+
+        const pickedOption = await window.showQuickPick(options, { canPickMany: false }, token);
+        if (pickedOption === undefined) {
+            return;
+        }
+
+        await this.selectFileAndImport(pickedOption);
     }
 
-    private async importFile(file: Uri | undefined, option: string | undefined) {
-        if (file === undefined) {
-            window.showErrorMessage("File was not found.");
-        }
-        if (option === undefined) {
-            window.showErrorMessage("Options was not found.");
+    async selectFileAndImport(selectedOption: any) {
+        const dialogOptions = { canSelectFiles: true, canSelectFolders: false, canSelectMany: false, title: ImportDialogTitle };
+
+        const pickedFiles = await window.showOpenDialog(dialogOptions);
+        const pickedFile = <Uri | undefined>pickedFiles?.pop();
+        if (pickedFile === undefined) {
+            return;
         }
 
-        if (option === 'Postman') {
-            const fileContent = await workspace.fs.readFile(<Uri>file);
-            const jsonObj = JSON.parse(fileContent.toString());
+        await this.resolveImporterAndUseIt(pickedFile, selectedOption);
+    }
 
-            const importer = new PostmanImporter();
-            const collection = new Collection(jsonObj);
-            const parsedContent = importer.import(<PostmanCollection>collection);
-            const document = await workspace.openTextDocument({ language: 'http', content: parsedContent });
-            await window.showTextDocument(document, { preview: false });
-        }
+    async resolveImporterAndUseIt(file: Uri, option: ImportOption) {
+        const content = await workspace.fs.readFile(file);
+        const importer = this._resolver.resolve(option);
+        const result = importer.import(content);
+        const document = await workspace.openTextDocument({ language: DocumentResultLanguage, content: result });
+        await window.showTextDocument(document, { preview: false });
     }
 }
