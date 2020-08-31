@@ -1,11 +1,11 @@
-import { ImportController } from './controllers/importController';
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { commands, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace, CancellationToken } from 'vscode';
+import { CancellationToken, commands, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
 import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
+import { ImportController } from './controllers/importController';
 import { RequestController } from './controllers/requestController';
 import { CustomVariableDiagnosticsProvider } from "./providers/customVariableDiagnosticsProvider";
 import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
