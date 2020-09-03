@@ -22,7 +22,7 @@ type FoldingRange = [number, number];
 
 export class HttpResponseWebview extends BaseWebview {
 
-    private readonly urlRegex = /(https?:\/\/[^\s"'<>\]\)]+)/gi;
+    private readonly urlRegex = /(https?:\/\/[^\s"'<>\]\)\\]+)/gi;
 
     private readonly panelResponses: Map<WebviewPanel, HttpResponse>;
 
@@ -217,7 +217,7 @@ export class HttpResponseWebview extends BaseWebview {
         <div>
             ${this.settings.disableAddingHrefLinkForLargeResponse && response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024
                 ? innerHtml
-                : this.addUrlLinks(innerHtml, contentType)}
+                : this.addUrlLinks(innerHtml)}
             <a id="scroll-to-top" role="button" aria-label="scroll to top" title="Scroll To Top"><span class="icon"></span></a>
         </div>
         <script type="text/javascript" src="${panel.webview.asWebviewUri(this.scriptFilePath)}" nonce="${nonce}" charset="UTF-8"></script>
@@ -350,15 +350,8 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         });
     }
 
-    private addUrlLinks(innerHtml: string, contentType: string | undefined) {
-        if (MimeUtility.isJSON(contentType)) {
-            return innerHtml.replace(this.urlRegex, match => {
-                const parsedLink = JSON.parse(`"${match}"`);
-                return `<a href=${parsedLink} target="_blank" rel="noopener noreferrer">${match}</a>`;
-            });
-        } else {
-            return innerHtml.replace(this.urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-        }
+    private addUrlLinks(innerHtml: string) {
+        return innerHtml.replace(this.urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
     }
 
     private getFoldingRange(lines: string[]): Map<number, FoldingRange> {
