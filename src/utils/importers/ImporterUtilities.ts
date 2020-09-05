@@ -1,6 +1,10 @@
 export class ImporterUtilities {
 
-    public static parseMultiLineStringAsMultiLineComment(str: string, symbol: string = '#', whitespaceAfterSymbol: boolean = true): string {
-        return str.replace(/\n/g, '\n' + symbol) + (whitespaceAfterSymbol ? ' ' : '');
+    public static parseMultiLineStringAsMultiLineComment(prefix = '# ', content: string | undefined): string {
+        if (content == null) {
+            return '';
+        }
+        const contentWithParsedNewLine = content.replace(/\n/g, '\n' + prefix);
+        return prefix + contentWithParsedNewLine;
     }
 }

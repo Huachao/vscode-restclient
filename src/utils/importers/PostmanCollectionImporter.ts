@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { Collection, PropertyList, Request, VariableList } from 'postman-collection';
+import { Collection, Request, VariableList, ItemGroup, Item, Url } from 'postman-collection';
 import { IAmImporter } from './IAmImporter';
 import { ImporterUtilities } from './ImporterUtilities';
 
@@ -7,17 +7,37 @@ import { ImporterUtilities } from './ImporterUtilities';
 export class PostmanImporter implements IAmImporter {
     import(source: Uint8Array): string {
         const postmanCollection = this.getCollectionFromFileContent(source);
-        let sb = '';
+        if (postmanCollection == null) throw 'Unrecognized document'
 
-        sb += this.prepareDocumentHeader(postmanCollection.name, postmanCollection.description.content);
+        let sb = this.prepareDocumentHeader(postmanCollection.name, postmanCollection.description?.content);
         sb += this.defineDocumentVariables(postmanCollection.variables);
-        postmanCollection.items.each(entry => {
-            sb += this.prepareGroupHeader(entry.name, entry.description.content);
-            sb += this.writeAllRequestsInGroup(entry.items);
-        }, this);
+        postmanCollection.items.each(entry => sb += this.processAllRequests(entry), this);
 
         return sb;
     }
+
+    private processAllRequests(entry: any) {
+        let sb = '';
+
+        if (entry instanceof ItemGroup) {
+            sb += this.prepareGroupHeader(entry.name, (<any>entry)?.description?.content);
+            entry.items?.each(el => sb += this.processAllRequests(el), this);
+        } else if (entry instanceof Item) {
+            sb += this.validateRequest(entry) ? this.writeRequestWithHeader(entry) : '';
+        } else {
+            throw 'Unrecognized entry type.\n Don\'t know what to do with that.'
+        }
+
+        return sb;
+    }
+
+    private validateRequest(entry: Item): boolean {
+        let isValid = entry?.request?.url?.getRaw() != null;
+        isValid = isValid && entry?.id != null;
+        isValid = isValid && entry?.name != null;
+        return isValid;
+    }
+
 
     private getCollectionFromFileContent(source: Uint8Array) {
         const collection = new Collection(<any>JSON.parse(source.toString()));
@@ -25,36 +45,28 @@ export class PostmanImporter implements IAmImporter {
         return postmanCollection;
     }
 
-    prepareGroupHeader(name: string, content: string): string {
-        return '#\t' + name + EOL + '#\t' + ImporterUtilities.parseMultiLineStringAsMultiLineComment(content);
+    private prepareGroupHeader(name: string, content: string | undefined): string {
+        return '#\t' + name + EOL + ImporterUtilities.parseMultiLineStringAsMultiLineComment('#\t\t', content);
     }
 
-    writeAllRequestsInGroup(items: PropertyList): string {
-        let sb = '';
-        items.each((element: { id: string; name: string; request: any; }) => {
-            sb += this.writeRequestHeader(element.id, element.name);
-            const req = element.request;
-            sb += this.writeRequest(element.id, req);
-        }, this);
+
+    private writeRequestWithHeader(element: { id: string; name: string; request: any; }) {
+        let sb = this.writeRequestHeader(element.id, element.name);
+        sb += this.writeRequest(element.id, element.request);
         return sb;
     }
 
-    writeRequestHeader(id: string, name: string): string {
+    private writeRequestHeader(id: string, name: string): string {
         return EOL +
             `# @name ${id}` + EOL +
             `# ${name}` + EOL;
     }
 
-    writeRequest(requestId: string, req: Request): string {
-        let sb = '';
+    private writeRequest(requestId: string, req: Request): string {
+        let sb = this.writeRequestVariables(requestId, req.url.variables);
+        sb += this.writeRequestUrl(requestId, req.method, req.url);
 
-        req.url.variables.each((variable) => {
-            sb += `@${requestId + variable.key} = ` + variable.value + EOL;
-        }, this);
-
-        sb += `${req.method} ` + this.getRequestPath(requestId, req) + this.addQueryParamsIfNeeded(req) + EOL;
-
-        req.headers.each((header: { key: any; value: any; }) => {
+        req.headers?.each((header: { key: any; value: any; }) => {
             sb += `${header.key}: ${header.value}` + EOL;
         }, this);
 
@@ -66,16 +78,28 @@ export class PostmanImporter implements IAmImporter {
         return sb;
     }
 
-    private addQueryParamsIfNeeded(req: Request) {
-        return (req.url.query.count() > 0 ? `?${req.url.getQueryString()}` : '');
+    private writeRequestUrl(id: string, method: string, url: Url) {
+        return method + ' ' + this.getRequestPath(id, url) + this.addQueryParamsIfNeeded(url) + EOL
     }
 
-    getRequestPath(requestId: string, req: Request): string {
-        let sb = req.url.getHost() + '/';
+    private writeRequestVariables(id: string, variables: VariableList | undefined): string {
+        let sb = '';
+        variables?.each((variable) => {
+            sb += `@${id + variable.key?.replace(' ', '_')} = ` + variable.value + EOL;
+        }, this);
+        return sb;
+    }
 
-        req.url.path.forEach(w => {
+    private addQueryParamsIfNeeded(url: Url) {
+        return (url.query.count() > 0 ? `?${url.getQueryString()}` : '');
+    }
+
+    private getRequestPath(requestId: string, url: Url): string {
+        let sb = url.getHost() + '/';
+
+        url.path?.forEach(w => {
             const variableKey = w.replace(":", "");
-            if (req.url.variables.get(variableKey) !== undefined) {
+            if (url.variables.get(variableKey) != null) {
                 sb += '{{' + requestId + variableKey + '}}/';
             } else {
                 sb += w + '/';
@@ -85,23 +109,23 @@ export class PostmanImporter implements IAmImporter {
         return sb.slice(0, -1);
     }
 
-    prepareDocumentHeader(name: string, description: string): string {
+    private prepareDocumentHeader(name: string, description: string | undefined): string {
         return `# ${name}` + EOL +
             `#` + EOL +
-            `# ${ImporterUtilities.parseMultiLineStringAsMultiLineComment(description)}` + EOL;
+            ImporterUtilities.parseMultiLineStringAsMultiLineComment('#\t', description) + EOL;
     }
 
-    defineDocumentVariables(variables: VariableList): string {
+    private defineDocumentVariables(variables: VariableList): string {
         let sb = '';
 
         variables.each(variable => {
-            if (variable.description.content.length > 0) {
-                sb += `// ${ImporterUtilities.parseMultiLineStringAsMultiLineComment(variable.description.content)}` + EOL;
+            if (variable?.description?.content) {
+                sb += ImporterUtilities.parseMultiLineStringAsMultiLineComment('// ',variable.description.content) + EOL;
             }
 
-            sb += `@${variable.key} = ${variable.value}` + EOL;
+            sb += `@${variable.key?.replace(' ', '_')} = ${variable.value}` + EOL;
         }, this);
-        return sb;
+        return sb + EOL + '###' + EOL;
     }
 }
 
