@@ -1,27 +1,29 @@
 import { EOL } from 'os';
-import { Collection, Request, VariableList, ItemGroup, Item, Url } from 'postman-collection';
-import { IAmImporter } from './IAmImporter';
-import { ImporterUtilities } from './ImporterUtilities';
+import { Collection, Item, ItemGroup, Request, RequestAuth, Url, VariableList } from 'postman-collection';
+import { IAmImporter } from '../IAmImporter';
+import { ImporterUtilities } from '../ImporterUtilities';
 
 
 export class PostmanImporter implements IAmImporter {
     import(source: Uint8Array): string {
         const postmanCollection = this.getCollectionFromFileContent(source);
-        if (postmanCollection == null) throw 'Unrecognized document'
+        if (postmanCollection == null) {
+            throw 'Unrecognized document';
+         }
 
         let sb = this.prepareDocumentHeader(postmanCollection.name, postmanCollection.description?.content);
         sb += this.defineDocumentVariables(postmanCollection.variables);
-        postmanCollection.items.each(entry => sb += this.processAllRequests(entry), this);
+        postmanCollection.items.each(entry => sb += this.processAllRequests(entry, postmanCollection.auth), this);
 
         return sb;
     }
 
-    private processAllRequests(entry: any) {
+    private processAllRequests(entry: any, auth: RequestAuth | undefined) {
         let sb = '';
 
         if (entry instanceof ItemGroup) {
             sb += this.prepareGroupHeader(entry.name, (<any>entry)?.description?.content);
-            entry.items?.each(el => sb += this.processAllRequests(el), this);
+            entry.items?.each(el => sb += this.processAllRequests(el, el?.auth), this);
         } else if (entry instanceof Item) {
             sb += this.validateRequest(entry) ? this.writeRequestWithHeader(entry) : '';
         } else {
@@ -120,7 +122,7 @@ export class PostmanImporter implements IAmImporter {
 
         variables.each(variable => {
             if (variable?.description?.content) {
-                sb += ImporterUtilities.parseMultiLineStringAsMultiLineComment('// ',variable.description.content) + EOL;
+                sb += ImporterUtilities.parseMultiLineStringAsMultiLineComment('// ', variable.description.content) + EOL;
             }
 
             sb += `@${variable.key?.replace(' ', '_')} = ${variable.value}` + EOL;

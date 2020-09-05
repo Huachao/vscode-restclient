@@ -1,6 +1,6 @@
 import { ImportOption } from './../../models/enums/ImportOption';
 import { IAmImporter } from './IAmImporter';
-import { PostmanImporter } from './PostmanCollectionImporter';
+import { PostmanImporter } from './postman/PostmanCollectionImporter';
 
 export class ImporterResolver {
     resolve(option: ImportOption): IAmImporter {
