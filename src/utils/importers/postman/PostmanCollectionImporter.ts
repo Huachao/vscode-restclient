@@ -1,7 +1,9 @@
 import { EOL } from 'os';
-import { Collection, Item, ItemGroup, Request, RequestAuth, Url, VariableList } from 'postman-collection';
+import { Collection, HeaderList, Item, ItemGroup, Request, RequestAuth, Url, VariableList } from 'postman-collection';
+import { Authorization } from '../../../models/auth/authorization';
 import { IAmImporter } from '../IAmImporter';
 import { ImporterUtilities } from '../ImporterUtilities';
+import { PostmanAuthorization, PostmanAuthorizationParser } from './PostmanAuthorizationParser';
 
 
 export class PostmanImporter implements IAmImporter {
@@ -9,13 +11,13 @@ export class PostmanImporter implements IAmImporter {
         const postmanCollection = this.getCollectionFromFileContent(source);
         if (postmanCollection == null) {
             throw 'Unrecognized document';
-         }
+        }
 
         let sb = this.prepareDocumentHeader(postmanCollection.name, postmanCollection.description?.content);
         sb += this.defineDocumentVariables(postmanCollection.variables);
         postmanCollection.items.each(entry => sb += this.processAllRequests(entry, postmanCollection.auth), this);
 
-        return sb;
+        return sb; ``
     }
 
     private processAllRequests(entry: any, auth: RequestAuth | undefined) {
@@ -23,9 +25,9 @@ export class PostmanImporter implements IAmImporter {
 
         if (entry instanceof ItemGroup) {
             sb += this.prepareGroupHeader(entry.name, (<any>entry)?.description?.content);
-            entry.items?.each(el => sb += this.processAllRequests(el, el?.auth), this);
+            entry.items?.each(e => ((el, auth) => sb += this.processAllRequests(el, auth))(e, entry.auth), this);
         } else if (entry instanceof Item) {
-            sb += this.validateRequest(entry) ? this.writeRequestWithHeader(entry) : '';
+            sb += this.validateRequest(entry) ? this.writeRequestWithHeader(entry, auth) : '';
         } else {
             throw 'Unrecognized entry type.\n Don\'t know what to do with that.'
         }
@@ -52,9 +54,14 @@ export class PostmanImporter implements IAmImporter {
     }
 
 
-    private writeRequestWithHeader(element: { id: string; name: string; request: any; }) {
+    private writeRequestWithHeader(element: { id: string; name: string; request: any; }, auth: RequestAuth | undefined) {
         let sb = this.writeRequestHeader(element.id, element.name);
-        sb += this.writeRequest(element.id, element.request);
+        let reqAuth: Authorization | undefined;
+        if (auth) {
+            reqAuth = PostmanAuthorizationParser.parse(<PostmanAuthorization><unknown>auth);
+        }
+
+        sb += this.writeRequest(element.id, element.request, reqAuth);
         return sb;
     }
 
@@ -64,9 +71,11 @@ export class PostmanImporter implements IAmImporter {
             `# ${name}` + EOL;
     }
 
-    private writeRequest(requestId: string, req: Request): string {
+    private writeRequest(requestId: string, req: Request, auth: Authorization | undefined): string {
         let sb = this.writeRequestVariables(requestId, req.url.variables);
         sb += this.writeRequestUrl(requestId, req.method, req.url);
+
+        sb += this.addAuthHeaderForRequest(req.headers, auth);
 
         req.headers?.each((header: { key: any; value: any; }) => {
             sb += `${header.key}: ${header.value}` + EOL;
@@ -78,6 +87,16 @@ export class PostmanImporter implements IAmImporter {
         sb += EOL + '###' + EOL;
 
         return sb;
+    }
+
+    private addAuthHeaderForRequest(headers: HeaderList, auth: Authorization | undefined): string {
+        const authorizationKeyRegex = new RegExp('Authorization');
+        const already_existing_authorization_header = headers?.find((h: { key: string; value: string; }) => h.key.match(authorizationKeyRegex));
+        if (already_existing_authorization_header) {
+            return '';
+        } else {
+            return auth?.toString() ?? '';
+        }
     }
 
     private writeRequestUrl(id: string, method: string, url: Url) {
