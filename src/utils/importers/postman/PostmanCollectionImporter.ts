@@ -5,7 +5,6 @@ import { IAmImporter } from '../IAmImporter';
 import { ImporterUtilities } from '../ImporterUtilities';
 import { PostmanAuthorization, PostmanAuthorizationParser } from './PostmanAuthorizationParser';
 
-
 export class PostmanImporter implements IAmImporter {
     import(source: Uint8Array): string {
         const postmanCollection = this.getCollectionFromFileContent(source);
@@ -17,7 +16,7 @@ export class PostmanImporter implements IAmImporter {
         sb += this.defineDocumentVariables(postmanCollection.variables);
         postmanCollection.items.each(entry => sb += this.processAllRequests(entry, postmanCollection.auth), this);
 
-        return sb; ``
+        return sb;
     }
 
     private processAllRequests(entry: any, auth: RequestAuth | undefined) {

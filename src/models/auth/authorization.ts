@@ -1,7 +1,7 @@
 import { AmazonWebServicesSignatureDetails } from "./amazonWebServicesSignatureDetails";
 
 export class Authorization {
-    name: string = "Authorization";
+    name: string;
     value: string;
 
     toString(): string {
@@ -10,11 +10,15 @@ export class Authorization {
 
     constructor(value: string) {
         this.value = value;
+        this.name = "Authorization";
     }
 }
 
 export class ApiKeyAuth extends Authorization {
-    name = 'api-key';
+    constructor(value: string) {
+        super(value);
+        this.name = 'api-key';
+    }
 }
 
 export class BearerAuth extends Authorization {
