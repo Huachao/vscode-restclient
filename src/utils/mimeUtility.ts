@@ -90,7 +90,7 @@ export class MimeUtility {
             return false;
         }
 
-        let essence = this.parse(contentTypeString).essence;
+        const essence = this.parse(contentTypeString).essence;
         return essence === 'application/javascript' || essence.includes("text/javascript");
     }
 
