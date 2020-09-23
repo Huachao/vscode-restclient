@@ -65,7 +65,7 @@ export class MimeUtility {
         }
 
         const { subtype, essence } = this.parse(contentTypeString);
-        return essence === 'application/json' || subtype.endsWith('+json') || essence.includes("text/javascript");
+        return essence === 'application/json' || subtype.endsWith('+json');
     }
 
     public static isXml(contentTypeString: string | undefined): boolean {
@@ -77,7 +77,7 @@ export class MimeUtility {
         return essence === 'application/xml' || essence === 'text/xml' || subtype.endsWith('+xml');
     }
 
-   public static isHtml(contentTypeString: string | undefined): boolean {
+    public static isHtml(contentTypeString: string | undefined): boolean {
         if (!contentTypeString) {
             return false;
         }
@@ -90,7 +90,8 @@ export class MimeUtility {
             return false;
         }
 
-        return this.parse(contentTypeString).essence === 'application/javascript';
+        let essence = this.parse(contentTypeString).essence;
+        return essence === 'application/javascript' || essence.includes("text/javascript");
     }
 
     public static isCSS(contentTypeString: string | undefined): boolean {
