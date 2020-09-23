@@ -115,8 +115,11 @@ export class HttpClient {
             }
         }
 
+        // Fix #682 Do not touch original headers in httpRequest, which may be used for retry later
+        // Simply do a shadow copy here
+        const clonedHeaders = Object.assign({}, httpRequest.headers);
         const options: got.GotBodyOptions<null> = {
-            headers: httpRequest.headers,
+            headers: clonedHeaders,
             method: httpRequest.method,
             body: requestBody,
             encoding: null,
