@@ -1,3 +1,7 @@
+## 0.24.3 (2020/10/5)
+* __Bug Fix__: [No response when result contains encoded string with double forward slash](https://github.com/Huachao/vscode-restclient/issues/676)
+* __Bug Fix__: [No Auth header sent when re-running a request](https://github.com/Huachao/vscode-restclient/issues/682)
+
 ## 0.24.2 (2020/8/30)
 * __Feature__: [Add support for Microsoft Identity Platform aka Azure ActiveDirectory V2](https://github.com/Huachao/vscode-restclient/pull/649) ([@darrelmiller](https://github.com/darrelmiller))
 * __Feature__: [Processing variables from external file](https://github.com/Huachao/vscode-restclient/pull/632) ([@ricmrodrigues](https://github.com/ricmrodrigues))
