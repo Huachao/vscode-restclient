@@ -121,9 +121,9 @@ export class RequestController {
             }
 
             if (error.code === 'ETIMEDOUT') {
-                error.message = `Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'. Details: ${error}. `;
+                error.message = `Request timed out. Double-check your network connection and/or raise the timeout duration (currently set to ${this._restClientSettings.timeoutInMilliseconds}ms) as needed: 'rest-client.timeoutinmilliseconds'. Details: ${error}.`;
             } else if (error.code === 'ECONNREFUSED') {
-                error.message = `Connection is being rejected. The service isn’t running on the server, or incorrect proxy settings in vscode, or a firewall is blocking requests. Details: ${error}.`;
+                error.message = `The connection was rejected. Either the requested service isn’t running on the requested server/port, the proxy settings in vscode are misconfigured, or a firewall is blocking requests. Details: ${error}.`;
             } else if (error.code === 'ENETUNREACH') {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }
