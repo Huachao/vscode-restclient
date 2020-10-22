@@ -1,7 +1,6 @@
 import * as fs from 'fs-extra';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';
-import { Readable, Stream } from 'stream';
 import { Cookie, CookieJar, Store } from 'tough-cookie';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
@@ -13,6 +12,7 @@ import { awsSignature } from './auth/awsSignature';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
 import { getHeader, hasHeader, removeHeader } from './misc';
+import { convertBufferToStream, convertStreamToBuffer } from './streamUtility';
 import { UserDataManager } from './userDataManager';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
@@ -98,7 +98,7 @@ export class HttpClient {
                 HttpClient.normalizeHeaderNames(
                     (response as any).request.gotOptions.headers as RequestHeaders,
                     Object.keys(httpRequest.headers)),
-                Buffer.isBuffer(requestBody) ? this.convertBufferToStream(requestBody) : requestBody,
+                Buffer.isBuffer(requestBody) ? convertBufferToStream(requestBody) : requestBody,
                 httpRequest.rawBody,
                 httpRequest.name
             ));
@@ -109,7 +109,7 @@ export class HttpClient {
         let requestBody: string | Buffer | undefined;
         if (originalRequestBody) {
             if (typeof originalRequestBody !== 'string') {
-                requestBody = await this.convertStreamToBuffer(originalRequestBody);
+                requestBody = await convertStreamToBuffer(originalRequestBody);
             } else {
                 requestBody = originalRequestBody;
             }
@@ -235,25 +235,6 @@ export class HttpClient {
         }
 
         return options;
-    }
-
-    private async convertStreamToBuffer(stream: Stream): Promise<Buffer> {
-        return new Promise<Buffer>((resolve, reject) => {
-            const buffers: Buffer[] = [];
-            stream.on('data', buffer => buffers.push(typeof buffer === 'string' ? Buffer.from(buffer) : buffer));
-            stream.on('end', () => resolve(Buffer.concat(buffers)));
-            stream.on('error', error => reject(error));
-            (<any>stream).resume();
-        });
-    }
-
-    private convertBufferToStream(buffer: Buffer): Stream {
-        return new Readable({
-            read() {
-                this.push(buffer);
-                this.push(null);
-            }
-        });
     }
 
     private decodeEscapedUnicodeCharacters(body: string): string {
