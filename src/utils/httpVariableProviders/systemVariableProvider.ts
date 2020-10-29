@@ -187,10 +187,14 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private registerDotenvVariable() {
         this.resolveFuncs.set(Constants.DotenvVariableName, async (name, document) => {
-            const absolutePath = path.join(path.dirname(document.fileName), '.env');
-            if (!await fs.pathExists(absolutePath)) {
-                return { warning: ResolveWarningMessage.DotenvFileNotFound };
+            let folderPath = path.dirname(document.fileName);
+            while (!await fs.pathExists(path.join(folderPath, '.env'))) {
+                folderPath = path.join(folderPath, '..');
+                if (folderPath === path.parse(process.cwd()).root) {
+                    return { warning: ResolveWarningMessage.DotenvFileNotFound };
+                }
             }
+            const absolutePath = path.join(folderPath, '.env');
             const groups = this.dotenvRegex.exec(name);
             if (groups !== null && groups.length === 3) {
                 const parsed = dotenv.parse(await fs.readFile(absolutePath));
