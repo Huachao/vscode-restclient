@@ -353,8 +353,13 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     private addUrlLinks(innerHtml: string, contentType: string | undefined) {
         if (MimeUtility.isJSON(contentType)) {
             return innerHtml.replace(this.urlRegex, match => {
-                const parsedLink = JSON.parse(`"${match}"`);
-                return `<a href=${parsedLink} target="_blank" rel="noopener noreferrer">${match}</a>`;
+                try {
+                    const parsedLink = JSON.parse(`"${match}"`);
+                    return `<a href=${parsedLink} target="_blank" rel="noopener noreferrer">${match}</a>`;
+                } catch (error) {
+                    console.error(error);
+                    return match;
+                }
             });
         } else {
             return innerHtml.replace(this.urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');

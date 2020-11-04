@@ -4,6 +4,16 @@
 
 REST Client allows you to send HTTP request and view the response in Visual Studio Code directly.
 
+## 扩展功能
+1.大纲支持多级，按#标题生成  
+2.修复url增加link时可以出现异常，导致结果不显示的bug.
+
+## 编译说明
+生成本地包
+```
+vsce package
+```
+
 ## Main Features
 * Send/Cancel/Rerun __HTTP request__ in editor and view response in a separate pane with syntax highlight
 * Send __GraphQL query__ and author __GraphQL variables__ in editor
