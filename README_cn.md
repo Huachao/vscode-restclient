@@ -1,8 +1,18 @@
 # REST Client
+中文 | [English](README.md)
 
 ## 扩展功能
-1.大纲支持多级，按#标题生成
-2.修复url增加link时可以出现异常，导致结果不显示的bug.
+1.大纲支持多级，按#标题生成  
+2.修复url增加link时可以出现异常，导致结果不显示的bug.  
+
+## 效果图
+
+原有大纲图  
+![rest-client](images/treeView-old.png)
+
+改进的后大纲视图  
+![rest-client](images/treeView-new.png)  
+支持多级结构
 
 ## 编译说明
 生成本地包
