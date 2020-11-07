@@ -9,6 +9,8 @@ type RequestVariableEvent = {
 
 export class RequestVariableCache {
     private static cache = new DocumentCache<Map<string, HttpResponse>>(true);
+    // global shared
+    private static sharedCache = new DocumentCache<HttpResponse>(true);
 
     private static readonly eventEmitter = new EventEmitter<RequestVariableEvent>();
 
@@ -22,14 +24,18 @@ export class RequestVariableCache {
         }
 
         this.cache.get(document)!.set(name, response);
+
+        // mocking TextDocument
+        this.sharedCache.set({ uri: name, version: 1 } as any, response);
+
         this.eventEmitter.fire({ name, document });
     }
 
     public static has(document: TextDocument, name: string): boolean {
-        return this.cache.has(document) && this.cache.get(document)!.has(name);
+        return this.cache.has(document) ? this.cache.get(document)!.has(name) : this.sharedCache.has({ uri: name, version: 1 } as any);
     }
 
     public static get(document: TextDocument, name: string): HttpResponse | undefined {
-        return this.cache.get(document)?.get(name);
+        return this.cache.get(document)?.get(name) ?? this.sharedCache.get({ uri: name, version: 1 } as any);
     }
 }

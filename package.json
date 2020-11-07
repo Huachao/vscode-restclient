@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.24.3",
+  "version": "0.25.0",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -610,6 +610,22 @@
           "default": true,
           "scope": "resource",
           "description": "Enable/disable custom variable references CodeLens in request file"
+        },
+        "rest-client.dotenvFilename": {
+          "type": "string",
+          "default": ".env",
+          "scope": "resource",
+          "description": "Specify custom dotenv filename"
+        },
+        "rest-client.requestVariableScope": {
+          "type": "string",
+          "enum": [
+            "file",
+            "global"
+          ],
+          "default": "file",
+          "scope": "resource",
+          "description": "Specify request variables sharing scope"
         }
       }
     },

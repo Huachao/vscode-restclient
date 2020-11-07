@@ -1,5 +1,6 @@
 import { TextDocument } from 'vscode';
 import * as Constants from '../../common/constants';
+import { RestClientSettings } from '../../models/configurationSettings';
 import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
@@ -9,6 +10,8 @@ import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 
 export class RequestVariableProvider implements HttpVariableProvider {
     private static _instance: RequestVariableProvider;
+
+    private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
     public static get Instance(): RequestVariableProvider {
         if (!this._instance) {
@@ -52,8 +55,13 @@ export class RequestVariableProvider implements HttpVariableProvider {
     }
 
     private getRequestVariables(document: TextDocument): string[] {
+        const requestVariableScope = this._settings.requestVariableScope;
+
         if (this.requestVariableCache.has(document)) {
-            return this.requestVariableCache.get(document)!;
+            return this.requestVariableCache.get(
+                requestVariableScope === 'global'
+                    ? { uri: 'sharedRequestVariables', version: 1 } as any
+                    : document)!;
         }
 
         const fileContent = document.getText();
@@ -68,6 +76,14 @@ export class RequestVariableProvider implements HttpVariableProvider {
 
         const values = [...variableNames];
         this.requestVariableCache.set(document, values);
+
+        if (requestVariableScope === 'global') {
+            const previousValues = this.requestVariableCache.get({ uri: 'sharedRequestVariables', version: 1 } as any) ?? [];
+            const mergedValues = [...previousValues, ...values];
+            this.requestVariableCache.set({ uri: 'sharedRequestVariables', version: 1 } as any, mergedValues);
+            return mergedValues;
+        }
+
         return values;
     }
 

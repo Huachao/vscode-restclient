@@ -1,6 +1,7 @@
 import { ConfigurationChangeEvent, Diagnostic, DiagnosticCollection, DiagnosticSeverity, Disposable, languages, Position, Range, TextDocument, workspace } from 'vscode';
 import * as Constants from '../common/constants';
 import { EnvironmentController } from '../controllers/environmentController';
+import { RestClientSettings } from '../models/configurationSettings';
 import { DocumentCache } from '../models/documentCache';
 import { ResolveState } from '../models/httpVariableResolveResult';
 import { VariableType } from '../models/variableType';
@@ -27,6 +28,8 @@ export class CustomVariableDiagnosticsProvider {
     private timer: NodeJS.Timer | undefined;
 
     private fileVariableReferenceCache = new DocumentCache<Map<string, VariableWithPosition[]>>();
+
+    private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
     constructor() {
         this.disposables.push(
@@ -84,15 +87,19 @@ export class CustomVariableDiagnosticsProvider {
             const allAvailableVariables = await VariableProcessor.getAllVariablesDefinitions(document);
             const variableReferences = this.findVariableReferences(document);
 
-            // Variable not found
-            [...variableReferences.entries()]
-                .filter(([name]) => !allAvailableVariables.has(name))
-                .forEach(([, variables]) => {
-                    variables.forEach(({name, begin, end}) => {
-                        diagnostics.push(
-                            new Diagnostic(new Range(begin, end), `${name} is not found`, DiagnosticSeverity.Error));
+            const requestVariableScope = this._settings.requestVariableScope;
+
+            if (requestVariableScope === 'file') {
+                // Variable not found
+                [...variableReferences.entries()]
+                    .filter(([name]) => !allAvailableVariables.has(name))
+                    .forEach(([, variables]) => {
+                        variables.forEach(({name, begin, end}) => {
+                            diagnostics.push(
+                                new Diagnostic(new Range(begin, end), `${name} is not found`, DiagnosticSeverity.Error));
+                        });
                     });
-                });
+            }
 
             // Request variable not active
             [...variableReferences.entries()]

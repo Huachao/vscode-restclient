@@ -6,6 +6,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
+import { RestClientSettings } from '../../models/configurationSettings';
 import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
@@ -40,6 +41,8 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private readonly innerSettingsEnvironmentVariableProvider: EnvironmentVariableProvider =  EnvironmentVariableProvider.Instance;
     private static _instance: SystemVariableProvider;
+
+    private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
     public static get Instance(): SystemVariableProvider {
         if (!this._instance) {
@@ -188,13 +191,14 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private registerDotenvVariable() {
         this.resolveFuncs.set(Constants.DotenvVariableName, async (name, document) => {
             let folderPath = path.dirname(document.fileName);
-            while (!await fs.pathExists(path.join(folderPath, '.env'))) {
+            const dotenvFilename = this._settings.dotenvFilename;
+            while (!await fs.pathExists(path.join(folderPath, dotenvFilename))) {
                 folderPath = path.join(folderPath, '..');
                 if (folderPath === path.parse(process.cwd()).root) {
                     return { warning: ResolveWarningMessage.DotenvFileNotFound };
                 }
             }
-            const absolutePath = path.join(folderPath, '.env');
+            const absolutePath = path.join(folderPath, dotenvFilename);
             const groups = this.dotenvRegex.exec(name);
             if (groups !== null && groups.length === 3) {
                 const parsed = dotenv.parse(await fs.readFile(absolutePath));
