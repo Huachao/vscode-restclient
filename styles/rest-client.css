@@ -100,17 +100,6 @@ pre .hljs-strong {
   font-weight: bold;
 }
 
-code {
-  display: block;
-  background: inherit;
-  font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-  font-size: 13px;
-  line-height: 1.5;
-  padding: 10px;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
 .vscode-light pre code {
   color: #4d4d4c;
 }
@@ -216,16 +205,6 @@ code .line:before {
   margin-right: 9px;
   color: #787878;
   background-color: inherit;
-}
-
-a {
-  color: #4080D0;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #4080D0;
-  text-decoration: underline;
 }
 
 /* Copy from https://github.com/Microsoft/vscode-docs/blob/master/release-notes/css/inproduct_releasenotes.css */

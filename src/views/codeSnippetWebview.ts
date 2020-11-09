@@ -79,7 +79,9 @@ export class CodeSnippetWebview extends BaseWebview {
         const csp = this.getCsp();
         return `
             <head>
-                <link rel="stylesheet" href="${panel.webview.asWebviewUri(this.styleFilePath)}">
+                <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.baseFilePath)}">
+                <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.vscodeStyleFilePath)}">
+                <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.customStyleFilePath)}">
                 ${csp}
             </head>
             <body>

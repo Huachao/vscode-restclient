@@ -203,7 +203,9 @@ export class HttpResponseWebview extends BaseWebview {
         const csp = this.getCsp(nonce);
         return `
     <head>
-        <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.styleFilePath)}">
+        <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.baseFilePath)}">
+        <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.vscodeStyleFilePath)}">
+        <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.customStyleFilePath)}">
         ${this.getSettingsOverrideStyles(width)}
         ${csp}
         <script nonce="${nonce}">
