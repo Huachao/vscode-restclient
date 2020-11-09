@@ -1,3 +1,11 @@
+## 0.24.4 (2020/11/9)
+* __Feature__: [Search for .env files on parent folders](https://github.com/Huachao/vscode-restclient/pull/691) ([@joaogsleite](joaogsleite))
+* __Bug Fix__: [Fix args parse failure for `'`](https://github.com/Huachao/vscode-restclient/issues/705)
+* __Bug Fix__: [GraphQL file import fails](https://github.com/Huachao/vscode-restclient/issues/699)
+* __Bug Fix__: [Display of response header name is altered when header name and value are case-insensitive matches](https://github.com/Huachao/vscode-restclient/issues/709)
+* __Improvement__: Use VS Code styles in webviews
+* __Improvement__: [Make error messages clearer](https://github.com/Huachao/vscode-restclient/pull/695) ([@noelforte](https://github.com/noelforte))
+
 ## 0.24.3 (2020/10/5)
 * __Bug Fix__: [No response when result contains encoded string with double forward slash](https://github.com/Huachao/vscode-restclient/issues/676)
 * __Bug Fix__: [No Auth header sent when re-running a request](https://github.com/Huachao/vscode-restclient/issues/682)
