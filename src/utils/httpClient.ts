@@ -330,7 +330,9 @@ export class HttpClient {
     private static normalizeHeaderNames<T extends RequestHeaders | ResponseHeaders>(headers: T, rawHeaders: string[]): T {
         const headersDic: { [key: string]: string } = rawHeaders.reduce(
             (prev, cur) => {
-                prev[cur.toLowerCase()] = cur;
+                if (!(cur.toLowerCase() in prev)) {
+                    prev[cur.toLowerCase()] = cur;
+                }
                 return prev;
             }, {});
         const adjustedResponseHeaders = {} as RequestHeaders | ResponseHeaders;

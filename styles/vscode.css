@@ -42,6 +42,13 @@ a:active {
 code {
     font-size: var(--vscode-editor-font-size);
     font-family: var(--vscode-editor-font-family);
+    background: inherit;
+    display: block;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+    display: block;
+    padding: 10px;
 }
 
 button {
@@ -53,12 +60,6 @@ button {
     outline-offset: 2px !important;
     color: var(--vscode-button-foreground);
     background: var(--vscode-button-background);
-    display: block;
-    font-size: var(--vscode-editor-font-size);
-    font-family: var(--vscode-editor-font-family);
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-all;
 }
 
 button:hover {
