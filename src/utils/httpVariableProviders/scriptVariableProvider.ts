@@ -28,7 +28,7 @@ const ArrowFunctionRegex = /\(?\s?([0-9a-zA-z ,]*)\)?\s?=>\s?(.*)?/;
 
 export class ScriptVariableProvider implements HttpVariableProvider {
 
-  private providerRequestCache = {}
+  private providerRequestCache = {};
 
   public readonly type: VariableType = VariableType.Script;
 
