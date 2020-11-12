@@ -23,8 +23,8 @@ interface ScriptVariableFunction {
   result?: HttpVariable;
 }
 
-const FunctionReqex = /function\s?\(([0-9a-zA-z ,]*)\)\s?{(.*)}/
-const ArrowFunctionRegex = /\(?\s?([0-9a-zA-z ,]*)\)?\s?=>\s?(.*)?/
+const FunctionReqex = /function\s?\(([0-9a-zA-z ,]*)\)\s?{(.*)}/;
+const ArrowFunctionRegex = /\(?\s?([0-9a-zA-z ,]*)\)?\s?=>\s?(.*)?/;
 
 export class ScriptVariableProvider implements HttpVariableProvider {
 
