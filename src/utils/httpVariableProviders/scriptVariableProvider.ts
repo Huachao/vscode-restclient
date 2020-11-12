@@ -23,7 +23,12 @@ interface ScriptVariableFunction {
   result?: HttpVariable;
 }
 
+const FunctionReqex = /function\s?\(([0-9a-zA-z ,]*)\)\s?{(.*)}/
+const ArrowFunctionRegex = /\(?\s?([0-9a-zA-z ,]*)\)?\s?=>\s?(.*)?/
+
 export class ScriptVariableProvider implements HttpVariableProvider {
+
+  private providerRequestCache = {}
 
   public readonly type: VariableType = VariableType.Script;
 
@@ -42,41 +47,37 @@ export class ScriptVariableProvider implements HttpVariableProvider {
     return !!this.parseScript(name);
   }
   public async get(name: string, document: TextDocument, context: HttpVariableContext): Promise<HttpVariable> {
-    const script = await this.parseCachedScript(name, document, context);
-    if (script && document) {
-      if (script.result) {
+      const script = await this.parseCachedScript(name, document, context);
+      if (script && document) {
+        if (script.result) {
+          return script.result;
+        }
+        script.result = await this.executeScript(script, script.values, document.fileName);
         return script.result;
+      } else {
+        return {
+          name,
+          error: 'script variable not valid',
+        };
       }
-      script.result = await this.executeScript(script, script.values, document.fileName);
-      return script.result;
-    } else {
-      return {
-        name,
-        error: 'script variable not valid',
-      };
     }
-  }
   public async getAll(document?: TextDocument, context?: HttpVariableContext | undefined): Promise<HttpVariable[]> {
     return [];
   }
 
-  private parseScript(name: string) : ScriptVariableFunction | null {
-    const scriptDelimiter = "=>";
-
-    const scriptDelimiterIndex = name.indexOf(scriptDelimiter);
-    if (scriptDelimiterIndex > 0) {
-      return {
-        name,
-        function: name.substring(scriptDelimiterIndex + scriptDelimiter.length),
-        args: name.substring(0, scriptDelimiterIndex)
-          .replace('(', '')
-          .replace(')', '')
-          .split(',')
-          .map(obj => obj.trim())
-          .filter(obj => obj !== ''),
-        values: []
-      };
-    }
+  private parseScript(name: string): ScriptVariableFunction | null {
+  const matches = ArrowFunctionRegex.exec(name) || FunctionReqex.exec(name);
+  if (matches && matches.length === 3) {
+    return {
+      name,
+      function: matches[2],
+      args: matches[1]
+        .split(',')
+        .map(obj => obj.trim())
+        .filter(obj => obj !== ''),
+      values: []
+    };
+  }
     return null;
   }
 
@@ -105,11 +106,16 @@ export class ScriptVariableProvider implements HttpVariableProvider {
   }
 
 
-  private async executeScript(script: ScriptVariableFunction, scriptArgValues: any[], fileName: string) : Promise<HttpVariable> {
+  private async executeScript(script: ScriptVariableFunction, scriptArgValues: any[], fileName: string): Promise<HttpVariable> {
     try {
       const wrappedArgs = ['exports', 'require', 'module', '__filename', '__dirname', ...script.args];
+
+      let moduleExports = `module.exports = ${script.function};`;
+      if (script.function.indexOf("return ") >= 0) {
+        moduleExports = script.function.replace("return ", "module.exports =");
+      }
       const wrappedFunction = `(function (${wrappedArgs.join(',')}){
-          module.exports = ${script.function};
+          ${moduleExports}
         })`;
       const dir = dirname(fileName);
       const scriptModule = new Module(fileName, module.parent as Module);
@@ -138,7 +144,7 @@ export class ScriptVariableProvider implements HttpVariableProvider {
         value
       };
     } catch (error) {
-    return {
+      return {
         name: script.name,
         error,
       };
@@ -167,13 +173,18 @@ export class ScriptVariableProvider implements HttpVariableProvider {
       };
     }
     const providers = [FileVariableProvider.Instance,
-      SystemVariableProvider.Instance,
-      EnvironmentVariableProvider.Instance
+    SystemVariableProvider.Instance,
+    EnvironmentVariableProvider.Instance
     ];
     for (const provider of providers) {
       if (await provider.has(arg, document)) {
-        const result = await provider.get(arg, document, context);
-        return result.value;
+        if (!this.providerRequestCache[arg]) {
+          const promise = provider.get(arg, document, context);
+          this.providerRequestCache[arg] = promise;
+          const result = await promise;
+          delete this.providerRequestCache[arg];
+          return result.value;
+        }
       }
     }
     return result;
