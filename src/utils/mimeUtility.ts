@@ -91,7 +91,7 @@ export class MimeUtility {
         }
 
         const essence = this.parse(contentTypeString).essence;
-        return essence === 'application/javascript' || essence.includes("text/javascript");
+        return essence === 'application/javascript' || essence === 'text/javascript';
     }
 
     public static isCSS(contentTypeString: string | undefined): boolean {
