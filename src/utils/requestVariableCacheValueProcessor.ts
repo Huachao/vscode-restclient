@@ -58,7 +58,7 @@ export class RequestVariableCacheValueProcessor {
             }
 
             const contentTypeHeader = getContentType(headers);
-            if (MimeUtility.isJSON(contentTypeHeader) || (MimeUtility.isJavaScript && isJSONString(body as string))) {
+            if (MimeUtility.isJSON(contentTypeHeader) || (MimeUtility.isJavaScript(contentTypeHeader) && isJSONString(body as string))) {
                 const parsedBody = JSON.parse(body as string);
 
                 return this.resolveJsonHttpBody(parsedBody, nameOrPath);
