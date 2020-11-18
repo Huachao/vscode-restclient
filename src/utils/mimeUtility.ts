@@ -77,7 +77,7 @@ export class MimeUtility {
         return essence === 'application/xml' || essence === 'text/xml' || subtype.endsWith('+xml');
     }
 
-   public static isHtml(contentTypeString: string | undefined): boolean {
+    public static isHtml(contentTypeString: string | undefined): boolean {
         if (!contentTypeString) {
             return false;
         }
@@ -90,7 +90,8 @@ export class MimeUtility {
             return false;
         }
 
-        return this.parse(contentTypeString).essence === 'application/javascript';
+        const essence = this.parse(contentTypeString).essence;
+        return essence === 'application/javascript' || essence === 'text/javascript';
     }
 
     public static isCSS(contentTypeString: string | undefined): boolean {
