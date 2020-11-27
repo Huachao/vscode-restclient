@@ -51,8 +51,7 @@ export async function activate(context: ExtensionContext) {
     }));
 
     const documentSelector = [
-        { language: 'http', scheme: 'file' },
-        { language: 'http', scheme: 'untitled' },
+        { language: 'http', scheme: '*' }
     ];
 
     context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new HttpCompletionItemProvider()));
