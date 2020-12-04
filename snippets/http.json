@@ -62,6 +62,24 @@
         ],
         "description": "SOAP Request"
     },
+    "multipart/form-data request block": {
+        "prefix": "mfr",
+        "body": [
+            "POST ${1:url} HTTP/1.1",
+            "Content-Type: multipart/form-data; boundary=WebAppBoundary",
+            "",
+            "--WebAppBoundary",
+            "Content-Disposition: form-data; name=\"${2:field-name}\"",
+            "",
+            "${3:field-value}",
+            "--WebAppBoundary",
+            "Content-Disposition: form-data; name=\"${4:field-name}\"; filename=\"${5:file-name.txt}\"",
+            "",
+            "< ${6:./relative/path/to/local_file.txt}",
+            "--WebAppBoundary--"
+        ],
+        "description": "multipart/form-data request with text and file data "
+    },
     "File level custom variable": {
         "prefix": "fv",
         "body": [
