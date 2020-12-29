@@ -194,6 +194,9 @@ export class CodeSnippetController {
                 const params = authHeader.substr(start).trim().split(' ');
                 if (params.length === 2) {
                     return `Basic ${base64(`${params[0]}:${params[1]}`)}`;
+                } else if (params.length === 1 && params[0].includes(':')) {
+                    const [user, password] = params[0].split(':');
+                    return `Basic ${base64(`${user}:${password}`)}`;
                 }
             }
         }
