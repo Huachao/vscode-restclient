@@ -125,7 +125,7 @@
           "name": "string.other.http"
         }
       },
-      "match": "^([\\w\\-]+)\\s*(\\:)\\s*(.*?)\\s*$",
+      "match": "^([\\w\\-]+)\\s*(\\:)\\s*([^\/].*?)\\s*$",
       "name": "http.headers"
     },
     {
