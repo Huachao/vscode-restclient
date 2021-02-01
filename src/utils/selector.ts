@@ -33,7 +33,7 @@ export class Selector {
             selectedText = editor.document.getText(editor.selection);
         }
 
-        if (selectedText === null) {
+        if(selectedText === null) {
             return null;
         }
 
@@ -142,10 +142,10 @@ export class Selector {
     }
 
     public static getFileHeaderLines(lines: string[]):  string[] | undefined {
-        let result: string[] = new Array<string>();
+        const result: string[] = new Array<string>();
         lines.forEach(line => {
-            let m =  Constants.FileHeaderDefinitionRegex.exec(line);
-            if(m)
+            const m =  Constants.FileHeaderDefinitionRegex.exec(line);
+            if (m)
             {
                 result.push(m[1]);
             }
@@ -158,10 +158,10 @@ export class Selector {
         const delimiterLineNumbers: number[] = this.getDelimiterRows(lines);
 
         let fileHeaders ;
-        if(delimiterLineNumbers.length == 0){
+        if (delimiterLineNumbers.length === 0){
             fileHeaders =  Selector.getFileHeaderLines(lines);
         } else {
-            fileHeaders = Selector.getFileHeaderLines(lines.slice(0, currentLine))
+            fileHeaders = Selector.getFileHeaderLines(lines.slice(0, currentLine));
         }
 
         if (delimiterLineNumbers.length === 0) {
@@ -173,7 +173,6 @@ export class Selector {
             return null;
         }
 
-        
         let requestLines: Array<string> | undefined;
 
         if (currentLine < delimiterLineNumbers[0]) {
@@ -192,8 +191,8 @@ export class Selector {
             }
         }
 
-        if(requestLines) {
-            if(fileHeaders) {
+        if (requestLines) {
+            if (fileHeaders) {
                 requestLines.splice(1,0, ...fileHeaders);
             }
 
