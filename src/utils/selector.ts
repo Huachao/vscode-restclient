@@ -8,6 +8,7 @@ export interface RequestRangeOptions {
     ignoreEmptyLine?: boolean;
     ignoreFileVariableDefinitionLine?: boolean;
     ignoreResponseRange?: boolean;
+    ignoreFileHeaderVariableDefinitionLine?: boolean;
 }
 
 export interface SelectedRequest {
@@ -67,6 +68,7 @@ export class Selector {
                 ignoreEmptyLine: true,
                 ignoreFileVariableDefinitionLine: true,
                 ignoreResponseRange: true,
+                ignoreFileHeaderVariableDefinitionLine: true,
             ...options};
         const requestRanges: [number, number][] = [];
         const delimitedLines = this.getDelimiterRows(lines);
@@ -84,7 +86,8 @@ export class Selector {
 
                 if (options.ignoreCommentLine && this.isCommentLine(startLine)
                     || options.ignoreEmptyLine && this.isEmptyLine(startLine)
-                    || options.ignoreFileVariableDefinitionLine && this.isFileVariableDefinitionLine(startLine)) {
+                    || options.ignoreFileVariableDefinitionLine && this.isFileVariableDefinitionLine(startLine)
+                    || options.ignoreFileHeaderVariableDefinitionLine && this.isFileHeaderDefinitionLine(startLine)) {
                     start++;
                     continue;
                 }
@@ -134,9 +137,33 @@ export class Selector {
         return Constants.NoteCommentRegex.test(text);
     }
 
+    public static isFileHeaderDefinitionLine(line: string): boolean {
+        return Constants.FileHeaderDefinitionRegex.test(line);
+    }
+
+    public static getFileHeaderLines(lines: string[]):  string[] | undefined {
+        let result: string[] = new Array<string>();
+        lines.forEach(line => {
+            let m =  Constants.FileHeaderDefinitionRegex.exec(line);
+            if(m)
+            {
+                result.push(m[1]);
+            }
+        });
+        return result;
+    }
+
     private static getDelimitedText(fullText: string, currentLine: number): string | null {
         const lines: string[] = fullText.split(Constants.LineSplitterRegex);
         const delimiterLineNumbers: number[] = this.getDelimiterRows(lines);
+
+        let fileHeaders ;
+        if(delimiterLineNumbers.length == 0){
+            fileHeaders =  Selector.getFileHeaderLines(lines);
+        } else {
+            fileHeaders = Selector.getFileHeaderLines(lines.slice(0, currentLine))
+        }
+
         if (delimiterLineNumbers.length === 0) {
             return fullText;
         }
@@ -146,20 +173,31 @@ export class Selector {
             return null;
         }
 
+        
+        let requestLines: Array<string> | undefined;
+
         if (currentLine < delimiterLineNumbers[0]) {
-            return lines.slice(0, delimiterLineNumbers[0]).join(EOL);
+            requestLines = lines.slice(0, delimiterLineNumbers[0]);
         }
 
         if (currentLine > delimiterLineNumbers[delimiterLineNumbers.length - 1]) {
-            return lines.slice(delimiterLineNumbers[delimiterLineNumbers.length - 1] + 1).join(EOL);
+            requestLines = lines.slice(delimiterLineNumbers[delimiterLineNumbers.length - 1] + 1);
         }
 
         for (let index = 0; index < delimiterLineNumbers.length - 1; index++) {
             const start = delimiterLineNumbers[index];
             const end = delimiterLineNumbers[index + 1];
             if (start < currentLine && currentLine < end) {
-                return lines.slice(start + 1, end).join(EOL);
+                requestLines = lines.slice(start + 1, end);
             }
+        }
+
+        if(requestLines) {
+            if(fileHeaders) {
+                requestLines.splice(1,0, ...fileHeaders);
+            }
+
+            return requestLines.join(EOL);
         }
 
         return null;
