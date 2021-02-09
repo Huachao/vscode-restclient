@@ -379,9 +379,8 @@
         },
         "rest-client.fontSize": {
           "type": "number",
-          "default": null,
           "scope": "resource",
-          "description": "Controls the font size in pixels used in the response preview"
+          "markdownDescription": "Controls the font size in pixels used in the response preview. When set to `0`, the value of `#editor.fontSize#` is used."
         },
         "rest-client.fontFamily": {
           "type": "string",
