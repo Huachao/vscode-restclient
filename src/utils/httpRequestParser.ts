@@ -237,12 +237,7 @@ export class HttpRequestParser implements RequestParser {
 
     private async parseTestslines(lines: string[]): Promise<string | Stream | undefined> {
         const combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
-
-        // combinedStream.append('import * as mocha from \'mocha\';');
-        // combinedStream.append(this.getLineEnding(undefined));
-        // combinedStream.append(this.getLineEnding(undefined));
-
-        for (const [index, line] of lines.entries()) {
+        for (const [, line] of lines.entries()) {
             combinedStream.append(line);
             combinedStream.append(this.getLineEnding(undefined));
         }
