@@ -198,9 +198,7 @@ export class HttpResponseWebview extends BaseWebview {
             const code = this.highlightResponse(response);
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
             innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
-            if (testRunnerResult.status != TestRunnerStates.NoTests) {
-                innerHtml += this.renderTestRunnerResult(testRunnerResult);
-            }
+            innerHtml += this.renderTestRunnerResult(testRunnerResult);
         }
 
         // Content Security Policy
@@ -235,11 +233,11 @@ export class HttpResponseWebview extends BaseWebview {
     private renderTestRunnerResult(result: TestRunnerResult): string {
         let code = '';
 
-        if (!result || result.status == TestRunnerStates.NoTests) {
+        if (!result || result.status === TestRunnerStates.NoTests) {
             return code;
         }
 
-        if (result.status == TestRunnerStates.Excepted) {
+        if (result.status === TestRunnerStates.Excepted) {
             return `<div class="test-results">
                 <h2 class="test-results-excepted">Test Results: Failed to Excecute</h2>
                 <p>${result.message}</p>
