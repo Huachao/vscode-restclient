@@ -134,8 +134,6 @@ export class HttpRequestParser implements RequestParser {
             requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
-        let tests = await this.parseTestslines(testLines);
-
         return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), name, testLines.join(EOL));
     }
 
@@ -233,16 +231,6 @@ export class HttpRequestParser implements RequestParser {
 
             return combinedStream;
         }
-    }
-
-    private async parseTestslines(lines: string[]): Promise<string | Stream | undefined> {
-        const combinedStream = CombinedStream.create({ maxDataSize: 10 * 1024 * 1024 });
-        for (const [, line] of lines.entries()) {
-            combinedStream.append(line);
-            combinedStream.append(this.getLineEnding(undefined));
-        }
-
-        return combinedStream;
     }
 
     private getLineEnding(contentTypeHeader: string | undefined) {
