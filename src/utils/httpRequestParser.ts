@@ -26,7 +26,7 @@ export class HttpRequestParser implements RequestParser {
     private readonly queryStringLinePrefix = /^\s*[&\?]/;
     private readonly inputFileSyntax = /^<(?:(?<processVariables>@)(?<encoding>\w+)?)?\s+(?<filepath>.+?)\s*$/;
     private readonly defaultFileEncoding = 'utf8';
-    private readonly testLinePrefix = /^```/;
+    private readonly testLinePrefix = /^@tests/;
 
     public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
     }
