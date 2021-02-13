@@ -636,16 +636,17 @@
     "@types/node": "^12.11.7",
     "@types/vscode": "^1.38.0",
     "mocha": "^6.1.4",
-    "ts-loader": "^5.3.2",
+    "ts-loader": "^5.4.5",
     "tslint": "^6.1.2",
-    "typescript": "^3.7.3",
-    "webpack": "^4.26.0",
-    "webpack-cli": "^3.1.0"
+    "typescript": "^3.9.9",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "adal-node": "^0.1.26",
     "applicationinsights": "^1.0.5",
     "aws4": "^1.9.1",
+    "chai": "4.3.0",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
     "dayjs": "^1.8.20",

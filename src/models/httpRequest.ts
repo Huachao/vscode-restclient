@@ -10,7 +10,8 @@ export class HttpRequest {
         public headers: RequestHeaders,
         public body?: string | Stream,
         public rawBody?: string,
-        public name?: string) {
+        public name?: string,
+        public tests?: string) {
             this.method = method.toLocaleUpperCase();
             this.isCancelled = false;
     }

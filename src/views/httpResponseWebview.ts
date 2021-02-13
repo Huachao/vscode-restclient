@@ -10,6 +10,7 @@ import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
 import { base64, isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
+import { TestCollector } from '../utils/testCollector';
 import { UserDataManager } from '../utils/userDataManager';
 import { BaseWebview } from './baseWebview';
 
@@ -54,7 +55,7 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', this.saveBody, this));
     }
 
-    public async render(response: HttpResponse, column: ViewColumn) {
+    public async render(response: HttpResponse, testResults: TestCollector, column: ViewColumn) {
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
@@ -97,7 +98,7 @@ export class HttpResponseWebview extends BaseWebview {
             panel.title = this.getTitle(response);
         }
 
-        panel.webview.html = this.getHtmlForWebview(panel, response);
+        panel.webview.html = this.getHtmlForWebview(panel, response, testResults);
 
         this.setPreviewActiveContext(this.settings.previewResponsePanelTakeFocus);
 
@@ -183,7 +184,7 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
-    private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse): string {
+    private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse, testResults: TestCollector): string {
         let innerHtml: string;
         let width = 2;
         let contentType = response.contentType;
@@ -193,14 +194,16 @@ export class HttpResponseWebview extends BaseWebview {
         if (MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
             innerHtml = `<img src="data:${contentType};base64,${base64(response.bodyBuffer)}">`;
         } else {
-            const code = this.highlightResponse(response);
+            let code = this.highlightResponse(response);
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
             innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
+            innerHtml += this.highlightTestResults(testResults);
         }
 
         // Content Security Policy
         const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
         const csp = this.getCsp(nonce);
+
         return `
     <head>
         <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.baseFilePath)}">
@@ -224,6 +227,35 @@ export class HttpResponseWebview extends BaseWebview {
         </div>
         <script type="text/javascript" src="${panel.webview.asWebviewUri(this.scriptFilePath)}" nonce="${nonce}" charset="UTF-8"></script>
     </body>`;
+    }
+
+    private highlightTestResults(testResults: TestCollector): string {
+        let code = '';
+        if (testResults && testResults.tests.length <= 0) {
+            return code;
+        }
+        const failures = testResults.tests.filter(test => {
+            return !test.passed;
+        });
+        const hasFailures = failures.length > 0;
+        const passed = !hasFailures;
+        const statusClass = passed ? 'passed' : 'failed';
+        const statusTitle = passed ? "Passed" : "Failed";
+
+        code += `<div class="test-results">\n`;
+        code += `<h2 class="test-results-${statusClass}">Test Results: ${statusTitle}</h2>\n`;
+
+        code += `<ul class="test-results passes">\n`
+        testResults.tests.forEach(test => {
+            var testClass = test.passed ? 'test-result-passed' : 'test-result-failed';
+
+            code += `<li class="test-results ${testClass}">${test.name} - ${test.message}</li>\n`;
+        });
+
+        code += `</ul>\n`
+        code += '</div>\n';
+
+        return code;
     }
 
     private highlightResponse(response: HttpResponse): string {
@@ -299,6 +331,18 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             '.line.collapsed .icon {',
             `left: calc(${width}ch + 3px)`,
             '}',
+            `.test-results .test-results-passed {
+                color: green;
+            }
+            .test-results .test-results-failed {
+                color: red;
+            }
+            .test-results .test-result-passed {
+                color: green;
+            }
+            .test-results .test-result-failed {
+                color: red;
+            }`,
             '</style>'].join('\n');
     }
 
