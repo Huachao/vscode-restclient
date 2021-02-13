@@ -10,7 +10,8 @@ import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
 import { base64, isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
-import { TestCollector } from '../utils/testCollector';
+import { TestRunnerResult } from '../utils/testRunnerResult';
+import { TestRunnerStates } from '../utils/TestRunnerStates';
 import { UserDataManager } from '../utils/userDataManager';
 import { BaseWebview } from './baseWebview';
 
@@ -55,7 +56,7 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', this.saveBody, this));
     }
 
-    public async render(response: HttpResponse, testResults: TestCollector, column: ViewColumn) {
+    public async render(response: HttpResponse, testRunnerResult: TestRunnerResult, column: ViewColumn) {
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
@@ -98,7 +99,7 @@ export class HttpResponseWebview extends BaseWebview {
             panel.title = this.getTitle(response);
         }
 
-        panel.webview.html = this.getHtmlForWebview(panel, response, testResults);
+        panel.webview.html = this.getHtmlForWebview(panel, response, testRunnerResult);
 
         this.setPreviewActiveContext(this.settings.previewResponsePanelTakeFocus);
 
@@ -184,7 +185,7 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
-    private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse, testResults: TestCollector): string {
+    private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse, testRunnerResult: TestRunnerResult): string {
         let innerHtml: string;
         let width = 2;
         let contentType = response.contentType;
@@ -197,7 +198,9 @@ export class HttpResponseWebview extends BaseWebview {
             const code = this.highlightResponse(response);
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
             innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
-            innerHtml += this.highlightTestResults(testResults);
+            if (testRunnerResult.status != TestRunnerStates.NoTests) {
+                innerHtml += this.renderTestRunnerResult(testRunnerResult);
+            }
         }
 
         // Content Security Policy
@@ -229,11 +232,21 @@ export class HttpResponseWebview extends BaseWebview {
     </body>`;
     }
 
-    private highlightTestResults(testResults: TestCollector): string {
+    private renderTestRunnerResult(result: TestRunnerResult): string {
         let code = '';
-        if (testResults && testResults.tests.length <= 0) {
+
+        if (!result || result.status == TestRunnerStates.NoTests) {
             return code;
         }
+
+        if (result.status == TestRunnerStates.Excepted) {
+            return `<div class="test-results">
+                <h2 class="test-results-excepted">Test Results: Failed to Excecute</h2>
+                <p>${result.message}</p>
+                </div>`;
+        }
+
+        const testResults = result.tests;
         const failures = testResults.tests.filter(test => {
             return !test.passed;
         });
@@ -336,6 +349,9 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             }
             .test-results .test-results-failed {
                 color: red;
+            }
+            .test-results .test-results-excepted {
+                color: orange;
             }
             .test-results .test-result-passed {
                 color: green;

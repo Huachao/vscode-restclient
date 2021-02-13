@@ -8,8 +8,8 @@ import { HttpClient } from '../utils/httpClient';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
-import { TestCollector } from '../utils/testCollector';
 import { TestRunner } from '../utils/testRunner';
+import { TestRunnerResult } from '../utils/testRunnerResult';
 import { UserDataManager } from '../utils/userDataManager';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
@@ -99,10 +99,10 @@ export class RequestController {
                 RequestVariableCache.add(document, httpRequest.name, response);
             }
 
-            let testResults: TestCollector = new TestCollector();
+            let testRunnerResult: TestRunnerResult = new TestRunnerResult();
             if (httpRequest.tests) {
                 const testRunner = new TestRunner(response);
-                testResults = testRunner.execute(httpRequest.tests);
+                testRunnerResult = testRunner.execute(httpRequest.tests);
             }
 
             try {
@@ -113,7 +113,7 @@ export class RequestController {
                 if (this._restClientSettings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
                 } else if (previewColumn) {
-                    this._webview.render(response, testResults, previewColumn);
+                    this._webview.render(response, testRunnerResult, previewColumn);
                 }
             } catch (reason) {
                 Logger.error('Unable to preview response:', reason);
