@@ -194,7 +194,7 @@ export class HttpResponseWebview extends BaseWebview {
         if (MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
             innerHtml = `<img src="data:${contentType};base64,${base64(response.bodyBuffer)}">`;
         } else {
-            let code = this.highlightResponse(response);
+            const code = this.highlightResponse(response);
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
             innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
             innerHtml += this.highlightTestResults(testResults);
@@ -245,14 +245,14 @@ export class HttpResponseWebview extends BaseWebview {
         code += `<div class="test-results">\n`;
         code += `<h2 class="test-results-${statusClass}">Test Results: ${statusTitle}</h2>\n`;
 
-        code += `<ul class="test-results passes">\n`
+        code += `<ul class="test-results passes">\n`;
         testResults.tests.forEach(test => {
-            var testClass = test.passed ? 'test-result-passed' : 'test-result-failed';
+            const testClass = test.passed ? 'test-result-passed' : 'test-result-failed';
 
             code += `<li class="test-results ${testClass}">${test.name} - ${test.message}</li>\n`;
         });
 
-        code += `</ul>\n`
+        code += `</ul>\n`;
         code += '</div>\n';
 
         return code;

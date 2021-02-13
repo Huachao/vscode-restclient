@@ -101,7 +101,7 @@ export class RequestController {
 
             let testResults: TestCollector = new TestCollector();
             if (httpRequest.tests) {
-                var testRunner = new TestRunner(response);
+                const testRunner = new TestRunner(response);
                 testResults = testRunner.execute(httpRequest.tests);
             }
 
