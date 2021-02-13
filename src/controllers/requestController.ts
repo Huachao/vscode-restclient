@@ -1,5 +1,3 @@
-import { Console } from 'console';
-import { Test } from 'mocha';
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
 import Logger from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
