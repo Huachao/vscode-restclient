@@ -20,13 +20,21 @@ export class TestRunner {
             const testFunction = Function("response", "expect", "assert", "rc", testLines);
             testFunction(this.response, expect, assert, rc);
         } catch (error) {
-            const match = error.stack.match(stackLineRegex);
-            const line = Number(match?.groups?.line) - 1;
-            const column = match?.groups?.column;
+            let errorLine = '';
+            if (error.stack) {
+                const match = error.stack.match(stackLineRegex);
+
+                if (match && match.groups?.line && match.groups?.column) {
+                    const line = Number(match?.groups?.line) - 1;
+                    const column = match?.groups?.column;
+                    errorLine = `${line}:${column}`;
+                }
+            }
+
             return TestRunnerResult.excepted(
-                error.name,
-                error.message,
-                `${line}:${column}`);
+                error.name ?? 'Unknown Error',
+                error.message ?? error.toString(),
+                errorLine);
         }
 
         return TestRunnerResult.ranToCompletion(rc);
