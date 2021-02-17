@@ -1,26 +1,34 @@
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import { HttpResponse } from '../models/httpResponse';
 import { TestCollector } from './testCollector';
 import { TestRunnerResult } from './testRunnerResult';
-import { TestRunnerStates } from './TestRunnerStates';
+
+const stackLineRegex = /\(eval.+<anonymous>:(?<line>\d+):(?<column>\d+)\)/;
 
 export class TestRunner {
 
     public constructor(public response: HttpResponse) { }
 
-    public execute(stream: string): TestRunnerResult {
-        let state = TestRunnerStates.Excepted;
-        let message = '';
+    public execute(testLines: string | undefined): TestRunnerResult {
+        if (!testLines) {
+            return TestRunnerResult.noTests();
+        }
+
         const rc = new TestCollector();
 
         try {
-            const testFunction = Function("response", "expect", "rc", stream);
-            testFunction(this.response, expect, rc);
-            state = TestRunnerStates.RanToCompletion;
+            const testFunction = Function("response", "expect", "assert", "rc", testLines);
+            testFunction(this.response, expect, assert, rc);
         } catch (error) {
-            message = error.message;
+            const match = error.stack.match(stackLineRegex);
+            const line = Number(match?.groups?.line) - 1;
+            const column = match?.groups?.column;
+            return TestRunnerResult.excepted(
+                error.name,
+                error.message,
+                `${line}:${column}`);
         }
 
-        return new TestRunnerResult(state , message, rc);
+        return TestRunnerResult.ranToCompletion(rc);
     }
 }

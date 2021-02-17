@@ -240,7 +240,7 @@ export class HttpResponseWebview extends BaseWebview {
         if (result.status === TestRunnerStates.Excepted) {
             return `<div class="test-results">
                 <h2 class="test-results-excepted">Test Results: Failed to Excecute</h2>
-                <p>${result.message}</p>
+                <p>${result.error?.name}: ${result.error?.message} (${result.error?.line})</p>
                 </div>`;
         }
 

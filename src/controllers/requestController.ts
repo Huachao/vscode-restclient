@@ -9,7 +9,6 @@ import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { Selector } from '../utils/selector';
 import { TestRunner } from '../utils/testRunner';
-import { TestRunnerResult } from '../utils/testRunnerResult';
 import { UserDataManager } from '../utils/userDataManager';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
@@ -99,11 +98,9 @@ export class RequestController {
                 RequestVariableCache.add(document, httpRequest.name, response);
             }
 
-            let testRunnerResult: TestRunnerResult = new TestRunnerResult();
-            if (httpRequest.tests) {
-                const testRunner = new TestRunner(response);
-                testRunnerResult = testRunner.execute(httpRequest.tests);
-            }
+            // Execute tests
+            const testRunner = new TestRunner(response);
+            const testRunnerResult = testRunner.execute(httpRequest.tests);
 
             try {
                 const activeColumn = window.activeTextEditor!.viewColumn;
