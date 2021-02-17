@@ -1,4 +1,4 @@
-import { expect, assert } from 'chai';
+import { assert, expect } from 'chai';
 import { HttpResponse } from '../models/httpResponse';
 import { TestCollector } from './testCollector';
 import { TestRunnerResult } from './testRunnerResult';
