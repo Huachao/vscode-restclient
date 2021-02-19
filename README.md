@@ -56,6 +56,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Support navigate to symbol definitions(request and file level custom variable) in open `http` file
     - CodeLens support to add an actionable link to send request
     - Fold/Unfold for request block
+* __Test support__ with `JavaScript` and the [Chai Assertion Library](https://www.chaijs.com/) support for [assert](https://www.chaijs.com/api/assert/) and [expect](https://www.chaijs.com/api/bdd/) assertion styles.
 
 ## Usage
 In editor, type an HTTP request as simple as below:
@@ -219,6 +220,116 @@ name=foo
 ```
 
 > When your mouse is over the document link, you can `Ctrl+Click`(`Cmd+Click` for macOS) to open the file in a new tab.
+
+### Tests
+Tests can be added after the __Request Body__ with the `@Tests` delimiter line followed by `JavaScript` tests.
+
+Example of the test delimiter.
+```
+@tests
+```
+
+Tests are defined using the `rc.test` function which takes the test `name` and a `test function`. A passing `test function` executes without error, a failing `test function` throws an error.
+
+Example test expecting the HTTP response status code is 200 OK.
+```JavaScript
+@tests
+
+rc.test('this is a test', () => {
+    // Your test funtion body goes here
+});
+
+###
+```
+
+`Test Function` receive a reference to the `request` and the `response` containing the corresponding HTTP request and HTTP response data.
+
+The `request` and `response` objects.
+```JavaScript
+request =
+{
+    // The request HTTP method
+    method, 
+    // The request URL
+    url,
+    // An array of the request headers
+    headers,
+    // The request body
+    body,
+    // The request name
+    name,
+};
+
+response =
+{
+    // The response status code
+    statusCode,
+    // The response status message
+    statusMessage,
+    // The response HTTP version
+    httpVersion,
+    // The response headers
+    headers,
+    // The response body
+    body,
+    // The byte size of the body 
+    bodySizeInBytes,
+    // The byte size of the headers
+    headersSizeInBytes,
+};
+```
+
+The [Chai Assertion Library](https://www.chaijs.com/) provides the [assert](https://www.chaijs.com/api/assert/) and [expect](https://www.chaijs.com/api/bdd/) assertion styles which allow for assertion and BDD style tests.
+
+Example test expecting the HTTP response status code is 200 OK.
+```JavaScript
+@tests
+
+rc.test('status code is 200 OK', () => {
+    expect(response.statusCode).to.equal(200);
+});
+
+###
+```
+
+Multiple tests and code can be defined between the `@tests` delimeter and the next request.
+```JavaScript
+@tests
+
+rc.test('status code is 200', () => {
+    expect(response.statusCode).to.equal(200);
+});
+
+rc.test('content is not null', () => {
+    expect(response.body).to.not.be.null;
+});
+
+var body = JSON.parse(response.body);
+
+rc.test('text equals hello world', () => {
+    expect(body.text).to.equal('hello world');
+});
+
+rc.test('type is cat', () => {
+    expect(body.type).to.equal('cat');
+});
+
+###
+```
+
+All tests will be executed and the results will be displayed after the response. `JavaScript` errors will also be reported.
+
+An example when all tests have passed.
+
+![Passing Tests Example](images/tests-passing.png)
+
+An example when some tests have failed.
+
+![Passing Tests Example](images/tests-failing.png)
+
+An example when a `JavaScript` error exists in the code.
+
+![Passing Tests Example](images/tests-excepted.png)
 
 ## Making GraphQL Request
 With [GraphQL](https://www.graphql.com/) support in REST Client extension, you can author and send `GraphQL` query using the request body. Besides that you can also author GraphQL variables in the request body. GraphQL variables part in request body is optional, you also need to add a **blank line** between GraphQL query and variables if you need it.
