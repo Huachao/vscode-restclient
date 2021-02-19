@@ -1,5 +1,8 @@
 import { TestResult } from "./testResult";
 
+/**
+ * Allows the user to add tests, runs the tests, and collects the results.
+ */
 export class TestCollector {
     public tests: TestResult[] = [];
 

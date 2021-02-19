@@ -5,6 +5,9 @@ import { TestRunnerResult } from './testRunnerResult';
 
 const stackLineRegex = /\(eval.+<anonymous>:(?<line>\d+):(?<column>\d+)\)/;
 
+/**
+ * Runs tests against an HttpResponse and returns a TestRunnerResult describing the outcome.
+ */
 export class TestRunner {
 
     public constructor(public response: HttpResponse) { }
@@ -17,8 +20,34 @@ export class TestRunner {
         const rc = new TestCollector();
 
         try {
-            const testFunction = Function("response", "expect", "assert", "rc", testLines);
-            testFunction(this.response, expect, assert, rc);
+            const testFunction = Function(
+                "request",
+                "response",
+                "expect",
+                "assert",
+                "rc",
+                testLines);
+
+            testFunction(
+                {
+                    method: this.response.request.method,
+                    url: this.response.request.url,
+                    headers: this.response.request.headers,
+                    body: this.response.request.body,
+                    name: this.response.request.name,
+                },
+                {
+                    statusCode: this.response.statusCode,
+                    statusMessage: this.response.statusMessage,
+                    httpVersion: this.response.httpVersion,
+                    headers: this.response.headers,
+                    body: this.response.body,
+                    bodySizeInBytes: this.response.bodySizeInBytes,
+                    headersSizeInBytes: this.response.headersSizeInBytes,
+                },
+                expect,
+                assert,
+                rc);
         } catch (error) {
             let errorLine = '';
             if (error.stack) {

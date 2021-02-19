@@ -238,13 +238,16 @@ export class HttpResponseWebview extends BaseWebview {
         }
 
         if (result.status === TestRunnerStates.Excepted) {
-            return `<div class="test-results">
-                <h2 class="test-results-excepted">Test Results: Failed to Excecute</h2>
+            return `<div class="test-results test-results-excepted">
+                <h1>Test Results: <span class="status">Failed to Excecute</span></h1>
                 <p>${result.error?.name}: ${result.error?.message} (${result.error?.line})</p>
                 </div>`;
         }
 
         const testResults = result.tests;
+        const passes = testResults.tests.filter(test => {
+            return test.passed;
+        });
         const failures = testResults.tests.filter(test => {
             return !test.passed;
         });
@@ -253,14 +256,23 @@ export class HttpResponseWebview extends BaseWebview {
         const statusClass = passed ? 'passed' : 'failed';
         const statusTitle = passed ? "Passed" : "Failed";
 
-        code += `<div class="test-results">\n`;
-        code += `<h2 class="test-results-${statusClass}">Test Results: ${statusTitle}</h2>\n`;
+        code += `<div class="test-results test-results-${statusClass}">\n`;
+        code += `<h1>Test Results: <span class="status">${statusTitle}</span></h1>\n`;
 
-        code += `<ul class="test-results passes">\n`;
+        code += `<ul>\n`;
+        if (passes.length > 0) {
+            code += `<li class="passed-summary">${passes.length} Passed</li>\n`;
+        }
+        if (failures.length > 0) {
+            code += `<li class="failed-summary">${failures.length} Failed</li>\n`;
+        }
+        code += `</ul>\n`;
+
+        code += `<br /><h2>Tests</h2>\n<ul class="tests">\n`;
         testResults.tests.forEach(test => {
-            const testClass = test.passed ? 'test-result-passed' : 'test-result-failed';
+            const testClass = test.passed ? 'test-passed' : 'test-failed';
 
-            code += `<li class="test-results ${testClass}">${test.name} - ${test.message}</li>\n`;
+            code += `<li class="test ${testClass}">${test.name} - ${test.message}</li>\n`;
         });
 
         code += `</ul>\n`;
@@ -342,19 +354,25 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             '.line.collapsed .icon {',
             `left: calc(${width}ch + 3px)`,
             '}',
-            `.test-results .test-results-passed {
+            `.test-results.test-results-passed .status {
                 color: green;
             }
-            .test-results .test-results-failed {
+            .test-results.test-results-failed .status {
                 color: red;
             }
-            .test-results .test-results-excepted {
+            .test-results.test-results-excepted .status, .test-results.test-results-excepted .message {
                 color: orange;
             }
-            .test-results .test-result-passed {
+            .test-results .passed-summary {
                 color: green;
             }
-            .test-results .test-result-failed {
+            .test-results .failed-summary {
+                color: red;
+            }
+            .tests .test.test-passed {
+                color: green;
+            }
+            .tests .test.test-failed {
                 color: red;
             }`,
             '</style>'].join('\n');

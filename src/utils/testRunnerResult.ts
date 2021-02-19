@@ -1,6 +1,10 @@
 import { TestCollector } from "./testCollector";
 import { TestRunnerError } from "./TestRunnerError";
 import { TestRunnerStates } from "./TestRunnerStates";
+
+/**
+ * The result of a test run.
+ */
 export class TestRunnerResult {
     public status: TestRunnerStates;
     public tests: TestCollector;
