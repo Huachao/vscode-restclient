@@ -231,7 +231,7 @@ Example of the test delimiter.
 
 Tests are defined using the `rc.test` function which takes the test `name` and a `test function`. A passing `test function` executes without error, a failing `test function` throws an error.
 
-Example test expecting the HTTP response status code is 200 OK.
+Example of an empty test.
 ```JavaScript
 @tests
 
