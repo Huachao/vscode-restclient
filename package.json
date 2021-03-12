@@ -666,7 +666,7 @@
     "tough-cookie": "^3.0.1",
     "tough-cookie-file-store-bugfix": "Huachao/tough-cookie-file-store-bugfix",
     "uuid": "^3.3.2",
-    "xmldom": "^0.1.27",
+    "xmldom": "^0.5.0",
     "xpath": "^0.0.27",
     "yargs-parser": "~11.1.1"
   }
