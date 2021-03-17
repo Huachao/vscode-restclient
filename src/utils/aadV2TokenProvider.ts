@@ -42,7 +42,7 @@ export class AadV2TokenProvider {
         }
     }
 
-    private async getDeviceCodeResponse(authParams: AuthParameters) : Promise<IDeviceCodeResponse> {
+    private async getDeviceCodeResponse(authParams: AuthParameters): Promise<IDeviceCodeResponse> {
         const request = this.createUserCodeRequest(authParams.clientId, authParams.tenantId, authParams.scopes);
         const response = await this._httpClient.send(request);
 
@@ -61,7 +61,7 @@ export class AadV2TokenProvider {
         return bodyObject as IDeviceCodeResponse;
     }
 
-    private async getToken(deviceCodeResponse: IDeviceCodeResponse, authParams: AuthParameters) : Promise<string> {
+    private async getToken(deviceCodeResponse: IDeviceCodeResponse, authParams: AuthParameters): Promise<string> {
         const request = this.createAcquireTokenRequest(authParams.clientId, authParams.tenantId, deviceCodeResponse.device_code);
         const response = await this._httpClient.send(request);
 
@@ -71,7 +71,13 @@ export class AadV2TokenProvider {
             this.processAuthErrorAndThrow(bodyObject);
         }
         const tokenResponse: ITokenResponse = bodyObject;
-        AadV2TokenCache.setToken(authParams.getCacheKey(), tokenResponse.scope.split(' '), tokenResponse.access_token);
+        const tokenScopes = tokenResponse.scope.split(' ');
+        for (const scope of authParams.scopes) {
+            if (!tokenScopes.includes(scope)) {
+                tokenScopes.push(scope);
+            }
+        }
+        AadV2TokenCache.setToken(authParams.getCacheKey(), tokenScopes, tokenResponse.access_token);
 
         return tokenResponse.access_token;
     }
@@ -86,7 +92,7 @@ export class AadV2TokenProvider {
             this.processAuthErrorAndThrow(bodyObject);
         }
         const tokenResponse: ITokenResponse = bodyObject;
-        const scopes : string[] = []; // Confidential Client tokens are limited to scopes defined in the app registration portal
+        const scopes: string[] = []; // Confidential Client tokens are limited to scopes defined in the app registration portal
         AadV2TokenCache.setToken(authParams.getCacheKey(), scopes, tokenResponse.access_token);
         return tokenResponse.access_token;
     }
@@ -96,26 +102,26 @@ export class AadV2TokenProvider {
         throw new Error("Auth call failed. " + errorResponse.error_description);
     }
 
-    private createUserCodeRequest(clientId: string, tenantId: string, scopes: string[]) : HttpRequest {
+    private createUserCodeRequest(clientId: string, tenantId: string, scopes: string[]): HttpRequest {
         return new HttpRequest(
             "POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/devicecode`,
             { "Content-Type": "application/x-www-form-urlencoded" },
-             `client_id=${clientId}&scope=${scopes.join("%20")}`);
+            `client_id=${clientId}&scope=${scopes.join("%20")}`);
     }
 
-    private createAcquireTokenRequest(clientId: string, tenantId: string, deviceCode: string) : HttpRequest {
+    private createAcquireTokenRequest(clientId: string, tenantId: string, deviceCode: string): HttpRequest {
         return new HttpRequest("POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-        { "Content-Type": "application/x-www-form-urlencoded" },
-         `grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=${clientId}&device_code=${deviceCode}`);
+            { "Content-Type": "application/x-www-form-urlencoded" },
+            `grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=${clientId}&device_code=${deviceCode}`);
     }
 
-    private createAcquireConfidentialClientTokenRequest(clientId: string, tenantId: string, clientSecret: string, appUri: string) : HttpRequest {
+    private createAcquireConfidentialClientTokenRequest(clientId: string, tenantId: string, clientSecret: string, appUri: string): HttpRequest {
         return new HttpRequest("POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
-        { "Content-Type": "application/x-www-form-urlencoded" },
-         `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&scope=${appUri}/.default`);
+            { "Content-Type": "application/x-www-form-urlencoded" },
+            `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&scope=${appUri}/.default`);
     }
 
-    private async promptForUserCode(deviceCodeResponse: IDeviceCodeResponse) : Promise<boolean>  {
+    private async promptForUserCode(deviceCodeResponse: IDeviceCodeResponse): Promise<boolean> {
 
         const messageBoxOptions = { modal: true };
         const signInPrompt = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${deviceCodeResponse.user_code}`;
@@ -159,7 +165,7 @@ class AuthParameters {
         this.appOnly = false;
     }
 
-    async readEnvironmentVariable(variableName: string) : Promise<string | undefined> {
+    async readEnvironmentVariable(variableName: string): Promise<string | undefined> {
         if (await EnvironmentVariableProvider.Instance.has(variableName)) {
             const { value, error, warning } = await EnvironmentVariableProvider.Instance.get(variableName);
             if (!warning && !error) {
@@ -218,7 +224,7 @@ class AuthParameters {
     }
 }
 
- class AadV2TokenCache {
+class AadV2TokenCache {
 
     private static tokens: Map<string, AadV2TokenCacheEntry> = new Map<string, AadV2TokenCacheEntry>();
 
@@ -229,28 +235,28 @@ class AuthParameters {
         this.tokens.set(cacheKey, entry);
     }
 
-    public static getToken(cacheKey: string) : AadV2TokenCacheEntry | undefined {
+    public static getToken(cacheKey: string): AadV2TokenCacheEntry | undefined {
         return this.tokens.get(cacheKey);
     }
 }
 
- class AadV2TokenCacheEntry {
-     public token: string;
-     public scopes: string[];
-     public supportScopes(scopes: string[]) : boolean {
+class AadV2TokenCacheEntry {
+    public token: string;
+    public scopes: string[];
+    public supportScopes(scopes: string[]): boolean {
         return scopes.every((scope) => this.scopes.includes(scope));
-     }
- }
+    }
+}
 
- interface IAuthError {
-     error: string;
-     error_description: string;
-     error_uri: string;
-     error_codes: number[];
-     timestamp: string;
-     trace_id: string;
-     correlation_id: string;
- }
+interface IAuthError {
+    error: string;
+    error_description: string;
+    error_uri: string;
+    error_codes: number[];
+    timestamp: string;
+    trace_id: string;
+    correlation_id: string;
+}
 
 interface IDeviceCodeResponse {
     user_code: string;
