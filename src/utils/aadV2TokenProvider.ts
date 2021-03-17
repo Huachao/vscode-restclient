@@ -171,8 +171,8 @@ class AuthParameters {
         return undefined;
     }
 
-    getCacheKey() : string {
-        return this.tenantId + "|" + this.clientId + "|" + this.appOnly as string;
+    getCacheKey(): string {
+        return this.tenantId + "|" + this.clientId + "|" + this.appOnly + "|" + this.scopes.join(',') as string;
     }
 
     static async parseName(name: string): Promise<AuthParameters> {
