@@ -142,7 +142,13 @@ export class HttpElementFactory {
             null,
             Constants.AzureActiveDirectoryV2TokenDescription,
             new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryV2TokenVariableName.slice(1)}}}}`)));
-
+        originalElements.push(new HttpElement(
+            Constants.FakerVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.FakerDescription,
+            new SnippetString(`{{$\${name:${Constants.FakerVariableName.slice(1)}} {1:expression}}}`)));
+    
         // add environment custom variables
         const environmentVariables = await EnvironmentVariableProvider.Instance.getAll();
         for (const { name, value } of environmentVariables) {

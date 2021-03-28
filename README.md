@@ -38,6 +38,9 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
       + `{{$processEnv [%]envVarName}}`
       + `{{$dotenv [%]variableName}}`
       + `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
+    - Generate realistic looking fake data using the faker.js library
+      + `{{$faker name.lastName}}` generates a random lastname 
+      + For full Faker API checkout https://github.com/Marak/faker.js/blob/master/Readme.md
     - Easily create/update/delete environments and environment variables in setting file
     - File variables can reference both custom and system variables
     - Support environment switch

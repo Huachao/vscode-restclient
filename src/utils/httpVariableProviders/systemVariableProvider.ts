@@ -14,6 +14,7 @@ import { AadV2TokenProvider } from '../aadV2TokenProvider';
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
+import { Faker } from 'faker'
 
 const uuidv4 = require('uuid/v4');
 
@@ -25,6 +26,7 @@ type ResolveSystemVariableFunc = (name: string, document: TextDocument, context:
 export class SystemVariableProvider implements HttpVariableProvider {
 
     private readonly clipboard: Clipboard;
+    private readonly faker: Faker;
     private readonly resolveFuncs: Map<string, ResolveSystemVariableFunc> = new Map<string, ResolveSystemVariableFunc>();
     private readonly timestampRegex: RegExp = new RegExp(`\\${Constants.TimeStampVariableName}(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
     private readonly datetimeRegex: RegExp = new RegExp(`\\${Constants.DateTimeVariableName}\\s(rfc1123|iso8601|\'.+\'|\".+\")(?:\\s(\\-?\\d+)\\s(y|Q|M|w|d|h|m|s|ms))?`);
@@ -38,6 +40,8 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private readonly aadRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+aud:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
 
+    private readonly fakerRegex: RegExp = new RegExp(`\\${Constants.FakerVariableName}\\s+(\\w+\\..+)`);
+
     private readonly innerSettingsEnvironmentVariableProvider: EnvironmentVariableProvider =  EnvironmentVariableProvider.Instance;
     private static _instance: SystemVariableProvider;
 
@@ -50,6 +54,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     }
 
     private constructor() {
+        this.faker = require('faker');
         this.clipboard = env.clipboard;
         this.registerTimestampVariable();
         this.registerDateTimeVariable();
@@ -60,6 +65,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerDotenvVariable();
         this.registerAadTokenVariable();
         this.registerAadV2TokenVariable();
+        this.registerFakerVariable();
     }
 
     public readonly type: VariableType = VariableType.System;
@@ -292,6 +298,19 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 return {value: token};
             });
     }
+
+    private registerFakerVariable() {
+        this.resolveFuncs.set(Constants.FakerVariableName, async name => {
+            const groups = this.fakerRegex.exec(name);
+            if (groups !== null && groups.length === 2) {
+                const [, expression] = groups;
+                return { value: (this.faker.fake("{{" + expression + "}}")) };
+            }
+
+            return { warning: ResolveWarningMessage.IncorrectFakerVariableFormat };
+        });
+    }
+
     private async resolveSettingsEnvironmentVariable(name: string) {
         if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
             const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);
