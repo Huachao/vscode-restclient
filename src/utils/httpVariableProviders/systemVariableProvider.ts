@@ -2,6 +2,7 @@ import * as adal from 'adal-node';
 import dayjs, { Dayjs, OpUnitType } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import * as dotenv from 'dotenv';
+import faker from 'faker';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
@@ -14,7 +15,6 @@ import { AadV2TokenProvider } from '../aadV2TokenProvider';
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
-import faker from 'faker';
 
 const uuidv4 = require('uuid/v4');
 
