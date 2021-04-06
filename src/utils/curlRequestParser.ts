@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
-import { RequestHeaders } from '../models/base';
+import * as path from 'path';
+import { HttpsOptions, RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
@@ -77,7 +78,42 @@ export class CurlRequestParser implements RequestParser {
             method = body ? "POST" : "GET";
         }
 
-        return new HttpRequest(method, url, headers, body, body, name);
+        // parse https options
+        let https: undefined | HttpsOptions;
+        if (typeof parsedArguments.E === "string" || typeof parsedArguments.cert === "string") {
+            const certArg = parsedArguments.E || parsedArguments.cert;
+            const [cert, passphrase] = certArg.split(":", 2);
+            const certExt = path.extname(cert).toLowerCase();
+            if (certExt === ".p12" || certExt === ".pfx") {
+                https = { pfx: cert, passphrase };
+            } else {
+                https = { cert, passphrase };
+            }
+        }
+
+        if (typeof parsedArguments.key === "string") {
+            const key = parsedArguments.key;
+            if (https) {
+                https.key = key;
+            } else {
+                https = { key };
+            }
+        }
+
+        if (https && typeof parsedArguments.pass === "string") {
+            https.passphrase = parsedArguments.pass;
+        }
+
+        if (typeof parsedArguments.cacert === "string") {
+            const ca = parsedArguments.cacert;
+            if (https) {
+                https.ca = ca;
+            } else {
+                https = { ca };
+            }
+        }
+
+        return new HttpRequest(method, url, headers, body, body, name, https);
     }
 
     private static mergeIntoSingleLine(text: string): string {

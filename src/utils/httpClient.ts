@@ -14,7 +14,7 @@ import { MimeUtility } from './mimeUtility';
 import { getHeader, hasHeader, removeHeader } from './misc';
 import { convertBufferToStream, convertStreamToBuffer } from './streamUtility';
 import { UserDataManager } from './userDataManager';
-import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
+import { getCurrentTextDocument, getWorkspaceRootPath } from './workspaceUtility';
 
 import got = require('got');
 
@@ -24,9 +24,10 @@ const cookieStore = require('tough-cookie-file-store-bugfix');
 type SetCookieCallback = (err: Error | null, cookie: Cookie) => void;
 type SetCookieCallbackWithoutOptions = (err: Error, cookie: Cookie) => void;
 type GetCookieStringCallback = (err: Error | null, cookies: string) => void;
-type Certificate = {
+type ResolvedHttpsOptions = {
     cert?: Buffer;
     key?: Buffer;
+    ca?: Buffer;
     pfx?: Buffer;
     passphrase?: string;
 };
@@ -172,9 +173,20 @@ export class HttpClient {
             }
         }
 
-        // set certificate
-        const certificate = this.getRequestCertificate(httpRequest.url);
-        Object.assign(options, certificate);
+        // set https options
+        if (httpRequest.https) {
+            // use https options from request
+            const cert = this.resolveCertificate(httpRequest.https.cert);
+            const key = this.resolveCertificate(httpRequest.https.key);
+            const ca = this.resolveCertificate(httpRequest.https.ca);
+            const pfx = this.resolveCertificate(httpRequest.https.pfx);
+            const passphrase = httpRequest.https.passphrase;
+            Object.assign(options, { cert, key, ca, pfx, passphrase });
+        } else {
+            // use https options from settings
+            const https = this.getRequestHttpsOptions(httpRequest.url);
+            Object.assign(options, https);
+        }
 
         // set proxy
         if (this._settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, this._settings.excludeHostsForProxy)) {
@@ -244,17 +256,18 @@ export class HttpClient {
         });
     }
 
-    private getRequestCertificate(requestUrl: string): Certificate | null {
+    private getRequestHttpsOptions(requestUrl: string): ResolvedHttpsOptions | null {
         const host = url.parse(requestUrl).host;
         if (!host || !(host in this._settings.hostCertificates)) {
             return null;
         }
 
-        const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = this._settings.hostCertificates[host];
+        const { cert: certPath, key: keyPath, ca: caPath, pfx: pfxPath, passphrase } = this._settings.hostCertificates[host];
         const cert = this.resolveCertificate(certPath);
         const key = this.resolveCertificate(keyPath);
+        const ca = this.resolveCertificate(caPath);
         const pfx = this.resolveCertificate(pfxPath);
-        return { cert, key, pfx, passphrase };
+        return { cert, key, ca, pfx, passphrase };
     }
 
     private static ignoreProxy(requestUrl: string, excludeHostsForProxy: string[]): Boolean {
@@ -307,13 +320,10 @@ export class HttpClient {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
             if (fs.existsSync(absolutePath)) {
                 return fs.readFileSync(absolutePath);
-            } else {
-                window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
-                return undefined;
             }
         }
 
-        const currentFilePath = getCurrentHttpFileName();
+        const currentFilePath = getCurrentTextDocument()?.fileName;
         if (!currentFilePath) {
             return undefined;
         }
