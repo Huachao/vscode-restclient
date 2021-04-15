@@ -1,5 +1,6 @@
+import { HttpsOptions } from './base';
 import { HttpRequest } from './httpRequest';
 
 export interface RequestParser {
-    parseHttpRequest(name?: string): Promise<HttpRequest>;
+    parseHttpRequest(name?: string, https?: HttpsOptions): Promise<HttpRequest>;
 }

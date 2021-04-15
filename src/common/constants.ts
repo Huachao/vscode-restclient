@@ -70,4 +70,6 @@ export const RequestVariableDefinitionRegex: RegExp = RequestVariableDefinitionW
 
 export const NoteCommentRegex = /^\s*(?:#{1,}|\/{2,})\s*@note\s*$/m;
 
+export const HttpsCommentRegex = /^\s*(?:#{1,}|\/{2,})\s*@https\.(cert|key|pfx|passphrase|ca)\s+([^\s]+)\s*$/gm;
+
 export const LineSplitterRegex: RegExp = /\r?\n/g;

@@ -1,6 +1,7 @@
 import { EOL } from 'os';
 import { Range, TextEditor } from 'vscode';
 import * as Constants from '../common/constants';
+import { HttpsOptions } from '../models/base';
 import { VariableProcessor } from './variableProcessor';
 
 export interface RequestRangeOptions {
@@ -13,6 +14,7 @@ export interface RequestRangeOptions {
 export interface SelectedRequest {
     text: string;
     name?: string;
+    https?: HttpsOptions;
     warnBeforeSend: boolean;
 }
 
@@ -42,6 +44,9 @@ export class Selector {
         // parse #@note comment
         const warnBeforeSend = this.hasNoteComment(selectedText);
 
+        // parse #@https.* options
+        const https = this.getRequestHttpsOptions(selectedText);
+
         // parse actual request lines
         const rawLines = selectedText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
         const requestRange = this.getRequestRanges(rawLines)[0];
@@ -57,6 +62,7 @@ export class Selector {
         return {
             text: selectedText,
             name: requestVariable,
+            https,
             warnBeforeSend
         };
     }
@@ -132,6 +138,23 @@ export class Selector {
 
     public static hasNoteComment(text: string): boolean {
         return Constants.NoteCommentRegex.test(text);
+    }
+
+    public static getRequestHttpsOptions(text: string): HttpsOptions | undefined {
+        // TODO use matchAll with es2020
+
+        // copy the regex, because we need to iterate over the results
+        const regexp = new RegExp(Constants.HttpsCommentRegex.source, Constants.HttpsCommentRegex.flags);
+        let https: HttpsOptions | undefined;
+        let match: RegExpExecArray | null;
+        while ((match = regexp.exec(text)) !== null) {
+            if (!https) {
+                https = {};
+            }
+            https[match[1]] = match[2];
+        }
+
+        return https;
     }
 
     private static getDelimitedText(fullText: string, currentLine: number): string | null {

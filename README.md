@@ -688,6 +688,10 @@ REST Client Extension also supports request-level settings for each independent 
 Name | Syntax    | Description
 -----|-----------|--------------------------------------------------------------
 note | `# @note` | Use for request confirmation, especially for critical request
+https.cert | `# @https.cert` | Use for per request [SSL Client Certificate](#ssl-client-certificates)
+https.key | `# @https.key` | Use for per request [SSL Client Certificate](#ssl-client-certificates)
+https.pfx | `# @https.pfx` | Use for per request [SSL Client Certificate](#ssl-client-certificates)
+https.passphrase | `# @https.passphrase` | Use for per request [SSL Client Certificate](#ssl-client-certificates)
 
 > All the above leading `#` can be replaced with `//`
 

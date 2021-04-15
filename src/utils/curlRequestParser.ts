@@ -16,7 +16,7 @@ export class CurlRequestParser implements RequestParser {
     public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
     }
 
-    public async parseHttpRequest(name?: string): Promise<HttpRequest> {
+    public async parseHttpRequest(name?: string, https?: HttpsOptions): Promise<HttpRequest> {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(this.requestRawText.trim()));
         requestText = requestText
@@ -78,16 +78,16 @@ export class CurlRequestParser implements RequestParser {
             method = body ? "POST" : "GET";
         }
 
-        // parse https options
-        let https: undefined | HttpsOptions;
+        // parse https arguments
+        let httpsArgs: undefined | HttpsOptions;
         if (typeof parsedArguments.E === "string" || typeof parsedArguments.cert === "string") {
             const certArg = parsedArguments.E || parsedArguments.cert;
             const [cert, passphrase] = certArg.split(":", 2);
             const certExt = path.extname(cert).toLowerCase();
             if (certExt === ".p12" || certExt === ".pfx") {
-                https = { pfx: cert, passphrase };
+                httpsArgs = { pfx: cert, passphrase };
             } else {
-                https = { cert, passphrase };
+                httpsArgs = { cert, passphrase };
             }
         }
 
@@ -96,21 +96,26 @@ export class CurlRequestParser implements RequestParser {
             if (https) {
                 https.key = key;
             } else {
-                https = { key };
+                httpsArgs = { key };
             }
         }
 
-        if (https && typeof parsedArguments.pass === "string") {
-            https.passphrase = parsedArguments.pass;
+        if (httpsArgs && typeof parsedArguments.pass === "string") {
+            httpsArgs.passphrase = parsedArguments.pass;
         }
 
         if (typeof parsedArguments.cacert === "string") {
             const ca = parsedArguments.cacert;
-            if (https) {
-                https.ca = ca;
+            if (httpsArgs) {
+                httpsArgs.ca = ca;
             } else {
-                https = { ca };
+                httpsArgs = { ca };
             }
+        }
+
+        // curl command line arguments override the per request settings
+        if (https && httpsArgs) {
+            https = Object.assign({}, https, httpsArgs);
         }
 
         return new HttpRequest(method, url, headers, body, body, name, https);

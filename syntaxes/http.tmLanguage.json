@@ -191,6 +191,36 @@
             }
           },
           "name": "comment.line.double-slash.http"
+        },
+        {
+          "match": "^\\s*\\#{1,}\\s+((@)https\\.(?:cert|key|pfx|passphrase|ca))\\s+([^\\s]+)\\s*$",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name"
+            },
+            "2": {
+              "name": "punctuation.definition.block.tag.metadata"
+            },
+            "3": {
+              "name": "entity.name.type.http"
+            }
+          },
+          "name": "comment.line.sharp.http"
+        },
+        {
+          "match": "^\\s*\\/{2,}\\s+((@)https\\.(?:cert|key|pfx|passphrase|ca))\\s+([^\\s]+)\\s*$",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name"
+            },
+            "2": {
+              "name": "punctuation.definition.block.tag.metadata"
+            },
+            "3": {
+              "name": "entity.name.type.http"
+            }
+          },
+          "name": "comment.line.double-slash.http"
         }
       ]
     },
