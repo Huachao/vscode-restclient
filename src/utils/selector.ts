@@ -46,6 +46,14 @@ export class Selector {
 
         // parse #@https.* options
         const https = this.getRequestHttpsOptions(selectedText);
+        if (https) {
+            // resolve the variables in the extracted options
+            for (const prop in https) {
+                if (https[prop].indexOf("{{") !== -1) {
+                    https[prop] = await VariableProcessor.processRawRequest(https[prop]);
+                }
+            }
+        }
 
         // parse actual request lines
         const rawLines = selectedText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
@@ -138,6 +146,10 @@ export class Selector {
 
     public static hasNoteComment(text: string): boolean {
         return Constants.NoteCommentRegex.test(text);
+    }
+
+    public static isRequestOption(line: string): boolean {
+        return Constants.RequestOptionRegex.test(line);
     }
 
     public static getRequestHttpsOptions(text: string): HttpsOptions | undefined {

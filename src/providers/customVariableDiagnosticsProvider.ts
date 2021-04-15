@@ -141,7 +141,7 @@ export class CustomVariableDiagnosticsProvider {
         const lines = document.getText().split(Constants.LineSplitterRegex);
         const pattern = /\{\{(\w[^\s\.{}]*)(\.[^\.]*?)*\}\}/g;
         lines.forEach((line, lineNumber) => {
-            if (Selector.isCommentLine(line)) {
+            if (Selector.isCommentLine(line) && !Selector.isRequestOption(line)) {
                 return;
             }
 

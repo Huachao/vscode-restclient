@@ -63,6 +63,8 @@ export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
 export const FileVariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.*?)\s*$/;
 
+export const RequestOptionRegex: RegExp = /^\s*(?:#{1,}|\/{2,})\s*@(?:note|name|https\.(?:cert|key|pfx|passphrase|ca))\s*/;
+
 export const RequestVariableDefinitionWithNameRegexFactory = (name: string, flags?: string): RegExp =>
     new RegExp(`^\\s*(?:#{1,}|\\/{2,})\\s+@name\\s+(${name})\\s*$`, flags);
 
