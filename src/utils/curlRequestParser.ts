@@ -113,9 +113,13 @@ export class CurlRequestParser implements RequestParser {
             }
         }
 
-        // curl command line arguments override the per request settings
-        if (https && httpsArgs) {
-            https = Object.assign({}, https, httpsArgs);
+        if (httpsArgs) {
+            // curl command line arguments override the per request settings
+            if (https) {
+                https = Object.assign({}, https, httpsArgs);
+            } else {
+                https = httpsArgs;
+            }
         }
 
         return new HttpRequest(method, url, headers, body, body, name, https);
