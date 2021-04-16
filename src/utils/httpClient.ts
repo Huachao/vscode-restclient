@@ -101,7 +101,8 @@ export class HttpClient {
                     Object.keys(httpRequest.headers)),
                 Buffer.isBuffer(requestBody) ? convertBufferToStream(requestBody) : requestBody,
                 httpRequest.rawBody,
-                httpRequest.name
+                httpRequest.name,
+                httpRequest.https
             ));
     }
 
