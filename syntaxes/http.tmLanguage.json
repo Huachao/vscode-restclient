@@ -193,7 +193,7 @@
           "name": "comment.line.double-slash.http"
         },
         {
-          "match": "^\\s*\\#{1,}\\s+((@)https\\.(?:cert|key|pfx|passphrase|ca))\\s+([^\\s]+)\\s*$",
+          "match": "^\\s*\\#{1,}\\s+((@)https\\.(?:cert|key|pfx|passphrase|ca))\\s+(.+)\\s*$",
           "captures": {
             "1": {
               "name": "entity.other.attribute-name"
@@ -208,7 +208,7 @@
           "name": "comment.line.sharp.http"
         },
         {
-          "match": "^\\s*\\/{2,}\\s+((@)https\\.(?:cert|key|pfx|passphrase|ca))\\s+([^\\s]+)\\s*$",
+          "match": "^\\s*\\/{2,}\\s+((@)https\\.(?:cert|key|pfx|passphrase|ca))\\s+(.+)\\s*$",
           "captures": {
             "1": {
               "name": "entity.other.attribute-name"
