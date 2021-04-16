@@ -176,12 +176,20 @@ export class HttpClient {
         // set https options
         if (httpRequest.https) {
             // use https options from request
-            const cert = this.resolveCertificate(httpRequest.https.cert);
-            const key = this.resolveCertificate(httpRequest.https.key);
-            const ca = this.resolveCertificate(httpRequest.https.ca);
-            const pfx = this.resolveCertificate(httpRequest.https.pfx);
-            const passphrase = httpRequest.https.passphrase;
-            Object.assign(options, { cert, key, ca, pfx, passphrase });
+            // resolve in place, so the request in the history knows the absolute path
+            const https: ResolvedHttpsOptions = {};
+            for (const key in httpRequest.https) {
+                if (key === "passphrase") {
+                    https[key] = httpRequest.https[key];
+                    continue;
+                }
+                const resolvedPath = this.resolveCertificatePath(httpRequest.https[key]);
+                if (resolvedPath) {
+                    httpRequest.https[key] = resolvedPath;
+                    https[key] = fs.readFileSync(resolvedPath);
+                }
+            }
+            Object.assign(options, https);
         } else {
             // use https options from settings
             const https = this.getRequestHttpsOptions(httpRequest.url);
@@ -263,11 +271,22 @@ export class HttpClient {
         }
 
         const { cert: certPath, key: keyPath, ca: caPath, pfx: pfxPath, passphrase } = this._settings.hostCertificates[host];
-        const cert = this.resolveCertificate(certPath);
-        const key = this.resolveCertificate(keyPath);
-        const ca = this.resolveCertificate(caPath);
-        const pfx = this.resolveCertificate(pfxPath);
-        return { cert, key, ca, pfx, passphrase };
+        const https: ResolvedHttpsOptions = { passphrase };
+
+        let resolvedPath: string | undefined;
+        if (resolvedPath = this.resolveCertificatePath(certPath)) {
+            https.cert = fs.readFileSync(resolvedPath);
+        }
+        if (resolvedPath = this.resolveCertificatePath(keyPath)) {
+            https.key = fs.readFileSync(resolvedPath);
+        }
+        if (resolvedPath = this.resolveCertificatePath(caPath)) {
+            https.ca = fs.readFileSync(resolvedPath);
+        }
+        if (resolvedPath = this.resolveCertificatePath(pfxPath)) {
+            https.pfx = fs.readFileSync(resolvedPath);
+        }
+        return https;
     }
 
     private static ignoreProxy(requestUrl: string, excludeHostsForProxy: string[]): Boolean {
@@ -299,7 +318,7 @@ export class HttpClient {
         return false;
     }
 
-    private resolveCertificate(absoluteOrRelativePath: string | undefined): Buffer | undefined {
+    private resolveCertificatePath(absoluteOrRelativePath: string | undefined): string | undefined {
         if (absoluteOrRelativePath === undefined) {
             return undefined;
         }
@@ -309,7 +328,7 @@ export class HttpClient {
                 window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
                 return undefined;
             } else {
-                return fs.readFileSync(absoluteOrRelativePath);
+                return absoluteOrRelativePath;
             }
         }
 
@@ -319,7 +338,7 @@ export class HttpClient {
         if (rootPath) {
             absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
             if (fs.existsSync(absolutePath)) {
-                return fs.readFileSync(absolutePath);
+                return absolutePath;
             }
         }
 
@@ -330,7 +349,7 @@ export class HttpClient {
 
         absolutePath = path.join(path.dirname(currentFilePath), absoluteOrRelativePath);
         if (fs.existsSync(absolutePath)) {
-            return fs.readFileSync(absolutePath);
+            return absolutePath;
         } else {
             window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
             return undefined;
