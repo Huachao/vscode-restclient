@@ -93,8 +93,8 @@ export class CurlRequestParser implements RequestParser {
 
         if (typeof parsedArguments.key === "string") {
             const key = parsedArguments.key;
-            if (https) {
-                https.key = key;
+            if (httpsArgs) {
+                httpsArgs.key = key;
             } else {
                 httpsArgs = { key };
             }
