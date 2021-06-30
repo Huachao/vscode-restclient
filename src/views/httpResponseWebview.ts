@@ -354,18 +354,18 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
 
     private addUrlLinks(innerHtml: string) {
         return innerHtml.replace(this.urlRegex, (match: string): string => {
-            const encodedEndCharacters = ["&lt;","&gt;","&quot;","&apos;"];
+            const encodedEndCharacters = ["&lt;", "&gt;", "&quot;", "&apos;"];
             let urlEndPosition = match.length;
 
             encodedEndCharacters.forEach((char) => {
-                var index = match.indexOf(char);
-                if(index > -1 && index < urlEndPosition){
+                const index = match.indexOf(char);
+                if (index > -1 && index < urlEndPosition) {
                     urlEndPosition = index;
                 }
             });
 
-            var url = match.substr(0, urlEndPosition);
-            var extraCharacters = match.substr(urlEndPosition);
+            const url = match.substr(0, urlEndPosition);
+            const extraCharacters = match.substr(urlEndPosition);
 
             return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>' + extraCharacters;
         });
