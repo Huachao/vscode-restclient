@@ -18,6 +18,7 @@ enum ParseState {
     URL,
     Header,
     Body,
+    Test,
 }
 
 export class HttpRequestParser implements RequestParser {
@@ -25,6 +26,7 @@ export class HttpRequestParser implements RequestParser {
     private readonly queryStringLinePrefix = /^\s*[&\?]/;
     private readonly inputFileSyntax = /^<(?:(?<processVariables>@)(?<encoding>\w+)?)?\s+(?<filepath>.+?)\s*$/;
     private readonly defaultFileEncoding = 'utf8';
+    private readonly testLinePrefix = /^@tests/;
 
     public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
     }
@@ -37,6 +39,7 @@ export class HttpRequestParser implements RequestParser {
         const headersLines: string[] = [];
         const bodyLines: string[] = [];
         const variableLines: string[] = [];
+        const testLines: string[] = [];
 
         let state = ParseState.URL;
         let currentLine: string | undefined;
@@ -67,8 +70,17 @@ export class HttpRequestParser implements RequestParser {
                     }
                     break;
                 case ParseState.Body:
-                    bodyLines.push(currentLine);
+                    if (this.testLinePrefix.test(currentLine?.trim())) {
+                        state = ParseState.Test;
+                    } else if (this.testLinePrefix.test(nextLine?.trim())) {
+                        lines.shift();
+                        state = ParseState.Test;
+                    } else {
+                        bodyLines.push(currentLine);
+                    }
                     break;
+                case ParseState.Test:
+                    testLines.push(currentLine);
             }
         }
 
@@ -122,7 +134,7 @@ export class HttpRequestParser implements RequestParser {
             requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
-        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), name);
+        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), name, testLines.join(EOL));
     }
 
     private async createGraphQlBody(variableLines: string[], contentTypeHeader: string | undefined, body: string | Stream | undefined) {

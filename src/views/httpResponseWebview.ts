@@ -10,6 +10,8 @@ import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
 import { base64, isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
+import { TestRunnerResult } from '../utils/testRunnerResult';
+import { TestRunnerStates } from '../utils/TestRunnerStates';
 import { UserDataManager } from '../utils/userDataManager';
 import { BaseWebview } from './baseWebview';
 
@@ -54,7 +56,7 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', this.saveBody, this));
     }
 
-    public async render(response: HttpResponse, column: ViewColumn) {
+    public async render(response: HttpResponse, testRunnerResult: TestRunnerResult, column: ViewColumn) {
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
@@ -97,7 +99,7 @@ export class HttpResponseWebview extends BaseWebview {
             panel.title = this.getTitle(response);
         }
 
-        panel.webview.html = this.getHtmlForWebview(panel, response);
+        panel.webview.html = this.getHtmlForWebview(panel, response, testRunnerResult);
 
         this.setPreviewActiveContext(this.settings.previewResponsePanelTakeFocus);
 
@@ -183,7 +185,7 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
-    private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse): string {
+    private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse, testRunnerResult: TestRunnerResult): string {
         let innerHtml: string;
         let width = 2;
         let contentType = response.contentType;
@@ -196,11 +198,13 @@ export class HttpResponseWebview extends BaseWebview {
             const code = this.highlightResponse(response);
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
             innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
+            innerHtml += this.renderTestRunnerResult(testRunnerResult);
         }
 
         // Content Security Policy
         const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
         const csp = this.getCsp(nonce);
+
         return `
     <head>
         <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.baseFilePath)}">
@@ -224,6 +228,57 @@ export class HttpResponseWebview extends BaseWebview {
         </div>
         <script type="text/javascript" src="${panel.webview.asWebviewUri(this.scriptFilePath)}" nonce="${nonce}" charset="UTF-8"></script>
     </body>`;
+    }
+
+    private renderTestRunnerResult(result: TestRunnerResult): string {
+        let code = '';
+
+        if (!result || result.status === TestRunnerStates.NoTests) {
+            return code;
+        }
+
+        if (result.status === TestRunnerStates.Excepted) {
+            return `<div class="test-results test-results-excepted">
+                <h1>Test Results: <span class="status">Failed to Excecute</span></h1>
+                <p>${result.error?.name}: ${result.error?.message} (${result.error?.line})</p>
+                </div>`;
+        }
+
+        const testResults = result.tests;
+        const passes = testResults.tests.filter(test => {
+            return test.passed;
+        });
+        const failures = testResults.tests.filter(test => {
+            return !test.passed;
+        });
+        const hasFailures = failures.length > 0;
+        const passed = !hasFailures;
+        const statusClass = passed ? 'passed' : 'failed';
+        const statusTitle = passed ? "Passed" : "Failed";
+
+        code += `<div class="test-results test-results-${statusClass}">\n`;
+        code += `<h1>Test Results: <span class="status">${statusTitle}</span></h1>\n`;
+
+        code += `<ul>\n`;
+        if (passes.length > 0) {
+            code += `<li class="passed-summary">${passes.length} Passed</li>\n`;
+        }
+        if (failures.length > 0) {
+            code += `<li class="failed-summary">${failures.length} Failed</li>\n`;
+        }
+        code += `</ul>\n`;
+
+        code += `<br /><h2>Tests</h2>\n<ul class="tests">\n`;
+        testResults.tests.forEach(test => {
+            const testClass = test.passed ? 'test-passed' : 'test-failed';
+
+            code += `<li class="test ${testClass}">${test.name} - ${test.message}</li>\n`;
+        });
+
+        code += `</ul>\n`;
+        code += '</div>\n';
+
+        return code;
     }
 
     private highlightResponse(response: HttpResponse): string {
@@ -299,6 +354,27 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             '.line.collapsed .icon {',
             `left: calc(${width}ch + 3px)`,
             '}',
+            `.test-results.test-results-passed .status {
+                color: green;
+            }
+            .test-results.test-results-failed .status {
+                color: red;
+            }
+            .test-results.test-results-excepted .status, .test-results.test-results-excepted .message {
+                color: orange;
+            }
+            .test-results .passed-summary {
+                color: green;
+            }
+            .test-results .failed-summary {
+                color: red;
+            }
+            .tests .test.test-passed {
+                color: green;
+            }
+            .tests .test.test-failed {
+                color: red;
+            }`,
             '</style>'].join('\n');
     }
 
