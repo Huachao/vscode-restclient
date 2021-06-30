@@ -353,7 +353,22 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
     }
 
     private addUrlLinks(innerHtml: string) {
-        return innerHtml.replace(this.urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+        return innerHtml.replace(this.urlRegex, (match: string): string => {
+            const encodedEndCharacters = ["&lt;","&gt;","&quot;","&apos;"];
+            let urlEndPosition = match.length;
+
+            encodedEndCharacters.forEach((char) => {
+                var index = match.indexOf(char);
+                if(index > -1 && index < urlEndPosition){
+                    urlEndPosition = index;
+                }
+            });
+
+            var url = match.substr(0, urlEndPosition);
+            var extraCharacters = match.substr(urlEndPosition);
+
+            return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>' + extraCharacters;
+        });
     }
 
     private getFoldingRange(lines: string[]): Map<number, FoldingRange> {
