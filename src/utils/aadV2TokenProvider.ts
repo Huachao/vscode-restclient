@@ -143,7 +143,7 @@ export class AadV2TokenProvider {
 */
 class AuthParameters {
 
-    private readonly aadV2TokenRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryV2TokenVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(appOnly))?(\\s+scopes:([\\w,./:]+))?(\\s+tenantId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+clientId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
+    private readonly aadV2TokenRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryV2TokenVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(appOnly))?(\\s+scopes:(\\S+))?(\\s+tenantId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+clientId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
     public tenantId: string;
     public clientId: string;
     public scopes: string[];
