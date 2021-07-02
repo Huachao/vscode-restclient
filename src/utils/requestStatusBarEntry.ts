@@ -29,8 +29,10 @@ export class RequestStatusEntry {
     private readonly sizeEntry: StatusBarItem;
 
     public constructor() {
-        this.durationEntry = window.createStatusBarItem(StatusBarAlignment.Left);
-        this.sizeEntry = window.createStatusBarItem(StatusBarAlignment.Left);
+        this.durationEntry = window.createStatusBarItem('duration', StatusBarAlignment.Left);
+        this.durationEntry.name = 'Response Timing';
+        this.sizeEntry = window.createStatusBarItem('size', StatusBarAlignment.Left);
+        this.sizeEntry.name = 'Response Size';
     }
 
     public dispose() {
