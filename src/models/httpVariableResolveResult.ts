@@ -32,6 +32,7 @@ export const enum ResolveWarningMessage {
     IncorrectHeaderName = 'No value is resolved for given header name',
     IncorrectJSONPath = 'No value is resolved for given JSONPath',
     IncorrectRandomIntegerVariableFormat = 'RandomInt system variable should follow format "{{$randomInt minInteger maxInteger}}"',
+    IncorrectFakerVariableFormat = 'Faker expression should follow format "$faker <subject>.<method>}}"',
     IncorrectProcessEnvVariableFormat = 'ProcessEnv system variable should follow format "{{$processEnv envVarName}}"',
     IncorrectTimestampVariableFormat = 'Timestamp system variable should follow format "{{$timestamp [integer y|M|w|d|h|m|s|ms]}}"',
     IncorrectDotenvVariableFormat = 'Dotenv variable should follow format "{{$dotenv variableName}}"',
