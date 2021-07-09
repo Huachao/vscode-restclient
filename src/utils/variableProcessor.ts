@@ -4,6 +4,7 @@ import { EnvironmentVariableProvider } from './httpVariableProviders/environment
 import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
 import { HttpVariableProvider } from './httpVariableProviders/httpVariableProvider';
 import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
+import { ScriptVariableProvider } from './httpVariableProviders/scriptVariableProvider';
 import { SystemVariableProvider } from './httpVariableProviders/systemVariableProvider';
 import { getCurrentTextDocument } from './workspaceUtility';
 
@@ -11,6 +12,7 @@ export class VariableProcessor {
 
     private static readonly providers: [HttpVariableProvider, boolean][] = [
         [SystemVariableProvider.Instance, false],
+        [ScriptVariableProvider.Instance, false],
         [RequestVariableProvider.Instance, true],
         [FileVariableProvider.Instance, true],
         [EnvironmentVariableProvider.Instance, true],
@@ -55,40 +57,19 @@ export class VariableProcessor {
     }
 
     public static async getAllVariablesDefinitions(document: TextDocument): Promise<Map<string, VariableType[]>> {
-        const [, [requestProvider], [fileProvider], [environmentProvider]] = this.providers;
-        const requestVariables = await (requestProvider as RequestVariableProvider).getAll(document);
-        const fileVariables = await (fileProvider as FileVariableProvider).getAll(document);
-        const environmentVariables = await (environmentProvider as EnvironmentVariableProvider).getAll();
-
         const variableDefinitions = new Map<string, VariableType[]>();
-
-        // Request variables in file
-        requestVariables.forEach(({ name }) => {
-            if (variableDefinitions.has(name)) {
-                variableDefinitions.get(name)!.push(VariableType.Request);
-            } else {
-                variableDefinitions.set(name, [VariableType.Request]);
+        for (const [httpVariableProvider, caching] of this.providers) {
+            if (caching) {
+                const variables = await httpVariableProvider.getAll(document);
+                variables.forEach(({ name }) => {
+                    if (variableDefinitions.has(name)) {
+                        variableDefinitions.get(name)!.push(httpVariableProvider.type);
+                    } else {
+                        variableDefinitions.set(name, [httpVariableProvider.type]);
+                    }
+                });
             }
-        });
-
-        // Normal file variables
-        fileVariables.forEach(({ name }) => {
-            if (variableDefinitions.has(name)) {
-                variableDefinitions.get(name)!.push(VariableType.File);
-            } else {
-                variableDefinitions.set(name, [VariableType.File]);
-            }
-        });
-
-        // Environment variables
-        environmentVariables.forEach(({ name }) => {
-            if (variableDefinitions.has(name)) {
-                variableDefinitions.get(name)!.push(VariableType.Environment);
-            } else {
-                variableDefinitions.set(name, [VariableType.Environment]);
-            }
-        });
-
+        }
         return variableDefinitions;
     }
 }

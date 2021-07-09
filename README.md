@@ -413,12 +413,12 @@ Environments give you the ability to customize requests using variables, and you
 Environments and including variables are defined directly in `Visual Studio Code` setting file, so you can create/update/delete environments and variables at any time you wish. If you __DO NOT__ want to use any environment, you can choose `No Environment` in the environment list. Notice that if you select `No Environment`, variables defined in shared environment are still available. See [Environment Variables](#environment-variables) for more details about environment variables.
 
 ## Variables
-We support two types of variables, one is __Custom Variables__ which is defined by user and can be further divided into __Environment Variables__, __File Variables__ and __Request Variables__, the other is __System Variables__ which is a predefined set of variables out-of-box.
+We support two types of variables, one is __Custom Variables__ which is defined by user and can be further divided into __Environment Variables__, __File Variables__, __Request Variables__  and __Script Variables__, the other is __System Variables__ which is a predefined set of variables out-of-box.
 
 The reference syntax of system and custom variables types has a subtle difference, for the former the syntax is `{{$SystemVariableName}}`, while for the latter the syntax is `{{CustomVariableName}}`, without preceding `$` before variable name. The definition syntax and location for different types of custom variables are different. Notice that when the same name used for custom variables, request variables takes higher resolving precedence over file variables, file variables takes higher precedence over environment variables.
 
 ### Custom Variables
-Custom variables can cover different user scenarios with the benefit of environment variables, file variables, and request variables. Environment variables are mainly used for storing values that may vary in different environments. Since environment variables are directly defined in Visual Studio Code setting file, they can be referenced across different `http` files. File variables are mainly used for representing values that are constant throughout the `http` file. Request variables are used for the chaining requests scenarios which means a request needs to reference some part(header or body) of another request/response in the _same_ `http` file, imagine we need to retrieve the auth token dynamically from the login response, request variable fits the case well. Both file and request variables are defined in the `http` file and only have __File Scope__.
+Custom variables can cover different user scenarios with the benefit of environment variables, file variables, and request variables. Environment variables are mainly used for storing values that may vary in different environments. Since environment variables are directly defined in Visual Studio Code setting file, they can be referenced across different `http` files. File variables are mainly used for representing values that are constant throughout the `http` file. Request variables are used for the chaining requests scenarios which means a request needs to reference some part(header or body) of another request/response in the _same_ `http` file, imagine we need to retrieve the auth token dynamically from the login response, request variable fits the case well. File, script and request variables are defined in the `http` file and only have __File Scope__.
 
 #### Environment Variables
 For environment variables, each environment comprises a set of key value pairs defined in setting file, key and value are variable name and value respectively. Only variables defined in selected environment and shared environment are available to you. You can also reference the variables in shared environment with `{{$shared variableName}}` syntax in your active environment. Below is a sample piece of setting file for custom environments and environment level variables:
@@ -529,6 +529,40 @@ Accept: application/xml
 
 # @name getFirstReply
 GET {{baseUrl}}/comments/{{commentId}}/replies/{{getReplies.response.body.//reply[1]/@id}}
+
+```
+
+### Script Variables
+With script variables it is possible to include JS code snippets. JS Code Snippets compiles to a CommonJS Module. JS Code Snippets support injection of all already defined variables. Request variables must be included by only name. A [require](https://nodejs.org/api/modules.html#modules_require_id) function is automatically provided.
+
+```http
+
+@currentDate = {{() => new Date()}}
+
+@authToken = {{(send) => require('logon.js')(send)}}
+
+# @name createComment
+POST {{baseUrl}}/comments HTTP/1.1
+Authorization: {{authToken}}
+Content-Type: application/json
+
+{
+    "content": "fake content"
+}
+
+###
+
+@commentId = {{(createComment, authToken) => createComment.response.body.$.id}}
+
+```
+
+All Script Variables in requests are evaluated each time. Script Variables assigend to file variables are cached.
+
+```http
+@cached = {{() => new Date()}}
+
+###
+GET {{baseUrl}}/comments?notcached={{() => new Date()}} HTTP/1.1
 
 ```
 
