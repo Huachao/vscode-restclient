@@ -53,10 +53,10 @@ export class CodeSnippetController {
         const { text } = selectedRequest;
 
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest();
-
-        const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
-        const snippet = new HTTPSnippet(harHttpRequest);
+        const snippets = await this.extractSnippets(text);
+        if (snippets.length === 0) {
+            return;
+        }
 
         let target: Pick<CodeSnippetTarget, 'key' | 'title'> | undefined = undefined;
 
@@ -92,8 +92,7 @@ export class CodeSnippetController {
                 const { key: ck, title: ct } = selectedItem as any as CodeSnippetClient;
                 const { key: tk, title: tt } = target!;
                 Telemetry.sendEvent('Generate Code Snippet', { 'target': target!.key, 'client': ck });
-                const result = snippet.convert(tk, ck);
-
+                const result = snippets.map(s => s.convert(tk, ck)).join('\r\n');
                 quickPick.hide();
                 try {
                     this._webview.render(result, `${tt}-${ct}`, tk);
@@ -104,6 +103,22 @@ export class CodeSnippetController {
             }
         });
         quickPick.show();
+    }
+
+    private async extractSnippets(text: string): Promise<any[]> {
+        if (text.trim()?.length === 0) {
+            return [];
+        }
+        const allSnippets = text.split(/^(\s*\r\n){2,}/m)
+            .filter(x => x.trim().length)
+            .map(async x => {
+                const httpRequest = await RequestParserFactory.createRequestParser(x.trim()).parseHttpRequest();
+                const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
+                const snippet = new HTTPSnippet(harHttpRequest);
+                return snippet;
+            });
+
+        return await Promise.all(allSnippets);
     }
 
     @trace('Copy Request As cURL')
