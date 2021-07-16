@@ -3,6 +3,7 @@ import { HttpResponse } from '../models/httpResponse';
 import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage } from "../models/httpVariableResolveResult";
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, isJSONString } from './misc';
+import JSONbig from 'json-bigint';
 
 const xpath = require('xpath');
 const { DOMParser } = require('xmldom');
@@ -59,7 +60,7 @@ export class RequestVariableCacheValueProcessor {
 
             const contentTypeHeader = getContentType(headers);
             if (MimeUtility.isJSON(contentTypeHeader) || (MimeUtility.isJavaScript(contentTypeHeader) && isJSONString(body as string))) {
-                const parsedBody = JSON.parse(body as string);
+                const parsedBody = JSONbig.parse(body as string);
 
                 return this.resolveJsonHttpBody(parsedBody, nameOrPath);
             } else if (MimeUtility.isXml(contentTypeHeader)) {
@@ -86,7 +87,7 @@ export class RequestVariableCacheValueProcessor {
     private static resolveJsonHttpBody(body: any, path: string): ResolveResult {
         try {
             const result = JSONPath({ path, json: body });
-            const value = typeof result[0] === 'string' ? result[0] : JSON.stringify(result[0]);
+            const value = typeof result[0] === 'string' ? result[0] : JSONbig.stringify(result[0]);
             if (!value) {
                 return { state: ResolveState.Warning, message: ResolveWarningMessage.IncorrectJSONPath };
             } else {
