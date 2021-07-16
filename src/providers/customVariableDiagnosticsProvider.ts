@@ -8,6 +8,7 @@ import { disposeAll } from '../utils/dispose';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { Selector } from '../utils/selector';
+
 import { VariableProcessor } from "../utils/variableProcessor";
 
 interface VariableWithPosition {
@@ -15,6 +16,11 @@ interface VariableWithPosition {
     path: string;
     begin: Position;
     end: Position;
+}
+
+interface PromptVariableDefinitionWithRange {
+    name: string;
+    range: [number, number];
 }
 
 export class CustomVariableDiagnosticsProvider {
@@ -82,16 +88,20 @@ export class CustomVariableDiagnosticsProvider {
             const diagnostics: Diagnostic[] = [];
 
             const allAvailableVariables = await VariableProcessor.getAllVariablesDefinitions(document);
+            const promptVariableDefinitions = this.findPromptVariableDefinitions(document);
             const variableReferences = this.findVariableReferences(document);
 
             // Variable not found
             [...variableReferences.entries()]
                 .filter(([name]) => !allAvailableVariables.has(name))
                 .forEach(([, variables]) => {
-                    variables.forEach(({name, begin, end}) => {
-                        diagnostics.push(
-                            new Diagnostic(new Range(begin, end), `${name} is not found`, DiagnosticSeverity.Error));
-                    });
+                    variables
+                        .filter(variable => !this.hasPromptVariableDefintion(promptVariableDefinitions, variable))
+                        .forEach(({ name, begin, end }) => {
+                            diagnostics.push(
+                                new Diagnostic(new Range(begin, end), `${name} is not found`, DiagnosticSeverity.Error));
+
+                        });
                 });
 
             // Request variable not active
@@ -101,7 +111,7 @@ export class CustomVariableDiagnosticsProvider {
                     && allAvailableVariables.get(name)![0] === VariableType.Request
                     && !RequestVariableCache.has(document, name))
                 .forEach(([, variables]) => {
-                    variables.forEach(({name, begin, end}) => {
+                    variables.forEach(({ name, begin, end }) => {
                         diagnostics.push(
                             new Diagnostic(new Range(begin, end), `Request '${name}' has not been sent`, DiagnosticSeverity.Information));
                     });
@@ -115,7 +125,7 @@ export class CustomVariableDiagnosticsProvider {
                     && RequestVariableCache.has(document, name))
                 .forEach(([name, variables]) => {
                     const value = RequestVariableCache.get(document, name);
-                    variables.forEach(({path, begin, end}) => {
+                    variables.forEach(({ path, begin, end }) => {
                         path = path.replace(/^\{{2}\s*/, '').replace(/\s*\}{2}$/, '');
                         const result = RequestVariableCacheValueProcessor.resolveRequestVariable(value, path);
                         if (result.state !== ResolveState.Success) {
@@ -165,5 +175,34 @@ export class CustomVariableDiagnosticsProvider {
         this.fileVariableReferenceCache.set(document, vars);
 
         return vars;
+    }
+
+    private findPromptVariableDefinitions(document: TextDocument): Map<string, PromptVariableDefinitionWithRange[]> {
+        const defs = new Map<string, PromptVariableDefinitionWithRange[]>();
+        const rawLines = document.getText().split(Constants.LineSplitterRegex);
+        const requestRanges = Selector.getRequestRanges(rawLines, { ignoreCommentLine: false });
+        for (const [start, end] of requestRanges) {
+            const scopedLines = rawLines.slice(start, end + 1);
+            for (const line of scopedLines) {
+                const matched = line.match(Constants.PromptCommentRegex);
+                if (matched) {
+                    const name = matched[1];
+                    if (defs.has(name)) {
+                        defs.get(name)!.push({ name, range: [start, end] });
+                    } else {
+                        defs.set(name, [{ name, range: [start, end] }]);
+                    }
+                }
+            }
+        }
+        return defs;
+    }
+    private hasPromptVariableDefintion(defs: Map<string, PromptVariableDefinitionWithRange[]>, variable: VariableWithPosition): boolean {
+        const { name, begin, end } = variable;
+        return defs.get(name)?.some(({ name, range: [rangeStart, rangeEnd] }) => {
+            return name === name
+                && rangeStart <= begin.line
+                && end.line <= rangeEnd;
+        }) || false;
     }
 }

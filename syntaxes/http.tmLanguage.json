@@ -191,6 +191,42 @@
             }
           },
           "name": "comment.line.double-slash.http"
+        },
+        {
+          "match": "^\\s*\\#{1,}\\s+(?:((@)prompt)\\s+([^\\s]+)(?:\\s+(.*))?\\s*)$",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name"
+            },
+            "2": {
+              "name": "punctuation.definition.block.tag.metadata"
+            },
+            "3": {
+              "name": "variable.other.http"
+            },
+            "4": {
+              "name": "string.other.http"
+            }
+          },
+          "name": "comment.line.sharp.http"
+        },
+        {
+          "match": "^\\s*\\/{2,}\\s+(?:((@)prompt)\\s+([^\\s]+)(?:\\s+(.*))?\\s*)$",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name"
+            },
+            "2": {
+              "name": "punctuation.definition.block.tag.metadata"
+            },
+            "3": {
+              "name": "variable.other.http"
+            },
+            "4": {
+              "name": "string.other.http"
+            }
+          },
+          "name": "comment.line.double-slash.http"
         }
       ]
     },
