@@ -100,5 +100,21 @@
             "# @note"
         ],
         "description": "Add sending request confirmation"
+    },
+    "Request with SSL client certificate": {
+        "prefix": "mtls",
+        "body": [
+            "# @http.cert",
+            "# @http.key"
+        ],
+        "description": "Use SSL client certificate"
+    },
+    "Request with SSL client certificate (PFX)": {
+        "prefix": "mtls-pfx",
+        "body": [
+            "# @http.pfx",
+            "# @http.passphrase"
+        ],
+        "description": "Use SSL client certificate with PKCS#12 file"
     }
 }

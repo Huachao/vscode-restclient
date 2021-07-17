@@ -43,7 +43,7 @@ export class RequestController {
             return;
         }
 
-        const { text, name, warnBeforeSend } = selectedRequest;
+        const { text, name, https, warnBeforeSend } = selectedRequest;
 
         if (warnBeforeSend) {
             const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
@@ -54,7 +54,7 @@ export class RequestController {
         }
 
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(name);
+        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(name, https);
 
         await this.runCore(httpRequest, document);
     }

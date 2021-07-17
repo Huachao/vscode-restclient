@@ -21,6 +21,11 @@ export class HARParam implements HARNameValue {
     }
 }
 
+export class HAROption implements HARNameValue {
+    public constructor(public name: string, public value: string) {
+    }
+}
+
 export class HARPostData {
     public params: HARParam[];
     public constructor(public mimeType: string, public text: string) {
@@ -41,7 +46,7 @@ export class HARPostData {
 export class HARHttpRequest {
     public queryString: HARParam[];
 
-    public constructor(public method: string, public url: string, public headers: HARHeader[], public cookies: HARCookie[], public postData?: HARPostData) {
+    public constructor(public method: string, public url: string, public headers: HARHeader[], public cookies: HARCookie[], public postData?: HARPostData, public _options?: HAROption[]) {
         const queryObj = urlParse(url, true).query;
         this.queryString = this.flatten(queryObj);
     }

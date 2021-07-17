@@ -232,6 +232,16 @@ export class HttpResponseWebview extends BaseWebview {
         if (previewOption === PreviewOption.Exchange) {
             // for add request details
             const request = response.request;
+            if (request.https) {
+                let requestOptionsPart = '';
+                for (const key in request.https) {
+                    const value = request.https[key];
+                    if (value) {
+                        requestOptionsPart += `# @https.${key} ${value}\r\n`;
+                    }
+                }
+                code += hljs.highlight('ruby', requestOptionsPart).value;
+            }
             const requestNonBodyPart = `${request.method} ${request.url} HTTP/1.1
 ${HttpResponseWebview.formatHeaders(request.headers)}`;
             code += hljs.highlight('http', requestNonBodyPart + '\r\n').value;

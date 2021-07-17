@@ -108,7 +108,7 @@ export class VariableUtility {
         const locations: Range[] = [];
         const regex = new RegExp(`{{${variable}}}`, 'g');
         for (const [index, line] of lines.entries()) {
-            if (Selector.isCommentLine(line)) {
+            if (Selector.isCommentLine(line) && !Selector.isRequestOption(line)) {
                 continue;
             }
 

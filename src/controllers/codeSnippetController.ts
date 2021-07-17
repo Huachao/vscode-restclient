@@ -2,7 +2,7 @@ import { EOL } from 'os';
 import * as url from 'url';
 import { Clipboard, env, ExtensionContext, QuickInputButtons, window } from 'vscode';
 import Logger from '../logger';
-import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
+import { HARCookie, HARHeader, HARHttpRequest, HAROption, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { trace } from "../utils/decorator";
@@ -119,10 +119,10 @@ export class CodeSnippetController {
             return;
         }
 
-        const { text } = selectedRequest;
+        const { text, https } = selectedRequest;
 
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest();
+        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(undefined, https);
 
         const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         const addPrefix = !(url.parse(harHttpRequest.url).protocol);
@@ -135,7 +135,15 @@ export class CodeSnippetController {
         if (addPrefix) {
             snippet.requests[0].fullUrl = originalUrl;
         }
-        const result = snippet.convert('shell', 'curl', process.platform === 'win32' ? { indent: false } : {});
+        let result = snippet.convert('shell', 'curl', process.platform === 'win32' ? { indent: false } : {});
+
+        // custom options (e.g. SSL client certificate)
+        if (harHttpRequest._options?.length) {
+            for (const opt of harHttpRequest._options) {
+                result += ` --${opt.name} ${opt.value}`;
+            }
+        }
+
         await this.clipboard.writeText(result);
     }
 
@@ -179,7 +187,26 @@ export class CodeSnippetController {
             }
         }
 
-        return new HARHttpRequest(request.method, encodeUrl(request.url), headers, cookies, body);
+        // convert additional options
+        const options: HAROption[] = [];
+        if (request.https) {
+            if (request.https.pfx) {
+                options.push(new HAROption("cert", request.https.pfx));
+            } else if (request.https.cert) {
+                options.push(new HAROption("cert", request.https.cert));
+            }
+            if (request.https.key) {
+                options.push(new HAROption("key", request.https.key));
+            }
+            if (request.https.passphrase) {
+                options.push(new HAROption("pass", request.https.passphrase));
+            }
+            if (request.https.ca) {
+                options.push(new HAROption("cacert", request.https.ca));
+            }
+        }
+
+        return new HARHttpRequest(request.method, encodeUrl(request.url), headers, cookies, body, options);
     }
 
     public dispose() {

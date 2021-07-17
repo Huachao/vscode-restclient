@@ -48,6 +48,14 @@ export class HttpResponseTextDocumentView {
         if (previewOption === PreviewOption.Exchange) {
             // for add request details
             const request = response.request;
+            if (request.https) {
+                for (const key in request.https) {
+                    const value = request.https[key];
+                    if (value) {
+                        content += `# @https.${key} ${value}${EOL}`;
+                    }
+                }
+            }
             content += `${request.method} ${request.url} HTTP/1.1${EOL}`;
             content += this.formatHeaders(request.headers);
             if (request.body) {

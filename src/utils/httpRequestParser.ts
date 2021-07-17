@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
 import { Stream } from 'stream';
+import { HttpsOptions } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
@@ -29,7 +30,7 @@ export class HttpRequestParser implements RequestParser {
     public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
     }
 
-    public async parseHttpRequest(name?: string): Promise<HttpRequest> {
+    public async parseHttpRequest(name?: string, https?: HttpsOptions): Promise<HttpRequest> {
         // parse follows http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
         // split the request raw text into lines
         const lines: string[] = this.requestRawText.split(EOL);
@@ -122,7 +123,7 @@ export class HttpRequestParser implements RequestParser {
             requestLine.url = `${scheme}://${host}${requestLine.url}`;
         }
 
-        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), name);
+        return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), name, https);
     }
 
     private async createGraphQlBody(variableLines: string[], contentTypeHeader: string | undefined, body: string | Stream | undefined) {
