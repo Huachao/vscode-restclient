@@ -17,9 +17,11 @@ export class FileVariableReferencesCodeLensProvider implements CodeLensProvider 
         const requestRanges: [number, number][] = Selector.getRequestRanges(lines, { ignoreFileVariableDefinitionLine: false });
 
         for (let [blockStart, blockEnd] of requestRanges) {
-            while (blockStart <= blockEnd) {
+            for (; blockStart <= blockEnd; blockStart++) {
                 const line = lines[blockStart];
-                if (!Selector.isFileVariableDefinitionLine(line)) {
+                if (Selector.isCommentLine(line)) {
+                    continue;
+                } else if (!Selector.isFileVariableDefinitionLine(line)) {
                     break;
                 }
 
@@ -35,7 +37,6 @@ export class FileVariableReferencesCodeLensProvider implements CodeLensProvider 
                     };
                     blocks.push(new CodeLens(range, cmd));
                 }
-                blockStart++;
             }
         }
 
