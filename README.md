@@ -7,8 +7,18 @@
 REST Client allows you to send HTTP request and view the response in Visual Studio Code directly.
 
 ## 扩展功能
-1.大纲支持多级，按#标题生成  
+1.大纲支持多级，按#标题生成，这是本项目独立出来的原因，我个人觉得这个功能非常有用。  
 2.修复url增加link时可以出现异常，导致结果不显示的bug.
+
+## 效果图
+
+原有大纲图  
+![rest-client](images/treeView-old.png)
+
+改进的后大纲视图  
+![rest-client](images/treeView-new.png)  
+支持多级结构
+
 
 ## 编译说明
 生成本地包
