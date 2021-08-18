@@ -6,18 +6,18 @@
 
 REST Client allows you to send HTTP request and view the response in Visual Studio Code directly.
 
-## 扩展功能
-1.大纲支持多级，按#标题生成，这是本项目独立出来的原因，我个人觉得这个功能非常有用。  
-2.修复url增加link时可以出现异常，导致结果不显示的bug.
+## change
+1. The outline supports multiple levels and is generated according to the # heading, which is why this project is independent. I personally find this function very useful.
+2. Fix the bug that the result is not displayed due to an exception when the URL is added with a link.
 
-## 效果图
+## screenshot
 
-原有大纲图  
+Original Outline plan  
 ![rest-client](images/treeView-old.png)
 
-改进的后大纲视图  
+Improved post outline view  
 ![rest-client](images/treeView-new.png)  
-支持多级结构
+Support multilevel structure
 
 
 ## 编译说明
