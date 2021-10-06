@@ -50,6 +50,8 @@ export class HttpResponseWebview extends BaseWebview {
 
         this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', this.foldResponseBody, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', this.unfoldResponseBody, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.preview', this.preview, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.raw', this.raw, this));
 
         this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-body', this.copyBody, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response', this.save, this));
@@ -121,6 +123,20 @@ export class HttpResponseWebview extends BaseWebview {
     @trace('Unfold Response')
     private unfoldResponseBody() {
         this.activePanel?.webview.postMessage({ 'command': 'unfoldAll' });
+    }
+
+    @trace('Preview')
+    private preview() {
+        if (this.activeResponse && this.activePanel) {
+            this.activePanel.webview.html = this.activeResponse.body
+        }
+    }
+
+    @trace('Raw')
+    private raw() {
+        if (this.activeResponse && this.activePanel) {
+            this.activePanel.webview.html = this.getHtmlForWebview(this.activePanel, this.activeResponse)
+        }
     }
 
     @trace('Copy Response Body')

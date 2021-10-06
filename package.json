@@ -179,6 +179,16 @@
         "command": "rest-client.unfold-response",
         "title": "Unfold Response",
         "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.preview",
+        "title": "Preview",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.raw",
+        "title": "Raw",
+        "category": "Rest Client"
       }
     ],
     "menus": {
@@ -189,6 +199,14 @@
         },
         {
           "command": "rest-client.unfold-response",
+          "when": "httpResponsePreviewFocus"
+        },
+        {
+          "command": "rest-client.preview",
+          "when": "httpResponsePreviewFocus"
+        },
+        {
+          "command": "rest-client.raw",
           "when": "httpResponsePreviewFocus"
         },
         {
@@ -233,6 +251,16 @@
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.unfold-response",
           "group": "1_rest-client@2"
+        },
+        {
+          "when": "httpResponsePreviewFocus",
+          "command": "rest-client.preview",
+          "group": "1_rest-client@3"
+        },
+        {
+          "when": "httpResponsePreviewFocus",
+          "command": "rest-client.raw",
+          "group": "1_rest-client@4"
         },
         {
           "when": "codeSnippetPreviewFocus",
