@@ -128,14 +128,14 @@ export class HttpResponseWebview extends BaseWebview {
     @trace('Preview')
     private preview() {
         if (this.activeResponse && this.activePanel) {
-            this.activePanel.webview.html = this.activeResponse.body
+            this.activePanel.webview.html = this.activeResponse.body;
         }
     }
 
     @trace('Raw')
     private raw() {
         if (this.activeResponse && this.activePanel) {
-            this.activePanel.webview.html = this.getHtmlForWebview(this.activePanel, this.activeResponse)
+            this.activePanel.webview.html = this.getHtmlForWebview(this.activePanel, this.activeResponse);
         }
     }
 
