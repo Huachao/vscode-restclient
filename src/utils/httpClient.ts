@@ -47,7 +47,8 @@ export class HttpClient {
         let bodySize = 0;
         let headersSize = 0;
         const requestUrl = encodeUrl(httpRequest.url);
-        const request = got(requestUrl, options);
+        const request: got.GotPromise<Buffer> = got(requestUrl, options);
+        httpRequest.setUnderlyingRequest(request);
         (request as any).on('response', res => {
             if (res.rawHeaders) {
                 headersSize += res.rawHeaders.map(h => h.length).reduce((a, b) => a + b, 0);
