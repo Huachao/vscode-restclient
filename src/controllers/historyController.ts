@@ -61,7 +61,18 @@ export class HistoryController {
 
     private async createRequestInTempFile(request: HistoricalHttpRequest): Promise<string> {
         const file = await this.createTempFile();
-        let output = `${request.method.toUpperCase()} ${request.url}${EOL}`;
+
+        let output = "";
+        if (request.https) {
+            for (const key in request.https) {
+                const val = request.https[key];
+                if (val) {
+                    output += `# @https.${key} ${val}${EOL}`;
+                }
+            }
+        }
+
+        output += `${request.method.toUpperCase()} ${request.url}${EOL}`;
         if (request.headers) {
             for (const header in request.headers) {
                 if (request.headers.hasOwnProperty(header)) {

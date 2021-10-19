@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
-import { RequestHeaders } from '../models/base';
+import * as path from 'path';
+import { HttpsOptions, RequestHeaders } from '../models/base';
 import { RestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
@@ -15,7 +16,7 @@ export class CurlRequestParser implements RequestParser {
     public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
     }
 
-    public async parseHttpRequest(name?: string): Promise<HttpRequest> {
+    public async parseHttpRequest(name?: string, https?: HttpsOptions): Promise<HttpRequest> {
         let requestText = CurlRequestParser.mergeMultipleSpacesIntoSingle(
             CurlRequestParser.mergeIntoSingleLine(this.requestRawText.trim()));
         requestText = requestText
@@ -77,7 +78,51 @@ export class CurlRequestParser implements RequestParser {
             method = body ? "POST" : "GET";
         }
 
-        return new HttpRequest(method, url, headers, body, body, name);
+        // parse https arguments
+        let httpsArgs: undefined | HttpsOptions;
+        if (typeof parsedArguments.E === "string" || typeof parsedArguments.cert === "string") {
+            const certArg = parsedArguments.E || parsedArguments.cert;
+            const [cert, passphrase] = certArg.split(":", 2);
+            const certExt = path.extname(cert).toLowerCase();
+            if (certExt === ".p12" || certExt === ".pfx") {
+                httpsArgs = { pfx: cert, passphrase };
+            } else {
+                httpsArgs = { cert, passphrase };
+            }
+        }
+
+        if (typeof parsedArguments.key === "string") {
+            const key = parsedArguments.key;
+            if (httpsArgs) {
+                httpsArgs.key = key;
+            } else {
+                httpsArgs = { key };
+            }
+        }
+
+        if (httpsArgs && typeof parsedArguments.pass === "string") {
+            httpsArgs.passphrase = parsedArguments.pass;
+        }
+
+        if (typeof parsedArguments.cacert === "string") {
+            const ca = parsedArguments.cacert;
+            if (httpsArgs) {
+                httpsArgs.ca = ca;
+            } else {
+                httpsArgs = { ca };
+            }
+        }
+
+        if (httpsArgs) {
+            // curl command line arguments override the per request settings
+            if (https) {
+                https = Object.assign({}, https, httpsArgs);
+            } else {
+                https = httpsArgs;
+            }
+        }
+
+        return new HttpRequest(method, url, headers, body, body, name, https);
     }
 
     private static mergeIntoSingleLine(text: string): string {

@@ -1,6 +1,6 @@
 import { Stream } from 'stream';
 import { getContentType } from '../utils/misc';
-import { RequestHeaders } from './base';
+import { HttpsOptions, RequestHeaders } from './base';
 
 import got = require('got');
 
@@ -13,7 +13,8 @@ export class HttpRequest {
         public headers: RequestHeaders,
         public body?: string | Stream,
         public rawBody?: string,
-        public name?: string) {
+        public name?: string,
+        public https?: HttpsOptions) {
             this.method = method.toLocaleUpperCase();
             this.isCancelled = false;
     }
@@ -40,6 +41,7 @@ export class HistoricalHttpRequest {
         public url: string,
         public headers: RequestHeaders,
         public body: string | undefined,
+        public https: HttpsOptions | undefined,
         public startTime: number) {
     }
 
@@ -49,6 +51,7 @@ export class HistoricalHttpRequest {
             httpRequest.url,
             httpRequest.headers,
             httpRequest.rawBody,
+            httpRequest.https,
             startTime
         );
     }

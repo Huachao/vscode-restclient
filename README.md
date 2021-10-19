@@ -268,6 +268,10 @@ We add the capability to directly run [curl request](https://curl.haxx.se/) in R
 * -b, --cookie(no cookie jar file support)
 * -u, --user(Basic auth support only)
 * -d, --data, --data-ascii,--data-binary, --data-raw
+* -E, --cert
+* --key
++ --pass
+* --cacert
 
 ## Copy Request As cURL
 Sometimes you may want to get the curl format of an http request quickly and save it to clipboard, just pressing `F1` and then selecting/typing `Rest Client: Copy Request As cURL` or simply right-click in the editor, and select `Copy Request As cURL`.
@@ -684,6 +688,10 @@ REST Client Extension also supports request-level settings for each independent 
 Name | Syntax    | Description
 -----|-----------|--------------------------------------------------------------
 note | `# @note` | Use for request confirmation, especially for critical request
+https.cert | `# @https.cert` | Use for per request [SSL Client Certificate](#ssl-client-certificates)
+https.key | `# @https.key` | Use for per request [SSL Client Certificate](#ssl-client-certificates)
+https.pfx | `# @https.pfx` | Use for per request [SSL Client Certificate](#ssl-client-certificates)
+https.passphrase | `# @https.passphrase` | Use for per request [SSL Client Certificate](#ssl-client-certificates)
 
 > All the above leading `#` can be replaced with `//`
 
