@@ -50,8 +50,8 @@ export class HttpResponseWebview extends BaseWebview {
 
         this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', this.foldResponseBody, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', this.unfoldResponseBody, this));
-        this.context.subscriptions.push(commands.registerCommand('rest-client.preview', this.preview, this));
-        this.context.subscriptions.push(commands.registerCommand('rest-client.raw', this.raw, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.preview-response-body', this.previewResponseBody, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.show-raw-response', this.showRawResponse, this));
 
         this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-body', this.copyBody, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response', this.save, this));
@@ -126,14 +126,14 @@ export class HttpResponseWebview extends BaseWebview {
     }
 
     @trace('Preview')
-    private preview() {
+    private previewResponseBody() {
         if (this.activeResponse && this.activePanel) {
             this.activePanel.webview.html = this.activeResponse.body;
         }
     }
 
     @trace('Raw')
-    private raw() {
+    private showRawResponse() {
         if (this.activeResponse && this.activePanel) {
             this.activePanel.webview.html = this.getHtmlForWebview(this.activePanel, this.activeResponse);
         }
