@@ -609,6 +609,12 @@
           "default": true,
           "scope": "resource",
           "description": "Enable/disable custom variable references CodeLens in request file"
+        },
+        "rest-client.useContentDispositionFilename": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Enable/disable using filename from 'content-disposition' header, when saving response body"
         }
       }
     },
@@ -648,6 +654,7 @@
     "aws4": "^1.9.1",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
+    "content-disposition": "^0.5.3",
     "dayjs": "^1.8.20",
     "dotenv": "^8.2.0",
     "encodeurl": "^1.0.1",
