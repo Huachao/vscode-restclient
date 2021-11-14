@@ -233,7 +233,7 @@ export class HttpResponseWebview extends BaseWebview {
             // for add request details
             const request = response.request;
             const requestNonBodyPart = `${request.method} ${request.url} HTTP/1.1
-${HttpResponseWebview.formatHeaders(request.headers)}`;
+${HttpResponseWebview.formatHeaders(request.headers, this.settings.hiddenResponseHeaders)}`;
             code += hljs.highlight('http', requestNonBodyPart + '\r\n').value;
             if (request.body) {
                 if (typeof request.body !== 'string') {
@@ -254,7 +254,7 @@ ${HttpResponseWebview.formatHeaders(request.headers)}`;
 
         if (previewOption !== PreviewOption.Body) {
             const responseNonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
-${HttpResponseWebview.formatHeaders(response.headers)}`;
+${HttpResponseWebview.formatHeaders(response.headers, this.settings.hiddenResponseHeaders)}`;
             code += hljs.highlight('http', responseNonBodyPart + (previewOption !== PreviewOption.Headers ? '\r\n' : '')).value;
         }
 
@@ -397,10 +397,10 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         return result;
     }
 
-    private static formatHeaders(headers: RequestHeaders | ResponseHeaders): string {
+    private static formatHeaders(headers: RequestHeaders | ResponseHeaders, suppressedHeaders: string[]): string {
         let headerString = '';
         for (const header in headers) {
-            if (headers.hasOwnProperty(header)) {
+            if (suppressedHeaders.indexOf(header) === -1 && headers.hasOwnProperty(header)) {
                 let value = headers[header];
                 if (typeof headers[header] !== 'string') {
                     value = <string>headers[header];

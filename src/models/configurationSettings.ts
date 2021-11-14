@@ -18,6 +18,7 @@ export type HostCertificates = {
 interface IRestClientSettings {
     followRedirect: boolean;
     defaultHeaders: RequestHeaders;
+    hiddenResponseHeaders: string[];
     timeoutInMilliseconds: number;
     showResponseInDifferentTab: boolean;
     requestNameAsResponseTabTitle: boolean;
@@ -51,6 +52,7 @@ interface IRestClientSettings {
 export class RestClientSettings implements IRestClientSettings {
     public followRedirect: boolean;
     public defaultHeaders: RequestHeaders;
+    public hiddenResponseHeaders: string[];
     public timeoutInMilliseconds: number;
     public showResponseInDifferentTab: boolean;
     public requestNameAsResponseTabTitle: boolean;
@@ -122,6 +124,7 @@ export class RestClientSettings implements IRestClientSettings {
                                                                      {
                                                                          "User-Agent": "vscode-restclient"
                                                                      });
+        this.hiddenResponseHeaders = restClientSettings.get<string[]>("hiddenResponseHeaders", []);
         this.showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
         this.requestNameAsResponseTabTitle = restClientSettings.get<boolean>("requestNameAsResponseTabTitle", false);
         this.rememberCookiesForSubsequentRequests = restClientSettings.get<boolean>("rememberCookiesForSubsequentRequests", true);

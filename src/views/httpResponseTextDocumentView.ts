@@ -75,9 +75,12 @@ export class HttpResponseTextDocumentView {
 
     private formatHeaders(headers: RequestHeaders | ResponseHeaders): string {
         let headerString = '';
+        const suppressedHeaders = this.settings.hiddenResponseHeaders;
         for (const header in headers) {
-            const value = headers[header] as string;
-            headerString += `${header}: ${value}${EOL}`;
+            if (suppressedHeaders.indexOf(header) === -1) {
+                const value = headers[header] as string;
+                headerString += `${header}: ${value}${EOL}`;
+            }
         }
         return headerString;
     }
