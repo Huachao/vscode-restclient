@@ -451,7 +451,7 @@ Authorization: {{token}}
 ```
 
 #### File Variables
-For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contain any spaces. As for variable value, it can consist of any characters, even whitespaces are allowed for them (leading and trailing whitespaces will be trimmed). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variable value can even contain references to all of other kinds of variables. For instance, you can create a file variable with value of other [request variables](#request-variables) like `@token = {{loginAPI.response.body.token}}`.
+For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contain any spaces. As for variable value, it can consist of any characters, even whitespaces are allowed for them (leading and trailing whitespaces will be trimmed). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variable value can even contain references to all of other kinds of variables. For instance, you can create a file variable with value of other [request variables](#request-variables) like `@token = {{loginAPI.response.body.token}}`. When referencing a file variable, you can use the _percent_ `%` to percent-encode the value.
 
 File variables can be defined in a separate request block only filled with variable definitions, as well as define request variables before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the file variables in the `http` file, they can be referenced in any requests of whole file. For file variables, you can also benefit from some `Visual Studio Code` features like _Go To Definition_ and _Find All References_. Below is a sample of file variable definitions and references in an `http` file.
 
@@ -465,13 +465,13 @@ File variables can be defined in a separate request block only filled with varia
 
 ###
 
-@name = hello
+@name = Strunk & White
 
-GET https://{{host}}/authors/{{name}} HTTP/1.1
+GET https://{{host}}/authors/{{%name}} HTTP/1.1
 
 ###
 
-PATCH https://{{host}}/authors/{{name}} HTTP/1.1
+PATCH https://{{host}}/authors/{{%name}} HTTP/1.1
 Content-Type: {{contentType}}
 
 {
