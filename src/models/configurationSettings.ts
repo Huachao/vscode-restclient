@@ -46,6 +46,7 @@ interface IRestClientSettings {
     logLevel: LogLevel;
     enableSendRequestCodeLens: boolean;
     enableCustomVariableReferencesCodeLens: boolean;
+    useContentDispositionFilename: boolean;
 }
 
 export class RestClientSettings implements IRestClientSettings {
@@ -79,6 +80,7 @@ export class RestClientSettings implements IRestClientSettings {
     public logLevel: LogLevel;
     public enableSendRequestCodeLens: boolean;
     public enableCustomVariableReferencesCodeLens: boolean;
+    public useContentDispositionFilename: boolean;
 
     private readonly brackets: CharacterPair[];
 
@@ -153,6 +155,7 @@ export class RestClientSettings implements IRestClientSettings {
         this.logLevel = ParseLogLevelStr(restClientSettings.get<string>('logLevel', 'error'));
         this.enableSendRequestCodeLens = restClientSettings.get<boolean>('enableSendRequestCodeLens', true);
         this.enableCustomVariableReferencesCodeLens = restClientSettings.get<boolean>('enableCustomVariableReferencesCodeLens', true);
+        this.useContentDispositionFilename = restClientSettings.get<boolean>('useContentDispositionFilename', true);
         languages.setLanguageConfiguration('http', { brackets: this.addRequestBodyLineIndentationAroundBrackets ? this.brackets : [] });
 
         const httpSettings = workspace.getConfiguration("http");

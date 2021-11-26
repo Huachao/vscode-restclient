@@ -52,7 +52,7 @@ export class CurlRequestParser implements RequestParser {
         }
 
         // parse body
-        let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-ascii'] || parsedArguments['data-binary'];
+        let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-ascii'] || parsedArguments['data-binary'] || parsedArguments['data-raw'];
         if (Array.isArray(body)) {
             body = body.join('&');
         }

@@ -1,5 +1,15 @@
+## 0.24.5 (2021/4/7)
+* __Feature__: [Add support for text/javascript as JSON](https://github.com/Huachao/vscode-restclient/pull/654) ([@mingue](https://github.com/mingue))
+* __Feature__: [Add snippet for multipart/form-data request](https://github.com/Huachao/vscode-restclient/pull/725) ([@yunxifd](https://github.com/yunxifd))
+* __Bug Fix__: [Fix basic auth header not generated correct for user:password case](https://github.com/Huachao/vscode-restclient/issues/741)
+* __Bug Fix__: [Fix `rest-client.fontSize` Default Value is Invalid](https://github.com/Huachao/vscode-restclient/issues/760)
+* __Bug Fix__: [Recognize `--data-raw` curl option](https://github.com/Huachao/vscode-restclient/issues/790)
+* __Bug Fix__: Fix incorrect syntax highlight for request line without specifing method
+* __Improvement__: [Updating document selector to support virtual file systems](https://github.com/Huachao/vscode-restclient/pull/720) ([@lostintangent](https://github.com/lostintangent))
+* __Improvement__: [Update azure ad token caching](https://github.com/Huachao/vscode-restclient/pull/795) ([@abdulkareemnalband](https://github.com/abdulkareemnalband))
+
 ## 0.24.4 (2020/11/9)
-* __Feature__: [Search for .env files on parent folders](https://github.com/Huachao/vscode-restclient/pull/691) ([@joaogsleite](joaogsleite))
+* __Feature__: [Search for .env files on parent folders](https://github.com/Huachao/vscode-restclient/pull/691) ([@joaogsleite](https://github.com/joaogsleite))
 * __Bug Fix__: [Fix args parse failure for `'`](https://github.com/Huachao/vscode-restclient/issues/705)
 * __Bug Fix__: [GraphQL file import fails](https://github.com/Huachao/vscode-restclient/issues/699)
 * __Bug Fix__: [Display of response header name is altered when header name and value are case-insensitive matches](https://github.com/Huachao/vscode-restclient/issues/709)
