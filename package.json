@@ -341,6 +341,18 @@
           "scope": "resource",
           "description": "If particular headers are omitted in request headers, these will be added as headers for each request."
         },
+        "rest-client.hiddenResponseHeaders": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "uniqueItems": true,
+            "pattern": "^[0-9a-zA-Z^_`|~!#$%&'*+-.]*$"
+          },
+          "default": [],
+          "scope": "resource",
+          "description": "List of HTTP header names, output of which will be suppressed (useful for hiding sensitive/unrelated headers for demo purposes). The entries on the list are case-sensitive."
+        },
         "rest-client.timeoutinmilliseconds": {
           "type": "integer",
           "default": 0,

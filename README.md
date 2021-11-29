@@ -646,9 +646,12 @@ headers  | Only the response headers(including _status line_) are previewed
 body     | Only the response body is previewed
 exchange | Preview the whole HTTP exchange(request and response)
 
+You may also suppress individual header output via the `rest-client.hiddenResponseHeaders` setting.
+
 ## Settings
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
 * `rest-client.defaultHeaders`: If particular headers are omitted in request header, these will be added as headers for each request. (Default is `{ "User-Agent": "vscode-restclient", "Accept-Encoding": "gzip" }`)
+* `rest-client.hiddenResponseHeaders`: List of HTTP header names (e.g. `["x-content-security-policy"]`), output of which will be suppressed (useful for hiding sensitive/unrelated headers for demo purposes). The entries on the list are case-sensitive. (Default is __[]__)
 * `rest-client.timeoutinmilliseconds`: Timeout in milliseconds. 0 for infinity. (Default is __0__)
 * `rest-client.showResponseInDifferentTab`: Show response in different tab. (Default is __false__)
 * `rest-client.requestNameAsResponseTabTitle`: Show request name as the response tab title. Only valid when using html view, if no request name is specified defaults to "Response". (Default is __false__)
