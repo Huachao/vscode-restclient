@@ -54,7 +54,8 @@
     "onCommand:rest-client.copy-request-as-curl",
     "onCommand:rest-client.fold-response",
     "onCommand:rest-client.unfold-response",
-    "onLanguage:http"
+    "onLanguage:http",
+    "onLanguage:markdown"
   ],
   "main": "./dist/extension",
   "contributes": {
