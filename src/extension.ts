@@ -13,9 +13,9 @@ import { FileVariableDefinitionProvider } from './providers/fileVariableDefiniti
 import { FileVariableReferenceProvider } from './providers/fileVariableReferenceProvider';
 import { FileVariableReferencesCodeLensProvider } from './providers/fileVariableReferencesCodeLensProvider';
 import { HttpCodeLensProvider } from './providers/httpCodeLensProvider';
-import { MarkdownCodeLensProvider } from './providers/markdownCodeLensProvider';
 import { HttpCompletionItemProvider } from './providers/httpCompletionItemProvider';
 import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvider';
+import { MarkdownCodeLensProvider } from './providers/markdownCodeLensProvider';
 import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
 import { RequestVariableDefinitionProvider } from './providers/requestVariableDefinitionProvider';
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
