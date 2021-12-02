@@ -135,7 +135,7 @@ export class HttpRequestParser implements RequestParser {
             body = await convertStreamToString(body);
         }
 
-        const matched = body?.match(/^\s*query\s+([^\{\(]+)/i);
+        const matched = body?.match(/^\s*query\s+([^@\{\(]+)/i);
         const operationName = matched?.[1];
 
         const graphQlPayload = {
