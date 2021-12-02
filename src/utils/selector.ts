@@ -76,7 +76,7 @@ export class Selector {
 
             const metaKey = matched[1];
             const metaValue = matched[2];
-            const metadata = ParseReqMetaKey(metaKey)
+            const metadata = ParseReqMetaKey(metaKey);
             if (metadata) {
                 metadatas.set(metadata, metaValue || undefined);
             }
