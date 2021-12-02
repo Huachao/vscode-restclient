@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
 import { Stream } from 'stream';
-import { RestClientSettings } from '../models/configurationSettings';
+import { SystemSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
@@ -26,7 +26,7 @@ export class HttpRequestParser implements RequestParser {
     private readonly inputFileSyntax = /^<(?:(?<processVariables>@)(?<encoding>\w+)?)?\s+(?<filepath>.+?)\s*$/;
     private readonly defaultFileEncoding = 'utf8';
 
-    public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
+    public constructor(private readonly requestRawText: string, private readonly settings: SystemSettings) {
     }
 
     public async parseHttpRequest(name?: string): Promise<HttpRequest> {

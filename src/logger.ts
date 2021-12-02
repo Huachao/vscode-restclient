@@ -1,10 +1,10 @@
 import { OutputChannel, window } from 'vscode';
-import { RestClientSettings } from './models/configurationSettings';
+import { SystemSettings } from './models/configurationSettings';
 import { LogLevel } from './models/logLevel';
 
 class Log {
     private readonly _outputChannel: OutputChannel;
-    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
+    private readonly _restClientSettings: SystemSettings = SystemSettings.Instance;
     public constructor() {
         this._outputChannel = window.createOutputChannel('REST');
     }

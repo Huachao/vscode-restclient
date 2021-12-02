@@ -1,7 +1,8 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
 import Logger from '../logger';
-import { RestClientSettings } from '../models/configurationSettings';
+import { SystemSettings } from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
+import { RequestMetadata } from '../models/requestMetadata';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
@@ -14,7 +15,7 @@ import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentV
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
 export class RequestController {
-    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
+    private readonly _restClientSettings: SystemSettings = SystemSettings.Instance;
     private _requestStatusEntry: RequestStatusEntry;
     private _httpClient: HttpClient;
     private _webview: HttpResponseWebview;
@@ -43,9 +44,10 @@ export class RequestController {
             return;
         }
 
-        const { text, name, warnBeforeSend } = selectedRequest;
+        const { text, metadatas } = selectedRequest;
+        const name = metadatas.get(RequestMetadata.Name);
 
-        if (warnBeforeSend) {
+        if (metadatas.has(RequestMetadata.Note)) {
             const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
             const userConfirmed = await window.showWarningMessage(note, 'Yes', 'No');
             if (userConfirmed !== 'Yes') {

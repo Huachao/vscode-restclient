@@ -1,6 +1,6 @@
 import { EventEmitter, QuickPickItem, window } from 'vscode';
 import * as Constants from '../common/constants';
-import { RestClientSettings } from '../models/configurationSettings';
+import { SystemSettings } from '../models/configurationSettings';
 import { trace } from "../utils/decorator";
 import { EnvironmentStatusEntry } from '../utils/environmentStatusBarEntry';
 import { UserDataManager } from '../utils/userDataManager';
@@ -20,7 +20,7 @@ export class EnvironmentController {
 
     public static readonly onDidChangeEnvironment = EnvironmentController._onDidChangeEnvironment.event;
 
-    private readonly settings: RestClientSettings = RestClientSettings.Instance;
+    private readonly settings: SystemSettings = SystemSettings.Instance;
 
     private environmentStatusEntry: EnvironmentStatusEntry;
 

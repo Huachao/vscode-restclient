@@ -1,6 +1,8 @@
 import { EOL } from 'os';
 import { Range, TextEditor } from 'vscode';
 import * as Constants from '../common/constants';
+import { fromString as ParseReqMetaKey, RequestMetadata } from '../models/requestMetadata';
+import { SelectedRequest } from '../models/SelectedRequest';
 import { VariableProcessor } from './variableProcessor';
 
 export interface RequestRangeOptions {
@@ -8,12 +10,6 @@ export interface RequestRangeOptions {
     ignoreEmptyLine?: boolean;
     ignoreFileVariableDefinitionLine?: boolean;
     ignoreResponseRange?: boolean;
-}
-
-export interface SelectedRequest {
-    text: string;
-    name?: string;
-    warnBeforeSend: boolean;
 }
 
 export class Selector {
@@ -36,14 +32,14 @@ export class Selector {
             return null;
         }
 
-        // parse request variable definition name
-        const requestVariable = this.getRequestVariableDefinitionName(selectedText);
+        // convert request text into lines
+        const lines = selectedText.split(Constants.LineSplitterRegex);
 
-        // parse #@note comment
-        const warnBeforeSend = this.hasNoteComment(selectedText);
+        // parse request metadata
+        const metadatas = this.parseReqMetadatas(lines);
 
         // parse actual request lines
-        const rawLines = selectedText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
+        const rawLines = lines.filter(l => !this.isCommentLine(l));
         const requestRange = this.getRequestRanges(rawLines)[0];
         if (!requestRange) {
             return null;
@@ -56,9 +52,36 @@ export class Selector {
 
         return {
             text: selectedText,
-            name: requestVariable,
-            warnBeforeSend
+            metadatas: metadatas
         };
+    }
+
+    public static parseReqMetadatas(lines: string[]): Map<RequestMetadata, string | undefined> {
+        const metadatas = new Map<RequestMetadata, string | undefined>();
+        for (const line of lines) {
+            if (this.isEmptyLine(line) || this.isFileVariableDefinitionLine(line)) {
+                continue;
+            }
+
+            if (!this.isCommentLine(line)) {
+                // find the first request line
+                break;
+            }
+
+            // here must be a comment line
+            const matched = line.match(Constants.RequestMetadataRegex);
+            if (!matched) {
+                continue;
+            }
+
+            const metaKey = matched[1];
+            const metaValue = matched[2];
+            const metadata = ParseReqMetaKey(metaKey)
+            if (metadata) {
+                metadatas.set(metadata, metaValue || undefined);
+            }
+        }
+        return metadatas;
     }
 
     public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {

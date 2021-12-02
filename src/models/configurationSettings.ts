@@ -49,7 +49,7 @@ interface IRestClientSettings {
     useContentDispositionFilename: boolean;
 }
 
-export class RestClientSettings implements IRestClientSettings {
+export class SystemSettings implements Partial<IRestClientSettings> {
     public followRedirect: boolean;
     public defaultHeaders: RequestHeaders;
     public timeoutInMilliseconds: number;
@@ -84,11 +84,11 @@ export class RestClientSettings implements IRestClientSettings {
 
     private readonly brackets: CharacterPair[];
 
-    private static _instance: RestClientSettings;
+    private static _instance: SystemSettings;
 
-    public static get Instance(): RestClientSettings {
+    public static get Instance(): SystemSettings {
         if (!this._instance) {
-            this._instance = new RestClientSettings();
+            this._instance = new SystemSettings();
         }
 
         return this._instance;

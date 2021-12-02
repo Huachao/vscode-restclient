@@ -59,6 +59,8 @@ export const AzureClouds: { [key: string]: { aad: string, arm: string, armAudien
     },
 };
 
+export const RequestMetadataRegex: RegExp = /^\s*(?:#|\/{2})\s*@([\w-]+)(?:\s+(.*?))?\s*$/;
+
 export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
 export const FileVariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.*?)\s*$/;

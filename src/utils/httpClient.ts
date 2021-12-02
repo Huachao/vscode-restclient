@@ -5,7 +5,7 @@ import { Cookie, CookieJar, Store } from 'tough-cookie';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
-import { RestClientSettings } from '../models/configurationSettings';
+import { SystemSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { awsSignature } from './auth/awsSignature';
@@ -32,7 +32,7 @@ type Certificate = {
 };
 
 export class HttpClient {
-    private readonly _settings: RestClientSettings = RestClientSettings.Instance;
+    private readonly _settings: SystemSettings = SystemSettings.Instance;
 
     private readonly cookieStore: Store;
 
