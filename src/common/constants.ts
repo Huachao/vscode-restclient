@@ -63,7 +63,7 @@ export const RequestMetadataRegex: RegExp = /^\s*(?:#|\/{2})\s*@([\w-]+)(?:\s+(.
 
 export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
-export const FileVariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.*?)\s*$/;
+export const FileVariableDefinitionRegex: RegExp = /^\s*@([^\s=@]+)\s*=\s*(.*?)\s*$/;
 
 export const RequestVariableDefinitionWithNameRegexFactory = (name: string, flags?: string): RegExp =>
     new RegExp(`^\\s*(?:#{1,}|\\/{2,})\\s+@name\\s+(${name})\\s*$`, flags);
@@ -73,3 +73,5 @@ export const RequestVariableDefinitionRegex: RegExp = RequestVariableDefinitionW
 export const NoteCommentRegex = /^\s*(?:#{1,}|\/{2,})\s*@note\s*$/m;
 
 export const LineSplitterRegex: RegExp = /\r?\n/g;
+
+export const FileHeaderDefinitionRegex: RegExp = /^\s*@@(.*?)\s*$/;
