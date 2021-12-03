@@ -54,7 +54,7 @@ export class RequestController {
             }
         }
 
-        const requestSettings = new RequestSettings(metadatas)
+        const requestSettings = new RequestSettings(metadatas);
         const settings: IRestClientSettings = new RestClientSettings(requestSettings);
 
         // parse http request
