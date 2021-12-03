@@ -1,6 +1,6 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
 import Logger from '../logger';
-import { SystemSettings } from '../models/configurationSettings';
+import { IRestClientSettings, RequestSettings, RestClientSettings, SystemSettings } from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
 import { RequestMetadata } from '../models/requestMetadata';
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -15,7 +15,6 @@ import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentV
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
 export class RequestController {
-    private readonly _restClientSettings: SystemSettings = SystemSettings.Instance;
     private _requestStatusEntry: RequestStatusEntry;
     private _httpClient: HttpClient;
     private _webview: HttpResponseWebview;
@@ -55,10 +54,13 @@ export class RequestController {
             }
         }
 
+        const requestSettings = new RequestSettings(metadatas)
+        const settings: IRestClientSettings = new RestClientSettings(requestSettings);
+
         // parse http request
         const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(name);
 
-        await this.runCore(httpRequest, document);
+        await this.runCore(httpRequest, settings, document);
     }
 
     @trace('Rerun Request')
@@ -67,7 +69,8 @@ export class RequestController {
             return;
         }
 
-        await this.runCore(this._lastRequest);
+        // TODO: recover from last request settings
+        await this.runCore(this._lastRequest, SystemSettings.Instance);
     }
 
     @trace('Cancel Request')
@@ -77,7 +80,7 @@ export class RequestController {
         this._requestStatusEntry.update({ state: RequestState.Cancelled });
     }
 
-    private async runCore(httpRequest: HttpRequest, document?: TextDocument) {
+    private async runCore(httpRequest: HttpRequest, settings: IRestClientSettings, document?: TextDocument) {
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
 
@@ -86,7 +89,7 @@ export class RequestController {
 
         // set http request
         try {
-            const response = await this._httpClient.send(httpRequest);
+            const response = await this._httpClient.send(httpRequest, settings);
 
             // check cancel
             if (httpRequest.isCancelled) {
@@ -101,10 +104,10 @@ export class RequestController {
 
             try {
                 const activeColumn = window.activeTextEditor!.viewColumn;
-                const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
+                const previewColumn = settings.previewColumn === ViewColumn.Active
                     ? activeColumn
                     : ((activeColumn as number) + 1) as ViewColumn;
-                if (this._restClientSettings.previewResponseInUntitledDocument) {
+                if (settings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
                 } else if (previewColumn) {
                     this._webview.render(response, previewColumn);
@@ -123,7 +126,7 @@ export class RequestController {
             }
 
             if (error.code === 'ETIMEDOUT') {
-                error.message = `Request timed out. Double-check your network connection and/or raise the timeout duration (currently set to ${this._restClientSettings.timeoutInMilliseconds}ms) as needed: 'rest-client.timeoutinmilliseconds'. Details: ${error}.`;
+                error.message = `Request timed out. Double-check your network connection and/or raise the timeout duration (currently set to ${settings.timeoutInMilliseconds}ms) as needed: 'rest-client.timeoutinmilliseconds'. Details: ${error}.`;
             } else if (error.code === 'ECONNREFUSED') {
                 error.message = `The connection was rejected. Either the requested service isn’t running on the requested server/port, the proxy settings in vscode are misconfigured, or a firewall is blocking requests. Details: ${error}.`;
             } else if (error.code === 'ENETUNREACH') {

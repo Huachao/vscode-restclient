@@ -153,10 +153,6 @@ export class Selector {
         return matched?.[1];
     }
 
-    public static hasNoteComment(text: string): boolean {
-        return Constants.NoteCommentRegex.test(text);
-    }
-
     private static getDelimitedText(fullText: string, currentLine: number): string | null {
         const lines: string[] = fullText.split(Constants.LineSplitterRegex);
         const delimiterLineNumbers: number[] = this.getDelimiterRows(lines);

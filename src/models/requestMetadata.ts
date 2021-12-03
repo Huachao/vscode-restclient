@@ -7,6 +7,10 @@ export enum RequestMetadata {
      * Used for request confirmation, especially for critical request
      */
     Note = 'note',
+    /**
+     * Represents don't follow the 3XX response as redirects
+     */
+    NoRedirect = 'no-redirect',
 }
 
 export function fromString(value: string): RequestMetadata | undefined {

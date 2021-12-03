@@ -5,7 +5,7 @@ import { Cookie, CookieJar, Store } from 'tough-cookie';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
-import { SystemSettings } from '../models/configurationSettings';
+import { IRestClientSettings, SystemSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { awsSignature } from './auth/awsSignature';
@@ -32,8 +32,6 @@ type Certificate = {
 };
 
 export class HttpClient {
-    private readonly _settings: SystemSettings = SystemSettings.Instance;
-
     private readonly cookieStore: Store;
 
     public constructor() {
@@ -41,8 +39,10 @@ export class HttpClient {
         this.cookieStore = new cookieStore(cookieFilePath) as Store;
     }
 
-    public async send(httpRequest: HttpRequest): Promise<HttpResponse> {
-        const options = await this.prepareOptions(httpRequest);
+    public async send(httpRequest: HttpRequest, settings?: IRestClientSettings): Promise<HttpResponse> {
+        settings = settings || SystemSettings.Instance;
+
+        const options = await this.prepareOptions(httpRequest, settings);
 
         let bodySize = 0;
         let headersSize = 0;
@@ -74,7 +74,7 @@ export class HttpClient {
         const bodyBuffer = response.body;
         let bodyString = iconv.encodingExists(encoding) ? iconv.decode(bodyBuffer, encoding) : bodyBuffer.toString();
 
-        if (this._settings.decodeEscapedUnicodeCharacters) {
+        if (settings.decodeEscapedUnicodeCharacters) {
             bodyString = this.decodeEscapedUnicodeCharacters(bodyString);
         }
 
@@ -105,7 +105,7 @@ export class HttpClient {
             ));
     }
 
-    private async prepareOptions(httpRequest: HttpRequest): Promise<got.GotBodyOptions<null>> {
+    private async prepareOptions(httpRequest: HttpRequest, settings: IRestClientSettings): Promise<got.GotBodyOptions<null>> {
         const originalRequestBody = httpRequest.body;
         let requestBody: string | Buffer | undefined;
         if (originalRequestBody) {
@@ -125,10 +125,10 @@ export class HttpClient {
             body: requestBody,
             encoding: null,
             decompress: true,
-            followRedirect: this._settings.followRedirect,
+            followRedirect: settings.followRedirect,
             rejectUnauthorized: false,
             throwHttpErrors: false,
-            cookieJar: this._settings.rememberCookiesForSubsequentRequests ? new CookieJar(this.cookieStore, { rejectPublicSuffixes: false }) : undefined,
+            cookieJar: settings.rememberCookiesForSubsequentRequests ? new CookieJar(this.cookieStore, { rejectPublicSuffixes: false }) : undefined,
             retry: 0,
             hooks: {
                 afterResponse: [],
@@ -146,8 +146,8 @@ export class HttpClient {
             }
         };
 
-        if (this._settings.timeoutInMilliseconds > 0) {
-            options.timeout = this._settings.timeoutInMilliseconds;
+        if (settings.timeoutInMilliseconds > 0) {
+            options.timeout = settings.timeoutInMilliseconds;
         }
 
         // TODO: refactor auth
@@ -174,17 +174,17 @@ export class HttpClient {
         }
 
         // set certificate
-        const certificate = this.getRequestCertificate(httpRequest.url);
+        const certificate = this.getRequestCertificate(httpRequest.url, settings);
         Object.assign(options, certificate);
 
         // set proxy
-        if (this._settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, this._settings.excludeHostsForProxy)) {
-            const proxyEndpoint = url.parse(this._settings.proxy);
+        if (settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, settings.excludeHostsForProxy)) {
+            const proxyEndpoint = url.parse(settings.proxy);
             if (/^https?:$/.test(proxyEndpoint.protocol || '')) {
                 const proxyOptions = {
                     host: proxyEndpoint.hostname,
                     port: Number(proxyEndpoint.port),
-                    rejectUnauthorized: this._settings.proxyStrictSSL
+                    rejectUnauthorized: settings.proxyStrictSSL
                 };
 
                 const ctor = (httpRequest.url.startsWith('http:')
@@ -245,13 +245,13 @@ export class HttpClient {
         });
     }
 
-    private getRequestCertificate(requestUrl: string): Certificate | null {
+    private getRequestCertificate(requestUrl: string, settings: IRestClientSettings): Certificate | null {
         const host = url.parse(requestUrl).host;
-        if (!host || !(host in this._settings.hostCertificates)) {
+        if (!host || !(host in settings.hostCertificates)) {
             return null;
         }
 
-        const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = this._settings.hostCertificates[host];
+        const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = settings.hostCertificates[host];
         const cert = this.resolveCertificate(certPath);
         const key = this.resolveCertificate(keyPath);
         const pfx = this.resolveCertificate(pfxPath);

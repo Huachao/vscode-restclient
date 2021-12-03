@@ -685,6 +685,7 @@ REST Client Extension also supports request-level settings for each independent 
 Name | Syntax    | Description
 -----|-----------|--------------------------------------------------------------
 note | `# @note` | Use for request confirmation, especially for critical request
+no-redirect | `# @no-redirect` | Don't follow the 3XX response as redirects
 
 > All the above leading `#` can be replaced with `//`
 
