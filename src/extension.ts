@@ -1,11 +1,12 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { commands, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
+import { commands, DocumentSelector, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
 import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
 import { RequestController } from './controllers/requestController';
+import { AsciidocCodeLensProvider } from './providers/asciidocCodeLensProvider';
 import { CustomVariableDiagnosticsProvider } from "./providers/customVariableDiagnosticsProvider";
 import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
 import { EnvironmentOrFileVariableHoverProvider } from './providers/environmentOrFileVariableHoverProvider';
@@ -50,27 +51,35 @@ export async function activate(context: ExtensionContext) {
         });
     }));
 
-    const documentSelector = [
+    const restDocumentSelector: DocumentSelector = [
         { language: 'http', scheme: '*' }
     ];
 
-    context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new HttpCompletionItemProvider()));
-    context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new RequestVariableCompletionItemProvider(), '.'));
-    context.subscriptions.push(languages.registerHoverProvider(documentSelector, new EnvironmentOrFileVariableHoverProvider()));
-    context.subscriptions.push(languages.registerHoverProvider(documentSelector, new RequestVariableHoverProvider()));
+    const asciidocDocumentSelector: DocumentSelector = [
+        { language: 'asciidoc', scheme: '*' }
+    ];
+
+    context.subscriptions.push(languages.registerCompletionItemProvider(restDocumentSelector, new HttpCompletionItemProvider()));
+    context.subscriptions.push(languages.registerCompletionItemProvider(restDocumentSelector, new RequestVariableCompletionItemProvider(), '.'));
+    context.subscriptions.push(languages.registerHoverProvider(restDocumentSelector, new EnvironmentOrFileVariableHoverProvider()));
+    context.subscriptions.push(languages.registerHoverProvider(restDocumentSelector, new RequestVariableHoverProvider()));
     context.subscriptions.push(
         new ConfigurationDependentRegistration(
-            () => languages.registerCodeLensProvider(documentSelector, new HttpCodeLensProvider()),
+            () => languages.registerCodeLensProvider(restDocumentSelector, new HttpCodeLensProvider()),
             s => s.enableSendRequestCodeLens));
     context.subscriptions.push(
         new ConfigurationDependentRegistration(
-            () => languages.registerCodeLensProvider(documentSelector, new FileVariableReferencesCodeLensProvider()),
+            () => languages.registerCodeLensProvider(restDocumentSelector, new FileVariableReferencesCodeLensProvider()),
             s => s.enableCustomVariableReferencesCodeLens));
-    context.subscriptions.push(languages.registerDocumentLinkProvider(documentSelector, new RequestBodyDocumentLinkProvider()));
-    context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new FileVariableDefinitionProvider()));
-    context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new RequestVariableDefinitionProvider()));
-    context.subscriptions.push(languages.registerReferenceProvider(documentSelector, new FileVariableReferenceProvider()));
-    context.subscriptions.push(languages.registerDocumentSymbolProvider(documentSelector, new HttpDocumentSymbolProvider()));
+    context.subscriptions.push(
+        new ConfigurationDependentRegistration(
+            () => languages.registerCodeLensProvider(asciidocDocumentSelector, new AsciidocCodeLensProvider()),
+            s => s.enableSendRequestCodeLens));
+    context.subscriptions.push(languages.registerDocumentLinkProvider(restDocumentSelector, new RequestBodyDocumentLinkProvider()));
+    context.subscriptions.push(languages.registerDefinitionProvider(restDocumentSelector, new FileVariableDefinitionProvider()));
+    context.subscriptions.push(languages.registerDefinitionProvider(restDocumentSelector, new RequestVariableDefinitionProvider()));
+    context.subscriptions.push(languages.registerReferenceProvider(restDocumentSelector, new FileVariableReferenceProvider()));
+    context.subscriptions.push(languages.registerDocumentSymbolProvider(restDocumentSelector, new HttpDocumentSymbolProvider()));
 
     const diagnosticsProvider = new CustomVariableDiagnosticsProvider();
     context.subscriptions.push(diagnosticsProvider);
