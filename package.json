@@ -1,12 +1,12 @@
 {
-  "name": "rest-client",
-  "displayName": "REST Client",
-  "description": "REST Client for Visual Studio Code",
+  "name": "best-rest-client",
+  "displayName": "best REST Client",
+  "description": "The outline supports multiple levels of # title generation",
   "version": "0.25.1",
-  "publisher": "humao",
+  "publisher": "zhufei",
   "author": {
-    "name": "Huachao Mao",
-    "email": "huachaomao@gmail.com"
+    "name": "zhufei",
+    "email": "zhupengfeivip@163.com"
   },
   "icon": "images/rest_icon.png",
   "galleryBanner": {
@@ -15,13 +15,13 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Huachao/vscode-restclient/issues",
+    "url": "https://github.com/zhupengfeivip/vscode-restclient/issues",
     "email": "huachaomao@gmail.com"
   },
-  "homepage": "https://github.com/Huachao/vscode-restclient/blob/master/README.md",
+  "homepage": "https://github.com/zhupengfeivip/vscode-restclient/blob/master/README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Huachao/vscode-restclient.git"
+    "url": "https://github.com/zhupengfeivip/vscode-restclient.git"
   },
   "engines": {
     "vscode": "^1.38.0"
