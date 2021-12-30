@@ -12,7 +12,7 @@ export function digest(user: string, pass: string): got.AfterResponseHook<got.Go
             && response.headers['www-authenticate']
             && response.headers['www-authenticate'].split(' ')[0].toLowerCase() === 'digest') {
             const authHeader = response.headers['www-authenticate'];
-            const method = (response as any).request.gotOptions.method;
+            const method = (response as any).request.options.method;
             const path = url.parse(response.url).path;
             const challenge = {
                 qop: '',
