@@ -97,7 +97,7 @@ export class HttpClient {
                 options.method!,
                 requestUrl,
                 HttpClient.normalizeHeaderNames(
-                    (response as any).request.gotOptions.headers as RequestHeaders,
+                    (response as any).request.options.headers as RequestHeaders,
                     Object.keys(httpRequest.headers)),
                 Buffer.isBuffer(requestBody) ? convertBufferToStream(requestBody) : requestBody,
                 httpRequest.rawBody,
@@ -123,7 +123,7 @@ export class HttpClient {
             headers: clonedHeaders,
             method: httpRequest.method,
             body: requestBody,
-            encoding: null,
+            responseType: 'buffer',
             decompress: true,
             followRedirect: settings.followRedirect,
             rejectUnauthorized: false,
@@ -132,16 +132,7 @@ export class HttpClient {
             retry: 0,
             hooks: {
                 afterResponse: [],
-                // Following port reset on redirect can be removed after upgrade got to version 10.0
-                // https://github.com/sindresorhus/got/issues/719
-                beforeRedirect: [
-                    opts => {
-                        const redirectHost = ((opts as any).href as string).split('/')[2];
-                        if (!redirectHost.includes(':')) {
-                            delete opts.port;
-                        }
-                    }
-                ],
+                beforeRedirect: [],
                 beforeRequest: [],
             }
         };
