@@ -9,7 +9,7 @@ import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 
 export class RequestVariableProvider implements HttpVariableProvider {
     private static _instance: RequestVariableProvider;
-
+    public _environmentName: string
     public static get Instance(): RequestVariableProvider {
         if (!this._instance) {
             this._instance = new RequestVariableProvider();

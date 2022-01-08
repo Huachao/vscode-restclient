@@ -12,7 +12,7 @@ type FileVariableValue = Record<'name' | 'value', string>;
 
 export class FileVariableProvider implements HttpVariableProvider {
     private static _instance: FileVariableProvider;
-
+    public _environmentName: string
     public static get Instance(): FileVariableProvider {
         if (!this._instance) {
             this._instance = new FileVariableProvider();

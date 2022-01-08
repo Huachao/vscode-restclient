@@ -37,9 +37,9 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private readonly aadRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+aud:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
 
-    private readonly innerSettingsEnvironmentVariableProvider: EnvironmentVariableProvider =  EnvironmentVariableProvider.Instance;
+    private readonly innerSettingsEnvironmentVariableProvider: EnvironmentVariableProvider = EnvironmentVariableProvider.Instance;
     private static _instance: SystemVariableProvider;
-
+    public _environmentName: string
     public static get Instance(): SystemVariableProvider {
         if (!this._instance) {
             this._instance = new SystemVariableProvider();
@@ -166,7 +166,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private registerProcessEnvVariable() {
         this.resolveFuncs.set(Constants.ProcessEnvVariableName, async name => {
             const groups = this.processEnvRegex.exec(name);
-            if (groups !== null && groups.length === 3 ) {
+            if (groups !== null && groups.length === 3) {
                 const [, refToggle, environmentVarName] = groups;
                 let processEnvName = environmentVarName;
                 if (refToggle !== undefined) {
@@ -247,7 +247,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                     const tokenString = `${token.tokenType} ${token.accessToken}`;
                     if (copy && tokenString) {
                         // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
-                       this.clipboard.writeText(tokenString).then(() => resolve({ value: tokenString }));
+                        this.clipboard.writeText(tokenString).then(() => resolve({ value: tokenString }));
                     } else {
                         resolve({ value: tokenString });
                     }
@@ -280,7 +280,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private async resolveSettingsEnvironmentVariable(name: string) {
         if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
-            const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);
+            const { value, error, warning } = await this.innerSettingsEnvironmentVariableProvider.get(name);
             if (!error && !warning) {
                 return value!.toString();
             } else {

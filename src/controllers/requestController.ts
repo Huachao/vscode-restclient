@@ -31,14 +31,14 @@ export class RequestController {
     }
 
     @trace('Request')
-    public async run(range: Range) {
+    public async run(range: Range, env: string) {
         const editor = window.activeTextEditor;
         const document = getCurrentTextDocument();
         if (!editor || !document) {
             return;
         }
 
-        const selectedRequest = await Selector.getRequest(editor, range);
+        const selectedRequest = await Selector.getRequest(editor, range, env);
         if (!selectedRequest) {
             return;
         }

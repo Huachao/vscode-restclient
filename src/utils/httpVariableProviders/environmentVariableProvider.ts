@@ -8,6 +8,8 @@ import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 export class EnvironmentVariableProvider implements HttpVariableProvider {
     private static _instance: EnvironmentVariableProvider;
 
+    public _environmentName: string
+
     private readonly _settings: RestClientSettings = RestClientSettings.Instance;
 
     public static get Instance(): EnvironmentVariableProvider {
@@ -39,19 +41,22 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
 
     public async getAll(): Promise<HttpVariable[]> {
         const variables = await this.getAvailableVariables();
-        return Object.keys(variables).map(key => ({ name: key, value: variables[key]}));
+        return Object.keys(variables).map(key => ({ name: key, value: variables[key] }));
     }
 
     private async getAvailableVariables(): Promise<{ [key: string]: string }> {
-        let { name: environmentName } = await EnvironmentController.getCurrentEnvironment();
+        let { name: environmentName } = await EnvironmentController.getCurrentEnvironment()
+        if (this._environmentName)
+            environmentName = this._environmentName
         if (environmentName === Constants.NoEnvironmentSelectedName) {
             environmentName = EnvironmentController.sharedEnvironmentName;
         }
+        // console.log('CurrentEnvironment', environmentName)
         const variables = this._settings.environmentVariables;
         const currentEnvironmentVariables = variables[environmentName];
         const sharedEnvironmentVariables = variables[EnvironmentController.sharedEnvironmentName];
         this.mapEnvironmentVariables(currentEnvironmentVariables, sharedEnvironmentVariables);
-        return {...sharedEnvironmentVariables, ...currentEnvironmentVariables};
+        return { ...sharedEnvironmentVariables, ...currentEnvironmentVariables };
     }
 
     private mapEnvironmentVariables(current: { [key: string]: string }, shared: { [key: string]: string }) {

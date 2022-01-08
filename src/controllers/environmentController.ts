@@ -57,6 +57,17 @@ export class EnvironmentController {
         await UserDataManager.setEnvironment(item);
     }
 
+    public static async getAllEnvironment(): Promise<EnvironmentPickItem[]> {
+        const userEnvironments: EnvironmentPickItem[] =
+            Object.keys(RestClientSettings.Instance.environmentVariables)
+                .filter(name => name !== EnvironmentController.sharedEnvironmentName)
+                .map(name => ({
+                    name,
+                    label: name
+                }));
+        return userEnvironments
+    }
+
     public static async create(): Promise<EnvironmentController> {
         const environment = await this.getCurrentEnvironment();
         return new EnvironmentController(environment);

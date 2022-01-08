@@ -19,7 +19,7 @@ export interface SelectedRequest {
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
+    public static async getRequest(editor: TextEditor, range: Range | null = null, env: string): Promise<SelectedRequest | null> {
         if (!editor.document) {
             return null;
         }
@@ -52,7 +52,7 @@ export class Selector {
         selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1).join(EOL);
 
         // variables replacement
-        selectedText = await VariableProcessor.processRawRequest(selectedText);
+        selectedText = await VariableProcessor.processRawRequest(selectedText, env);
 
         return {
             text: selectedText,

@@ -10,7 +10,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
         let allSharpRowIndexs: number[] = Selector.getAllSharpRanges(allLines);
         if (allSharpRowIndexs.length <= 0) return symbols;
         for (let i = 0; i < allSharpRowIndexs.length; i++) {
-            console.log('i:' + i);
+            // console.log('i:' + i);
             let blockStart = allSharpRowIndexs[i];
             let line = allLines[blockStart];
             if (line == undefined) break;
@@ -27,7 +27,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             for (let j = 0; j < child1Count; j++) {
                 i++;
                 if (i >= allSharpRowIndexs.length) break;
-                console.log('i:' + i);
+                // console.log('i:' + i);
                 blockStart = allSharpRowIndexs[i];
                 line = allLines[blockStart];
                 if (line == undefined) break;
@@ -46,7 +46,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
                     i++;
                     j++;
                     if (i >= allSharpRowIndexs.length) break;
-                    console.log('i:' + i);
+                    // console.log('i:' + i);
                     blockStart = allSharpRowIndexs[i];
                     line = allLines[blockStart];
                     if (line == undefined) break;
@@ -65,7 +65,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
                         j++;
                         k++;
                         if (i >= allSharpRowIndexs.length) break;
-                        console.log('i:' + i);
+                        // console.log('i:' + i);
                         blockStart = allSharpRowIndexs[i];
                         line = allLines[blockStart];
                         if (line == undefined) break;
