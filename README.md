@@ -12,6 +12,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 
 1. The outline supports multiple levels and is generated according to the # heading, which is why this project is independent. I personally find this function very useful.
 2. Fix the bug that the result is not displayed due to an exception when the URL is added with a link.
+3. Send a request according to the configuration of the environment, see the effect picture (in the process of using their own, often encountered send command, only to find that it is in the production environment, and then switch back and forth, often make a mistake, learn from WebStorm, can choose when sending, so that there will be no mistake, better than WebStorm. WebStorm needs two clicks, I can just click on it.
 
 ## screenshot
 
@@ -21,6 +22,10 @@ Original Outline plan
 Improved post outline view  
 ![rest-client](images/treeView-new.png)  
 Support multilevel structure
+
+send request  
+![rest-client](images/req.png)
+Environment variable is based on the above the rest - client. EnvironmentVariables configured in.
 
 ## 编译说明
 

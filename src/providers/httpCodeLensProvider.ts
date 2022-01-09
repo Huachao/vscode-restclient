@@ -12,21 +12,25 @@ export class HttpCodeLensProvider implements CodeLensProvider {
         for (const [blockStart, blockEnd] of requestRanges) {
             const range = new Range(blockStart, 0, blockEnd, 0);
             const userEnvironments: any[] = await EnvironmentController.getAllEnvironment()
-            for (let i = 0; i < userEnvironments.length; i++) {
-                const element = userEnvironments[i];
+            if (userEnvironments.length > 0) {
+                for (let i = 0; i < userEnvironments.length; i++) {
+                    const element = userEnvironments[i];
+                    const cmd: Command = {
+                        arguments: [document, range, element.name],
+                        title: `${element.name}`,
+                        command: 'rest-client.request'
+                    };
+                    blocks.push(new CodeLens(range, cmd));
+                }
+            }
+            else {
                 const cmd: Command = {
-                    arguments: [document, range, element.name],
-                    title: `${element.name}`,
+                    arguments: [document, range],
+                    title: 'Send Request',
                     command: 'rest-client.request'
                 };
                 blocks.push(new CodeLens(range, cmd));
             }
-            // const cmd: Command = {
-            //     arguments: [document, range],
-            //     title: 'Send Request',
-            //     command: 'rest-client.request'
-            // };
-            // blocks.push(new CodeLens(range, cmd));
         }
 
         return Promise.resolve(blocks);
