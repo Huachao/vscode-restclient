@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
 import { Stream } from 'stream';
-import { SystemSettings } from '../models/configurationSettings';
+import { IRestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
@@ -26,7 +26,7 @@ export class HttpRequestParser implements RequestParser {
     private readonly inputFileSyntax = /^<(?:(?<processVariables>@)(?<encoding>\w+)?)?\s+(?<filepath>.+?)\s*$/;
     private readonly defaultFileEncoding = 'utf8';
 
-    public constructor(private readonly requestRawText: string, private readonly settings: SystemSettings) {
+    public constructor(private readonly requestRawText: string, private readonly settings: IRestClientSettings) {
     }
 
     public async parseHttpRequest(name?: string): Promise<HttpRequest> {
@@ -135,7 +135,7 @@ export class HttpRequestParser implements RequestParser {
             body = await convertStreamToString(body);
         }
 
-        const matched = body?.match(/^\s*query\s+([^@\{\(]+)/i);
+        const matched = body?.match(/^\s*query\s+([^@\{\(\s]+)/i);
         const operationName = matched?.[1];
 
         const graphQlPayload = {

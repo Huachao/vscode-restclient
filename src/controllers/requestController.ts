@@ -1,6 +1,6 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
 import Logger from '../logger';
-import { IRestClientSettings, RequestSettings, RestClientSettings, SystemSettings } from '../models/configurationSettings';
+import { IRestClientSettings, RequestSettings, RestClientSettings } from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
 import { RequestMetadata } from '../models/requestMetadata';
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -19,7 +19,7 @@ export class RequestController {
     private _httpClient: HttpClient;
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
-    private _lastRequest?: HttpRequest;
+    private _lastRequestSettingTuple: [HttpRequest, IRestClientSettings];
     private _lastPendingRequest?: HttpRequest;
 
     public constructor(context: ExtensionContext) {
@@ -58,19 +58,21 @@ export class RequestController {
         const settings: IRestClientSettings = new RestClientSettings(requestSettings);
 
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(name);
+        const httpRequest = await RequestParserFactory.createRequestParser(text, settings).parseHttpRequest(name);
 
         await this.runCore(httpRequest, settings, document);
     }
 
     @trace('Rerun Request')
     public async rerun() {
-        if (!this._lastRequest) {
+        if (!this._lastRequestSettingTuple) {
             return;
         }
 
+        let [request, settings] = this._lastRequestSettingTuple;
+
         // TODO: recover from last request settings
-        await this.runCore(this._lastRequest, SystemSettings.Instance);
+        await this.runCore(request, settings);
     }
 
     @trace('Cancel Request')
@@ -85,7 +87,8 @@ export class RequestController {
         this._requestStatusEntry.update({ state: RequestState.Pending });
 
         // set last request and last pending request
-        this._lastPendingRequest = this._lastRequest = httpRequest;
+        this._lastPendingRequest = httpRequest;
+        this._lastRequestSettingTuple = [httpRequest, settings];
 
         // set http request
         try {

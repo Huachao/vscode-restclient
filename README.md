@@ -9,7 +9,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Send __GraphQL query__ and author __GraphQL variables__ in editor
 * Send __cURL command__ in editor and copy HTTP request as `cURL command`
 * Auto save and view/clear request history
-* Organize _MULTIPLE_ requests in the same file (separated by `###` delimiter)
+* Compose _MULTIPLE_ requests in a single file (separated by `###` delimiter)
 * View image response directly in pane
 * Save raw response and response body only to local disk
 * Fold and unfold response body
