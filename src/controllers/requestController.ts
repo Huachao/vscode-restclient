@@ -69,7 +69,7 @@ export class RequestController {
             return;
         }
 
-        let [request, settings] = this._lastRequestSettingTuple;
+        const [request, settings] = this._lastRequestSettingTuple;
 
         // TODO: recover from last request settings
         await this.runCore(request, settings);
