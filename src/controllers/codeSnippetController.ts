@@ -81,6 +81,7 @@ export class CodeSnippetController {
         quickPick.onDidAccept(() => {
             const selectedItem = quickPick.selectedItems[0];
             if (quickPick.step === 1) {
+                quickPick.value = '';
                 quickPick.step++;
                 quickPick.buttons = [QuickInputButtons.Back];
                 target = selectedItem as any as CodeSnippetTarget;
