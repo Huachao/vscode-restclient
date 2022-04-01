@@ -304,13 +304,21 @@ export class RequestSettings implements Partial<IRestClientSettings> {
 
     private _followRedirect?: boolean = undefined;
 
+    private _rememberCookiesForSubsequentRequests?: boolean = undefined;
+
     public get followRedirect() {
         return this._followRedirect;
+    }
+
+    public get rememberCookiesForSubsequentRequests() {
+        return this._rememberCookiesForSubsequentRequests;
     }
 
     public constructor(metadatas: Map<RequestMetadata, string | undefined>) {
         if (metadatas.has(RequestMetadata.NoRedirect)) {
             this._followRedirect = false;
+        } else if (metadatas.has(RequestMetadata.NoCookieJar)) {
+            this._rememberCookiesForSubsequentRequests = false;
         }
     }
 }
@@ -346,7 +354,7 @@ export class RestClientSettings implements IRestClientSettings {
     }
 
     public get rememberCookiesForSubsequentRequests() {
-        return this.systemSettings.rememberCookiesForSubsequentRequests;
+        return this.requestSettings.rememberCookiesForSubsequentRequests ?? this.systemSettings.rememberCookiesForSubsequentRequests;
     }
 
     public get enableTelemetry() {

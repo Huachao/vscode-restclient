@@ -686,6 +686,7 @@ Name | Syntax    | Description
 -----|-----------|--------------------------------------------------------------
 note | `# @note` | Use for request confirmation, especially for critical request
 no-redirect | `# @no-redirect` | Don't follow the 3XX response as redirects
+no-cookie-jar | `# @no-cookie-jar` | Don't save cookies in the cookie jar
 
 > All the above leading `#` can be replaced with `//`
 

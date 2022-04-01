@@ -11,6 +11,11 @@ export enum RequestMetadata {
      * Represents don't follow the 3XX response as redirects
      */
     NoRedirect = 'no-redirect',
+
+    /**
+     * Represents the cookie jar is disabled for this request
+     */
+    NoCookieJar = 'no-cookie-jar',
 }
 
 export function fromString(value: string): RequestMetadata | undefined {
