@@ -56,6 +56,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Support navigate to symbol definitions(request and file level custom variable) in open `http` file
     - CodeLens support to add an actionable link to send request
     - Fold/Unfold for request block
+* Support for AsciiDoc fenced code blocks
 
 ## Usage
 In editor, type an HTTP request as simple as below:

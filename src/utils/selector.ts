@@ -1,6 +1,7 @@
 import { EOL } from 'os';
-import { Range, TextEditor } from 'vscode';
+import { Position, Range, TextDocument, TextEditor } from 'vscode';
 import * as Constants from '../common/constants';
+import Logger from '../logger';
 import { fromString as ParseReqMetaKey, RequestMetadata } from '../models/requestMetadata';
 import { SelectedRequest } from '../models/SelectedRequest';
 import { VariableProcessor } from './variableProcessor';
@@ -23,7 +24,22 @@ export class Selector {
         let selectedText: string | null;
         if (editor.selection.isEmpty || range) {
             const activeLine = range?.start.line ?? editor.selection.active.line;
-            selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
+
+            Logger.info('language', editor.document.languageId);
+
+            if (editor.document.languageId === 'asciidoc') {
+                selectedText = null;
+
+                for (const r of Selector.getAsciidocRestSnippets(editor.document)) {
+                    const snippetRange = new Range(r.start.line + 2, 0, r.end.line, 0);
+                    if (snippetRange.contains(new Position(activeLine, 0))) {
+                        selectedText = editor.document.getText(snippetRange);
+                    }
+                }
+
+            } else {
+                selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
+            }
         } else {
             selectedText = editor.document.getText(editor.selection);
         }
@@ -188,5 +204,30 @@ export class Selector {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
             .map(([index, ]) => +index);
+    }
+
+    public static* getAsciidocRestSnippets(document: TextDocument): Generator<Range> {
+        const snippetStartRegx = /^\[source,http\]$/;
+        const snippetDelimiterRegx = /^----$/;
+
+        let snippetStart: number | undefined;
+        for (let i = 0; i < document.lineCount; i++) {
+            const lineText = document.lineAt(i).text;
+
+            const matchEnd = lineText.match(snippetDelimiterRegx);
+            if (snippetStart !== undefined && matchEnd && i !== snippetStart + 1) {
+                const snippetEnd = i;
+
+                const range = new Range(snippetStart, 0, snippetEnd, 0);
+                yield range;
+
+                snippetStart = undefined;
+            } else {
+                const matchStart = lineText.match(snippetStartRegx);
+                if (matchStart && document.lineAt(i + 1)?.text?.match(snippetDelimiterRegx)) {
+                    snippetStart = i;
+                }
+            }
+        }
     }
 }
