@@ -186,15 +186,15 @@ export class HttpElementFactory {
         const editor = window.activeTextEditor;
         if (editor) {
             const activeLine =  editor.selection.active.line;
-            let selectedText = Selector.getDelimitedText(editor.document.getText(), activeLine);
-            
-            if(selectedText) {
+            const selectedText = Selector.getDelimitedText(editor.document.getText(), activeLine);
+
+            if (selectedText) {
                 // convert request text into lines
                 const lines = selectedText.split(Constants.LineSplitterRegex);
                 const metadatas = Selector.parseReqMetadatas(lines);
 
                 // add prompt variables
-                const promptVariablesDefinitions = Selector.parsePromptMetadataForVariableDefinitions(metadatas.get(RequestMetadata.Prompt))
+                const promptVariablesDefinitions = Selector.parsePromptMetadataForVariableDefinitions(metadatas.get(RequestMetadata.Prompt));
                 for (const { name, description } of promptVariablesDefinitions) {
                     const v = new MarkdownString(`${description ? `Description: ${description}` : `Prompt Variable: \`${name}`}\``);
                     originalElements.push(

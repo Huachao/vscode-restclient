@@ -44,7 +44,7 @@ export class Selector {
         const metadatas = this.parseReqMetadatas(lines);
 
         // process #@prompt comment metadata
-        const promptVariablesDefinitions = this.parsePromptMetadataForVariableDefinitions(metadatas.get(RequestMetadata.Prompt))
+        const promptVariablesDefinitions = this.parsePromptMetadataForVariableDefinitions(metadatas.get(RequestMetadata.Prompt));
         const promptVariables = await this.promptForInput(promptVariablesDefinitions);
         if (!promptVariables) {
             return null;
@@ -90,7 +90,7 @@ export class Selector {
             const metaValue = matched[2];
             const metadata = ParseReqMetaKey(metaKey);
             if (metadata) {
-                if(metadata === RequestMetadata.Prompt) {
+                if (metadata === RequestMetadata.Prompt) {
                     this.handlePromptMetadata(metadatas, line);
                 } else {
                     metadatas.set(metadata, metaValue || undefined);
@@ -182,12 +182,12 @@ export class Selector {
     public static parsePromptMetadataForVariableDefinitions(text: string | undefined) : PromptVariableDefinition[] {
         const varDefs : PromptVariableDefinition[] = [];
         const parsedDefs = JSON.parse(text || "[]");
-        if(Array.isArray(parsedDefs)) {
-            for(const parsedDef of parsedDefs) {
+        if (Array.isArray(parsedDefs)) {
+            for (const parsedDef of parsedDefs) {
                 varDefs.push({
                     name: parsedDef['name'],
                     description: parsedDef['description']
-                })
+                });
             }
         }
 
@@ -233,7 +233,7 @@ export class Selector {
 
     private static handlePromptMetadata(metadatas: Map<RequestMetadata, string | undefined> , text: string) {
         const promptVarDef = this.getPrompVariableDefinition(text);
-        if(promptVarDef) {
+        if (promptVarDef) {
             const varDefs = this.parsePromptMetadataForVariableDefinitions(metadatas.get(RequestMetadata.Prompt));
             varDefs.push(promptVarDef);
             metadatas.set(RequestMetadata.Prompt, JSON.stringify(varDefs));
