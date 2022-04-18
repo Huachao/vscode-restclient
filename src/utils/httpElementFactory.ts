@@ -1,10 +1,12 @@
 import * as url from 'url';
-import { MarkdownString, SnippetString, TextDocument } from 'vscode';
+import { MarkdownString, SnippetString, TextDocument, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { ElementType, HttpElement } from '../models/httpElement';
+import { RequestMetadata } from '../models/requestMetadata';
 import { EnvironmentVariableProvider } from './httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from './httpVariableProviders/fileVariableProvider';
 import { RequestVariableProvider } from './httpVariableProviders/requestVariableProvider';
+import { Selector } from './selector';
 import { UserDataManager } from './userDataManager';
 
 export class HttpElementFactory {
@@ -136,6 +138,12 @@ export class HttpElementFactory {
             null,
             Constants.AzureActiveDirectoryDescription,
             new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryVariableName.slice(1)}}}}`)));
+        originalElements.push(new HttpElement(
+            Constants.AzureActiveDirectoryV2TokenVariableName,
+            ElementType.SystemVariable,
+            null,
+            Constants.AzureActiveDirectoryV2TokenDescription,
+            new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryV2TokenVariableName.slice(1)}}}}`)));
 
         // add environment custom variables
         const environmentVariables = await EnvironmentVariableProvider.Instance.getAll();
@@ -174,6 +182,32 @@ export class HttpElementFactory {
                     new SnippetString(`{{${name}.\${1|request,response|}.\${2|headers,body|}.\${3:Header Name, *(Full Body), JSONPath or XPath}}}`)));
         }
 
+        // add active editor elements
+        const editor = window.activeTextEditor;
+        if (editor) {
+            const activeLine =  editor.selection.active.line;
+            let selectedText = Selector.getDelimitedText(editor.document.getText(), activeLine);
+            
+            if(selectedText) {
+                // convert request text into lines
+                const lines = selectedText.split(Constants.LineSplitterRegex);
+                const metadatas = Selector.parseReqMetadatas(lines);
+
+                // add prompt variables
+                const promptVariablesDefinitions = Selector.parsePromptMetadataForVariableDefinitions(metadatas.get(RequestMetadata.Prompt))
+                for (const { name, description } of promptVariablesDefinitions) {
+                    const v = new MarkdownString(`${description ? `Description: ${description}` : `Prompt Variable: \`${name}`}\``);
+                    originalElements.push(
+                        new HttpElement(
+                            name,
+                            ElementType.PromptVariable,
+                            '^\\s*[^@]',
+                            v,
+                            new SnippetString(`{{${name}}}`)));
+                }
+            }
+        }
+
         // add urls from history
         const historyItems = await UserDataManager.getRequestHistory();
         const distinctRequestUrls = new Set(historyItems.map(item => item.url));
@@ -210,4 +244,5 @@ export class HttpElementFactory {
 
         return elements;
     }
+
 }

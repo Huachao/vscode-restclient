@@ -31,5 +31,6 @@ export enum ElementType {
     SystemVariable,
     EnvironmentCustomVariable,
     FileCustomVariable,
-    RequestCustomVariable
+    RequestCustomVariable,
+    PromptVariable
 }

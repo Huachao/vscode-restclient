@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import { RequestHeaders } from '../models/base';
-import { RestClientSettings } from '../models/configurationSettings';
+import { IRestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
 import { base64, hasHeader } from './misc';
@@ -12,7 +12,7 @@ const DefaultContentType: string = 'application/x-www-form-urlencoded';
 
 export class CurlRequestParser implements RequestParser {
 
-    public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
+    public constructor(private readonly requestRawText: string, private readonly settings: IRestClientSettings) {
     }
 
     public async parseHttpRequest(name?: string): Promise<HttpRequest> {
@@ -52,9 +52,11 @@ export class CurlRequestParser implements RequestParser {
         }
 
         // parse body
-        let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-ascii'] || parsedArguments['data-binary'];
+        let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-ascii'] || parsedArguments['data-binary'] || parsedArguments['data-raw'];
         if (Array.isArray(body)) {
             body = body.join('&');
+        } else  {
+            body = body.toString();
         }
 
         if (typeof body === 'string' && body[0] === '@') {

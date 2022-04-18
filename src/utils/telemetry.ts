@@ -1,7 +1,7 @@
 import * as appInsights from "applicationinsights";
 import { extensions } from 'vscode';
 import * as Constants from '../common/constants';
-import { RestClientSettings } from '../models/configurationSettings';
+import { SystemSettings } from '../models/configurationSettings';
 
 appInsights.setup(Constants.AiKey)
     .setAutoCollectConsole(false)
@@ -14,7 +14,7 @@ appInsights.setup(Constants.AiKey)
     .start();
 
 export class Telemetry {
-    private static readonly restClientSettings: RestClientSettings = RestClientSettings.Instance;
+    private static readonly restClientSettings: SystemSettings = SystemSettings.Instance;
 
     private static defaultClient: appInsights.TelemetryClient;
 

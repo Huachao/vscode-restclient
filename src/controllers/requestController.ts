@@ -1,7 +1,8 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
 import Logger from '../logger';
-import { RestClientSettings } from '../models/configurationSettings';
+import { IRestClientSettings, RequestSettings, RestClientSettings } from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
+import { RequestMetadata } from '../models/requestMetadata';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { trace } from "../utils/decorator";
 import { HttpClient } from '../utils/httpClient';
@@ -14,12 +15,11 @@ import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentV
 import { HttpResponseWebview } from '../views/httpResponseWebview';
 
 export class RequestController {
-    private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private _requestStatusEntry: RequestStatusEntry;
     private _httpClient: HttpClient;
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
-    private _lastRequest?: HttpRequest;
+    private _lastRequestSettingTuple: [HttpRequest, IRestClientSettings];
     private _lastPendingRequest?: HttpRequest;
 
     public constructor(context: ExtensionContext) {
@@ -43,9 +43,10 @@ export class RequestController {
             return;
         }
 
-        const { text, name, warnBeforeSend } = selectedRequest;
+        const { text, metadatas } = selectedRequest;
+        const name = metadatas.get(RequestMetadata.Name);
 
-        if (warnBeforeSend) {
+        if (metadatas.has(RequestMetadata.Note)) {
             const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
             const userConfirmed = await window.showWarningMessage(note, 'Yes', 'No');
             if (userConfirmed !== 'Yes') {
@@ -53,19 +54,25 @@ export class RequestController {
             }
         }
 
-        // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(name);
+        const requestSettings = new RequestSettings(metadatas);
+        const settings: IRestClientSettings = new RestClientSettings(requestSettings);
 
-        await this.runCore(httpRequest, document);
+        // parse http request
+        const httpRequest = await RequestParserFactory.createRequestParser(text, settings).parseHttpRequest(name);
+
+        await this.runCore(httpRequest, settings, document);
     }
 
     @trace('Rerun Request')
     public async rerun() {
-        if (!this._lastRequest) {
+        if (!this._lastRequestSettingTuple) {
             return;
         }
 
-        await this.runCore(this._lastRequest);
+        const [request, settings] = this._lastRequestSettingTuple;
+
+        // TODO: recover from last request settings
+        await this.runCore(request, settings);
     }
 
     @trace('Cancel Request')
@@ -75,16 +82,17 @@ export class RequestController {
         this._requestStatusEntry.update({ state: RequestState.Cancelled });
     }
 
-    private async runCore(httpRequest: HttpRequest, document?: TextDocument) {
+    private async runCore(httpRequest: HttpRequest, settings: IRestClientSettings, document?: TextDocument) {
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
 
         // set last request and last pending request
-        this._lastPendingRequest = this._lastRequest = httpRequest;
+        this._lastPendingRequest = httpRequest;
+        this._lastRequestSettingTuple = [httpRequest, settings];
 
         // set http request
         try {
-            const response = await this._httpClient.send(httpRequest);
+            const response = await this._httpClient.send(httpRequest, settings);
 
             // check cancel
             if (httpRequest.isCancelled) {
@@ -99,10 +107,10 @@ export class RequestController {
 
             try {
                 const activeColumn = window.activeTextEditor!.viewColumn;
-                const previewColumn = this._restClientSettings.previewColumn === ViewColumn.Active
+                const previewColumn = settings.previewColumn === ViewColumn.Active
                     ? activeColumn
                     : ((activeColumn as number) + 1) as ViewColumn;
-                if (this._restClientSettings.previewResponseInUntitledDocument) {
+                if (settings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
                 } else if (previewColumn) {
                     this._webview.render(response, previewColumn);
@@ -121,9 +129,9 @@ export class RequestController {
             }
 
             if (error.code === 'ETIMEDOUT') {
-                error.message = `Please check your networking connectivity and your time out in ${this._restClientSettings.timeoutInMilliseconds}ms according to your configuration 'rest-client.timeoutinmilliseconds'. Details: ${error}. `;
+                error.message = `Request timed out. Double-check your network connection and/or raise the timeout duration (currently set to ${settings.timeoutInMilliseconds}ms) as needed: 'rest-client.timeoutinmilliseconds'. Details: ${error}.`;
             } else if (error.code === 'ECONNREFUSED') {
-                error.message = `Connection is being rejected. The service isn’t running on the server, or incorrect proxy settings in vscode, or a firewall is blocking requests. Details: ${error}.`;
+                error.message = `The connection was rejected. Either the requested service isn’t running on the requested server/port, the proxy settings in vscode are misconfigured, or a firewall is blocking requests. Details: ${error}.`;
             } else if (error.code === 'ENETUNREACH') {
                 error.message = `You don't seem to be connected to a network. Details: ${error}`;
             }

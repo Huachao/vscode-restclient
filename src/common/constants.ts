@@ -21,6 +21,9 @@ export const DotenvVariableName = "$dotenv";
 export const DotenvDescription = "Returns the environment value stored in a .env file";
 export const AzureActiveDirectoryVariableName = "$aadToken";
 export const AzureActiveDirectoryDescription = "Prompts to sign in to Azure AD and adds the token to the request";
+export const AzureActiveDirectoryV2TokenVariableName = "$aadV2Token";
+export const AzureActiveDirectoryV2TokenDescription = "Prompts to sign in to Azure AD V2 and adds the token to the request";
+
 /**
  * NOTE: The client id represents an AAD app people sign in to. The client id is sent to AAD to indicate what app
  * is requesting a token for the user. When the user signs in, AAD shows the name of the app to confirm the user is
@@ -56,6 +59,8 @@ export const AzureClouds: { [key: string]: { aad: string, arm: string, armAudien
     },
 };
 
+export const RequestMetadataRegex: RegExp = /^\s*(?:#|\/{2})\s*@([\w-]+)(?:\s+(.*?))?\s*$/;
+
 export const CommentIdentifiersRegex: RegExp = /^\s*(#|\/{2})/;
 
 export const FileVariableDefinitionRegex: RegExp = /^\s*@([^\s=]+)\s*=\s*(.*?)\s*$/;
@@ -64,8 +69,6 @@ export const RequestVariableDefinitionWithNameRegexFactory = (name: string, flag
     new RegExp(`^\\s*(?:#{1,}|\\/{2,})\\s+@name\\s+(${name})\\s*$`, flags);
 
 export const RequestVariableDefinitionRegex: RegExp = RequestVariableDefinitionWithNameRegexFactory("\\w+", "m");
-
-export const NoteCommentRegex = /^\s*(?:#{1,}|\/{2,})\s*@note\s*$/m;
 
 export const PromptCommentRegex = /^\s*(?:#{1,}|\/{2,})\s*@prompt\s+([^\s]+)(?:\s+(.*))?\s*$/m;
 

@@ -1,3 +1,43 @@
+## 0.24.6 (2021/11/29)
+* __Bug Fix__: [Fix AADV2TokenProvider only works for special case of MS Graph Tokens](https://github.com/Huachao/vscode-restclient/pull/794) ([@mthierba](https://github.com/mthierba))
+* __Improvement__: [Allow comments between variable declarations](https://github.com/Huachao/vscode-restclient/pull/885) ([@Danysan1](https://github.com/Danysan1))
+* __Improvement__: [Add support for application/x-amz-json-1.1 as JSON](https://github.com/Huachao/vscode-restclient/pull/771) ([@fxalgrain](https://github.com/fxalgrain))
+* __Improvement__: [SaveBody now uses filename from content-disposition](https://github.com/Huachao/vscode-restclient/pull/924) ([@mbronk](https://github.com/mbronk))
+* __Improvement__: [Add operation name for GraphQL request](https://github.com/Huachao/vscode-restclient/issues/919)
+* __Improvement__: [Destory underlying connection when user cancels the request](https://github.com/Huachao/vscode-restclient/issues/910)
+
+## 0.24.5 (2021/4/7)
+* __Feature__: [Add support for text/javascript as JSON](https://github.com/Huachao/vscode-restclient/pull/654) ([@mingue](https://github.com/mingue))
+* __Feature__: [Add snippet for multipart/form-data request](https://github.com/Huachao/vscode-restclient/pull/725) ([@yunxifd](https://github.com/yunxifd))
+* __Bug Fix__: [Fix basic auth header not generated correct for user:password case](https://github.com/Huachao/vscode-restclient/issues/741)
+* __Bug Fix__: [Fix `rest-client.fontSize` Default Value is Invalid](https://github.com/Huachao/vscode-restclient/issues/760)
+* __Bug Fix__: [Recognize `--data-raw` curl option](https://github.com/Huachao/vscode-restclient/issues/790)
+* __Bug Fix__: Fix incorrect syntax highlight for request line without specifing method
+* __Improvement__: [Updating document selector to support virtual file systems](https://github.com/Huachao/vscode-restclient/pull/720) ([@lostintangent](https://github.com/lostintangent))
+* __Improvement__: [Update azure ad token caching](https://github.com/Huachao/vscode-restclient/pull/795) ([@abdulkareemnalband](https://github.com/abdulkareemnalband))
+
+## 0.24.4 (2020/11/9)
+* __Feature__: [Search for .env files on parent folders](https://github.com/Huachao/vscode-restclient/pull/691) ([@joaogsleite](https://github.com/joaogsleite))
+* __Bug Fix__: [Fix args parse failure for `'`](https://github.com/Huachao/vscode-restclient/issues/705)
+* __Bug Fix__: [GraphQL file import fails](https://github.com/Huachao/vscode-restclient/issues/699)
+* __Bug Fix__: [Display of response header name is altered when header name and value are case-insensitive matches](https://github.com/Huachao/vscode-restclient/issues/709)
+* __Improvement__: Use VS Code styles in webviews
+* __Improvement__: [Make error messages clearer](https://github.com/Huachao/vscode-restclient/pull/695) ([@noelforte](https://github.com/noelforte))
+
+## 0.24.3 (2020/10/5)
+* __Bug Fix__: [No response when result contains encoded string with double forward slash](https://github.com/Huachao/vscode-restclient/issues/676)
+* __Bug Fix__: [No Auth header sent when re-running a request](https://github.com/Huachao/vscode-restclient/issues/682)
+
+## 0.24.2 (2020/8/30)
+* __Feature__: [Add support for Microsoft Identity Platform aka Azure ActiveDirectory V2](https://github.com/Huachao/vscode-restclient/pull/649) ([@darrelmiller](https://github.com/darrelmiller))
+* __Feature__: [Processing variables from external file](https://github.com/Huachao/vscode-restclient/pull/632) ([@ricmrodrigues](https://github.com/ricmrodrigues))
+* __Bug Fix__: [Fix broken links in JSON responses](https://github.com/Huachao/vscode-restclient/pull/620) ([@jackbravo](https://github.com/jackbravo))
+* __Bug Fix__: [localDatetime timezone discrepancy in iso8601 format](https://github.com/Huachao/vscode-restclient/issues/648)
+* __Bug Fix__: [Allow {{...}} in comments and strings without linting error](https://github.com/Huachao/vscode-restclient/issues/631)
+* __Improvement__: [Fix some trivial errors in README.md](https://github.com/Huachao/vscode-restclient/pull/619) ([@wtetsu](https://github.com/wtetsu))
+* __Improvement__: [Support multiple line query string with spaces](https://github.com/Huachao/vscode-restclient/issues/635)
+* __Improvement__: [Add code snippet for request / request-promise or axios in NodeJS](https://github.com/Huachao/vscode-restclient/issues/428)
+
 ## 0.24.1 (2020/6/13)
 * __Bug Fix__: [Query strings not working on multiple lines](https://github.com/Huachao/vscode-restclient/issues/607)
 

@@ -2,8 +2,11 @@ import { Stream } from 'stream';
 import { getContentType } from '../utils/misc';
 import { RequestHeaders } from './base';
 
+import got = require('got');
+
 export class HttpRequest {
     public isCancelled: boolean;
+    private _underlyingRequest: got.GotPromise<Buffer>;
     public constructor(
         public method: string,
         public url: string,
@@ -19,8 +22,15 @@ export class HttpRequest {
         return getContentType(this.headers);
     }
 
+    public setUnderlyingRequest(request: got.GotPromise<Buffer>): void {
+        this._underlyingRequest = request;
+    }
+
     public cancel(): void {
-        this.isCancelled = true;
+        if (!this.isCancelled) {
+            this._underlyingRequest?.cancel();
+            this.isCancelled = true;
+        }
     }
 }
 

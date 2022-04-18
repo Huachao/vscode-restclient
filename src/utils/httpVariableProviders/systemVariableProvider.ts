@@ -10,6 +10,7 @@ import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { AadTokenCache } from '../aadTokenCache';
+import { AadV2TokenProvider } from '../aadV2TokenProvider';
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
@@ -58,6 +59,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerProcessEnvVariable();
         this.registerDotenvVariable();
         this.registerAadTokenVariable();
+        this.registerAadV2TokenVariable();
     }
 
     public readonly type: VariableType = VariableType.System;
@@ -134,7 +136,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 if (type === 'rfc1123') {
                     return { value: date.locale('en').format('ddd, DD MMM YYYY HH:mm:ss ZZ') };
                 } else if (type === 'iso8601') {
-                    return { value: date.toISOString() };
+                    return { value: date.format() };
                 } else {
                     return { value: date.format(type.slice(1, type.length - 1)) };
                 }
@@ -185,10 +187,14 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private registerDotenvVariable() {
         this.resolveFuncs.set(Constants.DotenvVariableName, async (name, document) => {
-            const absolutePath = path.join(path.dirname(document.fileName), '.env');
-            if (!await fs.pathExists(absolutePath)) {
-                return { warning: ResolveWarningMessage.DotenvFileNotFound };
+            let folderPath = path.dirname(document.fileName);
+            while (!await fs.pathExists(path.join(folderPath, '.env'))) {
+                folderPath = path.join(folderPath, '..');
+                if (folderPath === path.parse(process.cwd()).root) {
+                    return { warning: ResolveWarningMessage.DotenvFileNotFound };
+                }
             }
+            const absolutePath = path.join(folderPath, '.env');
             const groups = this.dotenvRegex.exec(name);
             if (groups !== null && groups.length === 3) {
                 const parsed = dotenv.parse(await fs.readFile(absolutePath));
@@ -278,6 +284,14 @@ export class SystemVariableProvider implements HttpVariableProvider {
         });
     }
 
+    private registerAadV2TokenVariable() {
+        this.resolveFuncs.set(Constants.AzureActiveDirectoryV2TokenVariableName,
+            async (name) => {
+                const aadV2TokenProvider = new AadV2TokenProvider();
+                const token = await aadV2TokenProvider.acquireToken(name);
+                return {value: token};
+            });
+    }
     private async resolveSettingsEnvironmentVariable(name: string) {
         if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
             const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);

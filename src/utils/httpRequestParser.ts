@@ -1,13 +1,14 @@
 import * as fs from 'fs-extra';
 import { EOL } from 'os';
 import { Stream } from 'stream';
-import { RestClientSettings } from '../models/configurationSettings';
+import { IRestClientSettings } from '../models/configurationSettings';
 import { FormParamEncodingStrategy } from '../models/formParamEncodingStrategy';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParser } from '../models/requestParser';
 import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, removeHeader } from './misc';
 import { parseRequestHeaders, resolveRequestBodyPath } from './requestParserUtil';
+import { convertStreamToString } from './streamUtility';
 import { VariableProcessor } from "./variableProcessor";
 
 const CombinedStream = require('combined-stream');
@@ -25,7 +26,7 @@ export class HttpRequestParser implements RequestParser {
     private readonly inputFileSyntax = /^<(?:(?<processVariables>@)(?<encoding>\w+)?)?\s+(?<filepath>.+?)\s*$/;
     private readonly defaultFileEncoding = 'utf8';
 
-    public constructor(private readonly requestRawText: string, private readonly settings: RestClientSettings) {
+    public constructor(private readonly requestRawText: string, private readonly settings: IRestClientSettings) {
     }
 
     public async parseHttpRequest(name?: string): Promise<HttpRequest> {
@@ -97,13 +98,7 @@ export class HttpRequestParser implements RequestParser {
         const contentTypeHeader = getContentType(headers);
         let body = await this.parseBody(bodyLines, contentTypeHeader);
         if (isGraphQlRequest) {
-            const variables = await this.parseBody(variableLines, contentTypeHeader);
-
-            const graphQlPayload = {
-                query: body,
-                variables: variables ? JSON.parse(variables.toString()) : {}
-            };
-            body = JSON.stringify(graphQlPayload);
+            body = await this.createGraphQlBody(variableLines, contentTypeHeader, body);
         } else if (this.settings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             if (this.settings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
                 const stringPairs = body.split('&');
@@ -130,13 +125,34 @@ export class HttpRequestParser implements RequestParser {
         return new HttpRequest(requestLine.method, requestLine.url, headers, body, bodyLines.join(EOL), name);
     }
 
+    private async createGraphQlBody(variableLines: string[], contentTypeHeader: string | undefined, body: string | Stream | undefined) {
+        let variables = await this.parseBody(variableLines, contentTypeHeader);
+        if (variables && typeof variables !== 'string') {
+            variables = await convertStreamToString(variables);
+        }
+
+        if (body && typeof body !== 'string') {
+            body = await convertStreamToString(body);
+        }
+
+        const matched = body?.match(/^\s*query\s+([^@\{\(\s]+)/i);
+        const operationName = matched?.[1];
+
+        const graphQlPayload = {
+            query: body,
+            operationName,
+            variables: variables ? JSON.parse(variables) : {}
+        };
+        return JSON.stringify(graphQlPayload);
+    }
+
     private parseRequestLine(line: string): { method: string, url: string } {
         // Request-Line = Method SP Request-URI SP HTTP-Version CRLF
         let method: string;
         let url: string;
 
         let match: RegExpExecArray | null;
-        if (match = /^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\s+/.exec(line)) {
+        if (match = /^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\s+/i.exec(line)) {
             method = match[1];
             url = line.substr(match[0].length);
         } else {

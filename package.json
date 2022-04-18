@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.24.1",
+  "version": "0.24.6",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -24,7 +24,7 @@
     "url": "https://github.com/Huachao/vscode-restclient.git"
   },
   "engines": {
-    "vscode": "^1.38.0"
+    "vscode": "^1.57.0"
   },
   "categories": [
     "Other",
@@ -379,9 +379,8 @@
         },
         "rest-client.fontSize": {
           "type": "number",
-          "default": null,
           "scope": "resource",
-          "description": "Controls the font size in pixels used in the response preview"
+          "markdownDescription": "Controls the font size in pixels used in the response preview. When set to `0`, the value of `#editor.fontSize#` is used."
         },
         "rest-client.fontFamily": {
           "type": "string",
@@ -610,6 +609,12 @@
           "default": true,
           "scope": "resource",
           "description": "Enable/disable custom variable references CodeLens in request file"
+        },
+        "rest-client.useContentDispositionFilename": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Enable/disable using filename from 'content-disposition' header, when saving response body"
         }
       }
     },
@@ -635,7 +640,7 @@
     "@types/got": "^9.6.8",
     "@types/mocha": "^5.2.6",
     "@types/node": "^12.11.7",
-    "@types/vscode": "^1.38.0",
+    "@types/vscode": "^1.57.0",
     "mocha": "^6.1.4",
     "ts-loader": "^5.3.2",
     "tslint": "^6.1.2",
@@ -649,16 +654,17 @@
     "aws4": "^1.9.1",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
+    "content-disposition": "^0.5.3",
     "dayjs": "^1.8.20",
     "dotenv": "^8.2.0",
     "encodeurl": "^1.0.1",
     "filesize": "^3.3.0",
     "fs-extra": "^5.0.0",
     "got": "^9.6.0",
-    "highlight.js": "^9.6.0",
+    "highlight.js": "^10.4.1",
     "http-proxy-agent": "^2.1.0",
     "https-proxy-agent": "^2.2.3",
-    "httpsnippet": "^1.20.0",
+    "httpsnippet": "^1.22.0",
     "iconv-lite": "^0.4.15",
     "jsonc-parser": "^2.0.2",
     "jsonpath-plus": "^0.20.1",
@@ -667,8 +673,8 @@
     "tough-cookie": "^3.0.1",
     "tough-cookie-file-store-bugfix": "Huachao/tough-cookie-file-store-bugfix",
     "uuid": "^3.3.2",
-    "xmldom": "^0.1.27",
+    "xmldom": "^0.5.0",
     "xpath": "^0.0.27",
-    "yargs-parser": "^11.1.1"
+    "yargs-parser": "~11.1.1"
   }
 }

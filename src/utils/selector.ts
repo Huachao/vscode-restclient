@@ -1,19 +1,18 @@
-import { EOL } from 'os';
-import { Range, TextEditor, window } from 'vscode';
-import * as Constants from '../common/constants';
-import { VariableProcessor } from './variableProcessor';
+import { EOL } from "os";
+import { Range, TextEditor, window } from "vscode";
+import * as Constants from "../common/constants";
+import {
+    fromString as ParseReqMetaKey,
+    RequestMetadata,
+} from "../models/requestMetadata";
+import { SelectedRequest } from "../models/SelectedRequest";
+import { VariableProcessor } from "./variableProcessor";
 
 export interface RequestRangeOptions {
     ignoreCommentLine?: boolean;
     ignoreEmptyLine?: boolean;
     ignoreFileVariableDefinitionLine?: boolean;
     ignoreResponseRange?: boolean;
-}
-
-export interface SelectedRequest {
-    text: string;
-    name?: string;
-    warnBeforeSend: boolean;
 }
 
 interface PromptVariableDefinition {
@@ -24,7 +23,10 @@ interface PromptVariableDefinition {
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
+    public static async getRequest(
+        editor: TextEditor,
+        range: Range | null = null
+    ): Promise<SelectedRequest | null> {
         if (!editor.document) {
             return null;
         }
@@ -32,7 +34,10 @@ export class Selector {
         let selectedText: string | null;
         if (editor.selection.isEmpty || range) {
             const activeLine = range?.start.line ?? editor.selection.active.line;
-            selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
+            selectedText = this.getDelimitedText(
+                editor.document.getText(),
+                activeLine
+            );
         } else {
             selectedText = editor.document.getText(editor.selection);
         }
@@ -41,45 +46,91 @@ export class Selector {
             return null;
         }
 
-        // parse request variable definition name
-        const requestVariable = this.getRequestVariableDefinitionName(selectedText);
+        // convert request text into lines
+        const lines = selectedText.split(Constants.LineSplitterRegex);
 
-        // parse #@note comment
-        const warnBeforeSend = this.hasNoteComment(selectedText);
+        // parse request metadata
+        const metadatas = this.parseReqMetadatas(lines);
 
-        // parse #@prompt comment
-        const promptVariablesDefinitions = this.extractPrompVariableDefinitions(selectedText);
-        const promptVariables = await this.promptForInput(promptVariablesDefinitions);
+        // process #@prompt comment metadata
+        const promptVariablesDefinitions =
+            this.parsePromptMetadataForVariableDefinitions(
+                metadatas.get(RequestMetadata.Prompt)
+            );
+        const promptVariables = await this.promptForInput(
+            promptVariablesDefinitions
+        );
         if (!promptVariables) {
             return null;
         }
 
         // parse actual request lines
-        const rawLines = selectedText.split(Constants.LineSplitterRegex).filter(l => !this.isCommentLine(l));
+        const rawLines = lines.filter((l) => !this.isCommentLine(l));
         const requestRange = this.getRequestRanges(rawLines)[0];
         if (!requestRange) {
             return null;
         }
 
-        selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1).join(EOL);
+        selectedText = rawLines
+            .slice(requestRange[0], requestRange[1] + 1)
+            .join(EOL);
 
         // variables replacement
-        selectedText = await VariableProcessor.processRawRequest(selectedText, promptVariables);
+        selectedText = await VariableProcessor.processRawRequest(
+            selectedText,
+            promptVariables
+        );
 
         return {
             text: selectedText,
-            name: requestVariable,
-            warnBeforeSend
+            metadatas: metadatas,
         };
     }
 
-    public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
+    public static parseReqMetadatas(
+        lines: string[]
+    ): Map<RequestMetadata, string | undefined> {
+        const metadatas = new Map<RequestMetadata, string | undefined>();
+        for (const line of lines) {
+            if (this.isEmptyLine(line) || this.isFileVariableDefinitionLine(line)) {
+                continue;
+            }
+
+            if (!this.isCommentLine(line)) {
+                // find the first request line
+                break;
+            }
+
+            // here must be a comment line
+            const matched = line.match(Constants.RequestMetadataRegex);
+            if (!matched) {
+                continue;
+            }
+
+            const metaKey = matched[1];
+            const metaValue = matched[2];
+            const metadata = ParseReqMetaKey(metaKey);
+            if (metadata) {
+                if (metadata === RequestMetadata.Prompt) {
+                    this.handlePromptMetadata(metadatas, line);
+                } else {
+                    metadatas.set(metadata, metaValue || undefined);
+                }
+            }
+        }
+        return metadatas;
+    }
+
+    public static getRequestRanges(
+        lines: string[],
+        options?: RequestRangeOptions
+    ): [number, number][] {
         options = {
             ignoreCommentLine: true,
             ignoreEmptyLine: true,
             ignoreFileVariableDefinitionLine: true,
             ignoreResponseRange: true,
-            ...options
+            ...options,
         };
         const requestRanges: [number, number][] = [];
         const delimitedLines = this.getDelimiterRows(lines);
@@ -91,20 +142,28 @@ export class Selector {
             let end = current - 1;
             while (start <= end) {
                 const startLine = lines[start];
-                if (options.ignoreResponseRange && this.isResponseStatusLine(startLine)) {
+                if (
+                    options.ignoreResponseRange &&
+                    this.isResponseStatusLine(startLine)
+                ) {
                     break;
                 }
 
-                if (options.ignoreCommentLine && this.isCommentLine(startLine)
-                    || options.ignoreEmptyLine && this.isEmptyLine(startLine)
-                    || options.ignoreFileVariableDefinitionLine && this.isFileVariableDefinitionLine(startLine)) {
+                if (
+                    (options.ignoreCommentLine && this.isCommentLine(startLine)) ||
+                    (options.ignoreEmptyLine && this.isEmptyLine(startLine)) ||
+                    (options.ignoreFileVariableDefinitionLine &&
+                        this.isFileVariableDefinitionLine(startLine))
+                ) {
                     start++;
                     continue;
                 }
 
                 const endLine = lines[end];
-                if (options.ignoreCommentLine && this.isCommentLine(endLine)
-                    || options.ignoreEmptyLine && this.isEmptyLine(endLine)) {
+                if (
+                    (options.ignoreCommentLine && this.isCommentLine(endLine)) ||
+                    (options.ignoreEmptyLine && this.isEmptyLine(endLine))
+                ) {
                     end--;
                     continue;
                 }
@@ -123,7 +182,7 @@ export class Selector {
     }
 
     public static isEmptyLine(line: string): boolean {
-        return line.trim() === '';
+        return line.trim() === "";
     }
 
     public static isRequestVariableDefinitionLine(line: string): boolean {
@@ -138,31 +197,45 @@ export class Selector {
         return this.responseStatusLineRegex.test(line);
     }
 
-    public static getRequestVariableDefinitionName(text: string): string | undefined {
+    public static getRequestVariableDefinitionName(
+        text: string
+    ): string | undefined {
         const matched = text.match(Constants.RequestVariableDefinitionRegex);
         return matched?.[1];
     }
 
-    public static hasNoteComment(text: string): boolean {
-        return Constants.NoteCommentRegex.test(text);
+    public static getPrompVariableDefinition(
+        text: string
+    ): PromptVariableDefinition | undefined {
+        const matched = text.match(Constants.PromptCommentRegex);
+        if (matched) {
+            const name = matched[1];
+            const description = matched[2];
+            return { name, description };
+        }
     }
 
-    public static extractPrompVariableDefinitions(text: string): PromptVariableDefinition[] {
-        const defs = new Array<PromptVariableDefinition>();
-
-        for (const line of text.split(Constants.LineSplitterRegex)) {
-            const matched = line.match(Constants.PromptCommentRegex);
-            if (matched) {
-                const name = matched[1];
-                const description = matched[2];
-                defs.push({ name, description });
+    public static parsePromptMetadataForVariableDefinitions(
+        text: string | undefined
+    ): PromptVariableDefinition[] {
+        const varDefs: PromptVariableDefinition[] = [];
+        const parsedDefs = JSON.parse(text || "[]");
+        if (Array.isArray(parsedDefs)) {
+            for (const parsedDef of parsedDefs) {
+                varDefs.push({
+                    name: parsedDef["name"],
+                    description: parsedDef["description"],
+                });
             }
         }
 
-        return defs;
+        return varDefs;
     }
 
-    private static getDelimitedText(fullText: string, currentLine: number): string | null {
+    public static getDelimitedText(
+        fullText: string,
+        currentLine: number
+    ): string | null {
         const lines: string[] = fullText.split(Constants.LineSplitterRegex);
         const delimiterLineNumbers: number[] = this.getDelimiterRows(lines);
         if (delimiterLineNumbers.length === 0) {
@@ -179,7 +252,9 @@ export class Selector {
         }
 
         if (currentLine > delimiterLineNumbers[delimiterLineNumbers.length - 1]) {
-            return lines.slice(delimiterLineNumbers[delimiterLineNumbers.length - 1] + 1).join(EOL);
+            return lines
+                .slice(delimiterLineNumbers[delimiterLineNumbers.length - 1] + 1)
+                .join(EOL);
         }
 
         for (let index = 0; index < delimiterLineNumbers.length - 1; index++) {
@@ -196,14 +271,33 @@ export class Selector {
     private static getDelimiterRows(lines: string[]): number[] {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
-            .map(([index, ]) => +index);
+            .map(([index]) => +index);
     }
 
-    private static async promptForInput(defs: PromptVariableDefinition[]): Promise<Map<string, string> | null> {
+    private static handlePromptMetadata(
+        metadatas: Map<RequestMetadata, string | undefined>,
+        text: string
+    ) {
+        const promptVarDef = this.getPrompVariableDefinition(text);
+        if (promptVarDef) {
+            const varDefs = this.parsePromptMetadataForVariableDefinitions(
+                metadatas.get(RequestMetadata.Prompt)
+            );
+            varDefs.push(promptVarDef);
+            metadatas.set(
+                RequestMetadata.Prompt,
+                JSON.stringify(varDefs)
+            );
+        }
+    }
+
+    private static async promptForInput(
+        defs: PromptVariableDefinition[]
+    ): Promise<Map<string, string> | null> {
         const promptVariables = new Map<string, string>();
         for (const { name, description } of defs) {
             const value = await window.showInputBox({
-                prompt: description ? `${description}` : `Input value for "${name}"`
+                prompt: description ? `${description}` : `Input value for "${name}"`,
             });
             if (value !== undefined) {
                 promptVariables.set(name, value);

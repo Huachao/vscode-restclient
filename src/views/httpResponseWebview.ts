@@ -2,18 +2,20 @@ import * as fs from 'fs-extra';
 import * as os from 'os';
 import { Clipboard, commands, env, ExtensionContext, Uri, ViewColumn, WebviewPanel, window, workspace } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
+import { SystemSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
 import { trace } from '../utils/decorator';
 import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
-import { base64, isJSONString } from '../utils/misc';
+import { base64, getHeader, isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 import { UserDataManager } from '../utils/userDataManager';
 import { BaseWebview } from './baseWebview';
 
 const hljs = require('highlight.js');
+const contentDisposition = require('content-disposition');
 
 const OPEN = 'Open';
 const COPYPATH = 'Copy Path';
@@ -22,7 +24,7 @@ type FoldingRange = [number, number];
 
 export class HttpResponseWebview extends BaseWebview {
 
-    private readonly urlRegex = /(https?:\/\/[^\s"'<>\]\)]+)/gi;
+    private readonly urlRegex = /(https?:\/\/[^\s"'<>\]\)\\]+)/gi;
 
     private readonly panelResponses: Map<WebviewPanel, HttpResponse>;
 
@@ -144,15 +146,32 @@ export class HttpResponseWebview extends BaseWebview {
     @trace('Save Response Body')
     private async saveBody() {
         if (this.activeResponse) {
-            const extension = MimeUtility.getExtension(this.activeResponse.contentType, this.settings.mimeAndFileExtensionMapping);
-            const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
+            const fileName = HttpResponseWebview.getResponseBodyOuptutFilename(this.activeResponse, this.settings);
             const defaultFilePath = UserDataManager.getResponseBodySaveFilePath(fileName);
+
             try {
                 await this.openSaveDialog(defaultFilePath, this.activeResponse.bodyBuffer);
             } catch {
                 window.showErrorMessage('Failed to save latest response body to disk');
             }
         }
+    }
+
+    private static getResponseBodyOuptutFilename(activeResponse: HttpResponse, settings: SystemSettings) {
+        if (settings.useContentDispositionFilename) {
+            const cdHeader = getHeader(activeResponse.headers, 'content-disposition');
+            if (cdHeader) {
+                const disposition = contentDisposition.parse(cdHeader);
+                if ((disposition?.type === "attachment" || disposition?.type === "inline") && disposition?.parameters?.hasOwnProperty("filename")) {
+                    const serverProvidedFilename = disposition.parameters.filename;
+                    return serverProvidedFilename;
+                }
+            }
+        }
+
+        const extension = MimeUtility.getExtension(activeResponse.contentType, settings.mimeAndFileExtensionMapping);
+        const defaultFileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
+        return defaultFileName;
     }
 
     private getTitle(response: HttpResponse): string {
@@ -203,7 +222,9 @@ export class HttpResponseWebview extends BaseWebview {
         const csp = this.getCsp(nonce);
         return `
     <head>
-        <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.styleFilePath)}">
+        <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.baseFilePath)}">
+        <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.vscodeStyleFilePath)}">
+        <link rel="stylesheet" type="text/css" href="${panel.webview.asWebviewUri(this.customStyleFilePath)}">
         ${this.getSettingsOverrideStyles(width)}
         ${csp}
         <script nonce="${nonce}">
@@ -217,7 +238,7 @@ export class HttpResponseWebview extends BaseWebview {
         <div>
             ${this.settings.disableAddingHrefLinkForLargeResponse && response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024
                 ? innerHtml
-                : this.addUrlLinks(innerHtml, contentType)}
+                : this.addUrlLinks(innerHtml)}
             <a id="scroll-to-top" role="button" aria-label="scroll to top" title="Scroll To Top"><span class="icon"></span></a>
         </div>
         <script type="text/javascript" src="${panel.webview.asWebviewUri(this.scriptFilePath)}" nonce="${nonce}" charset="UTF-8"></script>
@@ -350,15 +371,23 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
         });
     }
 
-    private addUrlLinks(innerHtml: string, contentType: string | undefined) {
-        if (MimeUtility.isJSON(contentType)) {
-            return innerHtml.replace(this.urlRegex, match => {
-                const parsedLink = JSON.parse(`"${match}"`);
-                return `<a href=${parsedLink} target="_blank" rel="noopener noreferrer">${match}</a>`;
+    private addUrlLinks(innerHtml: string) {
+        return innerHtml.replace(this.urlRegex, (match: string): string => {
+            const encodedEndCharacters = ["&lt;", "&gt;", "&quot;", "&apos;"];
+            let urlEndPosition = match.length;
+
+            encodedEndCharacters.forEach((char) => {
+                const index = match.indexOf(char);
+                if (index > -1 && index < urlEndPosition) {
+                    urlEndPosition = index;
+                }
             });
-        } else {
-            return innerHtml.replace(this.urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-        }
+
+            const url = match.substr(0, urlEndPosition);
+            const extraCharacters = match.substr(urlEndPosition);
+
+            return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>' + extraCharacters;
+        });
     }
 
     private getFoldingRange(lines: string[]): Map<number, FoldingRange> {

@@ -2,6 +2,7 @@ out
 node_modules
 dist
 *.vsix
+.DS_Store
 
 # Logs
 npm-debug.log*
