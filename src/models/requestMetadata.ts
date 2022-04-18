@@ -18,8 +18,7 @@ export enum RequestMetadata {
     NoCookieJar = 'no-cookie-jar',
 
     /**
-     * TODO: fix
-     * Represents the cookie jar is disabled for this request
+     * Used to allow user to interactively input variables for this request
      */
     Prompt = 'prompt',
 }
