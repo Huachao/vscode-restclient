@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as os from 'os';
 import { Clipboard, commands, env, ExtensionContext, Uri, ViewColumn, WebviewPanel, window, workspace } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
-import { RestClientSettings } from '../models/configurationSettings';
+import { SystemSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
@@ -157,7 +157,7 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
-    private static getResponseBodyOuptutFilename(activeResponse: HttpResponse, settings: RestClientSettings) {
+    private static getResponseBodyOuptutFilename(activeResponse: HttpResponse, settings: SystemSettings) {
         if (settings.useContentDispositionFilename) {
             const cdHeader = getHeader(activeResponse.headers, 'content-disposition');
             if (cdHeader) {

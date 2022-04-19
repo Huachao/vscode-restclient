@@ -1,6 +1,6 @@
 import * as Constants from '../../common/constants';
 import { EnvironmentController } from '../../controllers/environmentController';
-import { RestClientSettings } from '../../models/configurationSettings';
+import { SystemSettings } from '../../models/configurationSettings';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
@@ -8,7 +8,7 @@ import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
 export class EnvironmentVariableProvider implements HttpVariableProvider {
     private static _instance: EnvironmentVariableProvider;
 
-    private readonly _settings: RestClientSettings = RestClientSettings.Instance;
+    private readonly _settings: SystemSettings = SystemSettings.Instance;
 
     public static get Instance(): EnvironmentVariableProvider {
         if (!this._instance) {

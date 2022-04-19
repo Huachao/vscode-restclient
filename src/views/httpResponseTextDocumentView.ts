@@ -1,7 +1,7 @@
 import { EOL } from 'os';
 import { languages, Position, Range, TextDocument, ViewColumn, window, workspace } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
-import { RestClientSettings } from '../models/configurationSettings';
+import { SystemSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
 import { MimeUtility } from '../utils/mimeUtility';
@@ -9,7 +9,7 @@ import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 
 export class HttpResponseTextDocumentView {
 
-    private readonly settings: RestClientSettings = RestClientSettings.Instance;
+    private readonly settings: SystemSettings = SystemSettings.Instance;
 
     protected readonly documents: TextDocument[] = [];
 

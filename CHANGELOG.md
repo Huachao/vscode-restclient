@@ -1,3 +1,11 @@
+## 0.24.6 (2021/11/29)
+* __Bug Fix__: [Fix AADV2TokenProvider only works for special case of MS Graph Tokens](https://github.com/Huachao/vscode-restclient/pull/794) ([@mthierba](https://github.com/mthierba))
+* __Improvement__: [Allow comments between variable declarations](https://github.com/Huachao/vscode-restclient/pull/885) ([@Danysan1](https://github.com/Danysan1))
+* __Improvement__: [Add support for application/x-amz-json-1.1 as JSON](https://github.com/Huachao/vscode-restclient/pull/771) ([@fxalgrain](https://github.com/fxalgrain))
+* __Improvement__: [SaveBody now uses filename from content-disposition](https://github.com/Huachao/vscode-restclient/pull/924) ([@mbronk](https://github.com/mbronk))
+* __Improvement__: [Add operation name for GraphQL request](https://github.com/Huachao/vscode-restclient/issues/919)
+* __Improvement__: [Destory underlying connection when user cancels the request](https://github.com/Huachao/vscode-restclient/issues/910)
+
 ## 0.24.5 (2021/4/7)
 * __Feature__: [Add support for text/javascript as JSON](https://github.com/Huachao/vscode-restclient/pull/654) ([@mingue](https://github.com/mingue))
 * __Feature__: [Add snippet for multipart/form-data request](https://github.com/Huachao/vscode-restclient/pull/725) ([@yunxifd](https://github.com/yunxifd))

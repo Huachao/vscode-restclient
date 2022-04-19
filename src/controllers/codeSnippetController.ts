@@ -2,6 +2,7 @@ import { EOL } from 'os';
 import * as url from 'url';
 import { Clipboard, env, ExtensionContext, QuickInputButtons, window } from 'vscode';
 import Logger from '../logger';
+import { IRestClientSettings, RequestSettings, RestClientSettings } from '../models/configurationSettings';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -50,10 +51,12 @@ export class CodeSnippetController {
             return;
         }
 
-        const { text } = selectedRequest;
+        const { text, metadatas } = selectedRequest;
+        const requestSettings = new RequestSettings(metadatas);
+        const settings: IRestClientSettings = new RestClientSettings(requestSettings);
 
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest();
+        const httpRequest = await RequestParserFactory.createRequestParser(text, settings).parseHttpRequest();
 
         const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         const snippet = new HTTPSnippet(harHttpRequest);
@@ -78,6 +81,7 @@ export class CodeSnippetController {
         quickPick.onDidAccept(() => {
             const selectedItem = quickPick.selectedItems[0];
             if (quickPick.step === 1) {
+                quickPick.value = '';
                 quickPick.step++;
                 quickPick.buttons = [QuickInputButtons.Back];
                 target = selectedItem as any as CodeSnippetTarget;
@@ -119,10 +123,12 @@ export class CodeSnippetController {
             return;
         }
 
-        const { text } = selectedRequest;
+        const { text, metadatas } = selectedRequest;
+        const requestSettings = new RequestSettings(metadatas);
+        const settings: IRestClientSettings = new RestClientSettings(requestSettings);
 
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest();
+        const httpRequest = await RequestParserFactory.createRequestParser(text, settings).parseHttpRequest();
 
         const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
         const addPrefix = !(url.parse(harHttpRequest.url).protocol);
