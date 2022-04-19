@@ -244,7 +244,8 @@ export class Selector {
         const promptVariables = new Map<string, string>();
         for (const { name, description } of defs) {
             const value = await window.showInputBox({
-                prompt: description ? `${description}` : `Input value for "${name}"`
+                prompt: `Input value for "${name}"`,
+                placeHolder: description
             });
             if (value !== undefined) {
                 promptVariables.set(name, value);

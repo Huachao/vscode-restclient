@@ -196,7 +196,7 @@ export class HttpElementFactory {
                 // add prompt variables
                 const promptVariablesDefinitions = Selector.parsePromptMetadataForVariableDefinitions(metadatas.get(RequestMetadata.Prompt));
                 for (const { name, description } of promptVariablesDefinitions) {
-                    const v = new MarkdownString(`${description ? `Description: ${description}` : `Prompt Variable: \`${name}`}\``);
+                    const v = new MarkdownString(`${description ? `Description: ${description}` : `Prompt Variable: \`${name}\``}`);
                     originalElements.push(
                         new HttpElement(
                             name,
