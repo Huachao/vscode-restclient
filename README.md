@@ -24,9 +24,10 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - AWS Signature v4
 * Environments and custom/system variables support
     - Use variables in any place of request(_URL_, _Headers_, _Body_)
-    - Support both __environment__, __file__ and __request__ custom variables
+    - Support __environment__, __file__, __request__ and __prompt__ custom variables
+    - Interactively assign __prompt__ custom variables per request
     - Auto completion and hover support for both __environment__, __file__ and __request__ custom variables
-    - Diagnostic support for __request__ and __file__ custom variables
+    - Diagnostic support for __request__, __file__ and __prompt__ custom variables
     - Go to definition support for __request__ and __file__ custom variables
     - Find all references support _ONLY_ for __file__ custom variables
     - Provide system dynamic variables
@@ -413,7 +414,7 @@ Environments give you the ability to customize requests using variables, and you
 Environments and including variables are defined directly in `Visual Studio Code` setting file, so you can create/update/delete environments and variables at any time you wish. If you __DO NOT__ want to use any environment, you can choose `No Environment` in the environment list. Notice that if you select `No Environment`, variables defined in shared environment are still available. See [Environment Variables](#environment-variables) for more details about environment variables.
 
 ## Variables
-We support two types of variables, one is __Custom Variables__ which is defined by user and can be further divided into __Environment Variables__, __File Variables__ and __Request Variables__, the other is __System Variables__ which is a predefined set of variables out-of-box.
+We support two types of variables, one is __Custom Variables__ which is defined by user and can be further divided into __Environment Variables__, __File Variables__, __Prompt Variables__, and __Request Variables__, the other is __System Variables__ which is a predefined set of variables out-of-box.
 
 The reference syntax of system and custom variables types has a subtle difference, for the former the syntax is `{{$SystemVariableName}}`, while for the latter the syntax is `{{CustomVariableName}}`, without preceding `$` before variable name. The definition syntax and location for different types of custom variables are different. Notice that when the same name used for custom variables, request variables takes higher resolving precedence over file variables, file variables takes higher precedence over environment variables.
 
@@ -476,6 +477,32 @@ Content-Type: {{contentType}}
     "content": "foo bar",
     "created_at": "{{createdAt}}",
     "modified_by": "{{modifiedBy}}"
+}
+
+```
+
+#### Prompt Variables
+With prompt variables, user can input the variables to be used when sending a request. This gives a flexibility to change most dynamic variables without having to change the `http` file. User can specify more than one prompt variables. The definition syntax of prompt variables is like a single-line comment by adding the syntax before the desired request url with the following syntax __`// @prompt {var1}`__ or __`# @prompt {var1}`__. A variable description is also assignable using __`// @prompt {var1} {description}`__ or __`# @prompt {var1} {description}`__ which will prompt an input popup with a desired description message.
+ 
+ 
+ The reference syntax is the same as others, follows __`{{var}}`__. The prompt variable will override any preceding assigned variable and will never be stored to be used in other requests.
+
+```http
+@hostname = api.example.com
+@port = 8080
+@host = {{hostname}}:{{port}}
+@contentType = application/json
+
+###
+# @prompt username
+# @prompt refCode Your reference code display on webpage
+# @prompt otp Your one-time password in your mailbox
+POST https://{{host}}/verify-otp/{{refCode}} HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "username": "{{username}}",
+    "otp": "{{otp}}"
 }
 
 ```

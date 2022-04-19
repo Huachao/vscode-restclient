@@ -70,4 +70,6 @@ export const RequestVariableDefinitionWithNameRegexFactory = (name: string, flag
 
 export const RequestVariableDefinitionRegex: RegExp = RequestVariableDefinitionWithNameRegexFactory("\\w+", "m");
 
+export const PromptCommentRegex = /^\s*(?:#{1,}|\/{2,})\s*@prompt\s+([^\s]+)(?:\s+(.*))?\s*$/;
+
 export const LineSplitterRegex: RegExp = /\r?\n/g;

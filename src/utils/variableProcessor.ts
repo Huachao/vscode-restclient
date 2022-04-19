@@ -16,12 +16,11 @@ export class VariableProcessor {
         [EnvironmentVariableProvider.Instance, true],
     ];
 
-    public static async processRawRequest(request: string) {
+    public static async processRawRequest(request: string, resolvedVariables: Map<string, string> = new Map<string, string>()) {
         const variableReferenceRegex = /\{{2}(.+?)\}{2}/g;
         let result = '';
         let match: RegExpExecArray | null;
         let lastIndex = 0;
-        const resolvedVariables = new Map<string, string>();
         variable:
         while (match = variableReferenceRegex.exec(request)) {
             result += request.substring(lastIndex, match.index);

@@ -16,6 +16,11 @@ export enum RequestMetadata {
      * Represents the cookie jar is disabled for this request
      */
     NoCookieJar = 'no-cookie-jar',
+
+    /**
+     * Used to allow user to interactively input variables for this request
+     */
+    Prompt = 'prompt',
 }
 
 export function fromString(value: string): RequestMetadata | undefined {
