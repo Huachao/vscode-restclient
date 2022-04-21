@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { Range, TextEditor, window } from 'vscode';
+import { Position, Range, TextDocument, TextEditor, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { fromString as ParseReqMetaKey, RequestMetadata } from '../models/requestMetadata';
 import { SelectedRequest } from '../models/SelectedRequest';
@@ -28,7 +28,19 @@ export class Selector {
         let selectedText: string | null;
         if (editor.selection.isEmpty || range) {
             const activeLine = range?.start.line ?? editor.selection.active.line;
-            selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
+            if (editor.document.languageId === 'markdown') {
+                selectedText = null;
+
+                for (const r of Selector.getMarkdownRestSnippets(editor.document)) {
+                    const snippetRange = new Range(r.start.line + 1, 0, r.end.line, 0);
+                    if (snippetRange.contains(new Position(activeLine, 0))) {
+                        selectedText = editor.document.getText(snippetRange);
+                    }
+                }
+
+            } else {
+                selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
+            }
         } else {
             selectedText = editor.document.getText(editor.selection);
         }
@@ -229,6 +241,31 @@ export class Selector {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
             .map(([index, ]) => +index);
+    }
+
+    public static* getMarkdownRestSnippets(document: TextDocument): Generator<Range> {
+        const snippetStartRegx = new RegExp('^\`\`\`(' + ['http', 'rest'].join('|') + ')$');
+        const snippetEndRegx = /^\`\`\`$/;
+
+        let snippetStart: number | null = null;
+        for (let i = 0; i < document.lineCount; i++) {
+            const lineText = document.lineAt(i).text;
+
+            const matchEnd = lineText.match(snippetEndRegx);
+            if (snippetStart !== null && matchEnd) {
+                const snippetEnd = i;
+
+                const range = new Range(snippetStart, 0, snippetEnd, 0);
+                yield range;
+
+                snippetStart = null;
+            } else {
+                const matchStart = lineText.match(snippetStartRegx);
+                if (matchStart) {
+                    snippetStart = i;
+                }
+            }
+        }
     }
 
     private static handlePromptMetadata(metadatas: Map<RequestMetadata, string | undefined> , text: string) {

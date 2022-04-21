@@ -15,6 +15,7 @@ import { FileVariableReferencesCodeLensProvider } from './providers/fileVariable
 import { HttpCodeLensProvider } from './providers/httpCodeLensProvider';
 import { HttpCompletionItemProvider } from './providers/httpCompletionItemProvider';
 import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvider';
+import { MarkdownCodeLensProvider } from './providers/markdownCodeLensProvider';
 import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
 import { RequestVariableDefinitionProvider } from './providers/requestVariableDefinitionProvider';
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
@@ -54,6 +55,10 @@ export async function activate(context: ExtensionContext) {
         { language: 'http', scheme: '*' }
     ];
 
+    const mdDocumentSelector = [
+        { language: 'markdown', scheme: '*' }
+    ];
+
     context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new HttpCompletionItemProvider()));
     context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new RequestVariableCompletionItemProvider(), '.'));
     context.subscriptions.push(languages.registerHoverProvider(documentSelector, new EnvironmentOrFileVariableHoverProvider()));
@@ -66,6 +71,10 @@ export async function activate(context: ExtensionContext) {
         new ConfigurationDependentRegistration(
             () => languages.registerCodeLensProvider(documentSelector, new FileVariableReferencesCodeLensProvider()),
             s => s.enableCustomVariableReferencesCodeLens));
+    context.subscriptions.push(
+        new ConfigurationDependentRegistration(
+            () => languages.registerCodeLensProvider(mdDocumentSelector, new MarkdownCodeLensProvider()),
+            s => s.enableSendRequestCodeLens));
     context.subscriptions.push(languages.registerDocumentLinkProvider(documentSelector, new RequestBodyDocumentLinkProvider()));
     context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new FileVariableDefinitionProvider()));
     context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new RequestVariableDefinitionProvider()));
