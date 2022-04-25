@@ -6,6 +6,7 @@ import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } fr
 import { fromString as ParseLogLevelStr, LogLevel } from './logLevel';
 import { fromString as ParsePreviewOptionStr, PreviewOption } from './previewOption';
 import { RequestMetadata } from './requestMetadata';
+import { UrlSignConfiguration } from './urlSignConfiguration';
 
 export type HostCertificates = {
     [key: string]: {
@@ -47,6 +48,8 @@ export interface IRestClientSettings {
     readonly logLevel: LogLevel;
     readonly enableSendRequestCodeLens: boolean;
     readonly enableCustomVariableReferencesCodeLens: boolean;
+    readonly urlSignConfiguration: UrlSignConfiguration;
+    readonly urlSignKeySecrets: { [key: string]: string };
     readonly useContentDispositionFilename: boolean;
 }
 
@@ -81,6 +84,8 @@ export class SystemSettings implements IRestClientSettings {
     private _logLevel: LogLevel;
     private _enableSendRequestCodeLens: boolean;
     private _enableCustomVariableReferencesCodeLens: boolean;
+    private _urlSignConfiguration: UrlSignConfiguration;
+    private _urlSignKeySecrets: { [key: string]: string };
     private _useContentDispositionFilename: boolean;
 
     public get followRedirect() {
@@ -203,6 +208,14 @@ export class SystemSettings implements IRestClientSettings {
         return this._enableCustomVariableReferencesCodeLens;
     }
 
+    public get urlSignConfiguration() {
+        return this._urlSignConfiguration;
+    }
+
+    public get urlSignKeySecrets() {
+        return this._urlSignKeySecrets;
+    }
+
     public get useContentDispositionFilename() {
         return this._useContentDispositionFilename;
     }
@@ -280,6 +293,26 @@ export class SystemSettings implements IRestClientSettings {
         this._logLevel = ParseLogLevelStr(restClientSettings.get<string>('logLevel', 'error'));
         this._enableSendRequestCodeLens = restClientSettings.get<boolean>('enableSendRequestCodeLens', true);
         this._enableCustomVariableReferencesCodeLens = restClientSettings.get<boolean>('enableCustomVariableReferencesCodeLens', true);
+        this._urlSignConfiguration = restClientSettings.get<UrlSignConfiguration>('urlSignConfiguration', {
+            enableUrlSign: false,
+            algorithm: {
+                step1OrderParams: true,
+                step1UrlEncodeParams: true,
+                step1PercentEncode: false,
+                step1AddEqual: false,
+                step1AddAnd: false,
+                step2SeparatorAnd: false,
+                step2AddHttpMethod: false,
+                step2AddPercentEncodeSlash: false,
+                step2PercentEncode: false,
+                step3ComputeAlgorithm: 'md5',
+                step3SecretAppend: '',
+                step3TextAlgorithm: 'hex',
+            },
+            keyParamName: 'appkey',
+            signParamName: 'sign',
+        });
+        this._urlSignKeySecrets = restClientSettings.get<{ [key: string]: string }>("urlSignKeySecrets", {});
         this._useContentDispositionFilename = restClientSettings.get<boolean>('useContentDispositionFilename', true);
         languages.setLanguageConfiguration('http', { brackets: this._addRequestBodyLineIndentationAroundBrackets ? this.brackets : [] });
 
@@ -443,6 +476,14 @@ export class RestClientSettings implements IRestClientSettings {
 
     public get enableCustomVariableReferencesCodeLens() {
         return this.systemSettings.enableCustomVariableReferencesCodeLens;
+    }
+
+    public get urlSignConfiguration() {
+        return this.systemSettings.urlSignConfiguration;
+    }
+
+    public get urlSignKeySecrets() {
+        return this.systemSettings.urlSignKeySecrets;
     }
 
     public get useContentDispositionFilename() {

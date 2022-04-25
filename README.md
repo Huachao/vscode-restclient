@@ -381,6 +381,14 @@ GET https://httpbin.org/aws-auth HTTP/1.1
 Authorization: AWS <accessId> <accessKey> [token:<sessionToken>] [region:<regionName>] [service:<serviceName>]
 ```
 
+### URL Signature
+URL Signature method like AliYun's: [https://help.aliyun.com/document_detail/30563.htm](https://help.aliyun.com/document_detail/30563.htm).
+The signature algorithm is configurable. Configuration contains two parts:
+- `Url Sign Configuration`: Configuration for the signature algorithm and names.
+- `Url Sign Key Secrets`: Key and secret pairs for use.
+
+You should enable it in the configuration if you want to use this function, the default is disabled.
+
 ## Generate Code Snippet
 ![Generate Code Snippet](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/code-snippet.gif)
 Once you’ve finalized your request in REST Client extension, you might want to make the same request from your source code. We allow you to generate snippets of code in various languages and libraries that will help you achieve this. Once you prepared a request as previously, use shortcut `Ctrl+Alt+C`(`Cmd+Alt+C` for macOS), or right-click in the editor and then select `Generate Code Snippet` in the menu, or press `F1` and then select/type `Rest Client: Generate Code Snippet`, it will pop up the language pick list, as well as library list. After you selected the code snippet language/library you want, the generated code snippet will be previewed in a separate panel of Visual Studio Code, you can click the `Copy Code Snippet` icon in the tab title to copy it to clipboard.
