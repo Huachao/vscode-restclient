@@ -269,7 +269,7 @@ We add the capability to directly run [curl request](https://curl.haxx.se/) in R
 * -I, --head
 * -b, --cookie(no cookie jar file support)
 * -u, --user(Basic auth support only)
-* -d, --data, --data-ascii,--data-binary, --data-raw
+* -d, --data, --data-ascii,--data-binary, --data-raw, --data-urlencode
 
 ## Copy Request As cURL
 Sometimes you may want to get the curl format of an http request quickly and save it to clipboard, just pressing `F1` and then selecting/typing `Rest Client: Copy Request As cURL` or simply right-click in the editor, and select `Copy Request As cURL`.
