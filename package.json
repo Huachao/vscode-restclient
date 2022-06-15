@@ -44,7 +44,8 @@
     "onCommand:rest-client.clear-history",
     "onCommand:rest-client.save-response",
     "onCommand:rest-client.save-response-body",
-    "onCommand:rest-client.copy-response-body",
+    "onCommand:rest-client.copy-response",
+    "onCommand:rest-client.copy-response-type",
     "onCommand:rest-client.switch-environment",
     "onCommand:rest-client.clear-aad-token-cache",
     "onCommand:rest-client.cancel-request",
@@ -138,11 +139,20 @@
         "category": "Rest Client"
       },
       {
-        "command": "rest-client.copy-response-body",
-        "title": "Copy Response Body",
+        "command": "rest-client.copy-response",
+        "title": "Copy Response",
         "icon": {
           "light": "./images/copy.svg",
           "dark": "./images/copy-inverse.svg"
+        },
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.copy-response-type",
+        "title": "Copy Response type",
+        "icon": {
+          "light": "./images/ts.svg",
+          "dark": "./images/ts.svg"
         },
         "category": "Rest Client"
       },
@@ -200,7 +210,11 @@
           "when": "httpResponsePreviewFocus"
         },
         {
-          "command": "rest-client.copy-response-body",
+          "command": "rest-client.copy-response",
+          "when": "httpResponsePreviewFocus"
+        },
+        {
+          "command": "rest-client.copy-response-type",
           "when": "httpResponsePreviewFocus"
         },
         {
@@ -211,18 +225,23 @@
       "editor/title": [
         {
           "when": "httpResponsePreviewFocus",
-          "command": "rest-client.save-response",
+          "command": "rest-client.copy-response-type",
           "group": "navigation@1"
         },
         {
           "when": "httpResponsePreviewFocus",
-          "command": "rest-client.save-response-body",
+          "command": "rest-client.save-response",
           "group": "navigation@2"
         },
         {
           "when": "httpResponsePreviewFocus",
-          "command": "rest-client.copy-response-body",
+          "command": "rest-client.save-response-body",
           "group": "navigation@3"
+        },
+        {
+          "when": "httpResponsePreviewFocus",
+          "command": "rest-client.copy-response",
+          "group": "navigation@4"
         },
         {
           "when": "httpResponsePreviewFocus",

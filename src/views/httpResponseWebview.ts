@@ -8,6 +8,7 @@ import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
 import { trace } from '../utils/decorator';
 import { disposeAll } from '../utils/dispose';
+import { Json2Ts } from '../utils/json2ts';
 import { MimeUtility } from '../utils/mimeUtility';
 import { base64, getHeader, isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
@@ -51,7 +52,8 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', this.foldResponseBody, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', this.unfoldResponseBody, this));
 
-        this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-body', this.copyBody, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response', this.copyResponse, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-type', this.copyResponseType, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response', this.save, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', this.saveBody, this));
     }
@@ -123,10 +125,28 @@ export class HttpResponseWebview extends BaseWebview {
         this.activePanel?.webview.postMessage({ 'command': 'unfoldAll' });
     }
 
-    @trace('Copy Response Body')
-    private async copyBody() {
+    @trace('Copy Response')
+    private async copyResponse() {
         if (this.activeResponse) {
             await this.clipboard.writeText(this.activeResponse.body);
+        }
+    }
+    
+    @trace('Copy Response type')
+    private async copyResponseType() {
+        if (this.activeResponse) {
+            // await this.clipboard.writeText(this.activeResponse.body);
+            const config =  {
+                prependWithI: true,
+                sortAlphabetically: false,
+                addExport: true,
+                useArrayGeneric: false,
+                optionalFields: true,
+                prefix: '',
+                rootObjectName: 'RootObject'
+              }
+            const parser = new Json2Ts(config)
+            await this.clipboard.writeText(parser.convert(JSON.parse(this.activeResponse.body)));
         }
     }
 
