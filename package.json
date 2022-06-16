@@ -152,7 +152,7 @@
         "title": "Copy Response type",
         "icon": {
           "light": "./images/ts.svg",
-          "dark": "./images/ts.svg"
+          "dark": "./images/ts-inverse.svg"
         },
         "category": "Rest Client"
       },
@@ -652,7 +652,8 @@
     "vscode:prepublish": "webpack --mode production",
     "webpack": "webpack --mode development",
     "watch": "webpack --mode development --watch --info-verbosity verbose",
-    "tslint": "tslint --project tsconfig.json"
+    "tslint": "tslint --project tsconfig.json",
+    "build:vsix":"vsce package"
   },
   "devDependencies": {
     "@types/aws4": "^1.5.1",
