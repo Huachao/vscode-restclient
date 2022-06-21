@@ -216,7 +216,7 @@ export class HttpRequestParser implements RequestParser {
                     combinedStream.append(line);
                 }
 
-                if (index !== lines.length - 1) {
+                if (index < lines.length) {
                     combinedStream.append(this.getLineEnding(contentTypeHeader));
                 }
             }
