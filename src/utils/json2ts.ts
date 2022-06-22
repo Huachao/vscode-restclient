@@ -44,7 +44,7 @@ export class Json2Ts {
   convert(json: {}) {
     this.interfaces = {};
     let result = `\n`;
-    this.unknownToTS(json)
+    this.unknownToTS(json);
     result += this.interfacesToString();
     return result;
   }
@@ -63,7 +63,7 @@ export class Json2Ts {
 
   private arrayToTS(array: {}[], key: string | undefined = void 0) {
     let type = array.length ? void 0 : 'any';
-    for (let item of array) {
+    for (const item of array) {
       const itemType = this.unknownToTS(item, this.keyToTypeName(key));
       if (type && itemType !== type) {
         type = 'any';

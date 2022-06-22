@@ -131,7 +131,7 @@ export class HttpResponseWebview extends BaseWebview {
             await this.clipboard.writeText(this.activeResponse.body);
         }
     }
-    
+
     @trace('Copy Response type')
     private async copyResponseType() {
         if (this.activeResponse) {
@@ -144,8 +144,8 @@ export class HttpResponseWebview extends BaseWebview {
                 optionalFields: true,
                 prefix: '',
                 rootObjectName: 'RootObject'
-              }
-            const parser = new Json2Ts(config)
+              };
+            const parser = new Json2Ts(config);
             await this.clipboard.writeText(parser.convert(JSON.parse(this.activeResponse.body)));
         }
     }
