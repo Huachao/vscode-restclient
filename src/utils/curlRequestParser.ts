@@ -55,7 +55,7 @@ export class CurlRequestParser implements RequestParser {
         let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-ascii'] || parsedArguments['data-binary'] || parsedArguments['data-raw'];
         if (Array.isArray(body)) {
             body = body.join('&');
-        } else  {
+        } else if (body !== undefined) {
             body = body.toString();
         }
 
