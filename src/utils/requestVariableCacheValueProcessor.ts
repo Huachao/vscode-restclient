@@ -12,6 +12,7 @@ const requestVariablePathRegex: RegExp = /^(\w+)(?:\.(request|response)(?:\.(bod
 
 type HttpEntity = 'request' | 'response';
 type HttpPart = 'headers' | 'body';
+type BodyType = 'xml' | 'json' | 'js' | 'regex' | 'hex' | undefined;
 
 export class RequestVariableCacheValueProcessor {
     public static resolveRequestVariable(value: HttpResponse | undefined, path: string): ResolveResult {
@@ -57,17 +58,42 @@ export class RequestVariableCacheValueProcessor {
                 return { state: ResolveState.Success, value: body };
             }
 
-            const contentTypeHeader = getContentType(headers);
-            if (MimeUtility.isJSON(contentTypeHeader) || (MimeUtility.isJavaScript(contentTypeHeader) && isJSONString(body as string))) {
-                const parsedBody = JSON.parse(body as string);
-
-                return this.resolveJsonHttpBody(parsedBody, nameOrPath);
-            } else if (MimeUtility.isXml(contentTypeHeader)) {
-                return this.resolveXmlHttpBody(body, nameOrPath);
+            let bodyType: BodyType = undefined;
+            const bodyType1 =  /^#(json|xml|js|regex|hex)\./.exec(nameOrPath);
+            if (bodyType1) {
+                bodyType = bodyType1[1] as BodyType;
+                nameOrPath = nameOrPath.substring(bodyType1[0].length);
             } else {
-                return { state: ResolveState.Warning, value: body, message: ResolveWarningMessage.UnsupportedBodyContentType };
+                const contentTypeHeader = getContentType(headers);
+                if (MimeUtility.isJSON(contentTypeHeader) || (MimeUtility.isJavaScript(contentTypeHeader) && isJSONString(body as string))) {
+                    bodyType = "json";
+                } else if (MimeUtility.isXml(contentTypeHeader)) {
+                    bodyType = "xml";
+                }
             }
-
+            switch (bodyType) {
+                case "json":
+                    const parsedBody = JSON.parse(body as string);
+                    return this.resolveJsonHttpBody(parsedBody, nameOrPath);
+                case "xml":
+                    return this.resolveXmlHttpBody(body, nameOrPath);
+                case "js":
+                    try {
+                        const msg = eval('(body) => ' + nameOrPath)(body) as string;
+                        return {state : ResolveState.Success, value: msg};
+                    } catch {
+                        return { state: ResolveState.Warning, message: ResolveWarningMessage.InvalidScript };
+                    }
+                case "regex":
+                    // TODO: 待实现
+                    break
+                case "hex":
+                    // TODO: 待实现
+                    break
+                default:
+                    break
+            }
+            return { state: ResolveState.Warning, value: body, message: ResolveWarningMessage.UnsupportedBodyContentType };
         } else {
             const { headers } = http;
             if (!nameOrPath) {
