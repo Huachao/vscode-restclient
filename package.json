@@ -611,6 +611,43 @@
           "scope": "resource",
           "description": "Enable/disable custom variable references CodeLens in request file"
         },
+        "rest-client.urlSignConfiguration": {
+          "type": "object",
+          "default": {
+            "enableUrlSign": false,
+            "algorithm": {
+              "step1OrderParams": true,
+              "step1UrlEncodeParams": true,
+              "step1PercentEncode": false,
+              "step1AddEqual": false,
+              "step1AddAnd": false,
+              "step2SeparatorAnd": false,
+              "step2AddHttpMethod": false,
+              "step2AddPercentEncodeSlash": false,
+              "step2PercentEncode": false,
+              "step3ComputeAlgorithm": "md5",
+              "step3SecretAppend": "",
+              "step3TextAlgorithm": "hex"
+            },
+            "keyParamName": "appkey",
+            "signParamName": "sign"
+          },
+          "scope": "resource",
+          "markdownDescription": "Sets the URL Signature configuration"
+        },
+        "rest-client.urlSignKeySecrets": {
+          "type": "object",
+          "default": {},
+          "scope": "resource",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "markdownDescription": "Sets the key and secret pairs for URL Signature"
+        },
         "rest-client.useContentDispositionFilename": {
           "type": "boolean",
           "default": true,

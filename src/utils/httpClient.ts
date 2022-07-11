@@ -1,9 +1,11 @@
 import * as fs from 'fs-extra';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import { Cookie, CookieJar, Store } from 'tough-cookie';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
+import Logger from '../logger';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { IRestClientSettings, SystemSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
@@ -41,6 +43,8 @@ export class HttpClient {
 
     public async send(httpRequest: HttpRequest, settings?: IRestClientSettings): Promise<HttpResponse> {
         settings = settings || SystemSettings.Instance;
+
+        this.processUrlSign(httpRequest, settings);
 
         const options = await this.prepareOptions(httpRequest, settings);
 
@@ -103,6 +107,127 @@ export class HttpClient {
                 httpRequest.rawBody,
                 httpRequest.name
             ));
+    }
+
+    private processUrlSign(httpRequest: HttpRequest, settings: IRestClientSettings) {
+        const conf = settings.urlSignConfiguration;
+        const keySecrets = settings.urlSignKeySecrets;
+        const algo = conf.algorithm;
+        const httpMethod = httpRequest.method;
+
+        if (!conf.enableUrlSign) {
+            return;
+        }
+
+        // Step 1: Canonicalized Query String
+        let urlObj = new url.URL(httpRequest.url);
+        let searchParams = urlObj.searchParams;
+
+        let secret = '';
+        let pairArr: Array<[string, string]> = [];
+
+        if (algo.step1OrderParams) {
+            searchParams.sort();
+        }
+
+        for (const [key, value] of searchParams) {
+            if (key === conf.keyParamName) {
+                for (let k in  keySecrets) {
+                    let s = keySecrets[k];
+                    if (k === value) {
+                        secret = s;
+                    }
+                }
+            }
+
+            var encodeValue = value;
+            if (algo.step1UrlEncodeParams) {
+                encodeValue = encodeURIComponent(value);
+            }
+            if (algo.step1PercentEncode) {
+                encodeValue = this.percentEncode(encodeValue);
+            }
+
+            if (key !== conf.signParamName) {
+                pairArr.push([key, encodeValue]);
+            }
+        }
+
+        let joinSeparator = '';
+        if (algo.step1AddAnd) {
+            joinSeparator = '&';
+        }
+
+        let canonicalizedQueryString = pairArr.map(x => {
+            let pairSeparator = '';
+            if (algo.step1AddEqual) {
+                pairSeparator = '=';
+            }
+            return x[0] + pairSeparator + x[1];
+        }).join(joinSeparator);
+
+        Logger.verbose("canonicalizedQueryString: " + canonicalizedQueryString);
+        Logger.verbose("secret: " + secret);
+
+        if (secret === '') {
+            Logger.warn("No secret setted, please set it in plugin configuration: Url Sign Key Secrets!");
+        }
+
+        // Step 2: Construct StringToSign
+        let signArr: Array<string> = [];
+        if (algo.step2AddHttpMethod) {
+            signArr.push(httpMethod);
+        }
+        if (algo.step2AddPercentEncodeSlash) {
+            signArr.push(encodeURIComponent('/'));
+        }
+        let encodeStr = canonicalizedQueryString;
+        if (algo.step2PercentEncode) {
+            encodeStr = this.percentEncode(encodeURIComponent(canonicalizedQueryString));
+        }
+        signArr.push(encodeStr);
+
+        let step2JoinSeparator = '';
+        if (algo.step2SeparatorAnd) {
+            step2JoinSeparator = '&';
+        }
+
+        let stringToSign = signArr.join(step2JoinSeparator);
+        Logger.verbose("stringToSign: " + stringToSign);
+
+        // Step 3: Compute signature
+        let computeSign: string = '';
+        let signSecret = secret + algo.step3SecretAppend;
+        if (algo.step3ComputeAlgorithm === 'hmacsha1') {
+            let hmac = crypto.createHmac('sha1', signSecret).update(stringToSign);
+
+            if (algo.step3TextAlgorithm === 'base64') {
+                computeSign = hmac.digest('base64');
+            } else {
+                // Default hex
+                computeSign = hmac.digest('hex');
+            }
+        } else {
+            // Default md5
+            let hash = crypto.createHash('md5').update(stringToSign + signSecret);
+
+            if (algo.step3TextAlgorithm === 'base64') {
+                computeSign = hash.digest('base64');
+            } else {
+                // Default hex
+                computeSign = hash.digest('hex');
+            }
+        }
+        Logger.verbose("computeSign: " + computeSign);
+
+        searchParams.set(conf.signParamName, computeSign);
+
+        Logger.info("Request URL: " + urlObj.toString());
+        httpRequest.url = urlObj.toString();
+    }
+
+    private percentEncode(s: string): string {
+        return s.replace(/\+/g, "%20").replace(/\*/g, "%2A").replace(/\%7E/g, "~");
     }
 
     private async prepareOptions(httpRequest: HttpRequest, settings: IRestClientSettings): Promise<got.GotBodyOptions<null>> {
