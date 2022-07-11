@@ -258,7 +258,7 @@
           ]
         }
       },
-      "match": "(?i)^(?:(get|post|put|delete|patch|head|options|connect|trace)\\s+)?\\s*(.+?)(?:\\s+(HTTP\\/\\S+))?$",
+      "match": "(?i)^(?:(get|post|put|delete|patch|head|options|connect|trace|lock|unlock|propfind|proppatch|copy|move|mkcol|mkcalendar|acl|search)\\s+)?\\s*(.+?)(?:\\s+(HTTP\\/\\S+))?$",
       "name": "http.requestline"
     },
     "response-line": {
