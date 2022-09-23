@@ -54,6 +54,7 @@
     "onCommand:rest-client.copy-request-as-curl",
     "onCommand:rest-client.fold-response",
     "onCommand:rest-client.unfold-response",
+    "onCommand:rest-client.clear-cookies",
     "onLanguage:http",
     "onLanguage:markdown"
   ],
@@ -168,6 +169,11 @@
       {
         "command": "rest-client.clear-aad-token-cache",
         "title": "Clear Azure AD Token Cache",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.clear-cookies",
+        "title": "Clear cookies",
         "category": "Rest Client"
       },
       {
