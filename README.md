@@ -22,6 +22,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Azure Active Directory
     - Microsoft Identity Platform
     - AWS Signature v4
+    - AWS Cognito
 * Environments and custom/system variables support
     - Use variables in any place of request(_URL_, _Headers_, _Body_)
     - Support __environment__, __file__, __request__ and __prompt__ custom variables
@@ -379,6 +380,19 @@ AWS Signature version 4 authenticates requests to AWS services. To use it you ne
 ```http
 GET https://httpbin.org/aws-auth HTTP/1.1
 Authorization: AWS <accessId> <accessKey> [token:<sessionToken>] [region:<regionName>] [service:<serviceName>]
+```
+
+### AWS Cognito
+To authenticate via AWS Cognito, you need to set the Authorization header schema to `COGNITO` and provide your AWS credentials separated by spaces:
+- `<Username>`: AWS Username for target user
+- `<Password>`: AWS Password for target user
+- `<Region>`: AWS Region for Cognito pool
+- `<UserPoolId>`: AWS Cognito User Pool ID
+- `<ClientId>`: AWS Cognito Client ID
+
+```http
+GET https://httpbin.org/aws-auth HTTP/1.1
+Authorization: COGNITO <Username> <Password> <Region> <UserPoolId> <ClientId>
 ```
 
 ## Generate Code Snippet
