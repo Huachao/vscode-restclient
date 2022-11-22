@@ -8,6 +8,7 @@ import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { IRestClientSettings, SystemSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
+import { awsCognito } from './auth/awsCognito';
 import { awsSignature } from './auth/awsSignature';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
@@ -157,15 +158,22 @@ export class HttpClient {
             const normalizedScheme = scheme.toLowerCase();
             if (args.length > 0) {
                 const pass = args.join(' ');
-                if (normalizedScheme === 'basic') {
-                    removeHeader(options.headers!, 'Authorization');
-                    options.auth = `${user}:${pass}`;
-                } else if (normalizedScheme === 'digest') {
-                    removeHeader(options.headers!, 'Authorization');
-                    options.hooks!.afterResponse!.push(digest(user, pass));
-                } else if (normalizedScheme === 'aws') {
-                    removeHeader(options.headers!, 'Authorization');
-                    options.hooks!.beforeRequest!.push(awsSignature(authorization));
+                if (normalizedScheme === "basic") {
+                  removeHeader(options.headers!, "Authorization");
+                  options.auth = `${user}:${pass}`;
+                } else if (normalizedScheme === "digest") {
+                  removeHeader(options.headers!, "Authorization");
+                  options.hooks!.afterResponse!.push(digest(user, pass));
+                } else if (normalizedScheme === "aws") {
+                  removeHeader(options.headers!, "Authorization");
+                  options.hooks!.beforeRequest!.push(
+                    awsSignature(authorization)
+                  );
+                } else if (normalizedScheme === "cognito") {
+                  removeHeader(options.headers!, "Authorization");
+                  options.hooks!.beforeRequest!.push(
+                    await awsCognito(authorization)
+                  );
                 }
             } else if (normalizedScheme === 'basic' && user.includes(':')) {
                 removeHeader(options.headers!, 'Authorization');

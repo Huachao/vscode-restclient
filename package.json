@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.25.0",
+  "version": "0.26.0",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -24,6 +24,7 @@
     "url": "https://github.com/Huachao/vscode-restclient.git"
   },
   "engines": {
+    "node": "16",
     "vscode": "^1.57.0"
   },
   "categories": [
@@ -652,6 +653,7 @@
   "dependencies": {
     "adal-node": "^0.1.26",
     "applicationinsights": "^1.0.5",
+    "aws-amplify": "^5.0.3",
     "aws4": "^1.9.1",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
