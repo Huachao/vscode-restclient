@@ -166,14 +166,10 @@ export class HttpClient {
                     options.hooks!.afterResponse!.push(digest(user, pass));
                 } else if (normalizedScheme === 'aws') {
                     removeHeader(options.headers!, 'Authorization');
-                    options.hooks!.beforeRequest!.push(
-                        awsSignature(authorization)
-                    );
+                    options.hooks!.beforeRequest!.push(awsSignature(authorization));
                 } else if (normalizedScheme === 'cognito') {
                     removeHeader(options.headers!, 'Authorization');
-                   options.hooks!.beforeRequest!.push(
-                      await awsCognito(authorization)
-                    );
+                   options.hooks!.beforeRequest!.push(await awsCognito(authorization));
                 }
             } else if (normalizedScheme === 'basic' && user.includes(':')) {
                 removeHeader(options.headers!, 'Authorization');
