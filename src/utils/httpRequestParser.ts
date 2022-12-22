@@ -176,7 +176,8 @@ export class HttpRequestParser implements RequestParser {
         }
 
         // Check if needed to upload file
-        if (lines.every(line => !this.inputFileSyntax.test(line))) {
+        if (!MimeUtility.isMultiPartFormData(contentTypeHeader) &&
+            lines.every(line => !this.inputFileSyntax.test(line))) {
             if (MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
                 return lines.reduce((p, c, i) => {
                     p += `${(i === 0 || c.startsWith('&') ? '' : EOL)}${c}`;
