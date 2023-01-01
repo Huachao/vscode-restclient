@@ -643,11 +643,11 @@
     "@types/node": "^12.11.7",
     "@types/vscode": "^1.57.0",
     "mocha": "^6.1.4",
-    "ts-loader": "^5.3.2",
+    "ts-loader": "^9.4.2",
     "tslint": "^6.1.2",
     "typescript": "^3.7.3",
-    "webpack": "^4.26.0",
-    "webpack-cli": "^3.1.0"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   },
   "dependencies": {
     "adal-node": "^0.1.26",
