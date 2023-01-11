@@ -481,6 +481,10 @@
                   "passphrase": {
                     "type": "string",
                     "description": "[Optional] A string of passphrase for the private key or pfx"
+                  },
+                  "hostname": {
+                    "type": "string",
+                    "description": "[Optional] The actual hostname used in the request"
                   }
                 },
                 "dependencies": {

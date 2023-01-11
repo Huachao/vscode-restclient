@@ -25,6 +25,7 @@ type SetCookieCallback = (err: Error | null, cookie: Cookie) => void;
 type SetCookieCallbackWithoutOptions = (err: Error, cookie: Cookie) => void;
 type GetCookieStringCallback = (err: Error | null, cookies: string) => void;
 type Certificate = {
+    requestUrl: string ;
     cert?: Buffer;
     key?: Buffer;
     pfx?: Buffer;
@@ -176,7 +177,8 @@ export class HttpClient {
         // set certificate
         const certificate = this.getRequestCertificate(httpRequest.url, settings);
         Object.assign(options, certificate);
-
+        // update the request URL
+        httpRequest.url = certificate?.requestUrl || httpRequest.url ;
         // set proxy
         if (settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, settings.excludeHostsForProxy)) {
             const proxyEndpoint = url.parse(settings.proxy);
@@ -246,16 +248,22 @@ export class HttpClient {
     }
 
     private getRequestCertificate(requestUrl: string, settings: IRestClientSettings): Certificate | null {
-        const host = url.parse(requestUrl).host;
+        var actualUrl = url.parse(requestUrl)
+        const host = actualUrl.host;
         if (!host || !(host in settings.hostCertificates)) {
             return null;
         }
 
-        const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = settings.hostCertificates[host];
+        const { hostname: hostName, cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = settings.hostCertificates[host];
         const cert = this.resolveCertificate(certPath);
         const key = this.resolveCertificate(keyPath);
         const pfx = this.resolveCertificate(pfxPath);
-        return { cert, key, pfx, passphrase };
+        if (hostName != null) {
+            actualUrl.host = hostName
+        }
+        requestUrl = url.format(actualUrl)
+
+        return { requestUrl, cert, key, pfx, passphrase };
     }
 
     private static ignoreProxy(requestUrl: string, excludeHostsForProxy: string[]): Boolean {
