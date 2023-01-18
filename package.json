@@ -54,7 +54,7 @@
     "onCommand:rest-client.copy-request-as-curl",
     "onCommand:rest-client.fold-response",
     "onCommand:rest-client.unfold-response",
-    "onCommand:rest-client.preview-response-body",
+    "onCommand:rest-client.preview-html-response-body",
     "onCommand:rest-client.show-raw-response",
     "onLanguage:http",
     "onLanguage:markdown"
@@ -183,8 +183,8 @@
         "category": "Rest Client"
       },
       {
-        "command": "rest-client.preview-response-body",
-        "title": "Preview",
+        "command": "rest-client.preview-html-response-body",
+        "title": "HTML Preview",
         "category": "Rest Client"
       },
       {
@@ -204,12 +204,12 @@
           "when": "httpResponsePreviewFocus"
         },
         {
-          "command": "rest-client.preview-response-body",
-          "when": "httpResponsePreviewFocus"
+          "command": "rest-client.preview-html-response-body",
+          "when": "isHTMLResponse"
         },
         {
           "command": "rest-client.show-raw-response",
-          "when": "httpResponsePreviewFocus"
+          "when": "isHTMLResponse"
         },
         {
           "command": "rest-client.save-response",
@@ -255,12 +255,12 @@
           "group": "1_rest-client@2"
         },
         {
-          "when": "httpResponsePreviewFocus",
-          "command": "rest-client.preview-response-body",
+          "when": "isHTMLResponse",
+          "command": "rest-client.preview-html-response-body",
           "group": "1_rest-client@3"
         },
         {
-          "when": "httpResponsePreviewFocus",
+          "when": "isHTMLResponse",
           "command": "rest-client.show-raw-response",
           "group": "1_rest-client@4"
         },
