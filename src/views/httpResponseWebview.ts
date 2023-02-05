@@ -279,7 +279,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
 
         if (previewOption !== PreviewOption.Headers) {
             const responseBodyPart = `${ResponseFormatUtility.formatBody(response.body, response.contentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
-            if (this.settings.disableHighlightResonseBodyForLargeResponse &&
+            if (this.settings.disableHighlightResponseBodyForLargeResponse &&
                 response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024) {
                 code += responseBodyPart;
             } else {

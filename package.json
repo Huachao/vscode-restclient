@@ -525,7 +525,7 @@
           "scope": "resource",
           "description": "Response preview output option"
         },
-        "rest-client.disableHighlightResonseBodyForLargeResponse": {
+        "rest-client.disableHighlightResponseBodyForLargeResponse": {
           "type": "boolean",
           "default": true,
           "scope": "resource",
@@ -543,7 +543,7 @@
           "minimum": 0,
           "exclusiveMinimum": true,
           "scope": "resource",
-          "markdownDescription": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when `rest-client.disableHighlightResonseBodyForLargeResponse` and/or `rest-client.disableAddingHrefLinkForLargeResponse` is set to true"
+          "markdownDescription": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when `rest-client.disableHighlightResponseBodyForLargeResponse` and/or `rest-client.disableAddingHrefLinkForLargeResponse` is set to true"
         },
         "rest-client.previewColumn": {
           "type": "string",
