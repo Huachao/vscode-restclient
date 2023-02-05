@@ -54,6 +54,8 @@
     "onCommand:rest-client.copy-request-as-curl",
     "onCommand:rest-client.fold-response",
     "onCommand:rest-client.unfold-response",
+    "onCommand:rest-client.preview-html-response-body",
+    "onCommand:rest-client.show-raw-response",
     "onCommand:rest-client.clear-cookies",
     "onLanguage:http",
     "onLanguage:markdown"
@@ -185,6 +187,16 @@
         "command": "rest-client.unfold-response",
         "title": "Unfold Response",
         "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.preview-html-response-body",
+        "title": "HTML Preview",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.show-raw-response",
+        "title": "Raw",
+        "category": "Rest Client"
       }
     ],
     "menus": {
@@ -196,6 +208,14 @@
         {
           "command": "rest-client.unfold-response",
           "when": "httpResponsePreviewFocus"
+        },
+        {
+          "command": "rest-client.preview-html-response-body",
+          "when": "isHTMLResponse"
+        },
+        {
+          "command": "rest-client.show-raw-response",
+          "when": "isHTMLResponse"
         },
         {
           "command": "rest-client.save-response",
@@ -239,6 +259,16 @@
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.unfold-response",
           "group": "1_rest-client@2"
+        },
+        {
+          "when": "isHTMLResponse",
+          "command": "rest-client.preview-html-response-body",
+          "group": "1_rest-client@3"
+        },
+        {
+          "when": "isHTMLResponse",
+          "command": "rest-client.show-raw-response",
+          "group": "1_rest-client@4"
         },
         {
           "when": "codeSnippetPreviewFocus",
