@@ -77,7 +77,7 @@ export class AadV2TokenProvider {
                 tokenScopes.push(scope);
             }
         }
-        AadV2TokenCache.setToken(authParams.getCacheKey(), tokenScopes, tokenResponse.access_token);
+        AadV2TokenCache.setToken(authParams.getCacheKey(), tokenScopes, tokenResponse.access_token, tokenResponse.expires_in);
 
         return tokenResponse.access_token;
     }
@@ -93,7 +93,7 @@ export class AadV2TokenProvider {
         }
         const tokenResponse: ITokenResponse = bodyObject;
         const scopes: string[] = []; // Confidential Client tokens are limited to scopes defined in the app registration portal
-        AadV2TokenCache.setToken(authParams.getCacheKey(), scopes, tokenResponse.access_token);
+        AadV2TokenCache.setToken(authParams.getCacheKey(), scopes, tokenResponse.access_token, tokenResponse.expires_in);
         return tokenResponse.access_token;
     }
 
@@ -228,11 +228,14 @@ class AadV2TokenCache {
 
     private static tokens: Map<string, AadV2TokenCacheEntry> = new Map<string, AadV2TokenCacheEntry>();
 
-    public static setToken(cacheKey: string, scopes: string[], token: string) {
+    public static setToken(cacheKey: string, scopes: string[], token: string, expires_in: number) {
         const entry: AadV2TokenCacheEntry = new AadV2TokenCacheEntry();
         entry.token = token;
         entry.scopes = scopes;
         this.tokens.set(cacheKey, entry);
+        setTimeout(() => {
+            this.tokens.delete(cacheKey);
+        }, expires_in * 1000);
     }
 
     public static getToken(cacheKey: string): AadV2TokenCacheEntry | undefined {
