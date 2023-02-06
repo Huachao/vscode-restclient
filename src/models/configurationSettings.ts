@@ -37,7 +37,7 @@ export interface IRestClientSettings {
     readonly hostCertificates: HostCertificates;
     readonly suppressResponseBodyContentTypeValidationWarning: boolean;
     readonly previewOption: PreviewOption;
-    readonly disableHighlightResonseBodyForLargeResponse: boolean;
+    readonly disableHighlightResponseBodyForLargeResponse: boolean;
     readonly disableAddingHrefLinkForLargeResponse: boolean;
     readonly largeResponseBodySizeLimitInMB: number;
     readonly previewColumn: ViewColumn;
@@ -71,7 +71,7 @@ export class SystemSettings implements IRestClientSettings {
     private _hostCertificates: HostCertificates;
     private _suppressResponseBodyContentTypeValidationWarning: boolean;
     private _previewOption: PreviewOption;
-    private _disableHighlightResonseBodyForLargeResponse: boolean;
+    private _disableHighlightResponseBodyForLargeResponse: boolean;
     private _disableAddingHrefLinkForLargeResponse: boolean;
     private _largeResponseBodySizeLimitInMB: number;
     private _previewColumn: ViewColumn;
@@ -160,8 +160,8 @@ export class SystemSettings implements IRestClientSettings {
         return this._previewOption;
     }
 
-    public get disableHighlightResonseBodyForLargeResponse() {
-        return this._disableHighlightResonseBodyForLargeResponse;
+    public get disableHighlightResponseBodyForLargeResponse() {
+        return this._disableHighlightResponseBodyForLargeResponse;
     }
 
     public get disableAddingHrefLinkForLargeResponse() {
@@ -269,7 +269,7 @@ export class SystemSettings implements IRestClientSettings {
         this._previewColumn = this.parseColumn(restClientSettings.get<string>("previewColumn", "two"));
         this._previewResponsePanelTakeFocus = restClientSettings.get<boolean>("previewResponsePanelTakeFocus", true);
         this._hostCertificates = restClientSettings.get<HostCertificates>("certificates", {});
-        this._disableHighlightResonseBodyForLargeResponse = restClientSettings.get<boolean>("disableHighlightResonseBodyForLargeResponse", true);
+        this._disableHighlightResponseBodyForLargeResponse = restClientSettings.get<boolean>("disableHighlightResponseBodyForLargeResponse", true);
         this._disableAddingHrefLinkForLargeResponse = restClientSettings.get<boolean>("disableAddingHrefLinkForLargeResponse", true);
         this._largeResponseBodySizeLimitInMB = restClientSettings.get<number>("largeResponseBodySizeLimitInMB", 5);
         this._previewOption = ParsePreviewOptionStr(restClientSettings.get<string>("previewOption", "full"));
@@ -402,8 +402,8 @@ export class RestClientSettings implements IRestClientSettings {
         return this.systemSettings.previewOption;
     }
 
-    public get disableHighlightResonseBodyForLargeResponse() {
-        return this.systemSettings.disableHighlightResonseBodyForLargeResponse;
+    public get disableHighlightResponseBodyForLargeResponse() {
+        return this.systemSettings.disableHighlightResponseBodyForLargeResponse;
     }
 
     public get disableAddingHrefLinkForLargeResponse() {

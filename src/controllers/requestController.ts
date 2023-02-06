@@ -81,6 +81,13 @@ export class RequestController {
 
         this._requestStatusEntry.update({ state: RequestState.Cancelled });
     }
+    public async clearCookies() {
+        try {
+            await this._httpClient.clearCookies();
+        } catch (error) {
+            window.showErrorMessage(`Error clearing cookies:${error?.message}`);
+        }
+    }
 
     private async runCore(httpRequest: HttpRequest, settings: IRestClientSettings, document?: TextDocument) {
         // clear status bar

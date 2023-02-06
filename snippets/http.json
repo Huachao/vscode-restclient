@@ -38,6 +38,7 @@
         "body": [
             "POST ${1:url} HTTP/1.1",
             "X-Request-Type: GraphQL",
+            "Content-Type: application/json",
             "${2:header name}: ${3:header value}",
             "",
             "${4:body content}",
