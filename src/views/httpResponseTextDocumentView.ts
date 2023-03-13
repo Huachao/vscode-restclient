@@ -2,6 +2,7 @@ import { EOL } from 'os';
 import { languages, Position, Range, TextDocument, ViewColumn, window, workspace } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { SystemSettings } from '../models/configurationSettings';
+import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
 import { MimeUtility } from '../utils/mimeUtility';
@@ -22,9 +23,9 @@ export class HttpResponseTextDocumentView {
         });
     }
 
-    public async render(response: HttpResponse, column?: ViewColumn) {
-        const content = this.getTextDocumentContent(response);
-        const language = this.getVSCodeDocumentLanguageId(response);
+    public async render(responseOrRequest: HttpResponse | HttpRequest, column?: ViewColumn) {
+        const content = this.getTextDocumentContent(responseOrRequest);
+        const language = this.getVSCodeDocumentLanguageId(responseOrRequest);
         let document: TextDocument;
         if (this.settings.showResponseInDifferentTab || this.documents.length === 0) {
             document = await workspace.openTextDocument({ language, content });
@@ -42,12 +43,15 @@ export class HttpResponseTextDocumentView {
         }
     }
 
-    private getTextDocumentContent(response: HttpResponse): string {
+    private getTextDocumentContent(responseOrRequest: HttpResponse | HttpRequest): string {
+        if (responseOrRequest instanceof HttpRequest) {
+            return  `Loading ${responseOrRequest.method} ${responseOrRequest.url}`;
+        }
         let content = '';
         const previewOption = this.settings.previewOption;
         if (previewOption === PreviewOption.Exchange) {
             // for add request details
-            const request = response.request;
+            const request = responseOrRequest.request;
             content += `${request.method} ${request.url} HTTP/1.1${EOL}`;
             content += this.formatHeaders(request.headers);
             if (request.body) {
@@ -61,13 +65,13 @@ export class HttpResponseTextDocumentView {
         }
 
         if (previewOption !== PreviewOption.Body) {
-            content += `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${EOL}`;
-            content += this.formatHeaders(response.headers);
+            content += `HTTP/${responseOrRequest.httpVersion} ${responseOrRequest.statusCode} ${responseOrRequest.statusMessage}${EOL}`;
+            content += this.formatHeaders(responseOrRequest.headers);
         }
 
         if (previewOption !== PreviewOption.Headers) {
             const prefix = previewOption === PreviewOption.Body ? '' : EOL;
-            content += `${prefix}${ResponseFormatUtility.formatBody(response.body, response.contentType, true)}`;
+            content += `${prefix}${ResponseFormatUtility.formatBody(responseOrRequest.body, responseOrRequest.contentType, true)}`;
         }
 
         return content;
@@ -82,9 +86,9 @@ export class HttpResponseTextDocumentView {
         return headerString;
     }
 
-    private getVSCodeDocumentLanguageId(response: HttpResponse) {
+    private getVSCodeDocumentLanguageId(responseOrRequest: HttpResponse | HttpRequest) {        
         if (this.settings.previewOption === PreviewOption.Body) {
-            const contentType = response.contentType;
+            const contentType = responseOrRequest.contentType;
             if (MimeUtility.isJSON(contentType)) {
                 return 'json';
             } else if (MimeUtility.isJavaScript(contentType)) {

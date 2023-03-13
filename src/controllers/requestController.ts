@@ -2,6 +2,7 @@ import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscod
 import Logger from '../logger';
 import { IRestClientSettings, RequestSettings, RestClientSettings } from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
+import { HttpResponse } from '../models/httpResponse';
 import { RequestMetadata } from '../models/requestMetadata';
 import { RequestParserFactory } from '../models/requestParserFactory';
 import { trace } from "../utils/decorator";
@@ -92,7 +93,9 @@ export class RequestController {
     private async runCore(httpRequest: HttpRequest, settings: IRestClientSettings, document?: TextDocument) {
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
-
+        const previewColumn = this.getPreviewColumn(settings);
+        this.renderView(settings, httpRequest, previewColumn);
+        
         // set last request and last pending request
         this._lastPendingRequest = httpRequest;
         this._lastRequestSettingTuple = [httpRequest, settings];
@@ -112,20 +115,7 @@ export class RequestController {
                 RequestVariableCache.add(document, httpRequest.name, response);
             }
 
-            try {
-                const activeColumn = window.activeTextEditor!.viewColumn;
-                const previewColumn = settings.previewColumn === ViewColumn.Active
-                    ? activeColumn
-                    : ((activeColumn as number) + 1) as ViewColumn;
-                if (settings.previewResponseInUntitledDocument) {
-                    this._textDocumentView.render(response, previewColumn);
-                } else if (previewColumn) {
-                    this._webview.render(response, previewColumn);
-                }
-            } catch (reason) {
-                Logger.error('Unable to preview response:', reason);
-                window.showErrorMessage(reason);
-            }
+            this.renderView(settings, response, previewColumn);
 
             // persist to history json file
             await UserDataManager.addToRequestHistory(HistoricalHttpRequest.convertFromHttpRequest(httpRequest));
@@ -149,6 +139,26 @@ export class RequestController {
             if (this._lastPendingRequest === httpRequest) {
                 this._lastPendingRequest = undefined;
             }
+        }
+    }
+
+    private getPreviewColumn(settings: IRestClientSettings) {
+        const activeColumn = window.activeTextEditor!.viewColumn;
+        return settings.previewColumn === ViewColumn.Active
+            ? activeColumn
+            : ((activeColumn as number) + 1) as ViewColumn;
+    }
+
+    private renderView(settings: IRestClientSettings, responseOrRequest: HttpResponse | HttpRequest, previewColumn?: ViewColumn) {
+        try {
+            if (settings.previewResponseInUntitledDocument) {
+                this._textDocumentView.render(responseOrRequest, previewColumn);
+            } else if (previewColumn) {
+                this._webview.render(responseOrRequest, previewColumn);
+            }
+        } catch (reason) {
+            Logger.error('Unable to preview response:', reason);
+            window.showErrorMessage(reason);
         }
     }
 
