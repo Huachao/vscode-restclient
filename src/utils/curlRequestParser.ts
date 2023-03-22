@@ -52,11 +52,20 @@ export class CurlRequestParser implements RequestParser {
         }
 
         // parse body
-        let body = parsedArguments.d || parsedArguments.data || parsedArguments['data-ascii'] || parsedArguments['data-binary'] || parsedArguments['data-raw'] || parsedArguments['data-urlencode'];
-        if (Array.isArray(body)) {
-            body = body.join('&');
-        } else  {
-            body = body.toString();
+        const dataKeys = ['d', 'data', 'data-ascii', 'data-binary', 'data-raw', 'data-urlencode'];
+        const datakey = dataKeys.find(key => !!parsedArguments[key])
+        let body;
+        if (datakey) {
+            body = parsedArguments[datakey];
+            if (Array.isArray(body)) {
+                body = body.join('&');
+            } else  {
+                if (!!parsedArguments['data-urlencode']) {
+                    body = encodeURI(body.toString());
+                } else {
+                    body = body.toString();
+                }
+            }
         }
 
         if (typeof body === 'string' && body[0] === '@') {
