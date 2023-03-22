@@ -1,3 +1,13 @@
+## 0.25.0 (2022/06/21)
+* __Feature__: [Support prompt variables](https://github.com/Huachao/vscode-restclient/pull/616) ([@theerapatcha](https://github.com/theerapatcha))
+* __Feature__: Support request level setting for `no-cookie-jar` and `no-redirect-jar`
+* __Feature__: [Add Markdown support to run requests with code lenses](https://github.com/Huachao/vscode-restclient/pull/933) ([@acuarica](https://github.com/acuarica))
+* __Bug Fix__: [Quickpick Filter does not reset after selecting a language when Generating Code Snippet](https://github.com/Huachao/vscode-restclient/pull/965) ([@TheBinaryGuy](https://github.com/TheBinaryGuy))
+* __Bug Fix__: [Fix curl prase error if -d option is number only](https://github.com/Huachao/vscode-restclient/issues/957)
+* __Bug Fix__: [Fix inferred operation name issue with trailing space in GraphQL](https://github.com/Huachao/vscode-restclient/issues/960)
+* __Bug Fix__: [Fixed multipart/form-data request was not ending with `\r\n`](https://github.com/Huachao/vscode-restclient/pull/999) ([@MaximkaHuman](https://github.com/MaximkaHuman))
+* __Improvement__: [Treat `text/json` as JSON](https://github.com/Huachao/vscode-restclient/issues/1019)
+
 ## 0.24.6 (2021/11/29)
 * __Bug Fix__: [Fix AADV2TokenProvider only works for special case of MS Graph Tokens](https://github.com/Huachao/vscode-restclient/pull/794) ([@mthierba](https://github.com/mthierba))
 * __Improvement__: [Allow comments between variable declarations](https://github.com/Huachao/vscode-restclient/pull/885) ([@Danysan1](https://github.com/Danysan1))
