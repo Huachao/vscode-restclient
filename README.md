@@ -2,7 +2,7 @@
 
 [![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://open.vscode.dev/Huachao/vscode-restclient) [![Node CI](https://github.com/Huachao/vscode-restclient/workflows/Node%20CI/badge.svg?event=push)](https://github.com/Huachao/vscode-restclient/actions?query=workflow%3A%22Node+CI%22) [![Join the chat at https://gitter.im/Huachao/vscode-restclient](https://badges.gitter.im/Huachao/vscode-restclient.svg)](https://gitter.im/Huachao/vscode-restclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Marketplace Version](https://vsmarketplacebadge.apphb.com/version-short/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Downloads](https://vsmarketplacebadge.apphb.com/downloads/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Installs](https://vsmarketplacebadge.apphb.com/installs/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Rating](https://vsmarketplacebadge.apphb.com/rating/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
 
-REST Client allows you to send HTTP request and view the response in Visual Studio Code directly.
+REST Client allows you to send HTTP request and view the response in Visual Studio Code directly. It eliminates the need for a separate tool to test REST APIs and makes API testing convenient and efficient.
 
 ## Main Features
 * Send/Cancel/Rerun __HTTP request__ in editor and view response in a separate pane with syntax highlight
@@ -74,18 +74,16 @@ content-type: application/json
     "time": "Wed, 21 Oct 2015 18:27:50 GMT"
 }
 ```
-Once you prepared a request, click the `Send Request` link above the request (this will appear if the file's language mode is `HTTP`, by default `.http` files are like this), or use shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), or right-click in the editor and then select `Send Request` in the menu, or press `F1` and then select/type `Rest Client: Send Request`, the response will be previewed in a separate __webview__ panel of Visual Studio Code. If you'd like to use the full power of searching, selecting or manipulating in Visual Studio Code, you can also preview response in __an untitled document__ by setting `rest-client.previewResponseInUntitledDocument` to `true`. Once a request is issued, the waiting spin icon will be displayed in the status bar until the response is received. You can click the spin icon to cancel the request. After that, the icon will be replaced with the total duration and response size.
+To send a prepared request, you have several options. The easiest way is to click the `Send Request` link above the request. This link will appear automatically if the file's language mode is set to `HTTP`. You can also use the shortcut `Ctrl+Alt+R`(`Cmd+Alt+R` for macOS), right-click in the editor and select `Send Request` from the context menu, or press `F1` and select/type `Rest Client: Send Request`.
 
-You can view the breakdown of the response time when hovering over the total duration in status bar, you could view the duration details of _Socket_, _DNS_, _TCP_, _First Byte_ and _Download_.
+The response will be previewed in a separate webview panel inside Visual Studio Code. If you prefer to use the full power of searching, selecting, or manipulating in Visual Studio Code, you can preview the response in an untitled document by setting `rest-client.previewResponseInUntitledDocument` to `true`.
 
-When hovering over the response size in status bar, you could view the breakdown response size details of _headers_ and _body_.
+When you issue a request, a waiting spin icon will appear in the status bar until the response is received. You can click the spin icon to cancel the request. Once the response is received, the waiting icon will be replaced with the total duration and response size. By hovering over the total duration in the status bar, you can view a breakdown of the response time, including details on _Socket_, _DNS_, _TCP_, _First Byte_ and _Download_. By hovering over the response size displayed in the status bar, you can view a breakdown of the response size details for both the _headers_ and _body_.
 
-> All the shortcuts in REST Client Extension are __ONLY__ available for file language mode `http` and `plaintext`.
-
-> __Send Request__ link above each request will only be visible when the request file is in `http` mode, more details can be found in [http language section](#http-language).
+> The shortcuts in the REST Client Extension can be accessed exclusively when using the file language modes `http` and `plaintext`.
 
 ### Select Request Text
-You may even want to save numerous requests in the same file and execute any of them as you wish easily. REST Client extension could recognize requests separated by lines begin with three or more consecutive `#` as a delimiter. Place the cursor anywhere between the delimiters, issuing the request as above, and the underlying request will be sent out.
+If you need to store multiple requests in the same file and execute them at your convenience, REST Client Extension has got you covered. By using the three or more consecutive `#` symbol as a delimiter, you can create a separation between the requests that the extension can recognize. Once you have done this, simply place your cursor between the delimiters of the desired request, issue it as usual, and the extension will send it out without any hassle.
 ```http
 GET https://example.com/comments/1 HTTP/1.1
 
@@ -137,7 +135,8 @@ GET https://example.com/comments
 ```
 
 ### Request Headers
-The lines immediately after the _request line_ to first empty line are parsed as _Request Headers_. Please provide headers with the standard `field-name: field-value` format, each line represents one header. By default `REST Client Extension` will add a `User-Agent` header with value `vscode-restclient` in your request if you don't explicitly specify. You can also change the default value in setting `rest-client.defaultHeaders`.
+Once you've written your _Request line_, the lines that immediately follow until the first empty line will be parsed as _Request Headers_. These headers should follow the standard `field-name: field-value` format, with each line representing a single header. By default if you don't explicitly specify a `User-Agent` header, `REST Client Extension` will automatically add one with the value `vscode-restclient`. However, if you want to change the default value, you can do so in the `rest-client.defaultHeaders` setting.
+
 Below are examples of _Request Headers_:
 ```http
 User-Agent: rest-client
@@ -146,8 +145,7 @@ Content-Type: application/json
 ```
 
 ### Request Body
-If you want to provide the request body, please add a blank line after the request headers like the POST example in usage, and all content after it will be treated as _Request Body_.
-Below are examples of _Request Body_:
+If you want to provide a request body, simply add a blank line following the request headers, as demonstrated in the POST example in the usage section. Anything written after the blank line will be treated as _Request Body_ content. Here are some examples:
 
 ```http
 POST https://example.com/comments HTTP/1.1
@@ -272,17 +270,17 @@ We add the capability to directly run [curl request](https://curl.haxx.se/) in R
 * -d, --data, --data-ascii,--data-binary, --data-raw
 
 ## Copy Request As cURL
-Sometimes you may want to get the curl format of an http request quickly and save it to clipboard, just pressing `F1` and then selecting/typing `Rest Client: Copy Request As cURL` or simply right-click in the editor, and select `Copy Request As cURL`.
+If you need to quickly obtain the curl format of an HTTP request and save it to your clipboard, you can use a handy shortcut. Simply hit `F1` and select/type `Rest Client: Copy Request As cURL`. Alternatively, you can right-click in the editor and select `Copy Request As cURL.`
 
 ## Cancel Request
-Once you want to cancel a processing request, click the waiting spin icon or use shortcut `Ctrl+Alt+K`(`Cmd+Alt+K` for macOS), or press `F1` and then select/type `Rest Client: Cancel Request`.
+If you want to cancel a processing request, click the waiting spin icon or use shortcut `Ctrl+Alt+K`(`Cmd+Alt+K` for macOS), or press `F1` and then select/type `Rest Client: Cancel Request`.
 
 ## Rerun Last Request
 Sometimes you may want to refresh the API response, now you could do it simply using shortcut `Ctrl+Alt+L`(`Cmd+Alt+L` for macOS), or press `F1` and then select/type `Rest Client: Rerun Last Request` to rerun the last request.
 
 ## Request History
 ![request-history](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/request-history.png)
-Each time we sent an http request, the request details(method, url, headers, and body) would be persisted into file. By using shortcut `Ctrl+Alt+H`(`Cmd+Alt+H` for macOS), or press `F1` and then select/type `Rest Client: Request History`, you can view the last __50__ request items(method, url and request time) in the time reversing order, you can select any request you wish to trigger again. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
+Every time you send an http request, the request details, including method, url, headers, and body, are saved into a file for future reference. To access this content, you can use the shortcut `Ctrl+Alt+H`(`Cmd+Alt+H` for macOS), or press `F1` and then select/type `Rest Client: Request History`. This will allow you to view the last __50__ request items in time reversing order, displaying the method, url, and request time for each one. After specified request history item is selected, the request details would be displayed in a temp file, you can view the request details or follow previous step to trigger the request again.
 
 You can also clear request history by pressing `F1` and then selecting/typing `Rest Client: Clear Request History`.
 
