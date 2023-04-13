@@ -45,6 +45,7 @@
     "onCommand:rest-client.save-response",
     "onCommand:rest-client.save-response-body",
     "onCommand:rest-client.copy-response-body",
+    "onCommand:rest-client.import-from-document",
     "onCommand:rest-client.switch-environment",
     "onCommand:rest-client.clear-aad-token-cache",
     "onCommand:rest-client.cancel-request",
@@ -105,6 +106,11 @@
       {
         "command": "rest-client.cancel-request",
         "title": "Cancel Request",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.import-from-document",
+        "title": "Import Requests From Document",
         "category": "Rest Client"
       },
       {
@@ -706,6 +712,7 @@
     "jsonc-parser": "^2.0.2",
     "jsonpath-plus": "^0.20.1",
     "mime-types": "^2.1.14",
+    "postman-collection": "^3.6.5",
     "pretty-data": "^0.40.0",
     "tough-cookie": "^3.0.1",
     "tough-cookie-file-store-bugfix": "Huachao/tough-cookie-file-store-bugfix",

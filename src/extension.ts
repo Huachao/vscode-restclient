@@ -1,10 +1,11 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { commands, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
+import { CancellationToken, commands, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
 import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
+import { ImportController } from './controllers/importController';
 import { RequestController } from './controllers/requestController';
 import { CustomVariableDiagnosticsProvider } from "./providers/customVariableDiagnosticsProvider";
 import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
@@ -30,6 +31,7 @@ export async function activate(context: ExtensionContext) {
 
     const requestController = new RequestController(context);
     const historyController = new HistoryController();
+    const importController = new ImportController();
     const codeSnippetController = new CodeSnippetController(context);
     const environmentController = await EnvironmentController.create();
     context.subscriptions.push(requestController);
@@ -39,6 +41,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, range: Range) => requestController.run(range))));
     context.subscriptions.push(commands.registerCommand('rest-client.rerun-last-request', () => requestController.rerun()));
     context.subscriptions.push(commands.registerCommand('rest-client.cancel-request', () => requestController.cancel()));
+    context.subscriptions.push(commands.registerCommand('rest-client.import-from-document', (token: CancellationToken) => importController.import(token)));
     context.subscriptions.push(commands.registerCommand('rest-client.history', () => historyController.save()));
     context.subscriptions.push(commands.registerCommand('rest-client.clear-history', () => historyController.clear()));
     context.subscriptions.push(commands.registerCommand('rest-client.generate-codesnippet', () => codeSnippetController.run()));
