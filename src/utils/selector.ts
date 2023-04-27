@@ -37,7 +37,6 @@ export class Selector {
                         selectedText = editor.document.getText(snippetRange);
                     }
                 }
-
             } else {
                 selectedText = this.getDelimitedText(editor.document.getText(), activeLine);
             }
@@ -63,7 +62,7 @@ export class Selector {
         }
 
         // parse actual request lines
-        const rawLines = lines.filter(l => !this.isCommentLine(l));
+        const rawLines = lines.filter((l) => !this.isCommentLine(l));
         const requestRange = this.getRequestRanges(rawLines)[0];
         if (!requestRange) {
             return null;
@@ -76,7 +75,7 @@ export class Selector {
 
         return {
             text: selectedText,
-            metadatas: metadatas
+            metadatas: metadatas,
         };
     }
 
@@ -118,7 +117,7 @@ export class Selector {
             ignoreEmptyLine: true,
             ignoreFileVariableDefinitionLine: true,
             ignoreResponseRange: true,
-            ...options
+            ...options,
         };
         const requestRanges: [number, number][] = [];
         const delimitedLines = this.getDelimiterRows(lines);
@@ -134,16 +133,20 @@ export class Selector {
                     break;
                 }
 
-                if (options.ignoreCommentLine && this.isCommentLine(startLine)
-                    || options.ignoreEmptyLine && this.isEmptyLine(startLine)
-                    || options.ignoreFileVariableDefinitionLine && this.isFileVariableDefinitionLine(startLine)) {
+                if (
+                    (options.ignoreCommentLine && this.isCommentLine(startLine)) ||
+                    (options.ignoreEmptyLine && this.isEmptyLine(startLine)) ||
+                    (options.ignoreFileVariableDefinitionLine && this.isFileVariableDefinitionLine(startLine))
+                ) {
                     start++;
                     continue;
                 }
 
                 const endLine = lines[end];
-                if (options.ignoreCommentLine && this.isCommentLine(endLine)
-                    || options.ignoreEmptyLine && this.isEmptyLine(endLine)) {
+                if (
+                    (options.ignoreCommentLine && this.isCommentLine(endLine)) ||
+                    (options.ignoreEmptyLine && this.isEmptyLine(endLine))
+                ) {
                     end--;
                     continue;
                 }
@@ -191,14 +194,14 @@ export class Selector {
         }
     }
 
-    public static parsePromptMetadataForVariableDefinitions(text: string | undefined) : PromptVariableDefinition[] {
-        const varDefs : PromptVariableDefinition[] = [];
-        const parsedDefs = JSON.parse(text || "[]");
+    public static parsePromptMetadataForVariableDefinitions(text: string | undefined): PromptVariableDefinition[] {
+        const varDefs: PromptVariableDefinition[] = [];
+        const parsedDefs = JSON.parse(text || '[]');
         if (Array.isArray(parsedDefs)) {
             for (const parsedDef of parsedDefs) {
                 varDefs.push({
                     name: parsedDef['name'],
-                    description: parsedDef['description']
+                    description: parsedDef['description'],
                 });
             }
         }
@@ -240,11 +243,11 @@ export class Selector {
     private static getDelimiterRows(lines: string[]): number[] {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
-            .map(([index, ]) => +index);
+            .map(([index]) => +index);
     }
 
-    public static* getMarkdownRestSnippets(document: TextDocument): Generator<Range> {
-        const snippetStartRegx = new RegExp('^\`\`\`(' + ['http', 'rest'].join('|') + ')$');
+    public static *getMarkdownRestSnippets(document: TextDocument): Generator<Range> {
+        const snippetStartRegx = new RegExp('^```(' + ['http', 'rest'].join('|') + ')$');
         const snippetEndRegx = /^\`\`\`$/;
 
         let snippetStart: number | null = null;
@@ -268,7 +271,7 @@ export class Selector {
         }
     }
 
-    private static handlePromptMetadata(metadatas: Map<RequestMetadata, string | undefined> , text: string) {
+    private static handlePromptMetadata(metadatas: Map<RequestMetadata, string | undefined>, text: string) {
         const promptVarDef = this.getPrompVariableDefinition(text);
         if (promptVarDef) {
             const varDefs = this.parsePromptMetadataForVariableDefinitions(metadatas.get(RequestMetadata.Prompt));
@@ -280,9 +283,16 @@ export class Selector {
     private static async promptForInput(defs: PromptVariableDefinition[]): Promise<Map<string, string> | null> {
         const promptVariables = new Map<string, string>();
         for (const { name, description } of defs) {
+            // In name resembles some kind of password prompt, enable password InputBox option
+            const passwordPromptNames = ['password', 'Password', 'PASSWORD', 'passwd', 'Passwd', 'PASSWD', 'pass', 'Pass', 'PASS'];
+            let password = false;
+            if (passwordPromptNames.includes(name)) {
+                password = true;
+            }
             const value = await window.showInputBox({
                 prompt: `Input value for "${name}"`,
-                placeHolder: description
+                placeHolder: description,
+                password: password,
             });
             if (value !== undefined) {
                 promptVariables.set(name, value);
@@ -292,5 +302,4 @@ export class Selector {
         }
         return promptVariables;
     }
-
 }
