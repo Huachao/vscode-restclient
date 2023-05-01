@@ -6,6 +6,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
+import { EnvironmentController } from '../../controllers/environmentController';
 import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
@@ -188,13 +189,20 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private registerDotenvVariable() {
         this.resolveFuncs.set(Constants.DotenvVariableName, async (name, document) => {
             let folderPath = path.dirname(document.fileName);
-            while (!await fs.pathExists(path.join(folderPath, '.env'))) {
+            const { name : enviornmentName } = await EnvironmentController.getCurrentEnvironment();
+
+            let pathsFound = [false, false];
+
+            while ((pathsFound = await Promise.all([
+                fs.pathExists(path.join(folderPath, `.env.${enviornmentName}`)),
+                fs.pathExists(path.join(folderPath, '.env'))
+            ])).every(result => result === false)) {
                 folderPath = path.join(folderPath, '..');
                 if (folderPath === path.parse(process.cwd()).root) {
                     return { warning: ResolveWarningMessage.DotenvFileNotFound };
                 }
             }
-            const absolutePath = path.join(folderPath, '.env');
+            const absolutePath = path.join(folderPath, pathsFound[0] ? `.env.${enviornmentName}` : '.env');
             const groups = this.dotenvRegex.exec(name);
             if (groups !== null && groups.length === 3) {
                 const parsed = dotenv.parse(await fs.readFile(absolutePath));
