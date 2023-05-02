@@ -189,12 +189,12 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private registerDotenvVariable() {
         this.resolveFuncs.set(Constants.DotenvVariableName, async (name, document) => {
             let folderPath = path.dirname(document.fileName);
-            const { name : enviornmentName } = await EnvironmentController.getCurrentEnvironment();
+            const { name : environmentName } = await EnvironmentController.getCurrentEnvironment();
 
             let pathsFound = [false, false];
 
             while ((pathsFound = await Promise.all([
-                fs.pathExists(path.join(folderPath, `.env.${enviornmentName}`)),
+                fs.pathExists(path.join(folderPath, `.env.${environmentName}`)),
                 fs.pathExists(path.join(folderPath, '.env'))
             ])).every(result => result === false)) {
                 folderPath = path.join(folderPath, '..');
@@ -202,7 +202,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                     return { warning: ResolveWarningMessage.DotenvFileNotFound };
                 }
             }
-            const absolutePath = path.join(folderPath, pathsFound[0] ? `.env.${enviornmentName}` : '.env');
+            const absolutePath = path.join(folderPath, pathsFound[0] ? `.env.${environmentName}` : '.env');
             const groups = this.dotenvRegex.exec(name);
             if (groups !== null && groups.length === 3) {
                 const parsed = dotenv.parse(await fs.readFile(absolutePath));
