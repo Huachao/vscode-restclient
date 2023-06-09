@@ -482,6 +482,8 @@ Content-Type: {{contentType}}
 
 #### Prompt Variables
 With prompt variables, user can input the variables to be used when sending a request. This gives a flexibility to change most dynamic variables without having to change the `http` file. User can specify more than one prompt variables. The definition syntax of prompt variables is like a single-line comment by adding the syntax before the desired request url with the following syntax __`// @prompt {var1}`__ or __`# @prompt {var1}`__. A variable description is also assignable using __`// @prompt {var1} {description}`__ or __`# @prompt {var1} {description}`__ which will prompt an input popup with a desired description message.
+
+The user input will be hidden as typed if the variable is any one of these names: `password`, `Password`, `PASSWORD`, `passwd`, `Passwd`, `PASSWD`, `pass`, `Pass`, `PASS`.
  
  
  The reference syntax is the same as others, follows __`{{var}}`__. The prompt variable will override any preceding assigned variable and will never be stored to be used in other requests.
