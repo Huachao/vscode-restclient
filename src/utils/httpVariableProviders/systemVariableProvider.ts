@@ -2,6 +2,7 @@ import * as adal from 'adal-node';
 import dayjs, { Dayjs, OpUnitType } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import * as dotenv from 'dotenv';
+import faker from 'faker';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
@@ -38,6 +39,8 @@ export class SystemVariableProvider implements HttpVariableProvider {
 
     private readonly aadRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+aud:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
 
+    private readonly fakerRegex: RegExp = new RegExp(`\\${Constants.FakerVariableName}\\s+(\\w+\\..+)`);
+
     private readonly innerSettingsEnvironmentVariableProvider: EnvironmentVariableProvider =  EnvironmentVariableProvider.Instance;
     private static _instance: SystemVariableProvider;
 
@@ -60,6 +63,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.registerDotenvVariable();
         this.registerAadTokenVariable();
         this.registerAadV2TokenVariable();
+        this.registerFakerVariable();
     }
 
     public readonly type: VariableType = VariableType.System;
@@ -292,6 +296,19 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 return {value: token};
             });
     }
+
+    private registerFakerVariable() {
+        this.resolveFuncs.set(Constants.FakerVariableName, async name => {
+            const groups = this.fakerRegex.exec(name);
+            if (groups !== null && groups.length === 2) {
+                const [, expression] = groups;
+                return { value: (faker.fake("{{" + expression + "}}")) };
+            }
+
+            return { warning: ResolveWarningMessage.IncorrectFakerVariableFormat };
+        });
+    }
+
     private async resolveSettingsEnvironmentVariable(name: string) {
         if (await this.innerSettingsEnvironmentVariableProvider.has(name)) {
             const { value, error, warning } =  await this.innerSettingsEnvironmentVariableProvider.get(name);
