@@ -16,7 +16,7 @@ export class AadV2TokenProvider {
         AzureChinaCloud: { constantName: "cn" },
         AzureUSGovernment: { constantName: "us" },
         ppe: { constantName: "ppe" },
-    }
+    };
 
     private readonly _httpClient: HttpClient;
     private readonly clipboard: Clipboard;
