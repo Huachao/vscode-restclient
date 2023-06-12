@@ -16,8 +16,8 @@ export class AadV2TokenProvider {
         AzureChinaCloud: { constantName: "cn" },
         AzureUSGovernment: { constantName: "us" },
         ppe: { constantName: "ppe" },
-    };
-    
+    }
+
     private readonly _httpClient: HttpClient;
     private readonly clipboard: Clipboard;
 
@@ -129,8 +129,7 @@ export class AadV2TokenProvider {
             `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&scope=${appUri}/.default`);
     }
 
-    private getAadV2BaseUri(cloud: string, tenantId: string)
-    {
+    private getAadV2BaseUri(cloud: string, tenantId: string) {
         const constantCloudName = this.cloudConstantToCloudNameMap[cloud].constantName;
         const aadUri = Constants.AzureClouds[constantCloudName].aad;
         return `${aadUri}${tenantId}/oauth2/v2.0/`;
