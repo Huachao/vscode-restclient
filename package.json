@@ -697,7 +697,7 @@
     "encodeurl": "^1.0.1",
     "filesize": "^3.3.0",
     "fs-extra": "^5.0.0",
-    "got": "^9.6.0",
+    "got": "^12.5.3",
     "highlight.js": "^10.4.1",
     "http-proxy-agent": "^2.1.0",
     "https-proxy-agent": "^2.2.3",
