@@ -157,7 +157,8 @@ export class CustomVariableDiagnosticsProvider {
 
             let match: RegExpExecArray | null;
             while (match = pattern.exec(line)) {
-                let [path, name] = match;
+                const [path] = match;
+                let [, name] = match;
                 // For request variable, only keep the first part before dot for name
                 const requestIndex = name.indexOf('.request');
                 if (requestIndex > 0) {
