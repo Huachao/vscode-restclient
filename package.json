@@ -54,6 +54,9 @@
     "onCommand:rest-client.copy-request-as-curl",
     "onCommand:rest-client.fold-response",
     "onCommand:rest-client.unfold-response",
+    "onCommand:rest-client.preview-html-response-body",
+    "onCommand:rest-client.show-raw-response",
+    "onCommand:rest-client.clear-cookies",
     "onLanguage:http",
     "onLanguage:markdown"
   ],
@@ -171,6 +174,11 @@
         "category": "Rest Client"
       },
       {
+        "command": "rest-client.clear-cookies",
+        "title": "Clear cookies",
+        "category": "Rest Client"
+      },
+      {
         "command": "rest-client.fold-response",
         "title": "Fold Response",
         "category": "Rest Client"
@@ -178,6 +186,16 @@
       {
         "command": "rest-client.unfold-response",
         "title": "Unfold Response",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.preview-html-response-body",
+        "title": "HTML Preview",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.show-raw-response",
+        "title": "Raw",
         "category": "Rest Client"
       }
     ],
@@ -190,6 +208,14 @@
         {
           "command": "rest-client.unfold-response",
           "when": "httpResponsePreviewFocus"
+        },
+        {
+          "command": "rest-client.preview-html-response-body",
+          "when": "isHTMLResponse"
+        },
+        {
+          "command": "rest-client.show-raw-response",
+          "when": "isHTMLResponse"
         },
         {
           "command": "rest-client.save-response",
@@ -233,6 +259,16 @@
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.unfold-response",
           "group": "1_rest-client@2"
+        },
+        {
+          "when": "isHTMLResponse",
+          "command": "rest-client.preview-html-response-body",
+          "group": "1_rest-client@3"
+        },
+        {
+          "when": "isHTMLResponse",
+          "command": "rest-client.show-raw-response",
+          "group": "1_rest-client@4"
         },
         {
           "when": "codeSnippetPreviewFocus",
@@ -519,7 +555,7 @@
           "scope": "resource",
           "description": "Response preview output option"
         },
-        "rest-client.disableHighlightResonseBodyForLargeResponse": {
+        "rest-client.disableHighlightResponseBodyForLargeResponse": {
           "type": "boolean",
           "default": true,
           "scope": "resource",
@@ -537,7 +573,7 @@
           "minimum": 0,
           "exclusiveMinimum": true,
           "scope": "resource",
-          "markdownDescription": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when `rest-client.disableHighlightResonseBodyForLargeResponse` and/or `rest-client.disableAddingHrefLinkForLargeResponse` is set to true"
+          "markdownDescription": "Set the response body size threshold of MB to identify whether a response is a so-called 'large response', only used when `rest-client.disableHighlightResponseBodyForLargeResponse` and/or `rest-client.disableAddingHrefLinkForLargeResponse` is set to true"
         },
         "rest-client.previewColumn": {
           "type": "string",
