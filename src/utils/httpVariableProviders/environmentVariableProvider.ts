@@ -64,7 +64,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
         for (const [key, value] of Object.entries(current)) {
             const variableRegex = new RegExp(`\\{{2}\\$${environment} (.+?)\\}{2}`);
             const match = variableRegex.exec(value);
-            
+
             if (!match) {
                 continue;
             }
