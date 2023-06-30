@@ -38,8 +38,20 @@ export class HttpResponseWebview extends BaseWebview {
         return 'httpResponsePreviewFocus';
     }
 
+    protected get isHTMLResponse(): string {
+        return 'isHTMLResponse';
+    }
+
     private get activeResponse(): HttpResponse | undefined {
         return this.activePanel ? this.panelResponses.get(this.activePanel) : undefined;
+    }
+
+    private setIsHTMLResponse(response: HttpResponse | undefined) {
+        if (response?.headers['Content-Type']?.includes('text/html')) {
+            commands.executeCommand('setContext', this.isHTMLResponse, true);
+        } else {
+            commands.executeCommand('setContext', this.isHTMLResponse, false);
+        }
     }
 
     public constructor(context: ExtensionContext) {
@@ -50,6 +62,8 @@ export class HttpResponseWebview extends BaseWebview {
 
         this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', this.foldResponseBody, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', this.unfoldResponseBody, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.preview-html-response-body', this.previewResponseBody, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.show-raw-response', this.showRawResponse, this));
 
         this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-body', this.copyBody, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response', this.save, this));
@@ -73,6 +87,7 @@ export class HttpResponseWebview extends BaseWebview {
                 if (panel === this.activePanel) {
                     this.setPreviewActiveContext(false);
                     this.activePanel = undefined;
+                    this.setIsHTMLResponse(undefined);
                 }
 
                 const index = this.panels.findIndex(v => v === panel);
@@ -91,6 +106,7 @@ export class HttpResponseWebview extends BaseWebview {
                 const active = this.panels.some(p => p.active);
                 this.setPreviewActiveContext(active);
                 this.activePanel = webviewPanel.active ? webviewPanel : undefined;
+                this.setIsHTMLResponse(this.activeResponse);
             });
 
             this.panels.push(panel);
@@ -107,6 +123,8 @@ export class HttpResponseWebview extends BaseWebview {
 
         this.panelResponses.set(panel, response);
         this.activePanel = panel;
+
+        this.setIsHTMLResponse(this.activeResponse);
     }
 
     public dispose() {
@@ -121,6 +139,20 @@ export class HttpResponseWebview extends BaseWebview {
     @trace('Unfold Response')
     private unfoldResponseBody() {
         this.activePanel?.webview.postMessage({ 'command': 'unfoldAll' });
+    }
+
+    @trace('HTML Preview')
+    private previewResponseBody() {
+        if (this.activeResponse && this.activePanel) {
+            this.activePanel.webview.html = this.activeResponse.body;
+        }
+    }
+
+    @trace('Raw')
+    private showRawResponse() {
+        if (this.activeResponse && this.activePanel) {
+            this.activePanel.webview.html = this.getHtmlForWebview(this.activePanel, this.activeResponse);
+        }
     }
 
     @trace('Copy Response Body')
@@ -279,7 +311,7 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
 
         if (previewOption !== PreviewOption.Headers) {
             const responseBodyPart = `${ResponseFormatUtility.formatBody(response.body, response.contentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
-            if (this.settings.disableHighlightResonseBodyForLargeResponse &&
+            if (this.settings.disableHighlightResponseBodyForLargeResponse &&
                 response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024) {
                 code += responseBodyPart;
             } else {
