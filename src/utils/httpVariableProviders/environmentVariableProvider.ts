@@ -54,7 +54,7 @@ export class EnvironmentVariableProvider implements HttpVariableProvider {
         // Resolve mappings from shared environment
         this.mapEnvironmentVariables('shared', sharedEnvironmentVariables, sharedEnvironmentVariables);
         this.mapEnvironmentVariables('shared', currentEnvironmentVariables, sharedEnvironmentVariables);
-        
+
         // Resolve mappings from current environment
         this.mapEnvironmentVariables(environmentName, currentEnvironmentVariables, currentEnvironmentVariables);
         return {...sharedEnvironmentVariables, ...currentEnvironmentVariables};
