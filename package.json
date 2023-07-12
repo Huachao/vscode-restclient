@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.26.0",
+  "version": "0.25.1",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -24,7 +24,6 @@
     "url": "https://github.com/Huachao/vscode-restclient.git"
   },
   "engines": {
-    "node": "16",
     "vscode": "^1.57.0"
   },
   "categories": [
