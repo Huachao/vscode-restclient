@@ -40,7 +40,7 @@ export async function awsCognito(
   authorization: string
 ): Promise<got.BeforeRequestHook<got.GotBodyOptions<null>>> {
   const [, username, password, region, userPoolId, clientId] = authorization.split(/\s+/);
-  
+
   const { accessToken } = await login(
     username,
     password,
