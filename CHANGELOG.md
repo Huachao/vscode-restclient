@@ -1,3 +1,6 @@
+## 0.25.1 (2022/07/06)
+* __Bug Fix__: [Fix request parse error for curl request without body](https://github.com/Huachao/vscode-restclient/issues/1026)
+
 ## 0.25.0 (2022/06/21)
 * __Feature__: [Support prompt variables](https://github.com/Huachao/vscode-restclient/pull/616) ([@theerapatcha](https://github.com/theerapatcha))
 * __Feature__: Support request level setting for `no-cookie-jar` and `no-redirect-jar`

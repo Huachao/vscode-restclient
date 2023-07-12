@@ -280,9 +280,16 @@ export class Selector {
     private static async promptForInput(defs: PromptVariableDefinition[]): Promise<Map<string, string> | null> {
         const promptVariables = new Map<string, string>();
         for (const { name, description } of defs) {
+            // In name resembles some kind of password prompt, enable password InputBox option
+            const passwordPromptNames = ['password', 'Password', 'PASSWORD', 'passwd', 'Passwd', 'PASSWD', 'pass', 'Pass', 'PASS'];
+            let password = false;
+            if (passwordPromptNames.includes(name)) {
+                password = true;
+            }
             const value = await window.showInputBox({
                 prompt: `Input value for "${name}"`,
-                placeHolder: description
+                placeHolder: description,
+                password: password,
             });
             if (value !== undefined) {
                 promptVariables.set(name, value);

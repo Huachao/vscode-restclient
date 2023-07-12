@@ -33,7 +33,7 @@ type Certificate = {
 };
 
 export class HttpClient {
-    private readonly cookieStore: Store;
+    private cookieStore: Store;
 
     public constructor() {
         const cookieFilePath = UserDataManager.cookieFilePath;
@@ -104,6 +104,11 @@ export class HttpClient {
                 httpRequest.rawBody,
                 httpRequest.name
             ));
+    }
+
+    public async clearCookies() {
+        await fs.remove(UserDataManager.cookieFilePath);
+        this.cookieStore = new cookieStore(UserDataManager.cookieFilePath) as Store;
     }
 
     private async prepareOptions(httpRequest: HttpRequest, settings: IRestClientSettings): Promise<got.GotBodyOptions<null>> {
