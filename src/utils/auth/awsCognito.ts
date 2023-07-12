@@ -2,11 +2,11 @@ import { Amplify, Auth } from "aws-amplify";
 import got from "got";
 
 async function login(
-  Username: string,
-  Password: string,
-  Region: string,
-  UserPoolId: string,
-  ClientId: string
+  username: string,
+  password: string,
+  region: string,
+  userPoolId: string,
+  clientId: string
 ): Promise<{
   authId: string;
   idToken: string;
@@ -14,13 +14,13 @@ async function login(
 }> {
   Amplify.configure({
     Auth: {
-      region: Region,
-      userPoolId: UserPoolId,
-      userPoolWebClientId: ClientId,
+      region,
+      userPoolId,
+      userPoolWebClientId: clientId,
     },
   });
 
-  const user = await Auth.signIn(Username, Password);
+  const user = await Auth.signIn(username, password);
   const authId = user?.username;
   const idToken = user?.signInUserSession?.idToken?.jwtToken;
   const accessToken = user?.signInUserSession?.accessToken?.jwtToken;
@@ -39,15 +39,14 @@ async function login(
 export async function awsCognito(
   authorization: string
 ): Promise<got.BeforeRequestHook<got.GotBodyOptions<null>>> {
-  const [, Username, Password, Region, UserPoolId, ClientId] =
-    authorization.split(/\s+/);
+  const [, username, password, region, userPoolId, clientId] = authorization.split(/\s+/);
   
   const { accessToken } = await login(
-    Username,
-    Password,
-    Region,
-    UserPoolId,
-    ClientId
+    username,
+    password,
+    region,
+    userPoolId,
+    clientId
   );
 
   return async (options) => {
