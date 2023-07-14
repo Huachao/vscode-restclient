@@ -216,7 +216,7 @@ export class HttpRequestParser implements RequestParser {
                     combinedStream.append(line);
                 }
 
-                if (index < lines.length) {
+                if ((index !== lines.length - 1) || MimeUtility.isMultiPartFormData(contentTypeHeader)) {
                     combinedStream.append(this.getLineEnding(contentTypeHeader));
                 }
             }
