@@ -217,7 +217,7 @@ export class HttpElementFactory {
                 return;
             }
             const prefixLength = protocol.length + 2; // https: + //
-            originalElements.push(new HttpElement(`${requestUrl.substr(prefixLength)}`, ElementType.URL, '^\\s*(?:(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\\s+)https?\\:\\/{2}'));
+            originalElements.push(new HttpElement(`${requestUrl.substr(prefixLength)}`, ElementType.URL, '^\\s*(?:(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|LOCK|UNLOCK|PROPFIND|PROPPATCH|COPY|MOVE|MKCOL|MKCALENDAR|ACL|SEARCH)\\s+)https?\\:\\/{2}'));
         });
 
         let elements: HttpElement[] = [];
