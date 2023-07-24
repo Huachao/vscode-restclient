@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import * as os from 'os';
+import { Readable } from 'stream';
 import { Clipboard, commands, env, ExtensionContext, Uri, ViewColumn, WebviewPanel, window, workspace } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { SystemSettings } from '../models/configurationSettings';
@@ -70,12 +71,12 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', this.saveBody, this));
     }
 
-    public async render(response: HttpResponse, column: ViewColumn) {
+    public async render(responseOrRequest: HttpResponse | HttpRequest, column: ViewColumn) {
         let panel: WebviewPanel;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
                 this.viewType,
-                this.getTitle(response),
+                this.getTitle(responseOrRequest),
                 { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus },
                 {
                     enableFindWidget: true,
@@ -112,16 +113,18 @@ export class HttpResponseWebview extends BaseWebview {
             this.panels.push(panel);
         } else {
             panel = this.panels[this.panels.length - 1];
-            panel.title = this.getTitle(response);
+            panel.title = this.getTitle(responseOrRequest);
         }
 
-        panel.webview.html = this.getHtmlForWebview(panel, response);
-
+        panel.webview.html = this.getHtmlForWebview(panel, responseOrRequest);
         this.setPreviewActiveContext(this.settings.previewResponsePanelTakeFocus);
-
         panel.reveal(column, !this.settings.previewResponsePanelTakeFocus);
 
-        this.panelResponses.set(panel, response);
+        if (responseOrRequest instanceof HttpResponse) {
+            this.panelResponses.set(panel, responseOrRequest);
+        }
+        
+
         this.activePanel = panel;
 
         this.setIsHTMLResponse(this.activeResponse);
@@ -206,9 +209,12 @@ export class HttpResponseWebview extends BaseWebview {
         return defaultFileName;
     }
 
-    private getTitle(response: HttpResponse): string {
-        const prefix = (this.settings.requestNameAsResponseTabTitle && response.request.name) || 'Response';
-        return `${prefix}(${response.timingPhases.total ?? 0}ms)`;
+    private getTitle(responseOrrequest: HttpResponse | HttpRequest): string {
+        if (responseOrrequest instanceof HttpRequest) {
+            return `Running request...`;
+        }
+        const prefix = (this.settings.requestNameAsResponseTabTitle && responseOrrequest.request.name) || 'Response';
+        return `${prefix}(${responseOrrequest.timingPhases.total ?? 0}ms)`;
     }
 
     private getFullResponseString(response: HttpResponse): string {
@@ -234,7 +240,20 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
-    private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse): string {
+    private getHtmlForWebview(panel: WebviewPanel, responseOrRequest: HttpResponse | HttpRequest): string {
+        if (responseOrRequest instanceof HttpRequest) {
+            var message = 'Running...\n' 
+                + `${responseOrRequest.method} ${responseOrRequest.url}` 
+                + '\n';
+            if (typeof responseOrRequest.body === 'string') {
+                message += `Body-Length: ${responseOrRequest.body.length} bytes`;
+            }
+            if (responseOrRequest.body instanceof Readable) {
+                message += `Body-Length: ${responseOrRequest.body.readableLength} bytes`;
+            }
+            return this.getHtml(panel, `<pre><code>${this.addUrlLinks(this.addLineNums(message))}</code></pre>`, 1);
+        }
+        let response = responseOrRequest;
         let innerHtml: string;
         let width = 2;
         let contentType = response.contentType;
@@ -249,6 +268,12 @@ export class HttpResponseWebview extends BaseWebview {
             innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
         }
 
+        return this.getHtml(panel, this.settings.disableAddingHrefLinkForLargeResponse && response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024
+            ? innerHtml
+            : this.addUrlLinks(innerHtml), width);
+    }
+
+    private  getHtml(panel: WebviewPanel, body: string, width: number) {
         // Content Security Policy
         const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
         const csp = this.getCsp(nonce);
@@ -268,9 +293,7 @@ export class HttpResponseWebview extends BaseWebview {
     </head>
     <body>
         <div>
-            ${this.settings.disableAddingHrefLinkForLargeResponse && response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024
-                ? innerHtml
-                : this.addUrlLinks(innerHtml)}
+            ${body}
             <a id="scroll-to-top" role="button" aria-label="scroll to top" title="Scroll To Top"><span class="icon"></span></a>
         </div>
         <script type="text/javascript" src="${panel.webview.asWebviewUri(this.scriptFilePath)}" nonce="${nonce}" charset="UTF-8"></script>
