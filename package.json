@@ -703,6 +703,7 @@
     "https-proxy-agent": "^2.2.3",
     "httpsnippet": "^1.22.0",
     "iconv-lite": "^0.4.15",
+    "json-bigint": "^1.0.0",
     "jsonc-parser": "^2.0.2",
     "jsonpath-plus": "^0.20.1",
     "mime-types": "^2.1.14",
