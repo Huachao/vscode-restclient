@@ -577,7 +577,7 @@ System variables provide a pre-defined set of variables that can be used in any 
 
   `appOnly`: Optional. Specify `appOnly` to use make to use a client credentials flow to obtain a token. `aadV2ClientSecret` and `aadV2AppUri`must be provided as REST Client environment variables. `aadV2ClientId` and `aadV2TenantId` may also be optionally provided via the environment. `aadV2ClientId` in environment will only be used for `appOnly` calls.
 
-  `scopes:<scope[,]>`: Optional. Comma delimited list of scopes that must have consent to allow the call to be successful. Not applicable for `appOnly` calls.
+  `scopes:<scope[,]>`: Optional. Comma delimited list of scopes that must have consent to allow the call to be successful. Not applicable for `appOnly` calls. `aadV2Scopes` may optionally be provided via the environment.
 
   `tenantId:<domain|tenantId>`: Optional. Domain or tenant id for the tenant to sign in to. (`common` to determine tenant from sign in).
 
