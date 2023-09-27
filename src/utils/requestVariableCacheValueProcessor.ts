@@ -42,6 +42,8 @@ export class RequestVariableCacheValueProcessor {
 
     private static resolveHttpPart(http: HttpRequest | HttpResponse, httpPart: HttpPart, nameOrPath?: string): ResolveResult {
         if (httpPart === "body") {
+            const forceJsonExtension = 'asJson.';
+            const forceXmlExtension = 'asXml.';
             const { body, headers } = http;
             if (!body) {
                 const message = http instanceof HttpRequest ? ResolveWarningMessage.RequestBodyNotExist : ResolveWarningMessage.ResponseBodyNotExist;
@@ -57,12 +59,23 @@ export class RequestVariableCacheValueProcessor {
                 return { state: ResolveState.Success, value: body };
             }
 
+            let forceJson = false;
+            let forceXml = false;
+            if (nameOrPath.startsWith(forceJsonExtension)) {
+                nameOrPath = nameOrPath.substring(forceJsonExtension.length);
+                forceJson = true;
+            } else if (nameOrPath.startsWith(forceXmlExtension)) {
+                nameOrPath = nameOrPath.substring(forceXmlExtension.length);
+                forceXml = true;
+            }
+
             const contentTypeHeader = getContentType(headers);
-            if (MimeUtility.isJSON(contentTypeHeader) || (MimeUtility.isJavaScript(contentTypeHeader) && isJSONString(body as string))) {
+            if (MimeUtility.isJSON(contentTypeHeader) ||
+                (forceJson || MimeUtility.isJavaScript(contentTypeHeader)) && isJSONString(body as string)) {
                 const parsedBody = JSON.parse(body as string);
 
                 return this.resolveJsonHttpBody(parsedBody, nameOrPath);
-            } else if (MimeUtility.isXml(contentTypeHeader)) {
+            } else if (forceXml || MimeUtility.isXml(contentTypeHeader)) {
                 return this.resolveXmlHttpBody(body, nameOrPath);
             } else {
                 return { state: ResolveState.Warning, value: body, message: ResolveWarningMessage.UnsupportedBodyContentType };
