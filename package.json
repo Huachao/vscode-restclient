@@ -58,7 +58,8 @@
     "onCommand:rest-client.show-raw-response",
     "onCommand:rest-client.clear-cookies",
     "onLanguage:http",
-    "onLanguage:markdown"
+    "onLanguage:markdown",
+    "onCommand:rest-client.import-swagger"
   ],
   "main": "./dist/extension",
   "contributes": {
@@ -196,6 +197,11 @@
       {
         "command": "rest-client.show-raw-response",
         "title": "Raw",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.import-swagger",
+        "title": "Import from file",
         "category": "Rest Client"
       }
     ],
