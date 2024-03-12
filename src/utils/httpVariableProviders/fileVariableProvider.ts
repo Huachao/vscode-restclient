@@ -41,18 +41,25 @@ export class FileVariableProvider implements HttpVariableProvider {
     public readonly type: VariableType = VariableType.File;
 
     public async has(name: string, document: TextDocument): Promise<boolean> {
+        name = name.replace(/^%/, "");
         const variables = await this.getFileVariables(document);
         return variables.some(v => v.name === name);
     }
 
     public async get(name: string, document: TextDocument): Promise<HttpVariable> {
+        const isEncoded = name.startsWith("%");
+        name = name.replace(/^%/, "");
         const variables = await this.getFileVariables(document);
         const variable = variables.find(v => v.name === name);
         if (!variable) {
             return { name, error: ResolveErrorMessage.FileVariableNotExist };
         } else {
             const variableMap = await this.resolveFileVariables(document, variables);
-            return { name, value: variableMap.get(name) };
+            let value = variableMap.get(name);
+            if (value !== undefined && isEncoded) {
+                value = encodeURIComponent(value);
+            }
+            return { name, value };
         }
     }
 

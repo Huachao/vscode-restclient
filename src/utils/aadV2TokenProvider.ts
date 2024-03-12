@@ -10,6 +10,14 @@ import { EnvironmentVariableProvider } from './httpVariableProviders/environment
 const AadV2TokenProviderClientId = "07f0a107-95c1-41ad-8f13-912eab68b93f";
 
 export class AadV2TokenProvider {
+    private cloudConstantToCloudNameMap : { [cloudName: string]: { constantName: string } } = {
+        // default cloud must be first
+        AzureCloud: { constantName: "public" },
+        AzureChinaCloud: { constantName: "cn" },
+        AzureUSGovernment: { constantName: "us" },
+        ppe: { constantName: "ppe" },
+    };
+
     private readonly _httpClient: HttpClient;
     private readonly clipboard: Clipboard;
 
@@ -43,7 +51,7 @@ export class AadV2TokenProvider {
     }
 
     private async getDeviceCodeResponse(authParams: AuthParameters): Promise<IDeviceCodeResponse> {
-        const request = this.createUserCodeRequest(authParams.clientId, authParams.tenantId, authParams.scopes);
+        const request = this.createUserCodeRequest(authParams.clientId, authParams.tenantId, authParams.scopes, authParams.cloud);
         const response = await this._httpClient.send(request);
 
         const bodyObject = JSON.parse(response.body);
@@ -62,7 +70,7 @@ export class AadV2TokenProvider {
     }
 
     private async getToken(deviceCodeResponse: IDeviceCodeResponse, authParams: AuthParameters): Promise<string> {
-        const request = this.createAcquireTokenRequest(authParams.clientId, authParams.tenantId, deviceCodeResponse.device_code);
+        const request = this.createAcquireTokenRequest(authParams.clientId, authParams.tenantId, deviceCodeResponse.device_code, authParams.cloud);
         const response = await this._httpClient.send(request);
 
         const bodyObject = JSON.parse(response.body);
@@ -77,13 +85,13 @@ export class AadV2TokenProvider {
                 tokenScopes.push(scope);
             }
         }
-        AadV2TokenCache.setToken(authParams.getCacheKey(), tokenScopes, tokenResponse.access_token);
+        AadV2TokenCache.setToken(authParams.getCacheKey(), tokenScopes, tokenResponse.access_token, tokenResponse.expires_in);
 
         return tokenResponse.access_token;
     }
 
     private async getConfidentialClientToken(authParams: AuthParameters): Promise<string> {
-        const request = this.createAcquireConfidentialClientTokenRequest(authParams.clientId, authParams.tenantId, authParams.clientSecret!, authParams.appUri!);
+        const request = this.createAcquireConfidentialClientTokenRequest(authParams.clientId, authParams.tenantId, authParams.clientSecret!, authParams.appUri!, authParams.cloud!);
         const response = await this._httpClient.send(request);
 
         const bodyObject = JSON.parse(response.body);
@@ -93,7 +101,7 @@ export class AadV2TokenProvider {
         }
         const tokenResponse: ITokenResponse = bodyObject;
         const scopes: string[] = []; // Confidential Client tokens are limited to scopes defined in the app registration portal
-        AadV2TokenCache.setToken(authParams.getCacheKey(), scopes, tokenResponse.access_token);
+        AadV2TokenCache.setToken(authParams.getCacheKey(), scopes, tokenResponse.access_token, tokenResponse.expires_in);
         return tokenResponse.access_token;
     }
 
@@ -102,23 +110,29 @@ export class AadV2TokenProvider {
         throw new Error("Auth call failed. " + errorResponse.error_description);
     }
 
-    private createUserCodeRequest(clientId: string, tenantId: string, scopes: string[]): HttpRequest {
+    private createUserCodeRequest(clientId: string, tenantId: string, scopes: string[], cloud: string): HttpRequest {
         return new HttpRequest(
-            "POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/devicecode`,
+            "POST", `${this.getAadV2BaseUri(cloud, tenantId)}/devicecode`,
             { "Content-Type": "application/x-www-form-urlencoded" },
             `client_id=${clientId}&scope=${scopes.join("%20")}`);
     }
 
-    private createAcquireTokenRequest(clientId: string, tenantId: string, deviceCode: string): HttpRequest {
-        return new HttpRequest("POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+    private createAcquireTokenRequest(clientId: string, tenantId: string, deviceCode: string, cloud: string): HttpRequest {
+        return new HttpRequest("POST", `${this.getAadV2BaseUri(cloud, tenantId)}/token`,
             { "Content-Type": "application/x-www-form-urlencoded" },
             `grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=${clientId}&device_code=${deviceCode}`);
     }
 
-    private createAcquireConfidentialClientTokenRequest(clientId: string, tenantId: string, clientSecret: string, appUri: string): HttpRequest {
-        return new HttpRequest("POST", `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+    private createAcquireConfidentialClientTokenRequest(clientId: string, tenantId: string, clientSecret: string, appUri: string, cloud: string): HttpRequest {
+        return new HttpRequest("POST", `${this.getAadV2BaseUri(cloud, tenantId)}/token`,
             { "Content-Type": "application/x-www-form-urlencoded" },
             `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}&scope=${appUri}/.default`);
+    }
+
+    private getAadV2BaseUri(cloud: string, tenantId: string) {
+        const constantCloudName = this.cloudConstantToCloudNameMap[cloud].constantName;
+        const aadUri = Constants.AzureClouds[constantCloudName].aad;
+        return `${aadUri}${tenantId}/oauth2/v2.0/`;
     }
 
     private async promptForUserCode(deviceCodeResponse: IDeviceCodeResponse): Promise<boolean> {
@@ -149,7 +163,8 @@ export class AadV2TokenProvider {
 */
 class AuthParameters {
 
-    private readonly aadV2TokenRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryV2TokenVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(appOnly))?(\\s+scopes:(\\S+))?(\\s+tenantId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+clientId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
+    private readonly aadV2TokenRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryV2TokenVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(AzureCloud|AzureChinaCloud|AzureUSGovernment|ppe))?(\\s+(appOnly))?(\\s+scopes:(\\S+))?(\\s+tenantId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+clientId:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
+    public cloud: string;
     public tenantId: string;
     public clientId: string;
     public scopes: string[];
@@ -159,6 +174,7 @@ class AuthParameters {
     public appUri?: string;
 
     public constructor() {
+        this.cloud = "AzureCloud";
         this.clientId = AadV2TokenProviderClientId;
         this.tenantId = "common";
         this.forceNewToken = false;
@@ -178,7 +194,7 @@ class AuthParameters {
     }
 
     getCacheKey(): string {
-        return this.tenantId + "|" + this.clientId + "|" + this.appOnly + "|" + this.scopes.join(',') as string;
+        return this.cloud + "|" + this.tenantId + "|" + this.clientId + "|" + this.appOnly + "|" + this.scopes.join(',') as string;
     }
 
     static async parseName(name: string): Promise<AuthParameters> {
@@ -186,6 +202,7 @@ class AuthParameters {
         const authParameters = new AuthParameters();
 
         // Update defaults based on environment
+        authParameters.cloud = (await authParameters.readEnvironmentVariable("aadV2Cloud")) || authParameters.cloud;
         authParameters.tenantId = (await authParameters.readEnvironmentVariable("aadV2TenantId")) || authParameters.tenantId;
 
         let scopes = "openid,profile";
@@ -194,10 +211,11 @@ class AuthParameters {
         const groups = authParameters.aadV2TokenRegex.exec(name);
         if (groups) {
             authParameters.forceNewToken = groups[2] === Constants.AzureActiveDirectoryForceNewOption;
-            authParameters.appOnly = groups[4] === "appOnly";
-            scopes = groups[6] || scopes;
-            authParameters.tenantId = groups[8] || authParameters.tenantId;
-            explicitClientId = groups[10];
+            authParameters.cloud = groups[4] || authParameters.cloud;
+            authParameters.appOnly = groups[6] === "appOnly";
+            scopes = groups[8] || scopes;
+            authParameters.tenantId = groups[10] || authParameters.tenantId;
+            explicitClientId = groups[12];
         } else {
             throw new Error("Failed to parse parameters: " + name);
         }
@@ -228,11 +246,14 @@ class AadV2TokenCache {
 
     private static tokens: Map<string, AadV2TokenCacheEntry> = new Map<string, AadV2TokenCacheEntry>();
 
-    public static setToken(cacheKey: string, scopes: string[], token: string) {
+    public static setToken(cacheKey: string, scopes: string[], token: string, expires_in: number) {
         const entry: AadV2TokenCacheEntry = new AadV2TokenCacheEntry();
         entry.token = token;
         entry.scopes = scopes;
         this.tokens.set(cacheKey, entry);
+        setTimeout(() => {
+            this.tokens.delete(cacheKey);
+        }, expires_in * 1000);
     }
 
     public static getToken(cacheKey: string): AadV2TokenCacheEntry | undefined {
