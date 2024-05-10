@@ -35,12 +35,14 @@ export class SwaggerUtils {
         } else {
             operationBlock += `${operation.toUpperCase()} ${baseUrl}${endpoint} HTTP/1.1\n`;
         }
-        operationBlock += '\n###'
+        operationBlock += '\n###';
         return operationBlock;
     }
 
     getExampleObjectFromSchema(components: any, schema: any): any {
-        if (!schema) return;
+        if (!schema) {
+            return;
+        }
 
         if (schema.$ref) {
             const schemaRef = schema.$ref;
@@ -74,4 +76,4 @@ export class SwaggerUtils {
             throw error;
         }
     }
-}  
+}

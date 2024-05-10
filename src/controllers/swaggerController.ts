@@ -1,7 +1,7 @@
-import * as vscode from 'vscode';
+import dayjs from 'dayjs';
 import * as fs from 'fs';
 import * as path from 'path';
-import dayjs from 'dayjs';
+import * as vscode from 'vscode';
 import { SwaggerUtils } from '../utils/swaggerUtils';
 
 export class SwaggerController {
@@ -32,7 +32,7 @@ export class SwaggerController {
             placeHolder: 'Select an option',
         });
 
-        // Handle the user's selection  
+        // Handle the user's selection
         if (selectedItem) {
             if (selectedItem === importFromFileItem) {
                 const options: vscode.OpenDialogOptions = {
@@ -88,4 +88,4 @@ export class SwaggerController {
             vscode.window.showErrorMessage(error.message);
         }
     }
-}  
+}

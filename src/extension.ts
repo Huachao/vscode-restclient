@@ -6,6 +6,7 @@ import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
 import { RequestController } from './controllers/requestController';
+import { SwaggerController } from './controllers/swaggerController';
 import { CustomVariableDiagnosticsProvider } from "./providers/customVariableDiagnosticsProvider";
 import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
 import { EnvironmentOrFileVariableHoverProvider } from './providers/environmentOrFileVariableHoverProvider';
@@ -22,7 +23,6 @@ import { RequestVariableHoverProvider } from './providers/requestVariableHoverPr
 import { AadTokenCache } from './utils/aadTokenCache';
 import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
 import { UserDataManager } from './utils/userDataManager';
-import { SwaggerController } from './controllers/swaggerController';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

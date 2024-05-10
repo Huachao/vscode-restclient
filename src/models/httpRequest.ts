@@ -1,7 +1,7 @@
+import { CancelableRequest, Response } from 'got';
 import { Stream } from 'stream';
 import { getContentType } from '../utils/misc';
 import { RequestHeaders } from './base';
-import { CancelableRequest, Response } from 'got';
 
 export class HttpRequest {
     public isCancelled: boolean;

@@ -1,7 +1,7 @@
+import { Timings } from '@szmarczak/http-timer';
 import { getContentType } from '../utils/misc';
 import { ResponseHeaders } from './base';
 import { HttpRequest } from "./httpRequest";
-import { Timings } from '@szmarczak/http-timer';
 
 export class HttpResponse {
     public constructor(
