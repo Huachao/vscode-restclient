@@ -207,7 +207,7 @@ class AuthParameters {
         authParameters.cloud = (await authParameters.readEnvironmentVariable("aadV2Cloud")) || authParameters.cloud;
         authParameters.tenantId = (await authParameters.readEnvironmentVariable("aadV2TenantId")) || authParameters.tenantId;
 
-        let scopes = "openid,profile";
+        let scopes = (await authParameters.readEnvironmentVariable("aadV2Scopes")) || "openid,profile";
         let explicitClientId: string | undefined = undefined;
         // Parse variable parameters
         const groups = authParameters.aadV2TokenRegex.exec(name);
