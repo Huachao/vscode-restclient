@@ -22,6 +22,7 @@ import { RequestVariableHoverProvider } from './providers/requestVariableHoverPr
 import { AadTokenCache } from './utils/aadTokenCache';
 import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
 import { UserDataManager } from './utils/userDataManager';
+import { SwaggerController } from './controllers/swaggerController';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -32,6 +33,7 @@ export async function activate(context: ExtensionContext) {
     const historyController = new HistoryController();
     const codeSnippetController = new CodeSnippetController(context);
     const environmentController = await EnvironmentController.create();
+    const swaggerController = new SwaggerController(context);
     context.subscriptions.push(requestController);
     context.subscriptions.push(historyController);
     context.subscriptions.push(codeSnippetController);
@@ -51,6 +53,8 @@ export async function activate(context: ExtensionContext) {
             window.showErrorMessage(error.message);
         });
     }));
+    context.subscriptions.push(commands.registerCommand('rest-client.import-swagger', async () => swaggerController.import()));
+
 
     const documentSelector = [
         { language: 'http', scheme: '*' }
