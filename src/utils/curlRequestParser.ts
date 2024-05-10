@@ -21,7 +21,7 @@ export class CurlRequestParser implements RequestParser {
         requestText = requestText
             .replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|LOCK|UNLOCK|PROPFIND|PROPPATCH|COPY|MOVE|MKCOL|MKCALENDAR|ACL|SEARCH)/, '$1 $2')
             .replace(/(-I|--head)(?=\s+)/, '-X HEAD');
-        const parsedArguments = yargsParser(requestText);
+        const parsedArguments = yargsParser.default(requestText);
 
         // parse url
         let url = parsedArguments._[1];

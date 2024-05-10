@@ -1,5 +1,5 @@
 import * as adal from 'adal-node';
-import dayjs, { Dayjs, OpUnitType } from 'dayjs';
+import dayjs, { Dayjs, ManipulateType } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
@@ -89,7 +89,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
             if (groups !== null && groups.length === 3) {
                 const [, offset, option] = groups;
                 const ts = offset && option
-                    ? dayjs.utc().add(+offset, option as OpUnitType).unix()
+                    ? dayjs.utc().add(+offset, option as ManipulateType).unix()
                     : dayjs.utc().unix();
                 return { value: ts.toString() };
             }
@@ -105,7 +105,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 const [, type, offset, option] = groups;
                 let date: Dayjs;
                 if (offset && option) {
-                    date = dayjs.utc().add(+offset, option as OpUnitType);
+                    date = dayjs.utc().add(+offset, option as ManipulateType);
                 } else {
                     date = dayjs.utc();
                 }
@@ -130,7 +130,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 const [, type, offset, option] = groups;
                 let date = dayjs.utc().local();
                 if (offset && option) {
-                    date = date.add(+offset, option as OpUnitType);
+                    date = date.add(+offset, option as ManipulateType);
                 }
 
                 if (type === 'rfc1123') {

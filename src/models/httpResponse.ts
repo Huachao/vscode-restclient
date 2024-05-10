@@ -1,13 +1,7 @@
 import { getContentType } from '../utils/misc';
 import { ResponseHeaders } from './base';
 import { HttpRequest } from "./httpRequest";
-
-import got = require('got');
-
-// Make all properties in T nullable
-type Nullable<T> = {
-    [P in keyof T]: T[P] | null;
-};
+import { Timings } from '@szmarczak/http-timer';
 
 export class HttpResponse {
     public constructor(
@@ -19,7 +13,7 @@ export class HttpResponse {
         public bodySizeInBytes: number,
         public headersSizeInBytes: number,
         public bodyBuffer: Buffer,
-        public timingPhases: Nullable<got.GotTimingsPhases>,
+        public timingPhases: Timings['phases'],
         public request: HttpRequest) {
     }
 

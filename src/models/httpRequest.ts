@@ -1,12 +1,11 @@
 import { Stream } from 'stream';
 import { getContentType } from '../utils/misc';
 import { RequestHeaders } from './base';
-
-import got = require('got');
+import { CancelableRequest, Response } from 'got';
 
 export class HttpRequest {
     public isCancelled: boolean;
-    private _underlyingRequest: got.GotPromise<Buffer>;
+    private _underlyingRequest: CancelableRequest<Response<Buffer>>;
     public constructor(
         public method: string,
         public url: string,
@@ -22,7 +21,7 @@ export class HttpRequest {
         return getContentType(this.headers);
     }
 
-    public setUnderlyingRequest(request: got.GotPromise<Buffer>): void {
+    public setUnderlyingRequest(request: CancelableRequest<Response<Buffer>>): void {
         this._underlyingRequest = request;
     }
 

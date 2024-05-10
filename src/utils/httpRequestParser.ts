@@ -202,7 +202,7 @@ export class HttpRequestParser implements RequestParser {
                         if (fileAbsolutePath) {
                             if (groupsValues.processVariables) {
                                 const buffer = await fs.readFile(fileAbsolutePath);
-                                const fileContent = buffer.toString(groupsValues.encoding || this.defaultFileEncoding);
+                                const fileContent = buffer.toString((groupsValues.encoding || this.defaultFileEncoding) as BufferEncoding);
                                 const resolvedContent = await VariableProcessor.processRawRequest(fileContent);
                                 combinedStream.append(resolvedContent);
                             } else {

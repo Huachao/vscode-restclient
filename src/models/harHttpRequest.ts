@@ -53,7 +53,7 @@ export class HARHttpRequest {
             if (Array.isArray(value)) {
                 queryParams.push(...value.map(v => new HARParam(name, v)));
             } else {
-                queryParams.push(new HARParam(name, value));
+                queryParams.push(new HARParam(name, value || ''));
             }
         });
         return queryParams;
