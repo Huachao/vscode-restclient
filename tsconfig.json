@@ -5,6 +5,7 @@
         "outDir": "dist",
         "noUnusedLocals": true,
         "experimentalDecorators": true,
+        "incremental": true,
         "lib": [
             "es2019"
         ],
