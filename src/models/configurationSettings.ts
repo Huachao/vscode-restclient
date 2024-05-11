@@ -273,7 +273,7 @@ export class SystemSettings implements IRestClientSettings {
         this._largeResponseBodySizeLimitInMB = restClientSettings.get<number>("largeResponseBodySizeLimitInMB", 5);
         this._previewOption = ParsePreviewOptionStr(restClientSettings.get<string>("previewOption", "full"));
         this._formParamEncodingStrategy = ParseFormParamEncodingStr(restClientSettings.get<string>("formParamEncodingStrategy", "automatic"));
-        this._enableTelemetry = restClientSettings.get<boolean>('enableTelemetry', true);
+        this._enableTelemetry = restClientSettings.get<boolean>('enableTelemetry', false);
         this._suppressResponseBodyContentTypeValidationWarning = restClientSettings.get('suppressResponseBodyContentTypeValidationWarning', false);
         this._addRequestBodyLineIndentationAroundBrackets = restClientSettings.get<boolean>('addRequestBodyLineIndentationAroundBrackets', true);
         this._decodeEscapedUnicodeCharacters = restClientSettings.get<boolean>('decodeEscapedUnicodeCharacters', false);
