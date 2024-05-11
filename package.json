@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.25.1",
+  "version": "0.26.0",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -39,27 +39,7 @@
     "multi-root ready"
   ],
   "activationEvents": [
-    "onCommand:rest-client.request",
-    "onCommand:rest-client.history",
-    "onCommand:rest-client.clear-history",
-    "onCommand:rest-client.save-response",
-    "onCommand:rest-client.save-response-body",
-    "onCommand:rest-client.copy-response-body",
-    "onCommand:rest-client.switch-environment",
-    "onCommand:rest-client.clear-aad-token-cache",
-    "onCommand:rest-client.cancel-request",
-    "onCommand:rest-client.rerun-last-request",
-    "onCommand:rest-client.generate-codesnippet",
-    "onCommand:rest-client.copy-codesnippet",
-    "onCommand:rest-client.copy-request-as-curl",
-    "onCommand:rest-client.fold-response",
-    "onCommand:rest-client.unfold-response",
-    "onCommand:rest-client.preview-html-response-body",
-    "onCommand:rest-client.show-raw-response",
-    "onCommand:rest-client.clear-cookies",
-    "onLanguage:http",
-    "onLanguage:markdown",
-    "onCommand:rest-client.import-swagger"
+    "onLanguage:markdown"
   ],
   "main": "./dist/extension",
   "contributes": {
