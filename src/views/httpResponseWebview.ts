@@ -1,7 +1,6 @@
 import * as fs from 'fs-extra';
 import * as os from 'os';
 import { Clipboard, commands, env, ExtensionContext, Uri, ViewColumn, WebviewPanel, window, workspace } from 'vscode';
-import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { SystemSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
@@ -9,7 +8,7 @@ import { PreviewOption } from '../models/previewOption';
 import { trace } from '../utils/decorator';
 import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
-import { base64, getHeader, isJSONString } from '../utils/misc';
+import { base64, formatHeaders, getHeader, isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 import { UserDataManager } from '../utils/userDataManager';
 import { BaseWebview } from './baseWebview';
@@ -213,7 +212,7 @@ export class HttpResponseWebview extends BaseWebview {
 
     private getFullResponseString(response: HttpResponse): string {
         const statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
-        const headerString = Object.entries(response.headers).reduce((acc, [name, value]) => acc + `${name}: ${value}${os.EOL}`, '');
+        const headerString = formatHeaders(response.headers);
         const body = response.body ? `${os.EOL}${response.body}` : '';
         return `${statusLine}${headerString}${body}`;
     }
@@ -284,7 +283,7 @@ export class HttpResponseWebview extends BaseWebview {
             // for add request details
             const request = response.request;
             const requestNonBodyPart = `${request.method} ${request.url} HTTP/1.1
-${HttpResponseWebview.formatHeaders(request.headers)}`;
+${formatHeaders(request.headers)}`;
             code += hljs.highlight('http', requestNonBodyPart + '\r\n').value;
             if (request.body) {
                 if (typeof request.body !== 'string') {
@@ -305,7 +304,7 @@ ${HttpResponseWebview.formatHeaders(request.headers)}`;
 
         if (previewOption !== PreviewOption.Body) {
             const responseNonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
-${HttpResponseWebview.formatHeaders(response.headers)}`;
+${formatHeaders(response.headers)}`;
             code += hljs.highlight('http', responseNonBodyPart + (previewOption !== PreviewOption.Headers ? '\r\n' : '')).value;
         }
 
@@ -446,20 +445,6 @@ ${HttpResponseWebview.formatHeaders(response.headers)}`;
             }
         }
         return result;
-    }
-
-    private static formatHeaders(headers: RequestHeaders | ResponseHeaders): string {
-        let headerString = '';
-        for (const header in headers) {
-            if (headers.hasOwnProperty(header)) {
-                let value = headers[header];
-                if (typeof headers[header] !== 'string') {
-                    value = <string>headers[header];
-                }
-                headerString += `${header}: ${value}\n`;
-            }
-        }
-        return headerString;
     }
 
     private static getHighlightLanguageAlias(contentType: string | undefined, content: string | null = null): string | null {

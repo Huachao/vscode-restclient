@@ -1,10 +1,10 @@
 import { EOL } from 'os';
 import { languages, Position, Range, TextDocument, ViewColumn, window, workspace } from 'vscode';
-import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { SystemSettings } from '../models/configurationSettings';
 import { HttpResponse } from '../models/httpResponse';
 import { PreviewOption } from '../models/previewOption';
 import { MimeUtility } from '../utils/mimeUtility';
+import { formatHeaders } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 
 export class HttpResponseTextDocumentView {
@@ -49,7 +49,7 @@ export class HttpResponseTextDocumentView {
             // for add request details
             const request = response.request;
             content += `${request.method} ${request.url} HTTP/1.1${EOL}`;
-            content += this.formatHeaders(request.headers);
+            content += formatHeaders(request.headers);
             if (request.body) {
                 if (typeof request.body !== 'string') {
                     request.body = 'NOTE: Request Body From Is File Not Shown';
@@ -62,7 +62,7 @@ export class HttpResponseTextDocumentView {
 
         if (previewOption !== PreviewOption.Body) {
             content += `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${EOL}`;
-            content += this.formatHeaders(response.headers);
+            content += formatHeaders(response.headers);
         }
 
         if (previewOption !== PreviewOption.Headers) {
@@ -71,15 +71,6 @@ export class HttpResponseTextDocumentView {
         }
 
         return content;
-    }
-
-    private formatHeaders(headers: RequestHeaders | ResponseHeaders): string {
-        let headerString = '';
-        for (const header in headers) {
-            const value = headers[header] as string;
-            headerString += `${header}: ${value}${EOL}`;
-        }
-        return headerString;
     }
 
     private getVSCodeDocumentLanguageId(response: HttpResponse) {
