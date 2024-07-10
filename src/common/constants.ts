@@ -24,6 +24,11 @@ export const AzureActiveDirectoryDescription = "Prompts to sign in to Azure AD a
 export const AzureActiveDirectoryV2TokenVariableName = "$aadV2Token";
 export const AzureActiveDirectoryV2TokenDescription = "Prompts to sign in to Azure AD V2 and adds the token to the request";
 
+export const OidcVariableName = "$oidcAccessToken";
+export const OidcDescription = "Prompts to sign in to an Oidc provider  and adds the token to the request";
+export const OIdcForceNewOption = "new";
+
+
 /**
  * NOTE: The client id represents an AAD app people sign in to. The client id is sent to AAD to indicate what app
  * is requesting a token for the user. When the user signs in, AAD shows the name of the app to confirm the user is

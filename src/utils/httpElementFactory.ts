@@ -139,6 +139,12 @@ export class HttpElementFactory {
             Constants.AzureActiveDirectoryDescription,
             new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryVariableName.slice(1)}}}}`)));
         originalElements.push(new HttpElement(
+                Constants.OidcVariableName,
+                ElementType.SystemVariable,
+                null,
+                Constants.OidcDescription,
+                new SnippetString(`{{$\${name:${Constants.OidcVariableName.slice(1)}}}}`)));
+        originalElements.push(new HttpElement(
             Constants.AzureActiveDirectoryV2TokenVariableName,
             ElementType.SystemVariable,
             null,
