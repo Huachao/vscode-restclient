@@ -673,8 +673,6 @@
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
-    "@azure/msal-node": "^2.10.0",
-    "@opentelemetry/tracing": "^0.24.0",
     "adal-node": "^0.2.4",
     "applicationinsights": "^1.0.5",
     "aws4": "^1.9.1",
