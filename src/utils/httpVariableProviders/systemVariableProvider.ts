@@ -38,7 +38,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private readonly requestUrlRegex: RegExp = /^(?:[^\s]+\s+)([^:]*:\/\/\/?[^/\s]*\/?)/;
 
     private readonly aadRegex: RegExp = new RegExp(`\\s*\\${Constants.AzureActiveDirectoryVariableName}(\\s+(${Constants.AzureActiveDirectoryForceNewOption}))?(\\s+(ppe|public|cn|de|us))?(\\s+([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?(\\s+aud:([^\\.]+\\.[^\\}\\s]+|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}))?\\s*`);
-    private readonly oidcRegex: RegExp = new RegExp(`\\s*(\\${Constants.OidcVariableName})(?:\\s+(${Constants.OIdcForceNewOption}))?(?:\\s*clientId:([\\w|\.|:|/|_|-]+))?(?:\\s*issuer:([\\w|\.|:|/]+))?(?:\\s*callbackPort:([\\w|_]+))?(?:\\s*authorizeEndpoint:([\\w|\.|:|/|_|-]+))?(?:\\s*tokenEndpoint:([\\w|\.|:|/|_|-]+))?(?:\\s*scopes:([\\w|\.|:|/|_|-]+))?(?:\\s*audience:([\\w|\.|:|/|_|-]+))?`);
+    private readonly oidcRegex: RegExp = new RegExp(`\\s*(\\${Constants.OidcVariableName})(?:\\s+(${Constants.OIdcForceNewOption}))?(?:\\s*clientId:([\\w|\.|:|/|_|-]+))?(?:\\s*issuer:([\\w|\.|:|/]+))?(?:\\s*callbackDomain:([\\w|\.|:|/|_|-]+))?(?:\\s*callbackPort:([\\w|_]+))?(?:\\s*authorizeEndpoint:([\\w|\.|:|/|_|-]+))?(?:\\s*tokenEndpoint:([\\w|\.|:|/|_|-]+))?(?:\\s*scopes:([\\w|\.|:|/|_|-]+))?(?:\\s*audience:([\\w|\.|:|/|_|-]+))?`);
 
     private readonly innerSettingsEnvironmentVariableProvider: EnvironmentVariableProvider =  EnvironmentVariableProvider.Instance;
     private static _instance: SystemVariableProvider;
@@ -290,9 +290,9 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private registerOidcTokenVariable() {
         this.resolveFuncs.set(Constants.OidcVariableName, async (name, document, context) => {
             const matchVar = this.oidcRegex.exec(name) ?? [];
-            const [_, _1, forceNew, clientId, _3, callbackPort, authorizeEndpoint, tokenEndpoint,  scopes, audience] = matchVar;
+            const [_, _1, forceNew, clientId, _3, callbackDomain, callbackPort, authorizeEndpoint, tokenEndpoint,  scopes, audience] = matchVar;
 
-            const access_token = await OidcClient.getAccessToken(forceNew ? true : false, clientId, parseInt(callbackPort ?? CALLBACK_PORT), authorizeEndpoint, tokenEndpoint, scopes, audience);
+            const access_token = await OidcClient.getAccessToken(forceNew ? true : false, clientId, callbackDomain, parseInt(callbackPort ?? CALLBACK_PORT), authorizeEndpoint, tokenEndpoint, scopes, audience);
             await this.clipboard.writeText(access_token ?? "");
             return { value: access_token ?? "" };
         });

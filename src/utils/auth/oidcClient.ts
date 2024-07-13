@@ -1,10 +1,16 @@
 import * as crypto from 'crypto';
+import fs from 'fs';
 import * as http from "http";
+import * as https from "https";
 import * as jws from 'jws';
 import fetch from 'node-fetch';
+import path from 'path';
+import { SecureContextOptions } from 'tls';
 import { v4 as uuid } from 'uuid';
 import { env, Uri, window } from "vscode";
+import { IRestClientSettings, SystemSettings } from '../../models/configurationSettings';
 import { MemoryCache } from '../memoryCache';
+import { getCurrentHttpFileName, getWorkspaceRootPath } from '../workspaceUtility';
 
 type ServerAuthorizationCodeResponse = {
   // Success case
@@ -30,9 +36,9 @@ type ServerAuthorizationCodeResponse = {
 
 export class CodeLoopbackClient {
   port: number = 0; // default port, which will be set to a random available port
-  private server!: http.Server;
+  private server!: http.Server | https.Server;
 
-  private constructor(port: number = 0) {
+  private constructor(private callbackDomain: string, port: number = 0) {
     this.port = port;
   }
 
@@ -42,8 +48,8 @@ export class CodeLoopbackClient {
    * @param logger
    * @returns
    */
-  static async initialize(preferredPort: number | undefined): Promise<CodeLoopbackClient> {
-    const loopbackClient = new CodeLoopbackClient();
+  static async initialize(callbackDomain: string, preferredPort: number | undefined): Promise<CodeLoopbackClient> {
+    const loopbackClient = new CodeLoopbackClient(callbackDomain);
 
     if (preferredPort === 0 || preferredPort === undefined) {
       return loopbackClient;
@@ -69,7 +75,7 @@ export class CodeLoopbackClient {
     }
 
     const authCodeListener = new Promise<ServerAuthorizationCodeResponse & { url: string }>((resolve, reject) => {
-      this.server = http.createServer(async (req: http.IncomingMessage, res: http.ServerResponse) => {
+      const handler = async (req: http.IncomingMessage, res: http.ServerResponse) => {
         const url = req.url;
         if (!url) {
           res.end(errorTemplate || "Error occurred loading redirectUrl");
@@ -90,8 +96,27 @@ export class CodeLoopbackClient {
           reject(new Error(`Authorization Server Error:${JSON.stringify(authCodeResponse)}`));
         }
         resolve({ url, ...authCodeResponse });
-      });
-      this.server.listen(this.port);
+      };
+
+      const settings = SystemSettings.Instance as any;
+
+      try {
+        const certificates = this.getSslCertificate(settings);
+        if (certificates) {
+          const options: SecureContextOptions = {
+            cert: certificates?.cert,
+            key: certificates?.key,
+            pfx: certificates?.pfx,
+            passphrase: certificates?.passphrase
+          };
+          this.server = https.createServer(options, handler);
+        } else {
+          this.server = http.createServer(handler);
+        }
+        this.server.listen(this.port);
+      } catch (ex) {
+        reportError('Failed to start server', ex);
+      }
     });
 
     // Wait for server to be listening
@@ -113,8 +138,66 @@ export class CodeLoopbackClient {
     return authCodeListener;
   }
 
+  private getSslCertificate(settings: IRestClientSettings): SecureContextOptions | null {
+    const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = settings.oidcCertificates[this.callbackDomain] ?? {};
+    if (!certPath && !keyPath && !pfxPath && this.callbackDomain) {
+      reportError(`No certificates found for ${this.callbackDomain} in settings.`);
+      return null;
+    }
+    try {
+      const cert = this.resolveCertificate(certPath);
+      const key = this.resolveCertificate(keyPath);
+      const pfx = this.resolveCertificate(pfxPath);
+      return { cert, key, pfx, passphrase };
+    } catch (ex) {
+      reportError(`Failed to load certificates from: {certPath:${certPath}} {keyPath:${keyPath}} {pfxPath:${pfxPath}}`, ex);
+      return null;
+    }
+  }
+
+  private resolveCertificate(absoluteOrRelativePath: string | undefined): Buffer | undefined {
+    if (absoluteOrRelativePath === undefined) {
+      return undefined;
+    }
+
+    if (path.isAbsolute(absoluteOrRelativePath)) {
+      if (!fs.existsSync(absoluteOrRelativePath)) {
+        reportError(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
+        return undefined;
+      } else {
+        return fs.readFileSync(absoluteOrRelativePath);
+      }
+    }
+
+    // the path should be relative path
+    const rootPath = getWorkspaceRootPath();
+    let absolutePath = '';
+    if (rootPath) {
+      absolutePath = path.join(Uri.parse(rootPath).fsPath, absoluteOrRelativePath);
+      if (fs.existsSync(absolutePath)) {
+        return fs.readFileSync(absolutePath);
+      } else {
+        window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
+        return undefined;
+      }
+    }
+
+    const currentFilePath = getCurrentHttpFileName();
+    if (!currentFilePath) {
+      return undefined;
+    }
+
+    absolutePath = path.join(path.dirname(currentFilePath), absoluteOrRelativePath);
+    if (fs.existsSync(absolutePath)) {
+      return fs.readFileSync(absolutePath);
+    } else {
+      window.showWarningMessage(`Certificate path ${absoluteOrRelativePath} doesn't exist, please make sure it exists.`);
+      return undefined;
+    }
+  }
+
   /**
-   * Get the port that the loopback server is running on
+   * Get the redirect uri for the loopback server
    * @returns
    */
   getRedirectUri(): string {
@@ -130,7 +213,7 @@ export class CodeLoopbackClient {
 
     const port = address && address.port;
 
-    return `http://localhost:${port}`;
+    return `${this.callbackDomain ? 'https' : 'http'}://${this.callbackDomain ?? 'localhost'}:${port}`;
   }
 
   /**
@@ -223,6 +306,11 @@ export const CALLBACK_PORT = 7777;
 
 export const remoteOutput = window.createOutputChannel('REST-OIDC');
 
+const reportError = (msg: string, ex: Error | null = null ) => {
+  window.showWarningMessage(`Message: ${msg} Exception: ${ex?.message}`);
+  remoteOutput.appendLine(`Error: ${msg} Exception: ${ex?.message} Stack:${ex?.stack}`);
+};
+
 interface TokenInformation {
   access_token: string;
   refresh_token: string;
@@ -235,6 +323,7 @@ export class OidcClient {
   private _scopes = new Map<string, string[]>();
 
   constructor(private clientId: string,
+    private callbackDomain: string,
     private callbackPort: number,
     private authorizeEndpoint: string,
     private tokenEndpoint: string,
@@ -243,15 +332,15 @@ export class OidcClient {
   ) {
   }
 
-  public static async getAccessToken(forceNew: boolean, clientId: string, callbackPort: number,
+  public static async getAccessToken(forceNew: boolean, clientId: string, callbackDomain: string, callbackPort: number,
     authorizeEndpoint: string,
     tokenEndpoint: string,
     scopes: string,
     audience: string): Promise<string | undefined> {
-    const key = `${clientId}-${callbackPort}-${authorizeEndpoint}-${tokenEndpoint}-${scopes}-${audience}`;
+    const key = `${clientId}--${callbackDomain}-${callbackPort}-${authorizeEndpoint}-${tokenEndpoint}-${scopes}-${audience}`;
     const cache = MemoryCache.createOrGet<OidcClient>('oidc');
 
-    const client = cache.get(key) ?? new OidcClient(clientId, callbackPort, authorizeEndpoint, tokenEndpoint, scopes, audience);
+    const client = cache.get(key) ?? new OidcClient(clientId, callbackDomain, callbackPort, authorizeEndpoint, tokenEndpoint, scopes, audience);
     cache.set(key, client);
     if (forceNew) {
       client.cleanupTokenCache();
@@ -265,15 +354,16 @@ export class OidcClient {
   }
 
   get redirectUri() {
-    return `http://localhost:${this.callbackPort ?? 7777}`;
+    return `${this.callbackDomain ? 'https' : 'http'}://${this.callbackDomain ?? 'localhost'}:${this.callbackPort}`;
   }
 
   public async getAccessToken(): Promise<string | undefined> {
     const tryDecode = (token: string): any => {
       try {
-        const  { payload } = jws.decode(token) ?? {};
-        return  JSON.parse(payload);
+        const { payload } = jws.decode(token) ?? {};
+        return JSON.parse(payload);
       } catch (ex) {
+        reportError('Faild to decode access token', ex);
         return null;
       }
     };
@@ -338,8 +428,7 @@ export class OidcClient {
 
     remoteOutput.appendLine(`Login URI: ${uri.toString(true)}`);
 
-    const loopbackClient = await CodeLoopbackClient.initialize(this.callbackPort);
-
+    const loopbackClient = await CodeLoopbackClient.initialize(this.callbackDomain, this.callbackPort);
 
     try {
       await env.openExternal(uri);
@@ -387,7 +476,6 @@ export class OidcClient {
     return { access_token, refresh_token };
   }
 
-
   private async _handleCallback(uri: Uri): Promise<TokenInformation | undefined> {
     const query = new URLSearchParams(uri.query);
     const code = query.get('code');
@@ -431,12 +519,12 @@ export class OidcClient {
       const json = await response.json();
       const { access_token, refresh_token } = json;
       if (!access_token) {
-        remoteOutput.appendLine(`Failed to retrieve access token: ${response.status} ${JSON.stringify(json)}`);
+        reportError(`Failed to retrieve access token: ${response.status} ${JSON.stringify(json)}`);
       }
 
       return { access_token, refresh_token };
     } catch (ex) {
-      remoteOutput.appendLine(`Failed to retrieve access token: ${ex}`);
+      reportError('Failed to retrieve access token', ex);
       return undefined;
     }
   }
