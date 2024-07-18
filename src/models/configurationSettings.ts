@@ -35,6 +35,7 @@ export interface IRestClientSettings {
     readonly previewResponseInUntitledDocument: boolean;
     readonly hostCertificates: HostCertificates;
     readonly oidcCertificates: HostCertificates;
+    readonly oidcScopes: string[];
     readonly suppressResponseBodyContentTypeValidationWarning: boolean;
     readonly previewOption: PreviewOption;
     readonly disableHighlightResponseBodyForLargeResponse: boolean;
@@ -70,6 +71,7 @@ export class SystemSettings implements IRestClientSettings {
     private _previewResponseInUntitledDocument: boolean;
     private _hostCertificates: HostCertificates;
     private _oidcCertificates: HostCertificates;
+    private _oidcScopes: string[];
     private _suppressResponseBodyContentTypeValidationWarning: boolean;
     private _previewOption: PreviewOption;
     private _disableHighlightResponseBodyForLargeResponse: boolean;
@@ -155,6 +157,10 @@ export class SystemSettings implements IRestClientSettings {
 
     public get oidcCertificates() {
         return this._oidcCertificates;
+    }
+
+    public get oidcScopes() {
+        return this._oidcScopes;
     }
 
     public get suppressResponseBodyContentTypeValidationWarning() {
@@ -275,6 +281,7 @@ export class SystemSettings implements IRestClientSettings {
         this._previewResponsePanelTakeFocus = restClientSettings.get<boolean>("previewResponsePanelTakeFocus", true);
         this._hostCertificates = restClientSettings.get<HostCertificates>("certificates", {});
         this._oidcCertificates = Object.assign({}, restClientSettings.get<HostCertificates>("oidcCertificates", {}));
+        this._oidcScopes = restClientSettings.get<string[]>("oidcScopes", ['openid', 'profile', 'email']);
         this._disableHighlightResponseBodyForLargeResponse = restClientSettings.get<boolean>("disableHighlightResponseBodyForLargeResponse", true);
         this._disableAddingHrefLinkForLargeResponse = restClientSettings.get<boolean>("disableAddingHrefLinkForLargeResponse", true);
         this._largeResponseBodySizeLimitInMB = restClientSettings.get<number>("largeResponseBodySizeLimitInMB", 5);
@@ -400,6 +407,9 @@ export class RestClientSettings implements IRestClientSettings {
         return this.systemSettings.oidcCertificates;
     }
 
+    public get oidcScopes() {
+        return this.systemSettings.oidcScopes;
+    }
 
     public get hostCertificates() {
         return this.systemSettings.hostCertificates;

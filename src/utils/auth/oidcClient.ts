@@ -98,11 +98,11 @@ export class CodeLoopbackClient {
         resolve({ url, ...authCodeResponse });
       };
 
-      const settings = SystemSettings.Instance as any;
+      const settings = SystemSettings.Instance as IRestClientSettings;
 
       try {
         const certificates = this.getSslCertificate(settings);
-        if (certificates) {
+        if (certificates && certificates.cert && certificates.key) {
           const options: SecureContextOptions = {
             cert: certificates?.cert,
             key: certificates?.key,
@@ -534,23 +534,10 @@ export class OidcClient {
    * @param scopes
    */
   private getScopes(scopes: string[] = []): string[] {
-    const modifiedScopes = [...scopes];
-
-    // if (!modifiedScopes.includes('offline_access')) {
-    //   modifiedScopes.push('offline_access');
-    // }
-
-    if (!modifiedScopes.includes('openid')) {
-      modifiedScopes.push('openid');
-    }
-    if (!modifiedScopes.includes('profile')) {
-      modifiedScopes.push('profile');
-    }
-    if (!modifiedScopes.includes('email')) {
-      modifiedScopes.push('email');
-    }
-
-    return modifiedScopes.sort();
+    const settings = SystemSettings.Instance as IRestClientSettings;
+    
+    let modifiedScopes = [...(settings.oidcScopes ?? []), ...scopes];
+    return Array.from(new Set(modifiedScopes.sort()));
   }
 }
 

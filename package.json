@@ -475,6 +475,13 @@
           "scope": "resource",
           "description": "Preview response in untitled document if set to true, otherwise displayed in html view"
         },
+        "rest-client.oidcScopes": {
+          "type": "array",
+          "default": [],
+          "scope": "resource",
+          "description": "Scopes to be used by the OIDC client, default: [openid profile email]"
+        },
+
         "rest-client.oidcCertificates": {
           "type": "object",
           "default": {},
