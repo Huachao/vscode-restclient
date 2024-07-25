@@ -6,6 +6,7 @@ import * as path from 'path';
 import { QuickPickItem, window, workspace } from 'vscode';
 import { HistoricalHttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
+import { formatHeaders } from '../utils/misc';
 import { UserDataManager } from '../utils/userDataManager';
 
 dayjs.extend(relativeTime);
@@ -62,14 +63,7 @@ export class HistoryController {
     private async createRequestInTempFile(request: HistoricalHttpRequest): Promise<string> {
         const file = await this.createTempFile();
         let output = `${request.method.toUpperCase()} ${request.url}${EOL}`;
-        if (request.headers) {
-            for (const header in request.headers) {
-                if (request.headers.hasOwnProperty(header)) {
-                    const value = request.headers[header];
-                    output += `${header}: ${value}${EOL}`;
-                }
-            }
-        }
+        output += formatHeaders(request.headers);
         if (request.body) {
             output += `${EOL}${request.body}`;
         }
