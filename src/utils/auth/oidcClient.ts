@@ -102,7 +102,7 @@ export class CodeLoopbackClient {
 
       try {
         const certificates = this.getSslCertificate(settings);
-        if (certificates && certificates.cert && certificates.key) {
+        if (certificates && (certificates.cert && certificates.key || certificates.pfx)) {
           const options: SecureContextOptions = {
             cert: certificates?.cert,
             key: certificates?.key,
