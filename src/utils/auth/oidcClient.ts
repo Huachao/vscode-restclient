@@ -535,8 +535,8 @@ export class OidcClient {
    */
   private getScopes(scopes: string[] = []): string[] {
     const settings = SystemSettings.Instance as IRestClientSettings;
-    
-    let modifiedScopes = [...(settings.oidcScopes ?? []), ...scopes];
+
+    const modifiedScopes = [...(settings.oidcScopes ?? []), ...scopes];
     return Array.from(new Set(modifiedScopes.sort()));
   }
 }
