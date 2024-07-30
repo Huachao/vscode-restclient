@@ -33,6 +33,32 @@ export function removeHeader(headers: RequestHeaders | ResponseHeaders, name: st
     }
 }
 
+export function formatHeaders(headers: RequestHeaders | ResponseHeaders): string {
+    let headerString = '';
+    for (const header in headers) {
+        if (headers.hasOwnProperty(header)) {
+            let value = headers[header];
+            // Handle set-cookie as a special case since multiple entries
+            // should appear as their own header. For example:
+            //     set-cookie: a=b
+            //     set-cookie: c=d
+            // Not:
+            //     set-cookie: a=b,c=d
+            if (header.toLowerCase() === 'set-cookie') {
+                if (typeof value === 'string') {
+                    value = [value];
+                }
+                for (const cookie of <Array<string>>value) {
+                    headerString += `${header}: ${cookie}\n`;
+                }
+            } else {
+                headerString += `${header}: ${value}\n`;
+            }
+        }
+    }
+    return headerString;
+}
+
 export function md5(text: string | Buffer): string {
     return crypto.createHash('md5').update(text).digest('hex');
 }
