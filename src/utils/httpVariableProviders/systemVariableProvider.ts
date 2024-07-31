@@ -1,11 +1,12 @@
 import * as adal from 'adal-node';
-import dayjs, { Dayjs, OpUnitType } from 'dayjs';
+import dayjs, { Dayjs, ManipulateType } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
+import { EnvironmentController } from '../../controllers/environmentController';
 import { HttpRequest } from '../../models/httpRequest';
 import { ResolveErrorMessage, ResolveWarningMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
@@ -89,7 +90,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
             if (groups !== null && groups.length === 3) {
                 const [, offset, option] = groups;
                 const ts = offset && option
-                    ? dayjs.utc().add(+offset, option as OpUnitType).unix()
+                    ? dayjs.utc().add(+offset, option as ManipulateType).unix()
                     : dayjs.utc().unix();
                 return { value: ts.toString() };
             }
@@ -105,7 +106,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 const [, type, offset, option] = groups;
                 let date: Dayjs;
                 if (offset && option) {
-                    date = dayjs.utc().add(+offset, option as OpUnitType);
+                    date = dayjs.utc().add(+offset, option as ManipulateType);
                 } else {
                     date = dayjs.utc();
                 }
@@ -130,7 +131,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                 const [, type, offset, option] = groups;
                 let date = dayjs.utc().local();
                 if (offset && option) {
-                    date = date.add(+offset, option as OpUnitType);
+                    date = date.add(+offset, option as ManipulateType);
                 }
 
                 if (type === 'rfc1123') {
@@ -188,13 +189,20 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private registerDotenvVariable() {
         this.resolveFuncs.set(Constants.DotenvVariableName, async (name, document) => {
             let folderPath = path.dirname(document.fileName);
-            while (!await fs.pathExists(path.join(folderPath, '.env'))) {
+            const { name : environmentName } = await EnvironmentController.getCurrentEnvironment();
+
+            let pathsFound = [false, false];
+
+            while ((pathsFound = await Promise.all([
+                fs.pathExists(path.join(folderPath, `.env.${environmentName}`)),
+                fs.pathExists(path.join(folderPath, '.env'))
+            ])).every(result => result === false)) {
                 folderPath = path.join(folderPath, '..');
                 if (folderPath === path.parse(process.cwd()).root) {
                     return { warning: ResolveWarningMessage.DotenvFileNotFound };
                 }
             }
-            const absolutePath = path.join(folderPath, '.env');
+            const absolutePath = path.join(folderPath, pathsFound[0] ? `.env.${environmentName}` : '.env');
             const groups = this.dotenvRegex.exec(name);
             if (groups !== null && groups.length === 3) {
                 const parsed = dotenv.parse(await fs.readFile(absolutePath));

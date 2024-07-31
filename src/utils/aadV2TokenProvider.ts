@@ -144,7 +144,9 @@ export class AadV2TokenProvider {
         const tryAgain = "Try again";
         const done = "Done";
 
-        let value = await window.showInformationMessage(signInPrompt, messageBoxOptions, signIn);
+        type SignInResult = typeof signIn | typeof tryAgain | typeof done | undefined;
+
+        let value: SignInResult = await window.showInformationMessage(signInPrompt, messageBoxOptions, signIn);
         if (value === signIn) {
             do {
                 await this.clipboard.writeText(deviceCodeResponse.user_code);
@@ -205,7 +207,7 @@ class AuthParameters {
         authParameters.cloud = (await authParameters.readEnvironmentVariable("aadV2Cloud")) || authParameters.cloud;
         authParameters.tenantId = (await authParameters.readEnvironmentVariable("aadV2TenantId")) || authParameters.tenantId;
 
-        let scopes = "openid,profile";
+        let scopes = (await authParameters.readEnvironmentVariable("aadV2Scopes")) || "openid,profile";
         let explicitClientId: string | undefined = undefined;
         // Parse variable parameters
         const groups = authParameters.aadV2TokenRegex.exec(name);

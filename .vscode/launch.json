@@ -7,11 +7,13 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "args": ["--extensionDevelopmentPath=${workspaceFolder}" ],
-            "stopOnEntry": false,
+            "args": ["--profile=Debugging (REST Client)", "--extensionDevelopmentPath=${workspaceFolder}" ],
+            "debugWebviews": true,
             "sourceMaps": true,
+            "smartStep": true,
             "outFiles": [ "${workspaceFolder}/dist/**/*.js" ],
-            "preLaunchTask": "npm: watch"
+            "preLaunchTask": "npm: webpack",
+            "trace": true
         }
     ]
 }

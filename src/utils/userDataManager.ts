@@ -5,7 +5,9 @@ import { HistoricalHttpRequest } from '../models/httpRequest';
 import { JsonFileUtility } from './jsonFileUtility';
 
 const restClientDir = 'rest-client';
-const rootPath = path.join(os.homedir(), `.${restClientDir}`);
+const rootPath = process.env.VSC_REST_CLIENT_HOME !== undefined
+    ? process.env.VSC_REST_CLIENT_HOME
+    : path.join(os.homedir(), `.${restClientDir}`);
 
 function getCachePath(): string {
     if (fs.existsSync(rootPath)) {
@@ -19,13 +21,13 @@ function getCachePath(): string {
     return rootPath;
 }
 
-function getConfigPath(): string {
+function getStatePath(): string {
     if (fs.existsSync(rootPath)) {
         return rootPath;
     }
 
-    if (process.env.XDG_CONFIG_HOME !== undefined) {
-        return path.join(process.env.XDG_CONFIG_HOME, restClientDir);
+    if (process.env.XDG_STATE_HOME !== undefined) {
+        return path.join(process.env.XDG_STATE_HOME, restClientDir);
     }
 
     return rootPath;
@@ -36,7 +38,7 @@ export class UserDataManager {
     private static readonly historyItemsMaxCount = 50;
 
     private static readonly cachePath: string = getCachePath();
-    private static readonly configPath: string = getConfigPath();
+    private static readonly statePath: string = getStatePath();
 
     public static get cookieFilePath() {
         return path.join(this.cachePath, 'cookie.json');
@@ -47,7 +49,7 @@ export class UserDataManager {
     }
 
     private static get environmentFilePath() {
-        return path.join(this.configPath, 'environment.json');
+        return path.join(this.statePath, 'environment.json');
     }
 
     private static get responseSaveFolderPath() {

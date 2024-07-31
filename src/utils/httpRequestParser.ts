@@ -82,7 +82,7 @@ export class HttpRequestParser implements RequestParser {
         removeHeader(headers, 'content-length');
 
         // check request type
-        const isGraphQlRequest = getHeader(headers, 'X-Request-Type') === 'GraphQL';
+        const isGraphQlRequest = getHeader(headers, 'X-Request-Type') === 'GraphQL'.toLowerCase();
         if (isGraphQlRequest) {
             removeHeader(headers, 'X-Request-Type');
 
@@ -152,7 +152,7 @@ export class HttpRequestParser implements RequestParser {
         let url: string;
 
         let match: RegExpExecArray | null;
-        if (match = /^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)\s+/i.exec(line)) {
+        if (match = /^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|LOCK|UNLOCK|PROPFIND|PROPPATCH|COPY|MOVE|MKCOL|MKCALENDAR|ACL|SEARCH)\s+/i.exec(line)) {
             method = match[1];
             url = line.substr(match[0].length);
         } else {
@@ -202,7 +202,7 @@ export class HttpRequestParser implements RequestParser {
                         if (fileAbsolutePath) {
                             if (groupsValues.processVariables) {
                                 const buffer = await fs.readFile(fileAbsolutePath);
-                                const fileContent = buffer.toString(groupsValues.encoding || this.defaultFileEncoding);
+                                const fileContent = buffer.toString((groupsValues.encoding || this.defaultFileEncoding) as BufferEncoding);
                                 const resolvedContent = await VariableProcessor.processRawRequest(fileContent);
                                 combinedStream.append(resolvedContent);
                             } else {
@@ -216,7 +216,7 @@ export class HttpRequestParser implements RequestParser {
                     combinedStream.append(line);
                 }
 
-                if (index < lines.length) {
+                if ((index !== lines.length - 1) || MimeUtility.isMultiPartFormData(contentTypeHeader)) {
                     combinedStream.append(this.getLineEnding(contentTypeHeader));
                 }
             }

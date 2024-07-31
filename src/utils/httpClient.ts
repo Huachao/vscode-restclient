@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';
-import { Cookie, CookieJar, Store } from 'tough-cookie';
+import { CookieJar, Store } from 'tough-cookie';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
@@ -12,19 +12,17 @@ import { awsCognito } from './auth/awsCognito';
 import { awsSignature } from './auth/awsSignature';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
-import { getHeader, hasHeader, removeHeader } from './misc';
+import { getHeader, removeHeader } from './misc';
 import { convertBufferToStream, convertStreamToBuffer } from './streamUtility';
 import { UserDataManager } from './userDataManager';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility';
 
+import { CancelableRequest, Headers, Method, OptionsOfBufferResponseBody, Response } from 'got';
 import got = require('got');
 
 const encodeUrl = require('encodeurl');
-const cookieStore = require('tough-cookie-file-store-bugfix');
+const CookieFileStore = require('tough-cookie-file-store').FileCookieStore;
 
-type SetCookieCallback = (err: Error | null, cookie: Cookie) => void;
-type SetCookieCallbackWithoutOptions = (err: Error, cookie: Cookie) => void;
-type GetCookieStringCallback = (err: Error | null, cookies: string) => void;
 type Certificate = {
     cert?: Buffer;
     key?: Buffer;
@@ -37,7 +35,7 @@ export class HttpClient {
 
     public constructor() {
         const cookieFilePath = UserDataManager.cookieFilePath;
-        this.cookieStore = new cookieStore(cookieFilePath) as Store;
+        this.cookieStore = new CookieFileStore(cookieFilePath) as Store;
     }
 
     public async send(httpRequest: HttpRequest, settings?: IRestClientSettings): Promise<HttpResponse> {
@@ -48,7 +46,7 @@ export class HttpClient {
         let bodySize = 0;
         let headersSize = 0;
         const requestUrl = encodeUrl(httpRequest.url);
-        const request: got.GotPromise<Buffer> = got(requestUrl, options);
+        const request: CancelableRequest<Response<Buffer>> = got.default(requestUrl, options);
         httpRequest.setUnderlyingRequest(request);
         (request as any).on('response', res => {
             if (res.rawHeaders) {
@@ -86,7 +84,7 @@ export class HttpClient {
 
         return new HttpResponse(
             response.statusCode,
-            response.statusMessage,
+            response.statusMessage!,
             response.httpVersion,
             responseHeaders,
             bodyString,
@@ -98,7 +96,7 @@ export class HttpClient {
                 options.method!,
                 requestUrl,
                 HttpClient.normalizeHeaderNames(
-                    (response as any).request.gotOptions.headers as RequestHeaders,
+                    (response as any).request.options.headers as RequestHeaders,
                     Object.keys(httpRequest.headers)),
                 Buffer.isBuffer(requestBody) ? convertBufferToStream(requestBody) : requestBody,
                 httpRequest.rawBody,
@@ -108,10 +106,10 @@ export class HttpClient {
 
     public async clearCookies() {
         await fs.remove(UserDataManager.cookieFilePath);
-        this.cookieStore = new cookieStore(UserDataManager.cookieFilePath) as Store;
+        this.cookieStore = new CookieFileStore(UserDataManager.cookieFilePath) as Store;
     }
 
-    private async prepareOptions(httpRequest: HttpRequest, settings: IRestClientSettings): Promise<got.GotBodyOptions<null>> {
+    private async prepareOptions(httpRequest: HttpRequest, settings: IRestClientSettings): Promise<OptionsOfBufferResponseBody> {
         const originalRequestBody = httpRequest.body;
         let requestBody: string | Buffer | undefined;
         if (originalRequestBody) {
@@ -125,35 +123,31 @@ export class HttpClient {
         // Fix #682 Do not touch original headers in httpRequest, which may be used for retry later
         // Simply do a shadow copy here
         const clonedHeaders = Object.assign({}, httpRequest.headers);
-        const options: got.GotBodyOptions<null> = {
-            headers: clonedHeaders,
-            method: httpRequest.method,
+
+        const options: OptionsOfBufferResponseBody = {
+            headers: clonedHeaders as any as Headers,
+            method: httpRequest.method as any as Method,
             body: requestBody,
-            encoding: null,
+            responseType: 'buffer',
             decompress: true,
             followRedirect: settings.followRedirect,
-            rejectUnauthorized: false,
             throwHttpErrors: false,
-            cookieJar: settings.rememberCookiesForSubsequentRequests ? new CookieJar(this.cookieStore, { rejectPublicSuffixes: false }) : undefined,
             retry: 0,
             hooks: {
                 afterResponse: [],
-                // Following port reset on redirect can be removed after upgrade got to version 10.0
-                // https://github.com/sindresorhus/got/issues/719
-                beforeRedirect: [
-                    opts => {
-                        const redirectHost = ((opts as any).href as string).split('/')[2];
-                        if (!redirectHost.includes(':')) {
-                            delete opts.port;
-                        }
-                    }
-                ],
                 beforeRequest: [],
+            },
+            https: {
+                rejectUnauthorized: false
             }
         };
 
         if (settings.timeoutInMilliseconds > 0) {
             options.timeout = settings.timeoutInMilliseconds;
+        }
+
+        if (settings.rememberCookiesForSubsequentRequests) {
+            options.cookieJar = new CookieJar(this.cookieStore);
         }
 
         // TODO: refactor auth
@@ -165,7 +159,8 @@ export class HttpClient {
                 const pass = args.join(' ');
                 if (normalizedScheme === 'basic') {
                     removeHeader(options.headers!, 'Authorization');
-                    options.auth = `${user}:${pass}`;
+                    options.username = user;
+                    options.password = pass;
                 } else if (normalizedScheme === 'digest') {
                     removeHeader(options.headers!, 'Authorization');
                     options.hooks!.afterResponse!.push(digest(user, pass));
@@ -178,7 +173,9 @@ export class HttpClient {
                 }
             } else if (normalizedScheme === 'basic' && user.includes(':')) {
                 removeHeader(options.headers!, 'Authorization');
-                options.auth = user;
+                const [username, password] = user.split(':');
+                options.username = username;
+                options.password = password;
             }
         }
 
@@ -201,46 +198,6 @@ export class HttpClient {
                     : await import('https-proxy-agent')).default;
 
                 options.agent = new ctor(proxyOptions);
-            }
-        }
-
-        // set cookie jar
-        if (options.cookieJar) {
-            const { getCookieString: originalGetCookieString, setCookie: originalSetCookie } = options.cookieJar;
-
-            function _setCookie(cookieOrString: Cookie | string, currentUrl: string, opts: CookieJar.SetCookieOptions, cb: SetCookieCallback): void;
-            function _setCookie(cookieOrString: Cookie | string, currentUrl: string, cb: SetCookieCallbackWithoutOptions): void;
-            function _setCookie(cookieOrString: Cookie | string, currentUrl: string, opts: CookieJar.SetCookieOptions | SetCookieCallbackWithoutOptions, cb?: SetCookieCallback): void {
-                if (opts instanceof Function) {
-                    cb = opts;
-                    opts = {};
-                }
-                opts.ignoreError = true;
-                originalSetCookie.call(options.cookieJar, cookieOrString, currentUrl, opts, cb!);
-            }
-            options.cookieJar.setCookie = _setCookie;
-
-            if (hasHeader(options.headers!, 'cookie')) {
-                let count = 0;
-
-                function _getCookieString(currentUrl: string, opts: CookieJar.GetCookiesOptions, cb: GetCookieStringCallback): void;
-                function _getCookieString(currentUrl: string, cb: GetCookieStringCallback): void;
-                function _getCookieString(currentUrl: string, opts: CookieJar.GetCookiesOptions | GetCookieStringCallback, cb?: GetCookieStringCallback): void {
-                    if (opts instanceof Function) {
-                        cb = opts;
-                        opts = {};
-                    }
-
-                    originalGetCookieString.call(options.cookieJar, currentUrl, opts, (err, cookies) => {
-                        if (err || count > 0 || !cookies) {
-                            cb!(err, cookies);
-                        }
-
-                        count++;
-                        cb!(null, [cookies, getHeader(options.headers!, 'cookie')].filter(Boolean).join('; '));
-                    });
-                }
-                options.cookieJar.getCookieString = _getCookieString;
             }
         }
 

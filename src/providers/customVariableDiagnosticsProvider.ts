@@ -30,7 +30,7 @@ export class CustomVariableDiagnosticsProvider {
 
     private pendingHttpDocuments = new Set<TextDocument>();
 
-    private timer: NodeJS.Timer | undefined;
+    private timer: NodeJS.Timeout | undefined;
 
     private fileVariableReferenceCache = new DocumentCache<Map<string, VariableWithPosition[]>>();
 

@@ -1,4 +1,4 @@
-import { CancellationToken, Hover, HoverProvider, MarkdownString, MarkedString, Position, TextDocument } from 'vscode';
+import { CancellationToken, Hover, HoverProvider, MarkdownString, Position, TextDocument } from 'vscode';
 import { EnvironmentVariableProvider } from '../utils/httpVariableProviders/environmentVariableProvider';
 import { FileVariableProvider } from '../utils/httpVariableProviders/fileVariableProvider';
 import { VariableUtility } from '../utils/variableUtility';
@@ -16,7 +16,7 @@ export class EnvironmentOrFileVariableHoverProvider implements HoverProvider {
         if (await FileVariableProvider.Instance.has(selectedVariableName, document)) {
             const { name, value, error, warning } = await FileVariableProvider.Instance.get(selectedVariableName, document);
             if (!warning && !error) {
-                const contents: MarkedString[] = [value as string, new MarkdownString(`*File Variable* \`${name}\``)];
+                const contents: MarkdownString[] = [new MarkdownString(value as string), new MarkdownString(`*File Variable* \`${name}\``)];
                 return new Hover(contents, wordRange);
             }
 
@@ -26,7 +26,7 @@ export class EnvironmentOrFileVariableHoverProvider implements HoverProvider {
         if (await EnvironmentVariableProvider.Instance.has(selectedVariableName)) {
             const { name, value, error, warning } = await EnvironmentVariableProvider.Instance.get(selectedVariableName);
             if (!warning && !error) {
-                const contents: MarkedString[] = [value as string, new MarkdownString(`*Environment Variable* \`${name}\``)];
+                const contents: MarkdownString[] = [new MarkdownString(value as string), new MarkdownString(`*Environment Variable* \`${name}\``)];
                 return new Hover(contents, wordRange);
             }
         }

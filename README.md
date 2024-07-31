@@ -1,6 +1,7 @@
 # REST Client
 
-[![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://open.vscode.dev/Huachao/vscode-restclient) [![Node CI](https://github.com/Huachao/vscode-restclient/workflows/Node%20CI/badge.svg?event=push)](https://github.com/Huachao/vscode-restclient/actions?query=workflow%3A%22Node+CI%22) [![Join the chat at https://gitter.im/Huachao/vscode-restclient](https://badges.gitter.im/Huachao/vscode-restclient.svg)](https://gitter.im/Huachao/vscode-restclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/humao.rest-client)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Downloads](https://img.shields.io/visual-studio-marketplace/d/humao.rest-client)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Installs](https://img.shields.io/visual-studio-marketplace/i/humao.rest-client)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Rating](https://img.shields.io/visual-studio-marketplace/r/humao.rest-client)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
+[![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://open.vscode.dev/Huachao/vscode-restclient) [![Node CI](https://github.com/Huachao/vscode-restclient/workflows/Node%20CI/badge.svg?event=push)](https://github.com/Huachao/vscode-restclient/actions?query=workflow%3A%22Node+CI%22) [![Join the chat at https://gitter.im/Huachao/vscode-restclient](https://badges.gitter.im/Huachao/vscode-restclient.svg)](https://gitter.im/Huachao/vscode-restclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Marketplace Version](https://vsmarketplacebadges.dev/version-short/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Downloads](https://vsmarketplacebadges.dev/downloads-short/humao.rest-client.svg
+)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Installs](https://vsmarketplacebadges.dev/installs-short/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Rating](https://vsmarketplacebadges.dev/rating-short/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
 
 REST Client allows you to send HTTP request and view the response in Visual Studio Code directly. It eliminates the need for a separate tool to test REST APIs and makes API testing convenient and efficient.
 
@@ -463,7 +464,7 @@ Authorization: {{token}}
 ```
 
 #### File Variables
-For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contain any spaces. As for variable value, it can consist of any characters, even whitespaces are allowed for them (leading and trailing whitespaces will be trimmed). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variable value can even contain references to all of other kinds of variables. For instance, you can create a file variable with value of other [request variables](#request-variables) like `@token = {{loginAPI.response.body.token}}`.
+For file variables, the definition follows syntax __`@variableName = variableValue`__ which occupies a complete line. And variable name __MUST NOT__ contain any spaces. As for variable value, it can consist of any characters, even whitespaces are allowed for them (leading and trailing whitespaces will be trimmed). If you want to preserve some special characters like line break, you can use the _backslash_ `\` to escape, like `\n`. File variable value can even contain references to all of other kinds of variables. For instance, you can create a file variable with value of other [request variables](#request-variables) like `@token = {{loginAPI.response.body.token}}`. When referencing a file variable, you can use the _percent_ `%` to percent-encode the value.
 
 File variables can be defined in a separate request block only filled with variable definitions, as well as define request variables before any request url, which needs an extra blank line between variable definitions and request url. However, no matter where you define the file variables in the `http` file, they can be referenced in any requests of whole file. For file variables, you can also benefit from some `Visual Studio Code` features like _Go To Definition_ and _Find All References_. Below is a sample of file variable definitions and references in an `http` file.
 
@@ -477,13 +478,13 @@ File variables can be defined in a separate request block only filled with varia
 
 ###
 
-@name = hello
+@name = Strunk & White
 
-GET https://{{host}}/authors/{{name}} HTTP/1.1
+GET https://{{host}}/authors/{{%name}} HTTP/1.1
 
 ###
 
-PATCH https://{{host}}/authors/{{name}} HTTP/1.1
+PATCH https://{{host}}/authors/{{%name}} HTTP/1.1
 Content-Type: {{contentType}}
 
 {
@@ -593,7 +594,7 @@ System variables provide a pre-defined set of variables that can be used in any 
 
   `appOnly`: Optional. Specify `appOnly` to use make to use a client credentials flow to obtain a token. `aadV2ClientSecret` and `aadV2AppUri`must be provided as REST Client environment variables. `aadV2ClientId`, `aadV2TenantId` and `aadV2Cloud` may also be optionally provided via the environment. `aadV2ClientId` in environment will only be used for `appOnly` calls.
 
-  `scopes:<scope[,]>`: Optional. Comma delimited list of scopes that must have consent to allow the call to be successful. Not applicable for `appOnly` calls.
+  `scopes:<scope[,]>`: Optional. Comma delimited list of scopes that must have consent to allow the call to be successful. Not applicable for `appOnly` calls. `aadV2Scopes` may optionally be provided via the environment.
 
   `tenantId:<domain|tenantId>`: Optional. Domain or tenant id for the tenant to sign in to. (`common` to determine tenant from sign in).
 
@@ -697,7 +698,7 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.showResponseInDifferentTab`: Show response in different tab. (Default is __false__)
 * `rest-client.requestNameAsResponseTabTitle`: Show request name as the response tab title. Only valid when using html view, if no request name is specified defaults to "Response". (Default is __false__)
 * `rest-client.rememberCookiesForSubsequentRequests`: Save cookies from `Set-Cookie` header in response and use for subsequent requests. (Default is __true__)
-* `rest-client.enableTelemetry`: Send out anonymous usage data. (Default is __true__)
+* `rest-client.enableTelemetry`: Send out anonymous usage data. (Default is __false__)
 * `rest-client.excludeHostsForProxy`: Excluded hosts when using proxy settings. (Default is __[]__)
 * `rest-client.fontSize`: Controls the font size in pixels used in the response preview. (Default is __13__)
 * `rest-client.fontFamily`: Controls the font family used in the response preview. (Default is __Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback"__)

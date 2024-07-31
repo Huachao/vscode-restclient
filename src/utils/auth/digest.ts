@@ -1,4 +1,3 @@
-import * as stream from 'stream';
 import * as url from 'url';
 import { md5 } from '../misc';
 
@@ -6,13 +5,13 @@ import got = require('got');
 
 const uuidv4 = require('uuid/v4');
 
-export function digest(user: string, pass: string): got.AfterResponseHook<got.GotBodyOptions<null>, string | Buffer | stream.Readable> {
+export function digest(user: string, pass: string): got.AfterResponseHook {
     return (response, retryWithMergedOptions) => {
         if (response.statusCode === 401
             && response.headers['www-authenticate']
             && response.headers['www-authenticate'].split(' ')[0].toLowerCase() === 'digest') {
             const authHeader = response.headers['www-authenticate'];
-            const method = (response as any).request.gotOptions.method;
+            const method = (response as any).request.options.method;
             const path = url.parse(response.url).path;
             const challenge = {
                 qop: '',

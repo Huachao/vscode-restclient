@@ -6,6 +6,7 @@ import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
 import { HistoryController } from './controllers/historyController';
 import { RequestController } from './controllers/requestController';
+import { SwaggerController } from './controllers/swaggerController';
 import { CustomVariableDiagnosticsProvider } from "./providers/customVariableDiagnosticsProvider";
 import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
 import { EnvironmentOrFileVariableHoverProvider } from './providers/environmentOrFileVariableHoverProvider';
@@ -32,6 +33,7 @@ export async function activate(context: ExtensionContext) {
     const historyController = new HistoryController();
     const codeSnippetController = new CodeSnippetController(context);
     const environmentController = await EnvironmentController.create();
+    const swaggerController = new SwaggerController(context);
     context.subscriptions.push(requestController);
     context.subscriptions.push(historyController);
     context.subscriptions.push(codeSnippetController);
@@ -51,6 +53,8 @@ export async function activate(context: ExtensionContext) {
             window.showErrorMessage(error.message);
         });
     }));
+    context.subscriptions.push(commands.registerCommand('rest-client.import-swagger', async () => swaggerController.import()));
+
 
     const documentSelector = [
         { language: 'http', scheme: '*' }

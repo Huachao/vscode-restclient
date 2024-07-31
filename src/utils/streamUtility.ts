@@ -12,7 +12,7 @@ export async function convertStreamToBuffer(stream: Stream): Promise<Buffer> {
 
 export async function convertStreamToString(stream: Stream, encoding: string = "UTF-8"): Promise<string> {
     const buffer = await convertStreamToBuffer(stream);
-    return buffer.toString(encoding);
+    return buffer.toString(encoding as BufferEncoding);
 }
 
 export function convertBufferToStream(buffer: Buffer): Stream {
