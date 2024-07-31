@@ -11,6 +11,7 @@ import { env, Uri, window } from "vscode";
 import { IRestClientSettings, SystemSettings } from '../../models/configurationSettings';
 import { MemoryCache } from '../memoryCache';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from '../workspaceUtility';
+import sanitizeHtml from 'sanitize-html';
 
 type ServerAuthorizationCodeResponse = {
   // Success case
@@ -92,7 +93,7 @@ export class CodeLoopbackClient {
           res.writeHead(302, { location: redirectUri }); // Prevent auth code from being saved in the browser history
           res.end();
         } else {
-          res.end(`Authorization Server Error:${JSON.stringify(authCodeResponse)}`);
+          res.end(`Authorization Server Error:${sanitizeHtml(JSON.stringify(authCodeResponse))}`);
           reject(new Error(`Authorization Server Error:${JSON.stringify(authCodeResponse)}`));
         }
         resolve({ url, ...authCodeResponse });
@@ -467,7 +468,7 @@ export class OidcClient {
 
     if (response.status !== 200) {
       const error = await response.json();
-      throw new Error(`Failed to retrieve access token: ${response.status} ${error}`);
+      throw new Error(`Failed to retrieve access token: ${response.status} ${JSON.stringify(error)}`);
     }
 
     const { access_token, refresh_token } = await response.json();

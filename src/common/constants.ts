@@ -25,7 +25,7 @@ export const AzureActiveDirectoryV2TokenVariableName = "$aadV2Token";
 export const AzureActiveDirectoryV2TokenDescription = "Prompts to sign in to Azure AD V2 and adds the token to the request";
 
 export const OidcVariableName = "$oidcAccessToken";
-export const OidcDescription = "Prompts to sign in to an Oidc provider  and adds the token to the request";
+export const OidcDescription = "Prompts to sign in to an Oidc provider and adds the token to the request";
 export const OIdcForceNewOption = "new";
 
 

@@ -16,15 +16,15 @@ export class MemoryCache<T> {
         return this.caches.get(name) as MemoryCache<T>;
     }
 
-    public  get(key: string): T | undefined {
+    public get(key: string): T | undefined {
         return this.cache.get(key);
     }
 
-    public  set(key: string, value: T) {
+    public set(key: string, value: T) {
         this.cache.set(key, value);
     }
 
-    public  clear(): void {
+    public clear(): void {
         this.cache.clear();
     }
 }
