@@ -5,13 +5,13 @@ import * as https from "https";
 import * as jws from 'jws';
 import fetch from 'node-fetch';
 import path from 'path';
+import sanitizeHtml from 'sanitize-html';
 import { SecureContextOptions } from 'tls';
 import { v4 as uuid } from 'uuid';
 import { env, Uri, window } from "vscode";
 import { IRestClientSettings, SystemSettings } from '../../models/configurationSettings';
 import { MemoryCache } from '../memoryCache';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from '../workspaceUtility';
-import sanitizeHtml from 'sanitize-html';
 
 type ServerAuthorizationCodeResponse = {
   // Success case
