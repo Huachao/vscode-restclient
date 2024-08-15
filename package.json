@@ -475,6 +475,54 @@
           "scope": "resource",
           "description": "Preview response in untitled document if set to true, otherwise displayed in html view"
         },
+        "rest-client.oidcScopes": {
+          "type": "array",
+          "default": [],
+          "scope": "resource",
+          "description": "Scopes to be used by the OIDC client, default: [openid profile email]"
+        },
+        "rest-client.oidcCertificates": {
+          "type": "object",
+          "default": {},
+          "scope": "resource",
+          "description": "Certificate paths for Oidc callback server",
+          "pattern": "^(?!http(s?)://)",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "object",
+                "default": {},
+                "description": "Certifcate paths for Oidc callback server",
+                "properties": {
+                  "cert": {
+                    "type": "string",
+                    "description": "Absolute or relative path of Public x509 certificate"
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "Absolute or relative path of Private key"
+                  },
+                  "pfx": {
+                    "type": "string",
+                    "description": "Absolute or relative path of PKCS #12 certificate"
+                  },
+                  "passphrase": {
+                    "type": "string",
+                    "description": "[Optional] A string of passphrase for the private key or pfx"
+                  }
+                },
+                "dependencies": {
+                  "cert": [
+                    "key"
+                  ],
+                  "key": [
+                    "cert"
+                  ]
+                }
+              }
+            ]
+          }
+        },
         "rest-client.certificates": {
           "type": "object",
           "default": {},
@@ -660,8 +708,10 @@
   "devDependencies": {
     "@types/aws4": "^1.5.1",
     "@types/fs-extra": "^5.0.4",
+    "@types/jws": "^3.2.10",
     "@types/mocha": "^5.2.6",
     "@types/node": "^18.0.0",
+    "@types/node-fetch": "^2.6.11",
     "@types/vscode": "^1.81.0",
     "mocha": "^10.4.0",
     "ts-loader": "^7.0.5",
@@ -692,7 +742,11 @@
     "jsonc-parser": "^2.0.2",
     "jsonpath-plus": "^0.20.1",
     "mime-types": "^2.1.14",
+    "node-fetch": "^2.6.7",
+    "node-jws": "^0.1.4",
+    "open": "^10.1.0",
     "pretty-data": "^0.40.0",
+    "sanitize-html": "^2.13.0",
     "tough-cookie": "^4.1.3",
     "tough-cookie-file-store": "^2.0.3",
     "uuid": "^3.3.2",
