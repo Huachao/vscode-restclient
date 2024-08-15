@@ -1,5 +1,5 @@
 import { Amplify, Auth } from "aws-amplify";
-import got from "got";
+import type { BeforeRequestHook } from "got";
 
 async function login(
   username: string,
@@ -38,7 +38,7 @@ async function login(
 
 export async function awsCognito(
   authorization: string
-): Promise<got.BeforeRequestHook<got.GotBodyOptions<null>>> {
+): Promise<BeforeRequestHook> {
   const [, username, password, region, userPoolId, clientId] = authorization.split(/\s+/);
 
   const { accessToken } = await login(
