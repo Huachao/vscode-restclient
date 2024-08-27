@@ -99,7 +99,7 @@ export class RequestVariableCacheValueProcessor {
     private static resolveJsonHttpBody(body: any, path: string): ResolveResult {
         try {
             const result = JSONPath({ path, json: body });
-            const value = typeof result[0] === 'string' ? result[0] : JSON.stringify(result[0]);
+            const value = result.length > 1 ? JSON.stringify(result) : typeof result[0] === 'string' ? result[0] : JSON.stringify(result[0]);
             if (!value) {
                 return { state: ResolveState.Warning, message: ResolveWarningMessage.IncorrectJSONPath };
             } else {
