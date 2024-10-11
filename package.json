@@ -723,7 +723,7 @@
   "dependencies": {
     "adal-node": "^0.2.4",
     "applicationinsights": "^1.0.5",
-    "aws-amplify": "^5.0.3",
+    "aws-amplify": "^6.6.4",
     "aws4": "^1.9.1",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
