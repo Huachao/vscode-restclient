@@ -740,7 +740,7 @@
     "httpsnippet": "^1.22.0",
     "iconv-lite": "^0.4.15",
     "jsonc-parser": "^2.0.2",
-    "jsonpath-plus": "^0.20.1",
+    "jsonpath-plus": "^10.0.0",
     "mime-types": "^2.1.14",
     "node-fetch": "^2.6.7",
     "node-jws": "^0.1.4",
