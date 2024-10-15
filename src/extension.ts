@@ -9,6 +9,7 @@ import { RequestController } from './controllers/requestController';
 import { SwaggerController } from './controllers/swaggerController';
 import { CustomVariableDiagnosticsProvider } from "./providers/customVariableDiagnosticsProvider";
 import { RequestBodyDocumentLinkProvider } from './providers/documentLinkProvider';
+import { EnvironmentCodeLensProvider } from './providers/environmentCodeLensProvider';
 import { EnvironmentOrFileVariableHoverProvider } from './providers/environmentOrFileVariableHoverProvider';
 import { FileVariableDefinitionProvider } from './providers/fileVariableDefinitionProvider';
 import { FileVariableReferenceProvider } from './providers/fileVariableReferenceProvider';
@@ -68,6 +69,9 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerCompletionItemProvider(documentSelector, new RequestVariableCompletionItemProvider(), '.'));
     context.subscriptions.push(languages.registerHoverProvider(documentSelector, new EnvironmentOrFileVariableHoverProvider()));
     context.subscriptions.push(languages.registerHoverProvider(documentSelector, new RequestVariableHoverProvider()));
+    context.subscriptions.push(new ConfigurationDependentRegistration(
+        () => languages.registerCodeLensProvider(documentSelector, new EnvironmentCodeLensProvider()),
+        s => s.enableSendRequestCodeLens));
     context.subscriptions.push(
         new ConfigurationDependentRegistration(
             () => languages.registerCodeLensProvider(documentSelector, new HttpCodeLensProvider()),
