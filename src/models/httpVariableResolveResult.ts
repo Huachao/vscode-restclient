@@ -33,6 +33,7 @@ export const enum ResolveWarningMessage {
     IncorrectJSONPath = 'No value is resolved for given JSONPath',
     IncorrectRandomIntegerVariableFormat = 'RandomInt system variable should follow format "{{$randomInt minInteger maxInteger}}"',
     IncorrectProcessEnvVariableFormat = 'ProcessEnv system variable should follow format "{{$processEnv envVarName}}"',
+    IncorrectEvalVariableFormat = 'Eval system variable should follow format "{{$eval command}}"',
     IncorrectTimestampVariableFormat = 'Timestamp system variable should follow format "{{$timestamp [integer y|M|w|d|h|m|s|ms]}}"',
     IncorrectDotenvVariableFormat = 'Dotenv variable should follow format "{{$dotenv variableName}}"',
     IncorrectXPath = 'No value is resolved for given XPath',
