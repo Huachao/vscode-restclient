@@ -131,6 +131,15 @@
         "category": "Rest Client"
       },
       {
+        "command": "rest-client.copy-exchange",
+        "title": "Copy Exchange",
+        "icon": {
+          "light": "./images/copy.svg",
+          "dark": "./images/copy-inverse.svg"
+        },
+        "category": "Rest Client"
+      },
+      {
         "command": "rest-client.generate-codesnippet",
         "title": "Generate Code Snippet",
         "category": "Rest Client"
@@ -216,6 +225,10 @@
           "when": "httpResponsePreviewFocus"
         },
         {
+          "command": "rest-client.copy-exchange",
+          "when": "httpResponsePreviewFocus"
+        },
+        {
           "command": "rest-client.copy-codesnippet",
           "when": "codeSnippetPreviewFocus"
         }
@@ -235,6 +248,11 @@
           "when": "httpResponsePreviewFocus",
           "command": "rest-client.copy-response-body",
           "group": "navigation@3"
+        },
+        {
+          "when": "httpResponsePreviewFocus",
+          "command": "rest-client.copy-exchange",
+          "group": "navigation@4"
         },
         {
           "when": "httpResponsePreviewFocus",
