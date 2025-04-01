@@ -1,9 +1,6 @@
-# REST Client
+# REST Client with __HTTP TEST!__
 
-[![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://open.vscode.dev/Huachao/vscode-restclient) [![Node CI](https://github.com/Huachao/vscode-restclient/workflows/Node%20CI/badge.svg?event=push)](https://github.com/Huachao/vscode-restclient/actions?query=workflow%3A%22Node+CI%22) [![Join the chat at https://gitter.im/Huachao/vscode-restclient](https://badges.gitter.im/Huachao/vscode-restclient.svg)](https://gitter.im/Huachao/vscode-restclient?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Marketplace Version](https://vsmarketplacebadges.dev/version-short/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Downloads](https://vsmarketplacebadges.dev/downloads-short/humao.rest-client.svg
-)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Installs](https://vsmarketplacebadges.dev/installs-short/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) [![Rating](https://vsmarketplacebadges.dev/rating-short/humao.rest-client.svg)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
-
-REST Client allows you to send HTTP request and view the response in Visual Studio Code directly. It eliminates the need for a separate tool to test REST APIs and makes API testing convenient and efficient.
+REST Client allows you to send HTTP request and view the response in Visual Studio Code directly. It eliminates the need for a separate tool to test REST APIs and makes API testing convenient and efficient. __NEW!__ It also allows you to execute the HTTP file as an HTTP test.
 
 ## Main Features
 * Send/Cancel/Rerun __HTTP request__ in editor and view response in a separate pane with syntax highlight
@@ -17,7 +14,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
 * Customize font(size/family/weight) in response preview
 * Preview response with expected parts(_headers only_, _body only_, _full response_ and _both request and response_)
 * Authentication support for:
-    - Basic Auth
+    - Basic Auth(Auto Fetch Token Support) __NEW!__
     - Digest Auth
     - SSL Client Certificates
     - Azure Active Directory
@@ -43,6 +40,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
       + `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
       + `{{$oidcAccessToken  [new]  [<clientId:<clientId>] [<callbackPort:<callbackPort>] [authorizeEndpoint:<authorizeEndpoint}] [tokenEndpoint:<tokenEndpoint}] [scopes:<scopes}] [audience:<audience}]}`
     - Easily create/update/delete environments and environment variables in setting file
+    - Easily configure environment to AUTO Fetch Token from REST auth provider
     - File variables can reference both custom and system variables
     - Support environment switch
     - Support shared environment to provide variables that available in all environments
@@ -61,6 +59,61 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - CodeLens support to add an actionable link to send request
     - Fold/Unfold for request block
 * Support for Markdown fenced code blocks with either `http` or `rest`
+* __NEW!__ - Run HTTP Test for complete http file with basic and custom assertions. See [HTTP Testing Support](#-HTTP-Testing-Support)
+
+### Auto Token Fetching With Environment switch
+REST Client supports automatic token fetching when switching environments. This can be configured using the `auto_fetch_token_data` property in your environment settings:
+
+```json
+"rest-client.environmentVariables": {
+    "$shared": {},
+    "development": {
+        "host": "dev.example.com",
+        "auto_fetch_token_data": {
+            "client_id_variable_name": "CLIENT_ID",
+            "client_secret_variable_name": "CLIENT_SECRET",
+            "auth_type": "Basic",
+            "method": "POST",
+            "token_request_url": "https://auth.example.com/token",
+            "content_type": "application/x-www-form-urlencoded",
+            "grant_type": "client_credentials",
+            "scope": "api.access",
+            "response_token_value_tag_name": "access_token"
+        }
+    }
+}
+```
+
+The `auto_fetch_token_data` configuration requires:
+- `client_id_variable_name`: Name of the variable in .env file containing client ID
+- `client_secret_variable_name`: Name of the variable in .env file containing client secret
+- `auth_type`: Authentication type (e.g., "Basic", "Bearer")
+- `method`: HTTP method for token request
+- `token_request_url`: URL endpoint for token requests
+- `response_token_value_tag_name`: JSON path to token value in response
+  
+This configuration:
+- Uses OAuth2 client credentials flow
+- Makes a POST request to token_request_url value endpoint
+- Uses Basic authentication with client credentials
+- Expects credentials in .env file as:
+  ```env
+  CLIENT_ID=your_client_id
+  CLIENT_SECRET=your_client_secret
+  ```
+- Extracts token from response using "access_token" JSON path
+- Stores token in `$shared` environment as "token"
+
+When switching to an environment with `auto_fetch_token_data` configured:
+1. The extension checks for a .env file in the same directory as your .http file
+2. Reads the client credentials from .env file
+3. Makes a token request to the specified endpoint
+4. Stores the received token in the $shared environment as "token"
+   
+You can then use the token in your requests:
+```http
+GET https://{{host}}/api/v1/data
+Authorization: Bearer {{token}}
 
 ## Usage
 In editor, type an HTTP request as simple as below:
@@ -708,6 +761,116 @@ headers  | Only the response headers(including _status line_) are previewed
 body     | Only the response body is previewed
 exchange | Preview the whole HTTP exchange(request and response)
 
+### HTTP Testing Support
+REST Client includes built-in HTTP testing capabilities that allow you to write and execute API tests directly in your `.http` files. This feature helps you validate API responses without writing complex test scripts.
+
+### Writing Tests
+You can define tests using simple assertions after your HTTP requests. Tests are separated from requests using the `#### Assert:` syntax.
+
+```http
+### Get User
+GET https://api.example.com/users/1
+Authorization: Bearer {{token}}
+
+#### Assert: Check user response
+Status: 200
+Content-Type: application/json
+Body:
+$.id: 1
+$.name: John Doe
+```
+
+### Status Code Assertions
+Verify the response status code:
+
+```http
+### Create User
+POST https://api.example.com/users
+Content-Type: application/json
+
+{
+    "name": "Alice Johnson",
+    "email": "alice@example.com"
+}
+
+#### Assert: Verify creation
+Status: 201
+```
+
+### Header Assertions
+Check response headers:
+
+```http
+### Get Users
+GET https://api.example.com/users
+
+#### Assert: Check headers
+Status: 200
+Content-Type: application/json
+Cache-Control: no-cache
+```
+
+### JSONPath Assertions
+Use JSONPath to verify specific values in JSON responses:
+
+```http
+### Get User Profile
+GET https://api.example.com/profile
+
+#### Assert: Verify profile data
+Status: 200
+Body:
+$.user.name: Alice Johnson
+$.user.email: alice@example.com
+$.settings.notifications: true
+```
+
+### Variable Management
+You can save response values to variables for use in subsequent requests:
+
+```http
+### Login
+POST https://api.example.com/login
+Content-Type: application/json
+
+{
+    "username": "alice",
+    "password": "{{password}}"
+}
+
+#### Assert: Save auth token
+Status: 200
+@authToken = $.token
+
+### Get Protected Resource
+GET https://api.example.com/protected
+Authorization: Bearer {{authToken}}
+
+#### Assert: Verify access
+Status: 200
+```
+
+### Running Tests
+Tests can be executed in several ways:
+1. Click the "Send Request" CodeLens above any request
+2. Use the keyboard shortcut `Ctrl+Alt+R` (`Cmd+Alt+R` on macOS)
+3. Right-click and select "Send Request"
+4. Run all tests in a file using the "Run HTTP Test" command
+
+### Test Output
+Test results appear in the output panel, showing:
+- Request details
+- Response status and headers
+- Assertion results
+- Any failures or errors
+- Test summary with pass/fail counts
+
+### Advanced Features
+- Custom JavaScript assertions
+- File upload testing
+- Environment-specific variables
+- Detailed test reports
+
 ## Settings
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
 * `rest-client.defaultHeaders`: If particular headers are omitted in request header, these will be added as headers for each request. (Default is `{ "User-Agent": "vscode-restclient", "Accept-Encoding": "gzip" }`)
@@ -738,6 +901,7 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.enableSendRequestCodeLens`: Enable/disable sending request CodeLens in request file. (Default is __true__)
 * `rest-client.enableCustomVariableReferencesCodeLens`: Enable/disable custom variable references CodeLens in request file. (Default is __true__)
 * `rest-client.useContentDispositionFilename`: Use `filename=` from `'content-disposition'` header (if available), to determine output file name, when saving response body. (Default is __true__)
+* `rest-client.httpTestVerboseOutput`: Display verbose output of test result to help debug. (Default is __false__)
 
 Rest Client extension respects the proxy settings made for Visual Studio Code (`http.proxy` and `http.proxyStrictSSL`). Only HTTP and HTTPS proxies are supported.
 

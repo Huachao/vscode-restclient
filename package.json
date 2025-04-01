@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.26.0",
+  "version": "0.26.2",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -91,6 +91,11 @@
       {
         "command": "rest-client.switch-environment",
         "title": "Switch Environment",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.run-http-test",
+        "title": "Run HTTP Test",
         "category": "Rest Client"
       },
       {
@@ -686,6 +691,12 @@
           "default": true,
           "scope": "resource",
           "description": "Enable/disable using filename from 'content-disposition' header, when saving response body"
+        },
+        "rest-client.httpTestVerboseOutput": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "description": "Display verbose output of test result to help debug."
         }
       }
     },

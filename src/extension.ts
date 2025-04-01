@@ -4,6 +4,7 @@
 import { commands, ExtensionContext, languages, Range, TextDocument, Uri, window, workspace } from 'vscode';
 import { CodeSnippetController } from './controllers/codeSnippetController';
 import { EnvironmentController } from './controllers/environmentController';
+import { HttpTestingController } from './controllers/httpTestingController';
 import { HistoryController } from './controllers/historyController';
 import { RequestController } from './controllers/requestController';
 import { SwaggerController } from './controllers/swaggerController';
@@ -33,6 +34,7 @@ export async function activate(context: ExtensionContext) {
     const historyController = new HistoryController();
     const codeSnippetController = new CodeSnippetController(context);
     const environmentController = await EnvironmentController.create();
+    const httpTestingController = await HttpTestingController.create();
     const swaggerController = new SwaggerController(context);
     context.subscriptions.push(requestController);
     context.subscriptions.push(historyController);
@@ -46,6 +48,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(commands.registerCommand('rest-client.generate-codesnippet', () => codeSnippetController.run()));
     context.subscriptions.push(commands.registerCommand('rest-client.copy-request-as-curl', () => codeSnippetController.copyAsCurl()));
     context.subscriptions.push(commands.registerCommand('rest-client.switch-environment', () => environmentController.switchEnvironment()));
+    context.subscriptions.push(commands.registerCommand('rest-client.run-http-test', () => httpTestingController.runHttpTest()));
     context.subscriptions.push(commands.registerCommand('rest-client.clear-aad-token-cache', () => AadTokenCache.clear()));
     context.subscriptions.push(commands.registerCommand('rest-client.clear-cookies', () => requestController.clearCookies()));
     context.subscriptions.push(commands.registerCommand('rest-client._openDocumentLink', args => {
