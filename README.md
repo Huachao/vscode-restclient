@@ -437,7 +437,7 @@ The reference syntax of system and custom variables types has a subtle differenc
 Custom variables can cover different user scenarios with the benefit of environment variables, file variables, and request variables. Environment variables are mainly used for storing values that may vary in different environments. Since environment variables are directly defined in Visual Studio Code setting file, they can be referenced across different `http` files. File variables are mainly used for representing values that are constant throughout the `http` file. Request variables are used for the chaining requests scenarios which means a request needs to reference some part(header or body) of another request/response in the _same_ `http` file, imagine we need to retrieve the auth token dynamically from the login response, request variable fits the case well. Both file and request variables are defined in the `http` file and only have __File Scope__.
 
 #### Environment Variables
-For environment variables, each environment comprises a set of key value pairs defined in setting file, key and value are variable name and value respectively. Only variables defined in selected environment and shared environment are available to you. You can also reference the variables in shared environment with `{{$shared variableName}}` syntax in your active environment. Below is a sample piece of setting file for custom environments and environment level variables:
+For environment variables, each environment comprises a set of key value pairs defined in the settings file (typically the [Workspace Settings](https://code.visualstudio.com/docs/configure/settings#_workspace-settings) file located at `.vscode/settings.json`), key and value are variable name and value respectively. Only variables defined in selected environment and shared environment are available to you. You can also reference the variables in shared environment with `{{$shared variableName}}` syntax in your active environment. Below is a sample piece of setting file for custom environments and environment level variables:
 ```json
 "rest-client.environmentVariables": {
     "$shared": {
@@ -709,6 +709,7 @@ body     | Only the response body is previewed
 exchange | Preview the whole HTTP exchange(request and response)
 
 ## Settings
+These settings can either be set on your [User or in the Workspace Settings](https://code.visualstudio.com/docs/configure/settings) (in the `.vscode/settings.json` file):
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)
 * `rest-client.defaultHeaders`: If particular headers are omitted in request header, these will be added as headers for each request. (Default is `{ "User-Agent": "vscode-restclient", "Accept-Encoding": "gzip" }`)
 * `rest-client.timeoutinmilliseconds`: Timeout in milliseconds. 0 for infinity. (Default is __0__)
