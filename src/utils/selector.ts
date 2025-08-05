@@ -20,6 +20,42 @@ interface PromptVariableDefinition {
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
+    public static async getAllRequests(editor: TextEditor, document: TextDocument): Promise<SelectedRequest[]> {
+        const requests: SelectedRequest[] = [];
+        const fullText = document.getText();
+        const lines = fullText.split(Constants.LineSplitterRegex);
+
+        // Get all request ranges in the document
+        const requestRanges = this.getRequestRanges(lines);
+
+        for (const [start, end] of requestRanges) {
+            const requestLines = lines.slice(start, end + 1);
+            // Parse metadata for this request
+            const metadatas = this.parseReqMetadatas(requestLines);
+
+            // Prompt for variables if needed
+            const promptVariablesDefinitions = this.parsePromptMetadataForVariableDefinitions(metadatas.get(RequestMetadata.Prompt));
+            const promptVariables = await this.promptForInput(promptVariablesDefinitions);
+            if (!promptVariables) {
+                // If user cancels prompt, skip this request
+                continue;
+            }
+            
+
+            // Remove comment lines for the actual request
+            const rawLines = requestLines.filter(l => !this.isCommentLine(l));
+            const requestText = await VariableProcessor.processRawRequest(rawLines.join(EOL), promptVariables);
+
+            requests.push({
+                text: requestText,
+                metadatas: metadatas
+            });
+        }
+
+        return requests;
+    }
+
+
     public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
         if (!editor.document) {
             return null;

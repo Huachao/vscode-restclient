@@ -79,6 +79,11 @@
         "category": "Rest Client"
       },
       {
+        "command": "rest-client.run-all-requests-sequentialy",
+        "title": "Send all requests sequentially",
+        "category": "Rest Client"
+      },
+      {
         "command": "rest-client.rerun-last-request",
         "title": "Rerun Last Request",
         "category": "Rest Client"
@@ -286,6 +291,12 @@
         "key": "ctrl+alt+r",
         "mac": "cmd+alt+r",
         "when": "editorTextFocus && editorLangId == 'http'"
+      },
+      {
+        "command": "rest-client.run-all-requests-sequentialy",
+        "key": "ctrl+shift+r",
+        "mac": "cmd+shift+r",
+        "when": "editorTextFocus"
       },
       {
         "command": "rest-client.request",
