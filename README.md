@@ -41,7 +41,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
       + `{{$processEnv [%]envVarName}}`
       + `{{$dotenv [%]variableName}}`
       + `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`
-      + `{{$oidcAccessToken  [new]  [<clientId:<clientId>] [<callbackPort:<callbackPort>] [authorizeEndpoint:<authorizeEndpoint}] [tokenEndpoint:<tokenEndpoint}] [scopes:<scopes}] [audience:<audience}]}`
+      + `{{$oidcAccessToken [new] [clientId:<clientId>] [callbackPort:<callbackPort>] [authorizeEndpoint:<authorizeEndpoint>] [tokenEndpoint:<tokenEndpoint>] [scopes:<scope[,]>] [audience:<audience>]}}`
     - Easily create/update/delete environments and environment variables in setting file
     - File variables can reference both custom and system variables
     - Support environment switch
@@ -601,11 +601,13 @@ System variables provide a pre-defined set of variables that can be used in any 
 
   `clientId:<clientid>`: Optional. Identifier of the application registration to use to obtain the token. Default uses an application registration created specifically for this plugin.
 
-* `{{$oidcAccessToken  [new]  [<clientId:<clientId>] [<callbackPort:<callbackPort>] [authorizeEndpoint:<authorizeEndpoint}] [tokenEndpoint:<tokenEndpoint}] [scopes:<scopes}] [audience:<audience}]}`: Add an Oidc Identity Server token based on the following options (must be specified in order):
+* `{{$oidcAccessToken [new] [clientId:<clientId>] [callbackDomain:<callbackDomain>] [callbackPort:<callbackPort>] [authorizeEndpoint:<authorizeEndpoint>] [tokenEndpoint:<tokenEndpoint>] [scopes:<scope[,]>] [audience:<audience>]}}`: Add an Oidc Identity Server token based on the following options (must be specified in order):
 
   `new`: Optional. Specify `new` to force re-authentication and get a new token for the client. Default: Reuse previous token for clientId from an in-memory cache. Expired tokens are refreshed automatically. (Restart Visual Studio Code to clear the cache.)
 
   `clientId:<clientid>`: Optional. Identifier of the application registration to use to obtain the token.
+
+  `callbackDomain:<callbackDomain>`: Optional. If set, redirect URI will be set to `https://<callbackDomain>:<callbackPort>`. Defaults to `localhost` resulting in `http://localhost:<callbackPort>`.
 
   `callbackPort:<callbackPort>`: Optional. Port to use for the local callback server. Default: 7777 (random port).
 
@@ -615,7 +617,7 @@ System variables provide a pre-defined set of variables that can be used in any 
 
   `scopes:<scope[,]>`: Optional. Comma delimited list of scopes that must have consent to allow the call to be successful. 
 
-  `audience:<audience>`: Optional.
+  `audience:<audience>`: Optional. When set, will be passed in the query as `audience` parameter.
    
 * `{{$guid}}`: Add a RFC 4122 v4 UUID
 * `{{$processEnv [%]envVarName}}`: Allows the resolution of a local machine environment variable to a string value. A typical use case is for secret keys that you don't want to commit to source control.
