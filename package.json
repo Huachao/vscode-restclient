@@ -713,7 +713,7 @@
     "@types/node": "^18.0.0",
     "@types/node-fetch": "^2.6.11",
     "@types/vscode": "^1.81.0",
-    "mocha": "^10.4.0",
+    "mocha": "^10.8.2",
     "ts-loader": "^7.0.5",
     "tslint": "^6.1.2",
     "typescript": "^5.4.2",
