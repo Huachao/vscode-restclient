@@ -1,6 +1,6 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
 import Logger from '../logger';
-import { IRestClientSettings, RequestSettings, RestClientSettings } from '../models/configurationSettings';
+import { IRestClientSettings, RequestSettings, RestClientSettings} from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
 import { RequestMetadata } from '../models/requestMetadata';
 import { RequestParserFactory } from '../models/requestParserFactory';
@@ -28,6 +28,55 @@ export class RequestController {
         this._webview = new HttpResponseWebview(context);
         this._webview.onDidCloseAllWebviewPanels(() => this._requestStatusEntry.update({ state: RequestState.Closed }));
         this._textDocumentView = new HttpResponseTextDocumentView();
+    }
+
+    @trace('Send All Requests Sequentially')
+    public async runAllSequentially() {
+        const editor = window.activeTextEditor;
+        const document = getCurrentTextDocument();
+        if (!editor || !document) {
+            return;
+        }
+
+        const confirmation = await window.showInformationMessage(
+            "Are you sure you want to run all requests in this document?",
+            "Yes",
+            "No"
+        );
+
+        if (confirmation !== "Yes") {
+            return;
+        }
+
+        // Get all requests in the document
+        const requests = await Selector.getAllRequests(editor, document);
+        if (!requests || requests.length === 0) {
+            window.showInformationMessage('No HTTP requests found in the current file.');
+            return;
+        }
+
+        const activeColumn = window.activeTextEditor!.viewColumn;
+
+
+        for (const selectedRequest of requests) {
+            const { text, metadatas } = selectedRequest;
+            const name = metadatas.get(RequestMetadata.Name);
+
+            if (metadatas.has(RequestMetadata.Note)) {
+                const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
+                const userConfirmed = await window.showWarningMessage(note, 'Yes', 'No');
+                if (userConfirmed !== 'Yes') {
+                    continue;
+                }
+            }
+
+            const requestSettings = new RequestSettings(metadatas);
+            const settings: IRestClientSettings = new RestClientSettings(requestSettings);
+
+            const httpRequest = await RequestParserFactory.createRequestParser(text, settings).parseHttpRequest(name);
+
+            await this.runCore(httpRequest, settings, activeColumn,  document);
+        }
     }
 
     @trace('Request')
@@ -59,8 +108,9 @@ export class RequestController {
 
         // parse http request
         const httpRequest = await RequestParserFactory.createRequestParser(text, settings).parseHttpRequest(name);
+        const activeColumn = window.activeTextEditor!.viewColumn;
 
-        await this.runCore(httpRequest, settings, document);
+        await this.runCore(httpRequest, settings, activeColumn, document);
     }
 
     @trace('Rerun Request')
@@ -89,7 +139,13 @@ export class RequestController {
         }
     }
 
-    private async runCore(httpRequest: HttpRequest, settings: IRestClientSettings, document?: TextDocument) {
+    private async runCore(
+        httpRequest: HttpRequest,
+        settings: IRestClientSettings,
+        activeColumn?: ViewColumn,
+        document?: TextDocument,
+        options?: { appendToPreview?: boolean }
+    ) {
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
 
@@ -97,7 +153,6 @@ export class RequestController {
         this._lastPendingRequest = httpRequest;
         this._lastRequestSettingTuple = [httpRequest, settings];
 
-        // set http request
         try {
             const response = await this._httpClient.send(httpRequest, settings);
 
@@ -113,7 +168,6 @@ export class RequestController {
             }
 
             try {
-                const activeColumn = window.activeTextEditor!.viewColumn;
                 const previewColumn = settings.previewColumn === ViewColumn.Active
                     ? activeColumn
                     : ((activeColumn as number) + 1) as ViewColumn;

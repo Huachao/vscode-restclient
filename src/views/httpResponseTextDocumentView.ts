@@ -8,6 +8,22 @@ import { formatHeaders } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
 
 export class HttpResponseTextDocumentView {
+    public async append(combined: string, column?: ViewColumn) {
+        const content = combined;
+        let document: TextDocument;
+        if (this.documents.length === 0) {
+            document = await workspace.openTextDocument({ language: 'http', content });
+            this.documents.push(document);
+            await window.showTextDocument(document, { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus, preview: false });
+        } else {
+            document = this.documents[this.documents.length - 1];
+            const editor = await window.showTextDocument(document, { viewColumn: column, preserveFocus: !this.settings.previewResponsePanelTakeFocus, preview: false });
+            editor.edit(edit => {
+                const endPosition = document.lineAt(document.lineCount - 1).range.end;
+                edit.insert(endPosition, `\n${content}`);
+            });
+        }
+    }
 
     private readonly settings: SystemSettings = SystemSettings.Instance;
 
