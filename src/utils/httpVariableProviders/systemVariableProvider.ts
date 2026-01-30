@@ -34,7 +34,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
     private readonly randomIntegerRegex: RegExp = new RegExp(`\\${Constants.RandomIntVariableName}\\s(\\-?\\d+)\\s(\\-?\\d+)`);
     private readonly processEnvRegex: RegExp = new RegExp(`\\${Constants.ProcessEnvVariableName}\\s(\\%)?(\\w+)`);
 
-    private readonly dotenvRegex: RegExp = new RegExp(`\\${Constants.DotenvVariableName}\\s(\\%)?([\\w-.]+)`);
+    private readonly dotenvRegex: RegExp = new RegExp(`\\${Constants.DotenvVariableName}\\s(\\%)?([\\w-.]+)(?:\\s(\\.env[\\w-.]*))?`);
 
     private readonly requestUrlRegex: RegExp = /^(?:[^\s]+\s+)([^:]*:\/\/\/?[^/\s]*\/?)/;
 
@@ -193,10 +193,16 @@ export class SystemVariableProvider implements HttpVariableProvider {
         this.resolveFuncs.set(Constants.DotenvVariableName, async (name, document) => {
             let folderPath = path.dirname(document.fileName);
             const { name : environmentName } = await EnvironmentController.getCurrentEnvironment();
+            const [, refToggle, key, dotEnvFilename] = this.dotenvRegex.exec(name) ?? [];
 
-            let pathsFound = [false, false];
+            if (key === undefined) {
+                return { warning: ResolveWarningMessage.IncorrectDotenvVariableFormat };
+            }
+
+            let pathsFound = [false, false, false];
 
             while ((pathsFound = await Promise.all([
+                !!dotEnvFilename && fs.pathExists(path.join(folderPath, dotEnvFilename)),
                 fs.pathExists(path.join(folderPath, `.env.${environmentName}`)),
                 fs.pathExists(path.join(folderPath, '.env'))
             ])).every(result => result === false)) {
@@ -205,23 +211,19 @@ export class SystemVariableProvider implements HttpVariableProvider {
                     return { warning: ResolveWarningMessage.DotenvFileNotFound };
                 }
             }
-            const absolutePath = path.join(folderPath, pathsFound[0] ? `.env.${environmentName}` : '.env');
-            const groups = this.dotenvRegex.exec(name);
-            if (groups !== null && groups.length === 3) {
-                const parsed = dotenv.parse(await fs.readFile(absolutePath));
-                const [, refToggle, key] = groups;
-                let dotEnvVarName = key;
-                if (refToggle !== undefined) {
-                    dotEnvVarName = await this.resolveSettingsEnvironmentVariable(key);
-                }
-                if (!(dotEnvVarName in parsed)) {
-                    return { warning: ResolveWarningMessage.DotenvVariableNotFound };
-                }
+            const envFilename = dotEnvFilename ?? (pathsFound[1] ? `.env.${environmentName}` : ".env");
 
-                return { value: parsed[dotEnvVarName] };
+            const absolutePath = path.join(folderPath, envFilename);
+            const parsed = dotenv.parse(await fs.readFile(absolutePath));
+            let dotEnvVarName = key;
+            if (refToggle !== undefined) {
+                dotEnvVarName = await this.resolveSettingsEnvironmentVariable(key);
+            }
+            if (!(dotEnvVarName in parsed)) {
+                return { warning: ResolveWarningMessage.DotenvVariableNotFound };
             }
 
-            return { warning: ResolveWarningMessage.IncorrectDotenvVariableFormat };
+            return { value: parsed[dotEnvVarName] };
         });
     }
 
