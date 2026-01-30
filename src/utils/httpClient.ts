@@ -19,6 +19,9 @@ import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility
 
 import { CancelableRequest, Headers, Method, OptionsOfBufferResponseBody, Response } from 'got';
 import got = require('got');
+import * as dns from 'dns';
+import * as http from 'http';
+import * as https from 'https';
 
 const encodeUrl = require('encodeurl');
 const CookieFileStore = require('tough-cookie-file-store').FileCookieStore;
@@ -182,6 +185,46 @@ export class HttpClient {
         // set certificate
         const certificate = this.getRequestCertificate(httpRequest.url, settings);
         Object.assign(options, certificate);
+
+        // Custom agent for localhost to handle IPv6
+        const parsedUrl = url.parse(httpRequest.url);
+        if (parsedUrl.hostname === 'localhost' && !options.agent) {
+            // DNS lookup that prefers IPv6 for localhost
+            const ipv6Lookup = (hostname: string, options: any, callback: any) => {
+                if (typeof options === 'function') {
+                    callback = options;
+                    options = {};
+                }
+
+                dns.lookup(hostname, { all: true }, (err, addresses) => {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+
+                    // Prefer IPv6 over IPv4
+                    const ipv6 = addresses.find((addr: any) => addr.family === 6);
+                    const ipv4 = addresses.find((addr: any) => addr.family === 4);
+
+                    if (ipv6) {
+                        callback(null, ipv6.address, ipv6.family);
+                    } else if (ipv4) {
+                        callback(null, ipv4.address, ipv4.family);
+                    } else {
+                        callback(new Error('No address found for localhost'));
+                    }
+                });
+            };
+
+            // Create appropriate agent based on protocol
+            const AgentClass = parsedUrl.protocol === 'https:' ? https.Agent : http.Agent;
+            const customAgent = new AgentClass({ lookup: ipv6Lookup } as any);
+
+            options.agent = {
+                http: parsedUrl.protocol === 'http:' ? customAgent : undefined,
+                https: parsedUrl.protocol === 'https:' ? customAgent : undefined
+            } as any;
+        }
 
         // set proxy
         if (settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, settings.excludeHostsForProxy)) {
