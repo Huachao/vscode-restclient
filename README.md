@@ -340,6 +340,8 @@ We support `PFX`, `PKCS12`, and `PEM` certificates. Before using your certificat
 - `key`: Path of private key
 - `pfx`: Path of PKCS #12 or PFX certificate
 - `passphrase`: Optional passphrase for the certificate if required
+- `hostname`: Optionally override the hostname of the request. Allows using multiple certificates for the same host.
+
 You can add following piece of code in your setting file if your certificate is in `PEM` format:
 ```json
 "rest-client.certificates": {

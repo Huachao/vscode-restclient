@@ -9,6 +9,7 @@ import { RequestMetadata } from './requestMetadata';
 
 export type HostCertificates = {
     [key: string]: {
+        hostname?: string;
         cert?: string;
         key?: string;
         pfx?: string;

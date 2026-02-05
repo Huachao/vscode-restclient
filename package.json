@@ -551,6 +551,10 @@
                   "passphrase": {
                     "type": "string",
                     "description": "[Optional] A string of passphrase for the private key or pfx"
+                  },
+                  "hostname": {
+                    "type": "string",
+                    "description": "[Optional] The actual hostname used in the request"
                   }
                 },
                 "dependencies": {
@@ -718,7 +722,7 @@
     "tslint": "^6.1.2",
     "typescript": "^5.4.2",
     "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1"
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "adal-node": "^0.2.4",
