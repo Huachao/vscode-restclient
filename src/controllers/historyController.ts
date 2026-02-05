@@ -3,6 +3,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import * as fs from 'fs-extra';
 import { EOL, tmpdir } from 'os';
 import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import { QuickPickItem, window, workspace } from 'vscode';
 import { HistoricalHttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
@@ -10,8 +11,6 @@ import { formatHeaders } from '../utils/misc';
 import { UserDataManager } from '../utils/userDataManager';
 
 dayjs.extend(relativeTime);
-
-const uuidv4 = require('uuid/v4');
 
 export class HistoryController {
     public constructor() {

@@ -4,6 +4,7 @@ import utc from 'dayjs/plugin/utc';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import { Clipboard, commands, env, QuickPickItem, QuickPickOptions, TextDocument, Uri, window } from 'vscode';
 import * as Constants from '../../common/constants';
 import { EnvironmentController } from '../../controllers/environmentController';
@@ -16,8 +17,6 @@ import { CALLBACK_PORT, OidcClient } from '../auth/oidcClient';
 import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
-
-const uuidv4 = require('uuid/v4');
 
 dayjs.extend(utc);
 
