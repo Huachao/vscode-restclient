@@ -67,6 +67,7 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.copy-response-body', this.copyBody, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response', this.save, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', this.saveBody, this));
+        this.context.subscriptions.push(commands.registerCommand('rest-client.copy-exchange', this.copyExchange, this));
     }
 
     public async render(response: HttpResponse, column: ViewColumn) {
@@ -161,6 +162,14 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
+    @trace('Copy Exchange')
+    private async copyExchange() {
+        if (this.activeResponse) {
+            const exchange = this.getFullExchangeString(this.activeResponse);
+            await this.clipboard.writeText(exchange);
+        }
+    }
+
     @trace('Save Response')
     private async save() {
         if (this.activeResponse) {
@@ -208,6 +217,21 @@ export class HttpResponseWebview extends BaseWebview {
     private getTitle(response: HttpResponse): string {
         const prefix = (this.settings.requestNameAsResponseTabTitle && response.request.name) || 'Response';
         return `${prefix}(${response.timingPhases.total ?? 0}ms)`;
+    }
+
+    private getFullExchangeString(response: HttpResponse): string {
+        const requestString = this.getFullRequestString(response);
+        const responseString = this.getFullResponseString(response);
+
+        return `${requestString}${os.EOL}${os.EOL}${responseString}`;
+    }
+
+    private getFullRequestString(response: HttpResponse): string {
+        const request = response.request;
+        const statusLine = `${request.method} ${request.url} HTTP/1.1${os.EOL}`;
+        const headerString = formatHeaders(request.headers);
+        const body = request.body ? `${os.EOL}${request.body}` : '';
+        return `${statusLine}${headerString}${body}`;
     }
 
     private getFullResponseString(response: HttpResponse): string {
