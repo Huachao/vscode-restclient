@@ -224,7 +224,7 @@ class AuthParameters {
 
         // if scopes does not contain openid or profile, add it
         // Using /common endpoint with only organizational scopes causes device code to fail.
-        // Adding openid and/or profile prevents this failure from occuring
+        // Adding openid and/or profile prevents this failure from occurring
         if (scopes.indexOf("openid") === -1) {
             scopes += ",openid,profile";
         }

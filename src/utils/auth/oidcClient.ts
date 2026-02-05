@@ -293,7 +293,7 @@ export class CodeLoopbackClient {
     const decode = (s: string) => decodeURIComponent(s.replace(/\+/g, " "));
     params.forEach((pair) => {
       if (pair.trim()) {
-        const [key, value] = pair.split(/=(.+)/g, 2); // Split on the first occurence of the '=' character
+        const [key, value] = pair.split(/=(.+)/g, 2); // Split on the first occurrence of the '=' character
         if (key && value) {
           obj[decode(key)] = decode(value);
         }

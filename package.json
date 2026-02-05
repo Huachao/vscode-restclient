@@ -492,7 +492,7 @@
               {
                 "type": "object",
                 "default": {},
-                "description": "Certifcate paths for Oidc callback server",
+                "description": "Certificate paths for Oidc callback server",
                 "properties": {
                   "cert": {
                     "type": "string",
@@ -534,7 +534,7 @@
               {
                 "type": "object",
                 "default": {},
-                "description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
+                "description": "Certificate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
                 "properties": {
                   "cert": {
                     "type": "string",

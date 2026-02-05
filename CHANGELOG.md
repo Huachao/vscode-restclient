@@ -17,7 +17,7 @@
 * __Improvement__: [Add support for application/x-amz-json-1.1 as JSON](https://github.com/Huachao/vscode-restclient/pull/771) ([@fxalgrain](https://github.com/fxalgrain))
 * __Improvement__: [SaveBody now uses filename from content-disposition](https://github.com/Huachao/vscode-restclient/pull/924) ([@mbronk](https://github.com/mbronk))
 * __Improvement__: [Add operation name for GraphQL request](https://github.com/Huachao/vscode-restclient/issues/919)
-* __Improvement__: [Destory underlying connection when user cancels the request](https://github.com/Huachao/vscode-restclient/issues/910)
+* __Improvement__: [Destroy underlying connection when user cancels the request](https://github.com/Huachao/vscode-restclient/issues/910)
 
 ## 0.24.5 (2021/4/7)
 * __Feature__: [Add support for text/javascript as JSON](https://github.com/Huachao/vscode-restclient/pull/654) ([@mingue](https://github.com/mingue))
@@ -25,7 +25,7 @@
 * __Bug Fix__: [Fix basic auth header not generated correct for user:password case](https://github.com/Huachao/vscode-restclient/issues/741)
 * __Bug Fix__: [Fix `rest-client.fontSize` Default Value is Invalid](https://github.com/Huachao/vscode-restclient/issues/760)
 * __Bug Fix__: [Recognize `--data-raw` curl option](https://github.com/Huachao/vscode-restclient/issues/790)
-* __Bug Fix__: Fix incorrect syntax highlight for request line without specifing method
+* __Bug Fix__: Fix incorrect syntax highlight for request line without specifying method
 * __Improvement__: [Updating document selector to support virtual file systems](https://github.com/Huachao/vscode-restclient/pull/720) ([@lostintangent](https://github.com/lostintangent))
 * __Improvement__: [Update azure ad token caching](https://github.com/Huachao/vscode-restclient/pull/795) ([@abdulkareemnalband](https://github.com/abdulkareemnalband))
 
@@ -92,7 +92,7 @@
 * __Bug Fix__: [Set correct line ending character for multipart/form-data MIME type](https://github.com/Huachao/vscode-restclient/issues/456)
 * __Bug Fix__: [Disable automatical retry on failure](https://github.com/Huachao/vscode-restclient/issues/490)
 * __Bug Fix__: [fix command `rest-client-*` not found error](https://github.com/Huachao/vscode-restclient/pull/449) ([@stegano](stegano))
-* __Improvement__: [Support empty value for file varaible](https://github.com/Huachao/vscode-restclient/issues/322)
+* __Improvement__: [Support empty value for file variable](https://github.com/Huachao/vscode-restclient/issues/322)
 * __Improvement__: [Collapse/Expand children recursively in response webview with `Shift` modifier key](https://github.com/Huachao/vscode-restclient/issues/484)
 * __Improvement__: [Show request name if available in symbol list](https://github.com/Huachao/vscode-restclient/issues/461)
 * __Improvement__: [Use document level cache to improve parsing performance](https://github.com/Huachao/vscode-restclient/issues/463)
@@ -100,8 +100,8 @@
 * __Improvement__: Refresh diagnostic information when switching environment
 
 ## 0.23.0 (2019/11/20)
-* __Feature__: [Add new system varaible - .env file variable](https://github.com/Huachao/vscode-restclient/issues/418)
-* __Feature__: [Add new system varaible - local datetime](https://github.com/Huachao/vscode-restclient/issues/433)
+* __Feature__: [Add new system variable - .env file variable](https://github.com/Huachao/vscode-restclient/issues/418)
+* __Feature__: [Add new system variable - local datetime](https://github.com/Huachao/vscode-restclient/issues/433)
 * __Bug Fix__: [308 Permanent Redirect changes method to GET](https://github.com/Huachao/vscode-restclient/issues/436)
 * __Bug Fix__: [Command `Copy As cURL` not working for request method in lower case](https://github.com/Huachao/vscode-restclient/issues/431)
 * __Bug Fix__: [Preserve custom request header case](https://github.com/Huachao/vscode-restclient/issues/435)
