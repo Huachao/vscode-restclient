@@ -231,7 +231,7 @@ You can specify a request as `GraphQL Request` by adding a custom request header
 POST https://api.github.com/graphql
 Content-Type: application/json
 Authorization: Bearer xxx
-X-REQUEST-TYPE: GraphQL
+X-REQUEST-TYPE: graphql
 
 query ($name: String!, $owner: String!) {
   repository(name: $name, owner: $owner) {
