@@ -701,6 +701,8 @@
   },
   "scripts": {
     "vscode:prepublish": "webpack --mode production",
+    "vscode:package": "vsce package",
+    "vscode:publish": "vsce publish",
     "webpack": "webpack --mode development",
     "watch": "webpack --mode development --watch",
     "tslint": "tslint --project tsconfig.json"

@@ -300,7 +300,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
             const matchVar = this.oidcRegex.exec(name) ?? [];
             const [_, _1, forceNew, clientId, _3, callbackDomain, callbackPort, authorizeEndpoint, tokenEndpoint,  scopes, audience] = matchVar;
 
-            const access_token = await OidcClient.getAccessToken(forceNew ? true : false, clientId, callbackDomain, parseInt(callbackPort ?? CALLBACK_PORT), authorizeEndpoint, tokenEndpoint, scopes, audience);
+            const access_token = await OidcClient.getAccessToken(new HttpClient(),forceNew ? true : false, clientId, callbackDomain, parseInt(callbackPort ?? CALLBACK_PORT), authorizeEndpoint, tokenEndpoint, scopes, audience);
             await this.clipboard.writeText(access_token ?? "");
             return { value: access_token ?? "" };
         });

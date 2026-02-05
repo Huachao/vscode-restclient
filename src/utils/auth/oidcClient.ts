@@ -3,7 +3,6 @@ import fs from 'fs';
 import * as http from "http";
 import * as https from "https";
 import * as jws from 'jws';
-import fetch from 'node-fetch';
 import path from 'path';
 import sanitizeHtml from 'sanitize-html';
 import { SecureContextOptions } from 'tls';
@@ -12,6 +11,8 @@ import { env, Uri, window } from "vscode";
 import { IRestClientSettings, SystemSettings } from '../../models/configurationSettings';
 import { MemoryCache } from '../memoryCache';
 import { getCurrentHttpFileName, getWorkspaceRootPath } from '../workspaceUtility';
+import { HttpClient } from '../httpClient';
+import { HttpRequest } from '../../models/httpRequest';
 
 type ServerAuthorizationCodeResponse = {
   // Success case
@@ -323,7 +324,9 @@ export class OidcClient {
   private _codeVerfifiers = new Map<string, string>();
   private _scopes = new Map<string, string[]>();
 
-  constructor(private clientId: string,
+  constructor(
+    private httpClient: HttpClient,
+    private clientId: string,
     private callbackDomain: string,
     private callbackPort: number,
     private authorizeEndpoint: string,
@@ -333,7 +336,12 @@ export class OidcClient {
   ) {
   }
 
-  public static async getAccessToken(forceNew: boolean, clientId: string, callbackDomain: string, callbackPort: number,
+  public static async getAccessToken(
+    httpClient: HttpClient,
+    forceNew: boolean, 
+    clientId: string, 
+    callbackDomain: string, 
+    callbackPort: number,
     authorizeEndpoint: string,
     tokenEndpoint: string,
     scopes: string,
@@ -341,7 +349,16 @@ export class OidcClient {
     const key = `${clientId}--${callbackDomain}-${callbackPort}-${authorizeEndpoint}-${tokenEndpoint}-${scopes}-${audience}`;
     const cache = MemoryCache.createOrGet<OidcClient>('oidc');
 
-    const client = cache.get(key) ?? new OidcClient(clientId, callbackDomain, callbackPort, authorizeEndpoint, tokenEndpoint, scopes, audience);
+    const client = cache.get(key) ?? new OidcClient(
+      httpClient,
+      clientId, 
+      callbackDomain, 
+      callbackPort, 
+      authorizeEndpoint, 
+      tokenEndpoint, 
+      scopes, 
+      audience
+    );
     cache.set(key, client);
     if (forceNew) {
       client.cleanupTokenCache();
@@ -362,7 +379,7 @@ export class OidcClient {
     const tryDecode = (token: string): any => {
       try {
         const { payload } = jws.decode(token) ?? {};
-        return JSON.parse(payload);
+        return payload;
       } catch (ex) {
         reportError('Faild to decode access token', ex);
         return null;
@@ -373,10 +390,17 @@ export class OidcClient {
       if (payloadJson === null || payloadJson.exp && payloadJson.exp > Date.now() / 1000) {
         return this._tokenInformation.access_token;
       } else {
-        return this.getAccessTokenByRefreshToken(this._tokenInformation.refresh_token, this.clientId).then((resp) => {
-          this._tokenInformation = resp;
-          return resp.access_token;
-        });
+        try{
+          return this.getAccessTokenByRefreshToken(this._tokenInformation.refresh_token, this.clientId).then((resp) => {
+            this._tokenInformation = resp;
+            return resp.access_token;
+          });
+        }catch(ex){
+          reportError('We hadn\'t a valid refresh token. Fallback to interactive workflow.', ex);
+          this.cleanupTokenCache();
+          // Don't do anything here and continue with the interactive workflow
+        }
+        
       }
     }
 
@@ -457,21 +481,22 @@ export class OidcClient {
       refresh_token: refreshToken
     }).toString();
 
-    const response = await fetch(this.tokenEndpoint, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+    var response = await this.httpClient.send(new HttpRequest(
+      'POST', 
+      this.tokenEndpoint, 
+      {
+        'Content-Type': 'application/x-www-form-urlencoded',
         'Content-Length': postData.length.toString()
       },
-      body: postData
-    });
+      postData
+    ));
 
-    if (response.status !== 200) {
-      const error = await response.json();
-      throw new Error(`Failed to retrieve access token: ${response.status} ${JSON.stringify(error)}`);
+    if (response.statusCode !== 200) {
+      const error = response.body;
+      throw new Error(`Failed to retrieve access token: ${response.statusCode} ${error}`);
     }
 
-    const { access_token, refresh_token } = await response.json();
+    const { access_token, refresh_token } = JSON.parse(response.body);
 
 
     return { access_token, refresh_token };
@@ -509,18 +534,20 @@ export class OidcClient {
       redirect_uri: this.redirectUri,
     }).toString();
     try {
-      const response = await fetch(`${this.tokenEndpoint}`, {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+      const response = await this.httpClient.send(new HttpRequest(
+        'POST',
+        this.tokenEndpoint,
+        {
+          'Content-Type': 'application/x-www-form-urlencoded',
           'Content-Length': postData.length.toString()
         },
-        body: postData
-      });
-      const json = await response.json();
+        postData
+      ));
+      
+      const json = JSON.parse(response.body);
       const { access_token, refresh_token } = json;
       if (!access_token) {
-        reportError(`Failed to retrieve access token: ${response.status} ${JSON.stringify(json)}`);
+        reportError(`Failed to retrieve access token: ${response.statusCode} ${JSON.stringify(json)}`);
       }
 
       return { access_token, refresh_token };
