@@ -259,6 +259,38 @@ query ($name: String!, $owner: String!) {
 }
 ```
 
+Alternatively, you can use the http method `GRAPHQL`:
+```http
+GRAPHQL https://api.github.com/graphql
+Content-Type: application/json
+Authorization: Bearer xxx
+
+query ($name: String!, $owner: String!) {
+  repository(name: $name, owner: $owner) {
+    name
+    fullName: nameWithOwner
+    description
+    diskUsage
+    forkCount
+    stargazers(first: 5) {
+        totalCount
+        nodes {
+            login
+            name
+        }
+    }
+    watchers {
+        totalCount
+    }
+  }
+}
+
+{
+    "name": "vscode-restclient",
+    "owner": "Huachao"
+}
+```
+
 ## Making cURL Request
 ![cURL Request](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/curl-request.png)
 We add the capability to directly run [curl request](https://curl.haxx.se/) in REST Client extension. The issuing request command is the same as raw HTTP one. REST Client will automatically parse the request with specified parser.
