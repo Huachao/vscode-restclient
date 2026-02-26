@@ -576,6 +576,47 @@ GET {{baseUrl}}/comments/{{commentId}}/replies/{{getReplies.response.body.//repl
 
 ```
 
+#### Runtime Shared Variables
+
+Runtime shared variables allow writing response values in one `.http` file and reusing them in other `.http` files through normal `{{varName}}` syntax.
+
+1. Predeclare writable keys under `$shared` in `rest-client.environmentVariables`:
+
+```json
+"rest-client.environmentVariables": {
+    "$shared": {
+        "baseUrl": "https://api.example.com",
+        "sessionId": "",
+        "authToken": ""
+    },
+    "dev": {
+        "baseUrl": "https://dev.api.example.com"
+    }
+}
+```
+
+2. Add one or more `@set` directives before a request URL:
+
+```http
+# @name login
+# @set sessionId = response.headers.X-Session-Id
+# @set authToken = response.body.$.token
+POST {{baseUrl}}/auth/login
+```
+
+`@set` source paths support:
+
+- `response.headers.<Header-Name>` (header lookup is case-insensitive)
+- `response.body.<JSONPath|XPath|*>`
+
+Runtime values are persisted to `runtime-shared.json` in REST Client user data and merged with normal environment variables in this precedence order (highest wins):
+
+1. Selected environment variables (for example `dev`)
+2. Runtime shared overlay (values written by `@set`)
+3. Static `$shared` values
+
+Only keys that already exist in `$shared` are writable. Invalid directives, undeclared target keys, or unresolved source paths show warnings and keep the previous runtime value.
+
 ### System Variables
 System variables provide a pre-defined set of variables that can be used in any part of the request(Url/Headers/Body) in the format `{{$variableName}}`. Currently, we provide a few dynamic variables which you can use in your requests. The variable names are _case-sensitive_.
 * `{{$aadToken [new] [public|cn|de|us|ppe] [<domain|tenantId>] [aud:<domain|tenantId>]}}`: Add an Azure Active Directory token based on the following options (must be specified in order):
@@ -720,7 +761,7 @@ exchange | Preview the whole HTTP exchange(request and response)
 * `rest-client.fontSize`: Controls the font size in pixels used in the response preview. (Default is __13__)
 * `rest-client.fontFamily`: Controls the font family used in the response preview. (Default is __Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback"__)
 * `rest-client.fontWeight`: Controls the font weight used in the response preview. (Default is __normal__)
-* `rest-client.environmentVariables`: Sets the environments and custom variables belongs to it (e.g., `{"production": {"host": "api.example.com"}, "sandbox":{"host":"sandbox.api.example.com"}}`). (Default is __{}__)
+* `rest-client.environmentVariables`: Sets environments and custom variables (e.g., `{"production": {"host": "api.example.com"}, "sandbox":{"host":"sandbox.api.example.com"}}`). `$shared` variables are available to all environments, and can be overlaid by runtime shared values written via `@set`. (Default is __{}__)
 * `rest-client.mimeAndFileExtensionMapping`: Sets the custom mapping of mime type and file extension of saved response body. (Default is __{}__)
 * `rest-client.previewResponseInUntitledDocument`: Preview response in untitled document if set to true, otherwise displayed in html view. (Default is __false__)
 * `rest-client.certificates`: Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file). (Default is __{}__)
@@ -749,6 +790,7 @@ Name | Syntax    | Description
 note | `# @note` | Use for request confirmation, especially for critical request
 no-redirect | `# @no-redirect` | Don't follow the 3XX response as redirects
 no-cookie-jar | `# @no-cookie-jar` | Don't save cookies in the cookie jar
+set | `# @set <targetName> = <response.headers.*\|response.body.*>` | Extract response values and persist them to predeclared `$shared` runtime variables
 
 > All the above leading `#` can be replaced with `//`
 

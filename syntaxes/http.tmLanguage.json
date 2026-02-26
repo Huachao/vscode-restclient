@@ -1,9 +1,6 @@
 {
   "scopeName": "source.http",
-  "fileTypes": [
-    "http",
-    "rest"
-  ],
+  "fileTypes": ["http", "rest"],
   "keyEquivalent": "^~H",
   "name": "http",
   "patterns": [
@@ -221,6 +218,42 @@
             },
             "3": {
               "name": "variable.other.http"
+            },
+            "4": {
+              "name": "string.other.http"
+            }
+          },
+          "name": "comment.line.double-slash.http"
+        },
+        {
+          "match": "^\\s*\\#{1,}\\s+(?:((@)set)\\s+([A-Za-z_]\\w*)\\s*=\\s*(response\\.(?:headers|body)\\..+?)\\s*)$",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name"
+            },
+            "2": {
+              "name": "punctuation.definition.block.tag.metadata"
+            },
+            "3": {
+              "name": "entity.name.type.http"
+            },
+            "4": {
+              "name": "string.other.http"
+            }
+          },
+          "name": "comment.line.sharp.http"
+        },
+        {
+          "match": "^\\s*\\/{2,}\\s+(?:((@)set)\\s+([A-Za-z_]\\w*)\\s*=\\s*(response\\.(?:headers|body)\\..+?)\\s*)$",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name"
+            },
+            "2": {
+              "name": "punctuation.definition.block.tag.metadata"
+            },
+            "3": {
+              "name": "entity.name.type.http"
             },
             "4": {
               "name": "string.other.http"

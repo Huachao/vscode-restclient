@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "tabWidth": 4,
+  "singleQuote": true,
+  "sortPackageJson": false,
+  "arrowParens": "avoid",
+  "trailingComma": "es5",
+  "overrides": [
+    {
+      "files": ["*.json"],
+      "options": {
+        "tabWidth": 2
+      }
+    }
+  ],
+  "ignorePatterns": ["README.md"]
+}

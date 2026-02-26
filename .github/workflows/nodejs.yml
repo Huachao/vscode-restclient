@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   lint:
-    name: Run tslint on node ${{ matrix.node-version }} and ${{ matrix.os }}
+    name: Run lint on node ${{ matrix.node-version }} and ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
 
@@ -24,4 +24,4 @@ jobs:
       run: |
         npm install
         npm run vscode:prepublish
-        npm run tslint
+        npm run lint

@@ -21,10 +21,17 @@ export enum RequestMetadata {
      * Used to allow user to interactively input variables for this request
      */
     Prompt = 'prompt',
+
+    /**
+     * Used to write extracted response values to runtime shared variables
+     */
+    Set = 'set',
 }
 
 export function fromString(value: string): RequestMetadata | undefined {
     value = value.toLowerCase();
-    const enumName = (Object.keys(RequestMetadata) as Array<keyof typeof RequestMetadata>).find(k => RequestMetadata[k] === value);
+    const enumName = (Object.keys(RequestMetadata) as Array<keyof typeof RequestMetadata>).find(
+        k => RequestMetadata[k] === value
+    );
     return enumName ? RequestMetadata[enumName] : undefined;
 }

@@ -9,7 +9,6 @@ src/**
 .gitignore
 .gitattributes
 tsconfig.json
-tslint.json
 vsc-extension-quickstart.md
 package-json.lock
 webpack.config.js

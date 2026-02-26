@@ -1,13 +1,22 @@
 import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
 import Logger from '../logger';
-import { IRestClientSettings, RequestSettings, RestClientSettings } from '../models/configurationSettings';
+import {
+    IRestClientSettings,
+    RequestSettings,
+    RestClientSettings,
+    SystemSettings,
+} from '../models/configurationSettings';
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
+import { HttpResponse } from '../models/httpResponse';
+import { ResolveState } from '../models/httpVariableResolveResult';
 import { RequestMetadata } from '../models/requestMetadata';
 import { RequestParserFactory } from '../models/requestParserFactory';
-import { trace } from "../utils/decorator";
+import { EnvironmentController } from './environmentController';
+import { trace } from '../utils/decorator';
 import { HttpClient } from '../utils/httpClient';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
-import { RequestVariableCache } from "../utils/requestVariableCache";
+import { RequestVariableCache } from '../utils/requestVariableCache';
+import { RequestVariableCacheValueProcessor } from '../utils/requestVariableCacheValueProcessor';
 import { Selector } from '../utils/selector';
 import { UserDataManager } from '../utils/userDataManager';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
@@ -26,7 +35,9 @@ export class RequestController {
         this._requestStatusEntry = new RequestStatusEntry();
         this._httpClient = new HttpClient();
         this._webview = new HttpResponseWebview(context);
-        this._webview.onDidCloseAllWebviewPanels(() => this._requestStatusEntry.update({ state: RequestState.Closed }));
+        this._webview.onDidCloseAllWebviewPanels(() =>
+            this._requestStatusEntry.update({ state: RequestState.Closed })
+        );
         this._textDocumentView = new HttpResponseTextDocumentView();
     }
 
@@ -47,7 +58,9 @@ export class RequestController {
         const name = metadatas.get(RequestMetadata.Name);
 
         if (metadatas.has(RequestMetadata.Note)) {
-            const note = name ? `Are you sure you want to send the request "${name}"?` : 'Are you sure you want to send this request?';
+            const note = name
+                ? `Are you sure you want to send the request "${name}"?`
+                : 'Are you sure you want to send this request?';
             const userConfirmed = await window.showWarningMessage(note, 'Yes', 'No');
             if (userConfirmed !== 'Yes') {
                 return;
@@ -58,9 +71,12 @@ export class RequestController {
         const settings: IRestClientSettings = new RestClientSettings(requestSettings);
 
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text, settings).parseHttpRequest(name);
+        const httpRequest = await RequestParserFactory.createRequestParser(
+            text,
+            settings
+        ).parseHttpRequest(name);
 
-        await this.runCore(httpRequest, settings, document);
+        await this.runCore(httpRequest, settings, document, metadatas);
     }
 
     @trace('Rerun Request')
@@ -89,7 +105,12 @@ export class RequestController {
         }
     }
 
-    private async runCore(httpRequest: HttpRequest, settings: IRestClientSettings, document?: TextDocument) {
+    private async runCore(
+        httpRequest: HttpRequest,
+        settings: IRestClientSettings,
+        document?: TextDocument,
+        metadatas?: Map<RequestMetadata, string | undefined>
+    ) {
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
 
@@ -112,11 +133,16 @@ export class RequestController {
                 RequestVariableCache.add(document, httpRequest.name, response);
             }
 
+            if (metadatas) {
+                await this.applySetMetadata(metadatas, response);
+            }
+
             try {
                 const activeColumn = window.activeTextEditor!.viewColumn;
-                const previewColumn = settings.previewColumn === ViewColumn.Active
-                    ? activeColumn
-                    : ((activeColumn as number) + 1) as ViewColumn;
+                const previewColumn =
+                    settings.previewColumn === ViewColumn.Active
+                        ? activeColumn
+                        : (((activeColumn as number) + 1) as ViewColumn);
                 if (settings.previewResponseInUntitledDocument) {
                     this._textDocumentView.render(response, previewColumn);
                 } else if (previewColumn) {
@@ -128,7 +154,9 @@ export class RequestController {
             }
 
             // persist to history json file
-            await UserDataManager.addToRequestHistory(HistoricalHttpRequest.convertFromHttpRequest(httpRequest));
+            await UserDataManager.addToRequestHistory(
+                HistoricalHttpRequest.convertFromHttpRequest(httpRequest)
+            );
         } catch (error) {
             // check cancel
             if (httpRequest.isCancelled) {
@@ -155,5 +183,66 @@ export class RequestController {
     public dispose() {
         this._requestStatusEntry.dispose();
         this._webview.dispose();
+    }
+
+    private async applySetMetadata(
+        metadatas: Map<RequestMetadata, string | undefined>,
+        response: HttpResponse
+    ): Promise<void> {
+        const directives = Selector.parseSetMetadataForRawDirectives(
+            metadatas.get(RequestMetadata.Set)
+        );
+        if (directives.length === 0) {
+            return;
+        }
+
+        const sharedVariables =
+            SystemSettings.Instance.environmentVariables[
+                EnvironmentController.sharedEnvironmentName
+            ] ?? {};
+        const updates: { [key: string]: string } = {};
+
+        for (const directive of directives) {
+            const assignment = Selector.parseSetAssignment(directive);
+            if (!assignment) {
+                this.warnSet(
+                    `Invalid @set directive "${directive}". Expected format: @set <targetName> = <response.headers.*|response.body.*>`
+                );
+                continue;
+            }
+
+            const { targetName, sourcePath } = assignment;
+            if (!Object.prototype.hasOwnProperty.call(sharedVariables, targetName)) {
+                this.warnSet(
+                    `@set target "${targetName}" is not predeclared in $shared and will be ignored.`
+                );
+                continue;
+            }
+
+            const resolveResult = RequestVariableCacheValueProcessor.resolveResponseVariable(
+                response,
+                sourcePath
+            );
+            if (resolveResult.state !== ResolveState.Success) {
+                this.warnSet(
+                    `@set source "${sourcePath}" couldn't be resolved for "${targetName}": ${resolveResult.message}`
+                );
+                continue;
+            }
+
+            updates[targetName] = String(resolveResult.value ?? '');
+        }
+
+        if (Object.keys(updates).length > 0) {
+            await UserDataManager.updateRuntimeSharedVariables(variables => ({
+                ...variables,
+                ...updates,
+            }));
+        }
+    }
+
+    private warnSet(message: string) {
+        Logger.warn(message);
+        window.showWarningMessage(message);
     }
 }
