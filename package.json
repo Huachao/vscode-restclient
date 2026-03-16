@@ -743,7 +743,7 @@
     "jsonpath-plus": "^0.20.1",
     "mime-types": "^2.1.14",
     "node-fetch": "^2.6.7",
-    "node-jws": "^0.1.4",
+    "jws": "^4.0.1",
     "open": "^10.1.0",
     "pretty-data": "^0.40.0",
     "sanitize-html": "^2.13.0",

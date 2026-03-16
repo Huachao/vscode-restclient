@@ -21,12 +21,14 @@ export class CurlRequestParser implements RequestParser {
         requestText = requestText
             .replace(/(-X)(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|LOCK|UNLOCK|PROPFIND|PROPPATCH|COPY|MOVE|MKCOL|MKCALENDAR|ACL|SEARCH)/, '$1 $2')
             .replace(/(-I|--head)(?=\s+)/, '-X HEAD');
-        const parsedArguments = yargsParser.default(requestText);
+        const parsedArguments = yargsParser(requestText);
 
-        // parse url
-        let url = parsedArguments._[1];
+        let url: any = parsedArguments._[1];
         if (!url) {
             url = parsedArguments.L || parsedArguments.location || parsedArguments.compressed || parsedArguments.url;
+        }
+        if (url && typeof url === 'string') {
+            url = url.replace(/^['"]|['"]$/g, '');
         }
 
         // parse header
@@ -40,14 +42,18 @@ export class CurlRequestParser implements RequestParser {
         }
 
         // parse cookie
-        const cookieString: string = parsedArguments.b || parsedArguments.cookie;
-        if (cookieString?.includes('=')) {
-            // Doesn't support cookie jar
-            headers['Cookie'] = cookieString;
+        let cookieString: string | undefined = parsedArguments.b || parsedArguments.cookie;
+        if (cookieString && typeof cookieString === 'string') {
+            cookieString = cookieString.replace(/^['"]|['"]$/g, '');
+            if (cookieString.includes('=')) {
+                // Doesn't support cookie jar
+                headers['Cookie'] = cookieString;
+            }
         }
 
-        const user = parsedArguments.u || parsedArguments.user;
-        if (user) {
+        let user: string | undefined = parsedArguments.u || parsedArguments.user;
+        if (user && typeof user === 'string') {
+            user = user.replace(/^['"]|['"]$/g, '');
             headers['Authorization'] = `Basic ${base64(user)}`;
         }
 

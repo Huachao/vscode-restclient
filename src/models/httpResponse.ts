@@ -1,4 +1,4 @@
-import { Timings } from '@szmarczak/http-timer';
+
 import { getContentType } from '../utils/misc';
 import { ResponseHeaders } from './base';
 import { HttpRequest } from "./httpRequest";
@@ -13,7 +13,7 @@ export class HttpResponse {
         public bodySizeInBytes: number,
         public headersSizeInBytes: number,
         public bodyBuffer: Buffer,
-        public timingPhases: Timings['phases'],
+        public timingPhases: any,
         public request: HttpRequest) {
     }
 
