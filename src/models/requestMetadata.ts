@@ -21,6 +21,11 @@ export enum RequestMetadata {
      * Used to allow user to interactively input variables for this request
      */
     Prompt = 'prompt',
+
+    /**
+     * Represents a directive to automatically URL encode a JSON request body
+     */
+    JsonToForm = 'jsontoform',
 }
 
 export function fromString(value: string): RequestMetadata | undefined {

@@ -99,6 +99,38 @@ export class HttpRequestParser implements RequestParser {
         let body = await this.parseBody(bodyLines, contentTypeHeader);
         if (isGraphQlRequest) {
             body = await this.createGraphQlBody(variableLines, contentTypeHeader, body);
+        } else if (this.settings.jsonToForm && typeof body === 'string') {
+            try {
+                // Strip redundant quotes around JSON objects/arrays to fix unescaped quote errors
+                const fixedBody = body.replace(/"\s*(\{[\s\S]*?\})\s*"/g, "$1").replace(/"\s*(\[[\s\S]*?\])\s*"/g, "$1");
+                const { parse } = require('jsonc-parser');
+                const errors: any[] = [];
+                const parsedJson = parse(fixedBody, errors, { allowTrailingComma: true });
+                if (errors.length > 0) {
+                    throw new Error(`JSON parsing failed at offset ${errors[0].offset} with length ${errors[0].length}.`);
+                }
+                const encodedStringPairs: string[] = [];
+                for (const key in parsedJson) {
+                    if (parsedJson.hasOwnProperty(key)) {
+                        const value = parsedJson[key];
+                        // If value is object/array, stringify it first
+                        const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+                        encodedStringPairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(stringValue)}`);
+                    }
+                }
+                body = encodedStringPairs.join('&');
+                
+                // Force the content-type to be application/x-www-form-urlencoded if it was converted
+                const contentTypeKey = Object.keys(headers).find(k => k.toLowerCase() === 'content-type');
+                if (contentTypeKey) {
+                    headers[contentTypeKey] = 'application/x-www-form-urlencoded';
+                } else {
+                    headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                }
+            } catch (err) {
+                // Return descriptive error from JSON parse failure so the request errors out usefully
+                throw new Error(`Invalid JSON format for @jsonToForm directive: ${err.message}`);
+            }
         } else if (this.settings.formParamEncodingStrategy !== FormParamEncodingStrategy.Never && typeof body === 'string' && MimeUtility.isFormUrlEncoded(contentTypeHeader)) {
             if (this.settings.formParamEncodingStrategy === FormParamEncodingStrategy.Always) {
                 const stringPairs = body.split('&');

@@ -50,6 +50,7 @@ export interface IRestClientSettings {
     readonly enableSendRequestCodeLens: boolean;
     readonly enableCustomVariableReferencesCodeLens: boolean;
     readonly useContentDispositionFilename: boolean;
+    readonly jsonToForm?: boolean;
 }
 
 export class SystemSettings implements IRestClientSettings {
@@ -319,6 +320,8 @@ export class RequestSettings implements Partial<IRestClientSettings> {
     private _followRedirect?: boolean = undefined;
 
     private _rememberCookiesForSubsequentRequests?: boolean = undefined;
+    
+    private _jsonToForm?: boolean = undefined;
 
     public get followRedirect() {
         return this._followRedirect;
@@ -328,11 +331,19 @@ export class RequestSettings implements Partial<IRestClientSettings> {
         return this._rememberCookiesForSubsequentRequests;
     }
 
+    public get jsonToForm() {
+        return this._jsonToForm;
+    }
+
     public constructor(metadatas: Map<RequestMetadata, string | undefined>) {
         if (metadatas.has(RequestMetadata.NoRedirect)) {
             this._followRedirect = false;
         } else if (metadatas.has(RequestMetadata.NoCookieJar)) {
             this._rememberCookiesForSubsequentRequests = false;
+        }
+
+        if (metadatas.has(RequestMetadata.JsonToForm)) {
+            this._jsonToForm = true;
         }
     }
 }
@@ -469,6 +480,10 @@ export class RestClientSettings implements IRestClientSettings {
 
     public get useContentDispositionFilename() {
         return this.systemSettings.useContentDispositionFilename;
+    }
+
+    public get jsonToForm() {
+        return this.requestSettings.jsonToForm;
     }
 
     private readonly systemSettings = SystemSettings.Instance;
