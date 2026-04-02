@@ -19,6 +19,7 @@ import { getCurrentHttpFileName, getWorkspaceRootPath } from './workspaceUtility
 
 import { CancelableRequest, Headers, Method, OptionsOfBufferResponseBody, Response } from 'got';
 import got = require('got');
+import crypto = require('crypto');
 
 const encodeUrl = require('encodeurl');
 const CookieFileStore = require('tough-cookie-file-store').FileCookieStore;
@@ -112,17 +113,28 @@ export class HttpClient {
     private async prepareOptions(httpRequest: HttpRequest, settings: IRestClientSettings): Promise<OptionsOfBufferResponseBody> {
         const originalRequestBody = httpRequest.body;
         let requestBody: string | Buffer | undefined;
-        if (originalRequestBody) {
-            if (typeof originalRequestBody !== 'string') {
-                requestBody = await convertStreamToBuffer(originalRequestBody);
-            } else {
-                requestBody = originalRequestBody;
-            }
-        }
 
         // Fix #682 Do not touch original headers in httpRequest, which may be used for retry later
         // Simply do a shadow copy here
         const clonedHeaders = Object.assign({}, httpRequest.headers);
+
+        const authorization = getHeader(clonedHeaders, 'Authorization') as string | undefined;
+        if (originalRequestBody) {
+            if (typeof originalRequestBody !== 'string') {
+                const buffer = await convertStreamToBuffer(originalRequestBody);
+                requestBody = buffer;
+                
+                if (authorization) {
+                    const [scheme] = authorization.split(/\s+/);
+                    const normalizedScheme = scheme.toLowerCase();
+                    if (normalizedScheme === 'aws' || normalizedScheme === 'cognito') {
+                        clonedHeaders['X-Amz-Content-Sha256'] = crypto.createHash('sha256').update(buffer).digest('hex');
+                    }
+                }
+            } else {
+                requestBody = originalRequestBody;
+            }
+        }
 
         const options: OptionsOfBufferResponseBody = {
             headers: clonedHeaders as any as Headers,
@@ -151,7 +163,6 @@ export class HttpClient {
         }
 
         // TODO: refactor auth
-        const authorization = getHeader(options.headers!, 'Authorization') as string | undefined;
         if (authorization) {
             const [scheme, user, ...args] = authorization.split(/\s+/);
             const normalizedScheme = scheme.toLowerCase();
