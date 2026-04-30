@@ -29,12 +29,12 @@ class Log {
         if (level >= this._restClientSettings.logLevel) {
             this._outputChannel.appendLine(`[${LogLevel[level]} - ${(new Date().toLocaleTimeString())}] ${message}`);
             if (data) {
-                this._outputChannel.appendLine(this.data2String(data));
+                this._outputChannel.appendLine(this.formatData(data));
             }
         }
     }
 
-    private data2String(data: any): string {
+    private formatData(data: any): string {
         if (data instanceof Error) {
             return data.stack || data.message;
         }
