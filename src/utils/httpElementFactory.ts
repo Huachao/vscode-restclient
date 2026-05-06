@@ -23,6 +23,7 @@ export class HttpElementFactory {
         originalElements.push(new HttpElement('OPTIONS', ElementType.Method));
         originalElements.push(new HttpElement('TRACE', ElementType.Method));
         originalElements.push(new HttpElement('CONNECT', ElementType.Method));
+        originalElements.push(new HttpElement('QUERY', ElementType.Method));
 
         // add http headers
         originalElements.push(new HttpElement('Accept', ElementType.Header, null, 'Specify certain media types which are acceptable for the response'));
@@ -223,7 +224,7 @@ export class HttpElementFactory {
                 return;
             }
             const prefixLength = protocol.length + 2; // https: + //
-            originalElements.push(new HttpElement(`${requestUrl.substr(prefixLength)}`, ElementType.URL, '^\\s*(?:(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|LOCK|UNLOCK|PROPFIND|PROPPATCH|COPY|MOVE|MKCOL|MKCALENDAR|ACL|SEARCH)\\s+)https?\\:\\/{2}'));
+            originalElements.push(new HttpElement(`${requestUrl.substr(prefixLength)}`, ElementType.URL, '^\\s*(?:(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE|LOCK|UNLOCK|PROPFIND|PROPPATCH|COPY|MOVE|MKCOL|MKCALENDAR|ACL|SEARCH|QUERY)\\s+)https?\\:\\/{2}'));
         });
 
         let elements: HttpElement[] = [];

@@ -33,6 +33,16 @@
         ],
         "description": "PUT Request"
     },
+    "Query request block": {
+        "prefix": "query",
+        "body": [
+            "QUERY ${1:url} HTTP/1.1",
+            "${2:header name}: ${3:header value}",
+            "",
+            "${4:content}"
+        ],
+        "description": "QUERY Request"
+    },
     "GraphQL request block": {
         "prefix": "graphql",
         "body": [
