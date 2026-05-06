@@ -56,7 +56,7 @@ REST Client allows you to send HTTP request and view the response in Visual Stud
     - Auto completion for method, url, header, custom/system variables, mime types and so on
     - Comments (line starts with `#` or `//`) support
     - Support `json` and `xml` body indentation, comment shortcut and auto closing brackets
-    - Code snippets for operations like `GET` and `POST`
+    - Code snippets for operations like `GET`, `POST`, and `QUERY`
     - Support navigate to symbol definitions(request and file level custom variable) in open `http` file
     - CodeLens support to add an actionable link to send request
     - Fold/Unfold for request block
@@ -222,6 +222,33 @@ name=foo
 ```
 
 > When your mouse is over the document link, you can `Ctrl+Click`(`Cmd+Click` for macOS) to open the file in a new tab.
+
+## Making QUERY Requests
+The HTTP `QUERY` method is a safe, idempotent method that allows sending a request body, similar to `GET` but with the ability to include complex query parameters in the body. This is useful when query parameters are too complex or long to fit in the URL.
+
+The `QUERY` method is defined in [draft-ietf-httpbis-safe-method-w-body](https://www.ietf.org/archive/id/draft-ietf-httpbis-safe-method-w-body-05.html).
+
+Here's an example of using the `QUERY` method:
+```http
+QUERY https://api.example.com/search HTTP/1.1
+Content-Type: application/json
+
+{
+    "filters": {
+        "status": "active",
+        "category": "electronics"
+    },
+    "pagination": {
+        "page": 1,
+        "limit": 10
+    }
+}
+```
+
+The `QUERY` method is ideal when:
+- You need to send complex query parameters that don't fit in a URL
+- The request is safe (no side effects) and idempotent
+- You want the benefits of cacheability that `GET` provides
 
 ## Making GraphQL Request
 With [GraphQL](https://www.graphql.com/) support in REST Client extension, you can author and send `GraphQL` query using the request body. Besides that you can also author GraphQL variables in the request body. GraphQL variables part in request body is optional, you also need to add a **blank line** between GraphQL query and variables if you need it.

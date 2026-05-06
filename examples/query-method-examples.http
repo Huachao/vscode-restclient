@@ -1,0 +1,121 @@
+###
+# HTTP QUERY Method Examples
+# This file demonstrates using the HTTP QUERY method as defined in:
+# https://www.ietf.org/archive/id/draft-ietf-httpbis-safe-method-w-body-05.html
+#
+# The QUERY method is used for safe, idempotent requests that include
+# a request body, similar to GET but with a body.
+###
+
+###############################################################################
+# Basic QUERY Examples
+###############################################################################
+
+### QUERY with JSON body
+# The QUERY method allows sending a request body for complex queries
+# while maintaining the safe and idempotent semantics of GET
+
+QUERY https://httpbin.org/anything HTTP/1.1
+Content-Type: application/json
+
+{
+    "filters": {
+        "status": "active",
+        "category": "electronics"
+    },
+    "pagination": {
+        "page": 1,
+        "limit": 10
+    },
+    "sort": {
+        "field": "created_at",
+        "order": "desc"
+    }
+}
+
+###
+
+### QUERY with XML body
+QUERY https://httpbin.org/anything HTTP/1.1
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<query>
+    <filter field="status" value="active"/>
+    <filter field="category" value="books"/>
+    <limit>25</limit>
+</query>
+
+###
+
+### QUERY with URL-encoded form data
+QUERY https://httpbin.org/anything HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+search=keyword&category=all&page=1
+
+###
+
+### QUERY with Accept header
+QUERY https://httpbin.org/anything HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "query": "SELECT * FROM items WHERE active = true"
+}
+
+###
+
+### QUERY with Authorization
+@token = your-bearer-token
+
+QUERY https://httpbin.org/anything HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "query": {
+        "match": {
+            "title": "REST Client"
+        }
+    }
+}
+
+###
+
+###############################################################################
+# QUERY vs POST comparison
+###############################################################################
+
+### Using QUERY (safe, idempotent - can be cached)
+# QUERY is appropriate when:
+# - The request is safe (no side effects)
+# - The request is idempotent
+# - You need to send complex query parameters in a body
+
+QUERY https://httpbin.org/anything HTTP/1.1
+Content-Type: application/json
+
+{
+    "search": "complex query that doesn't fit in URL"
+}
+
+###
+
+### Using POST (not safe, potentially not idempotent)
+# POST should be used when:
+# - The request causes side effects
+# - The request creates/modifies resources
+
+POST https://httpbin.org/anything HTTP/1.1
+Content-Type: application/json
+
+{
+    "action": "create",
+    "data": {
+        "name": "New Item"
+    }
+}
+
+###
