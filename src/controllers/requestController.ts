@@ -113,14 +113,11 @@ export class RequestController {
             }
 
             try {
-                const activeColumn = window.activeTextEditor!.viewColumn;
-                const previewColumn = settings.previewColumn === ViewColumn.Active
-                    ? activeColumn
-                    : ((activeColumn as number) + 1) as ViewColumn;
+                const previewColumn = this.resolvePreviewColumn(settings, document);
                 if (settings.previewResponseInUntitledDocument) {
-                    this._textDocumentView.render(response, previewColumn);
-                } else if (previewColumn) {
-                    this._webview.render(response, previewColumn);
+                    await this._textDocumentView.render(response, previewColumn);
+                } else {
+                    await this._webview.render(response, previewColumn);
                 }
             } catch (reason) {
                 Logger.error('Unable to preview response:', reason);
@@ -150,6 +147,19 @@ export class RequestController {
                 this._lastPendingRequest = undefined;
             }
         }
+    }
+
+    private resolvePreviewColumn(settings: IRestClientSettings, document?: TextDocument): ViewColumn {
+        if (settings.previewColumn !== ViewColumn.Active) {
+            return settings.previewColumn;
+        }
+
+        const requestEditor = document
+            ? window.visibleTextEditors.find(editor => editor.document === document)
+            : undefined;
+        const editor = requestEditor ?? window.activeTextEditor;
+
+        return editor?.viewColumn ?? ViewColumn.One;
     }
 
     public dispose() {
