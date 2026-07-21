@@ -707,6 +707,7 @@ full     | Default. Full response is previewed
 headers  | Only the response headers(including _status line_) are previewed
 body     | Only the response body is previewed
 exchange | Preview the whole HTTP exchange(request and response)
+status   | The HTTP status line and response body are previewed (e.g., HTTP/1.1 200 OK + body)
 
 ## Settings
 * `rest-client.followredirect`: Follow HTTP 3xx responses as redirects. (Default is __true__)

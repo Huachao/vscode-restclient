@@ -62,7 +62,9 @@ export class HttpResponseTextDocumentView {
 
         if (previewOption !== PreviewOption.Body) {
             content += `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${EOL}`;
-            content += formatHeaders(response.headers);
+            if (previewOption !== PreviewOption.Status) {
+                content += formatHeaders(response.headers);
+            }
         }
 
         if (previewOption !== PreviewOption.Headers) {

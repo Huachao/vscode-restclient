@@ -303,9 +303,14 @@ ${formatHeaders(request.headers)}`;
         }
 
         if (previewOption !== PreviewOption.Body) {
-            const responseNonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
+            if (previewOption === PreviewOption.Status) {
+                const statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}`;
+                code += hljs.highlight('http', statusLine + '\r\n').value;
+            } else {
+                const responseNonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
 ${formatHeaders(response.headers)}`;
-            code += hljs.highlight('http', responseNonBodyPart + (previewOption !== PreviewOption.Headers ? '\r\n' : '')).value;
+                code += hljs.highlight('http', responseNonBodyPart + (previewOption !== PreviewOption.Headers ? '\r\n' : '')).value;
+            }
         }
 
         if (previewOption !== PreviewOption.Headers) {
