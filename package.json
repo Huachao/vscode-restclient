@@ -2,8 +2,8 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.26.0",
-  "publisher": "humao",
+  "version": "1.0.0",
+  "publisher": "franktore",
   "author": {
     "name": "Huachao Mao",
     "email": "huachaomao@gmail.com"
@@ -703,6 +703,7 @@
     "vscode:prepublish": "webpack --mode production",
     "webpack": "webpack --mode development",
     "watch": "webpack --mode development --watch",
+    "package": "vsce package --no-dependencies",
     "tslint": "tslint --project tsconfig.json"
   },
   "devDependencies": {
@@ -713,18 +714,20 @@
     "@types/node": "^18.0.0",
     "@types/node-fetch": "^2.6.11",
     "@types/vscode": "^1.81.0",
+    "@vscode/vsce": "^3.9.2",
     "mocha": "^12.0.1",
     "ts-loader": "^7.0.5",
     "tslint": "^6.1.2",
     "typescript": "^5.4.2",
     "webpack": "^5.75.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "@vscode/vsce": "^3.2.1"
   },
   "dependencies": {
     "@azure/msal-node": "^6.0.0",
     "@xmldom/xmldom": "^0.9.12",
     "applicationinsights": "^1.0.5",
-    "aws-amplify": "^6.20.0",
+    "aws-amplify": "^5.0.3",
     "aws4": "^1.9.1",
     "code-highlight-linenums": "^0.2.1",
     "combined-stream": "^1.0.5",
@@ -757,5 +760,9 @@
   },
   "overrides": {
     "form-data": "^4.0.6"
+  },
+  "volta": {
+    "node": "20.18.0",
+    "pnpm": "9.15.0"
   }
 }

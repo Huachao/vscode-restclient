@@ -5,7 +5,7 @@ import { RequestHeaders } from './base';
 
 export class HttpRequest {
     public isCancelled: boolean;
-    private _underlyingRequest: CancelableRequest<Response<Buffer>>;
+    private _underlyingRequest?: CancelableRequest<Response<Buffer>>;
     public constructor(
         public method: string,
         public url: string,
