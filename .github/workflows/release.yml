@@ -71,6 +71,10 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           VER="${GITHUB_REF_NAME#v}"
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "Sin NPM_TOKEN: npm se salta (el paquete de la organizacion esta pendiente de decidir en #4)"
+            exit 0
+          fi
           node scripts/preparar-npm.mjs
           if npm view "httpkeeper-cli@$VER" version >/dev/null 2>&1; then
             echo "npm ya tiene $VER"

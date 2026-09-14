@@ -3,7 +3,9 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.0] - 2026-09-14
+
+First release of the community continuation, published as `vscode-restclient.rest-client`.
 
 ### Added
 
@@ -18,6 +20,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 - The original **`rest-client.*` command IDs are back** (`rest-client.request`, `rest-client.rerun-last-request`, … — all 19 of them, keybindings included): they are public API, used from keybindings.json, tasks.json and other extensions via `executeCommand`. The two commands this project added follow the same prefix (`rest-client.set-secret`, `rest-client.delete-secret`). The internal document-link command stays under a distinct prefix on purpose: sharing it is what made links open in the other extension when both were installed. If `humao.rest-client` is installed alongside, activation no longer breaks on the duplicate registrations — you get one clear warning asking to disable one of the two. The IDs are frozen by `commandIds.test.ts`, so renaming one by accident fails the suite.
 - The extension is called **REST Client** again (`displayName` and `name`), and the README is Huachao Mao's original reference, with a summary of what changed since 0.25.1 on top and one addition: AWS Cognito, supported since 0.24 but never documented. The HttpKeeper README moved to `docs/HTTPKEEPER.md` (and `docs/HTTPKEEPER.es.md`). Development now happens in the [vscode-restclient organisation](https://github.com/vscode-restclient/vscode-restclient).
+- `THIRD-PARTY-NOTICES.txt` is generated from the real production dependency tree (`scripts/generar-notices.mjs`), and the audit fails if a dependency changes without regenerating it.
+
+[1.2.0]: https://github.com/vscode-restclient/vscode-restclient/releases/tag/v1.2.0
 
 ## [1.1.1] - 2026-08-27
 
