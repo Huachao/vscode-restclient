@@ -721,7 +721,8 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "adal-node": "^0.2.4",
+    "@azure/msal-node": "^6.0.0",
+    "@xmldom/xmldom": "^0.9.12",
     "applicationinsights": "^1.0.5",
     "aws-amplify": "^6.20.0",
     "aws4": "^1.9.1",
@@ -737,10 +738,11 @@
     "highlight.js": "^10.4.1",
     "http-proxy-agent": "^2.1.0",
     "https-proxy-agent": "^2.2.3",
-    "httpsnippet": "^3.0.10",
+    "httpsnippet": "^2.0.0",
     "iconv-lite": "^0.4.15",
     "jsonc-parser": "^2.0.2",
     "jsonpath-plus": "^10.4.0",
+    "jws": "^3.2.2",
     "mime-types": "^2.1.14",
     "node-fetch": "^2.6.7",
     "node-jws": "^0.1.4",
@@ -750,8 +752,10 @@
     "tough-cookie": "^4.1.3",
     "tough-cookie-file-store": "^2.0.3",
     "uuid": "^14.0.2",
-    "xmldom": "^0.5.0",
     "xpath": "^0.0.27",
     "yargs-parser": "^21.1.1"
+  },
+  "overrides": {
+    "form-data": "^4.0.6"
   }
 }

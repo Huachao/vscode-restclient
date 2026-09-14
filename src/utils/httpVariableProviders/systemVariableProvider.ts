@@ -1,4 +1,4 @@
-import * as adal from 'adal-node';
+import { AuthenticationResult, PublicClientApplication } from '@azure/msal-node';
 import dayjs, { Dayjs, ManipulateType } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import * as dotenv from 'dotenv';
@@ -17,7 +17,7 @@ import { HttpClient } from '../httpClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
 import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
 
-const uuidv4 = require('uuid/v4');
+import { v4 as uuidv4 } from 'uuid';
 
 dayjs.extend(utc);
 
@@ -248,37 +248,49 @@ export class SystemVariableProvider implements HttpVariableProvider {
             cloud = cloud in Constants.AzureClouds ? cloud : 'public';
 
             const endpoint = Constants.AzureClouds[cloud].aad;
-            const signInUrl = `${endpoint}${tenantId}`;
-            const authContext = new adal.AuthenticationContext(signInUrl);
-
+            const authority = `${endpoint}${tenantId}`;
             const clientId = Constants.AzureActiveDirectoryClientId;
 
+            const pca = new PublicClientApplication({
+                auth: {
+                    clientId: clientId,
+                    authority: authority
+                }
+            });
+
             return new Promise((resolve, reject) => {
-                const resolveToken = (token: adal.TokenResponse, cache: boolean = true, copy?: boolean) => {
-                    if (cache) {
+                const resolveToken = (token: AuthenticationResult, cache: boolean = true) => {
+                    if (cache && token) {
                         // save token using both specified and resulting domain/tenantId to cover more reuse scenarios
                         AadTokenCache.set(`${cloud}:${token.tenantId}`, token);
                         AadTokenCache.set(`${cloud}:${tenantId}`, token);
                     }
 
-                    const tokenString = `${token.tokenType} ${token.accessToken}`;
+                    const tokenString = this._getTokenString(token);
                     resolve({ value: tokenString });
                 };
-                const acquireToken = () => this._acquireToken(resolveToken, reject, authContext, cloud, tenantId, targetApp, clientId);
+                const acquireToken = () => this._acquireToken(resolveToken, reject, pca, cloud, tenantId, targetApp, clientId);
 
                 // use previous token, if one has been obtained for the directory
                 const cachedToken = !forceNewToken && AadTokenCache.get(`${cloud}:${tenantId}`);
                 if (cachedToken) {
-                    // if token expired, try to refresh; otherwise, use cached token
-                    if (cachedToken.expiresOn <= new Date() && cachedToken.refreshToken) {
-                        authContext.acquireTokenWithRefreshToken(cachedToken.refreshToken, clientId, targetApp, (refreshError: Error, refreshResponse: adal.TokenResponse) => {
-                            // if refresh fails, acquire new token; otherwise, cache updated token
-                            if (refreshError) {
+                    if (cachedToken.expiresOn && cachedToken.expiresOn <= new Date()) {
+                        if (cachedToken.account) {
+                            pca.acquireTokenSilent({
+                                account: cachedToken.account,
+                                scopes: this._getScopes(targetApp)
+                            }).then(silentResult => {
+                                if (silentResult) {
+                                    resolveToken(silentResult);
+                                } else {
+                                    acquireToken();
+                                }
+                            }).catch(() => {
                                 acquireToken();
-                            } else {
-                                resolveToken(refreshResponse);
-                            }
-                        });
+                            });
+                        } else {
+                            acquireToken();
+                        }
                     } else {
                         resolveToken(cachedToken, false);
                     }
@@ -342,9 +354,9 @@ export class SystemVariableProvider implements HttpVariableProvider {
     }
 
     private _acquireToken(
-        resolve: (value?: adal.TokenResponse | PromiseLike<adal.TokenResponse>, cache?: boolean, copy?: boolean) => void,
+        resolve: (value?: AuthenticationResult | PromiseLike<AuthenticationResult>, cache?: boolean) => void,
         reject: (reason?: any) => void,
-        authContext: adal.AuthenticationContext,
+        pca: PublicClientApplication,
         cloud: string,
         tenantId: string,
         targetApp: string,
@@ -354,137 +366,146 @@ export class SystemVariableProvider implements HttpVariableProvider {
         const signInFailed = (stage: string, message: string) => {
             window.showErrorMessage(`Sign in failed. Please try again.\r\n\r\nStage: ${stage}\r\n\r\n${message}`, messageBoxOptions);
         };
-        authContext.acquireUserCode(targetApp, clientId, "en-US", (codeError: Error, codeResponse: adal.UserCodeInfo) => {
-            if (codeError) {
-                signInFailed("acquireUserCode", codeError.message);
-                return reject(codeError);
+
+        const scopes = this._getScopes(targetApp);
+
+        pca.acquireTokenByDeviceCode({
+            deviceCodeCallback: (codeResponse) => {
+                const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${codeResponse.userCode}`;
+                const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n\r\nCode: ${codeResponse.userCode}`;
+                const signIn = "Sign in";
+                const tryAgain = "Try again";
+                const done = "Done";
+
+                const signInPrompt = value => {
+                    if (value === signIn || value === tryAgain) {
+                        this.clipboard.writeText(codeResponse.userCode).then(() => {
+                            commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUri));
+                            window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
+                        });
+                    }
+                };
+                window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
+            },
+            scopes: scopes
+        }).then(async (tokenResponse) => {
+            if (!tokenResponse) {
+                signInFailed("acquireTokenByDeviceCode", "No token returned");
+                return reject(new Error("No token returned"));
             }
 
-            const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${codeResponse.userCode}`;
-            const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n\r\nCode: ${codeResponse.userCode}`;
-            const signIn = "Sign in";
-            const tryAgain = "Try again";
-            const done = "Done";
-            const signInPrompt = value => {
-                if (value === signIn || value === tryAgain) {
-                    this.clipboard.writeText(codeResponse.userCode).then(() => {
-                        commands.executeCommand("vscode.open", Uri.parse(codeResponse.verificationUrl));
-                        window.showInformationMessage(prompt2, messageBoxOptions, done, tryAgain).then(signInPrompt);
-                    });
-                } else if (value === done) {
-                    authContext.acquireTokenWithDeviceCode(targetApp, clientId, codeResponse, (tokenError: Error, tokenResponse: adal.TokenResponse) => {
-                        if (tokenError) {
-                            signInFailed("acquireTokenWithDeviceCode", tokenError.message);
-                            return reject(tokenError);
+            // if no directory chosen, pick one (otherwise, the token is likely useless :P)
+            if (tenantId === Constants.AzureActiveDirectoryDefaultTenantId) {
+                const client = new HttpClient();
+                const request = new HttpRequest(
+                    "GET", `${Constants.AzureClouds[cloud].arm}/tenants?api-version=2017-08-01`,
+                    { Authorization: this._getTokenString(tokenResponse) });
+                try {
+                    const value = await client.send(request);
+                    const items = JSON.parse(value.body).value;
+                    const directories: QuickPickItem[] = [];
+                    items.forEach(element => {
+                        let displayName = element.displayName;
+                        const count = element.domains ? element.domains.length : 0;
+                        let domain = element.domains && element.domains[0];
+                        if (count > 1) {
+                            try {
+                                const displayNameSpaceIndex = displayName.indexOf(" ");
+                                const displayNameFirstWord = displayNameSpaceIndex > -1
+                                    ? displayName.substring(0, displayNameSpaceIndex)
+                                    : displayName;
+                                const bestMatches: string[] = [];
+                                const bestMatchesRegex = new RegExp(`(^${displayNameFirstWord}.com$)|(^${displayNameFirstWord}.[a-z]+(?:.[a-z]+)?$)|(^${displayNameFirstWord}[a-z]+.com$)|(^${displayNameFirstWord}[^:]*$)|(^[^:]*${displayNameFirstWord}[^:]*$)`, "gi");
+                                const bestMatchesRegexGroups = bestMatchesRegex.source.match(new RegExp(`${displayNameFirstWord}`, "g"))!.length;
+                                for (const d of element.domains) {
+                                    const matches = bestMatchesRegex.exec(d)
+                                        || Array(bestMatchesRegexGroups + 1).fill(null);
+
+                                    bestMatches[0] = matches[1];
+                                    if (bestMatches[0]) {
+                                        break;
+                                    }
+
+                                    for (let g = 1; g < bestMatchesRegexGroups; g++) {
+                                        bestMatches[g] = bestMatches[g] || matches[g + 1];
+                                    }
+                                }
+
+                                domain = bestMatches.find(m => !!m) || domain;
+                            } catch {
+                            }
+                            domain = `${domain} (+${count - 1} more)`;
                         }
 
-                        // if no directory chosen, pick one (otherwise, the token is likely useless :P)
-                        if (tenantId === Constants.AzureActiveDirectoryDefaultTenantId) {
-                            const client = new HttpClient();
-                            const request = new HttpRequest(
-                                "GET", `${Constants.AzureClouds[cloud].arm}/tenants?api-version=2017-08-01`,
-                                { Authorization: this._getTokenString(tokenResponse) });
-                            return client.send(request).then(async value => {
-                                const items = JSON.parse(value.body).value;
-                                const directories: QuickPickItem[] = [];
-                                items.forEach(element => {
-                                    /**
-                                     * Some directories have multiple domains, but ARM doesn't return the primary domain
-                                     * first. For instance, Microsoft has 268 domains and "microsoft.com" is #12. This
-                                     * block attempts to pick the closest match based on the first word of the display
-                                     * name (e.g. "Foo" in "Foo Bar"). If the search fails, the first domain is used.
-                                     */
-                                    let displayName = element.displayName;
-                                    const count = element.domains.length;
-                                    let domain = element.domains && element.domains[0];
-                                    if (count > 1) {
-                                        try {
-                                            // find the best matches
-                                            const displayNameSpaceIndex = displayName.indexOf(" ");
-                                            const displayNameFirstWord = displayNameSpaceIndex > -1
-                                                ? displayName.substring(0, displayNameSpaceIndex)
-                                                : displayName;
-                                            const bestMatches: string[] = [];
-                                            const bestMatchesRegex = new RegExp(`(^${displayNameFirstWord}.com$)|(^${displayNameFirstWord}.[a-z]+(?:.[a-z]+)?$)|(^${displayNameFirstWord}[a-z]+.com$)|(^${displayNameFirstWord}[^:]*$)|(^[^:]*${displayNameFirstWord}[^:]*$)`, "gi");
-                                            const bestMatchesRegexGroups = bestMatchesRegex.source.match(new RegExp(`${displayNameFirstWord}`, "g"))!.length;
-                                            for (const d of element.domains) {
-                                                // find matches; use empty array for all captures (+1 for the full string) if no matches found
-                                                const matches = bestMatchesRegex.exec(d)
-                                                    || Array(bestMatchesRegexGroups + 1).fill(null);
+                        if (displayName === Constants.AzureActiveDirectoryDefaultDisplayName) {
+                            const separator = domain ? domain.indexOf(".") : -1;
+                            displayName = `${separator > 0 ? domain.substring(0, separator) : domain} (${displayName})`;
+                        }
+                        directories.push({ label: displayName, description: element.tenantId, detail: domain });
+                    });
 
-                                                // stop looking if the best match is found
-                                                bestMatches[0] = matches[1];
-                                                if (bestMatches[0]) {
-                                                    break;
-                                                }
+                    let result: QuickPickItem | undefined;
+                    if (directories.length > 1) {
+                        directories.sort((a, b) => a.label + a.detail < b.label + b.detail ? -1 : 1);
 
-                                                // keep old matches, save new matches
-                                                for (let g = 1; g < bestMatchesRegexGroups; g++) {
-                                                    bestMatches[g] = bestMatches[g] || matches[g + 1];
-                                                }
-                                            }
+                        const options: QuickPickOptions = {
+                            matchOnDescription: true,
+                            matchOnDetail: true,
+                            placeHolder: `Select the directory to sign in to or press 'Esc' to use the default`,
+                            ignoreFocusOut: true,
+                        };
+                        result = await window.showQuickPick(directories, options);
+                    } else {
+                        result = directories[0];
+                    }
 
-                                            // use the first match in the array of matches
-                                            domain = bestMatches.find(m => !!m) || domain;
-                                        } catch {
-                                        }
-                                        domain = `${domain} (+${count - 1} more)`;
-                                    }
-
-                                    /**
-                                     * People with multiple directories sometimes end up 2 or more "Default Directory"
-                                     * names. To improve findability and recognition speed, we are prepending the domain
-                                     * prefix (e.g. abc.onmicrosoft.com == "abc (Default Directory)"), making the sorted
-                                     * list easier to traverse.
-                                     */
-                                    if (displayName === Constants.AzureActiveDirectoryDefaultDisplayName) {
-                                        const separator = domain.indexOf(".");
-                                        displayName = `${separator > 0 ? domain.substring(0, separator) : domain} (${displayName})`;
-                                    }
-                                    directories.push({ label: displayName, description: element.tenantId, detail: domain });
+                    if (result && result.description) {
+                        const newTenantId = result.description;
+                        const newPca = new PublicClientApplication({
+                            auth: {
+                                clientId: clientId,
+                                authority: `${Constants.AzureClouds[cloud].aad}${newTenantId}`
+                            }
+                        });
+                        if (tokenResponse.account) {
+                            try {
+                                const newDirResponse = await newPca.acquireTokenSilent({
+                                    account: tokenResponse.account,
+                                    scopes: scopes
                                 });
-
-                                // default to first directory
-                                let result: QuickPickItem | undefined;
-                                if (directories.length > 1) {
-                                    // sort by display name and domain (in case display name isn't unique)
-                                    directories.sort((a, b) => a.label + a.detail < b.label + b.detail ? -1 : 1);
-
-                                    const options: QuickPickOptions = {
-                                        matchOnDescription: true,  // tenant id
-                                        matchOnDetail: true,       // url
-                                        placeHolder: `Select the directory to sign in to or press 'Esc' to use the default`,
-                                        ignoreFocusOut: true,      // keep list open when focus is lost (so we don't have to get the device code again)
-                                    };
-                                    result = await window.showQuickPick(directories, options);
-                                } else {
-                                    result = directories[0];
+                                if (newDirResponse) {
+                                    return resolve(newDirResponse, true);
                                 }
-
-                                // if directory selected, sign in to that directory; otherwise, stick with the default
-                                if (result) {
-                                    const newDirAuthContext = new adal.AuthenticationContext(`${Constants.AzureClouds[cloud].aad}${result.description}`);
-                                    newDirAuthContext.acquireTokenWithRefreshToken(tokenResponse.refreshToken!, clientId, null!, (newDirError: Error, newDirResponse: adal.TokenResponse) => {
-                                        // cache/copy new directory token, if successful
-                                        resolve(newDirError ? tokenResponse : newDirResponse, true, true);
-                                    });
-                                } else {
-                                    return resolve(tokenResponse, true, true);
-                                }
-                            });
+                            } catch {
+                                // Ignore silent token failure for new directory and fallback
+                            }
                         }
-
-                        // explicitly copy this token since we've informed the user in the dialog
-                        return resolve(tokenResponse, true, true);
-                    });
+                    }
+                } catch {
+                    // Ignore tenant fetch errors
                 }
-            };
-            window.showInformationMessage(prompt1, messageBoxOptions, signIn).then(signInPrompt);
+            }
+
+            return resolve(tokenResponse, true);
+        }).catch(err => {
+            signInFailed("acquireTokenByDeviceCode", err.message || String(err));
+            return reject(err);
         });
     }
 
-    private _getTokenString(token: adal.TokenResponse) {
+    private _getTokenString(token: AuthenticationResult) {
         return token ? `${token.tokenType} ${token.accessToken}` : '';
+    }
+
+    private _getScopes(targetApp: string): string[] {
+        if (!targetApp) {
+            return ['https://management.azure.com/.default'];
+        }
+        if (targetApp.endsWith('/.default')) {
+            return [targetApp];
+        }
+        const cleanApp = targetApp.endsWith('/') ? targetApp.slice(0, -1) : targetApp;
+        return [`${cleanApp}/.default`];
     }
 
     // #endregion

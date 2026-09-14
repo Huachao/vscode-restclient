@@ -3,7 +3,7 @@ import { md5 } from '../misc';
 
 import got = require('got');
 
-const uuidv4 = require('uuid/v4');
+import { v4 as uuidv4 } from 'uuid';
 
 export function digest(user: string, pass: string): got.AfterResponseHook {
     return (response, retryWithMergedOptions) => {

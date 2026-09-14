@@ -5,7 +5,7 @@ import { MimeUtility } from './mimeUtility';
 import { getContentType, getHeader, isJSONString } from './misc';
 
 const xpath = require('xpath');
-const { DOMParser } = require('xmldom');
+const { DOMParser } = require('@xmldom/xmldom');
 const { JSONPath } = require('jsonpath-plus');
 
 const requestVariablePathRegex: RegExp = /^(\w+)(?:\.(request|response)(?:\.(body|headers)(?:\.(.*))?)?)?$/;
