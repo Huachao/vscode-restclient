@@ -68,6 +68,22 @@ export class UserDataManager {
             fs.ensureDir(this.responseSaveFolderPath),
             fs.ensureDir(this.responseBodySaveFolderPath)
         ]);
+
+        if (process.platform !== 'win32') {
+            try {
+                await Promise.all([
+                    fs.chmod(this.cachePath, 0o700),
+                    fs.chmod(this.statePath, 0o700),
+                    fs.chmod(this.historyFilePath, 0o600),
+                    fs.chmod(this.cookieFilePath, 0o600),
+                    fs.chmod(this.environmentFilePath, 0o600),
+                    fs.chmod(this.responseSaveFolderPath, 0o700),
+                    fs.chmod(this.responseBodySaveFolderPath, 0o700)
+                ]);
+            } catch {
+                // Ignore permission modification errors if unsupported by filesystem
+            }
+        }
     }
 
     public static async addToRequestHistory(request: HistoricalHttpRequest) {

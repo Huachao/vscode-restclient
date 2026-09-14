@@ -262,12 +262,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
                     }
 
                     const tokenString = `${token.tokenType} ${token.accessToken}`;
-                    if (copy && tokenString) {
-                        // only copy the token to the clipboard if it's the first use (since we tell them we're doing it)
-                       this.clipboard.writeText(tokenString).then(() => resolve({ value: tokenString }));
-                    } else {
-                        resolve({ value: tokenString });
-                    }
+                    resolve({ value: tokenString });
                 };
                 const acquireToken = () => this._acquireToken(resolveToken, reject, authContext, cloud, tenantId, targetApp, clientId);
 
@@ -301,7 +296,6 @@ export class SystemVariableProvider implements HttpVariableProvider {
             const [_, _1, forceNew, clientId, _3, callbackDomain, callbackPort, authorizeEndpoint, tokenEndpoint,  scopes, audience] = matchVar;
 
             const access_token = await OidcClient.getAccessToken(forceNew ? true : false, clientId, callbackDomain, parseInt(callbackPort ?? CALLBACK_PORT), authorizeEndpoint, tokenEndpoint, scopes, audience);
-            await this.clipboard.writeText(access_token ?? "");
             return { value: access_token ?? "" };
         });
     }
@@ -367,7 +361,7 @@ export class SystemVariableProvider implements HttpVariableProvider {
             }
 
             const prompt1 = `Sign in to Azure AD with the following code (will be copied to the clipboard) to add a token to your request.\r\n\r\nCode: ${codeResponse.userCode}`;
-            const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n4. Token will be copied to the clipboard when finished\r\n\r\nCode: ${codeResponse.userCode}`;
+            const prompt2 = `1. Azure AD verification page opened in default browser (you may need to switch apps)\r\n2. Paste code to sign in and authorize VS Code (already copied to the clipboard)\r\n3. Confirm when done\r\n\r\nCode: ${codeResponse.userCode}`;
             const signIn = "Sign in";
             const tryAgain = "Try again";
             const done = "Done";

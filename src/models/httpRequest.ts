@@ -33,6 +33,22 @@ export class HttpRequest {
     }
 }
 
+function sanitizeHeaders(headers: RequestHeaders): RequestHeaders {
+    if (!headers) {
+        return headers;
+    }
+    const sanitized: RequestHeaders = {};
+    const sensitivePattern = /auth|token|key|secret|password|credential|cookie|session/i;
+    for (const header of Object.keys(headers)) {
+        if (sensitivePattern.test(header)) {
+            sanitized[header] = '***REDACTED***';
+        } else {
+            sanitized[header] = headers[header];
+        }
+    }
+    return sanitized;
+}
+
 export class HistoricalHttpRequest {
     public constructor(
         public method: string,
@@ -46,7 +62,7 @@ export class HistoricalHttpRequest {
         return new HistoricalHttpRequest(
             httpRequest.method,
             httpRequest.url,
-            httpRequest.headers,
+            sanitizeHeaders(httpRequest.headers),
             httpRequest.rawBody,
             startTime
         );
