@@ -1,11 +1,11 @@
-# El flujo acordado en #6: release-please mantiene un PR de versión a partir de
-# los títulos convencionales (feat:/fix:) de lo fusionado; al fusionar ESE PR,
-# crea el tag y la release, y este mismo workflow publica.
+# The flow agreed in #6: release-please keeps a release PR built from the
+# conventional titles (feat:/fix:) of what was merged; merging THAT PR creates
+# the tag and the release, and this same workflow publishes.
 #
-# La publicación va encadenada aquí (job `publish`) y no en release.yml porque
-# los tags creados con GITHUB_TOKEN no disparan otros workflows: un release.yml
-# esperando el tag se quedaría mudo. release.yml sigue valiendo para un tag
-# empujado a mano (respaldo).
+# Publishing is chained here (job `publish`) instead of in release.yml because
+# tags created with GITHUB_TOKEN do not trigger other workflows: a release.yml
+# waiting for the tag would stay silent. release.yml remains valid for a tag
+# pushed by hand (fallback).
 name: release-please
 
 on:
@@ -46,42 +46,42 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm run audit
-      - name: Sin secretos no hay release silenciosamente rota
+      - name: Missing secrets must fail loudly, not leave a half-made release
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
-          faltan=""
-          [ -z "$VSCE_PAT" ] && faltan="$faltan VSCE_PAT"
-          [ -z "$OVSX_PAT" ] && faltan="$faltan OVSX_PAT"
-          if [ -n "$faltan" ]; then
-            echo "::error::Faltan secretos del repositorio:$faltan — la release existe pero NO se puede publicar. Añadirlos en Settings → Secrets and variables → Actions."
+          missing=""
+          [ -z "$VSCE_PAT" ] && missing="$missing VSCE_PAT"
+          [ -z "$OVSX_PAT" ] && missing="$missing OVSX_PAT"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing — the release exists but cannot be published. Add them in Settings > Secrets and variables > Actions."
             exit 1
           fi
       - run: npx vsce package --no-dependencies -o "rest-client-${TAG}.vsix"
-      - name: Marketplace (se salta si ya está esta versión)
+      - name: Marketplace (skipped if this version is already there)
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
           VER="${TAG#v}"
           ID=$(node -p "const p=require('./package.json');p.publisher+'.'+p.name")
           if npx vsce show "$ID" --json 2>/dev/null | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{let j={};try{j=JSON.parse(d)||{}}catch{}process.exit((j.versions||[]).some(v=>v.version==='$VER')?0:1)})"; then
-            echo "Marketplace ya tiene $VER"
+            echo "Marketplace already has $VER"
           else
             npx vsce publish --no-dependencies --packagePath "rest-client-${TAG}.vsix"
           fi
-      - name: Open VSX (se salta si ya está esta versión)
+      - name: Open VSX (skipped if this version is already there)
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
           VER="${TAG#v}"
           ID=$(node -p "const p=require('./package.json');p.publisher+'.'+p.name")
           if npx ovsx get "$ID" -v "$VER" --metadata >/dev/null 2>&1; then
-            echo "Open VSX ya tiene $VER"
+            echo "Open VSX already has $VER"
           else
             npx ovsx publish "rest-client-${TAG}.vsix" -p "$OVSX_PAT"
           fi
-      - name: El runner suelto, adjunto a la release
+      - name: The standalone runner, attached to the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

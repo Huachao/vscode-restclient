@@ -1,8 +1,8 @@
 name: Release
 
 # Etiqueta vX.Y.Z sobre main -> comprueba, empaqueta, publica en Marketplace y
-# Open VSX, y adjunta el .vsix a una publicación de GitHub. Repetirlo tras un
-# fallo a medias es seguro: una versión ya publicada se detecta y se salta.
+# Open VSX, and attaches the .vsix to a GitHub release. Re-running it after a
+# half-way failure is safe: a version already published is detected and skipped.
 # Secretos necesarios: VSCE_PAT (Azure DevOps), OVSX_PAT (open-vsx.org) y NPM_TOKEN
 # (token granular de npm con bypass 2FA; caduca el 2026-11-25).
 on:
@@ -30,9 +30,9 @@ jobs:
           TAG="${GITHUB_REF_NAME#v}"
           PKG="$(node -p "require('./package.json').version")"
           test "$TAG" = "$PKG" || { echo "etiqueta $TAG != package.json $PKG"; exit 1; }
-      - name: El crédito al autor original sigue en su sitio
+      - name: The credit to the original author is still in place
         run: |
-          grep -q "Huachao Mao" README.md || { echo "falta el crédito en el README"; exit 1; }
+          grep -q "Huachao Mao" README.md || { echo "the credit is missing from the README"; exit 1; }
           grep -q "Huachao Mao" LICENSE   || { echo "falta el copyright original en LICENSE"; exit 1; }
       - run: npm run build
       - run: npx tsc -p ./ --noEmit --skipLibCheck
@@ -44,46 +44,46 @@ jobs:
       - run: xvfb-run -a npm run test:vsix
       - run: npm run audit
       - run: npx vsce package --no-dependencies -o "rest-client-${GITHUB_REF_NAME}.vsix"
-      - name: Marketplace (se salta si ya está esta versión)
+      - name: Marketplace (skipped if this version is already there)
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
           VER="${GITHUB_REF_NAME#v}"
           if npx vsce show vscode-restclient.rest-client --json 2>/dev/null | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{let j={};try{j=JSON.parse(d)||{}}catch{}process.exit((j.versions||[]).some(v=>v.version==='$VER')?0:1)})"; then
-            echo "Marketplace ya tiene $VER"
+            echo "Marketplace already has $VER"
           else
             npx vsce publish --no-dependencies --packagePath "rest-client-${GITHUB_REF_NAME}.vsix"
           fi
-      - name: Open VSX (se salta si ya está esta versión)
+      - name: Open VSX (skipped if this version is already there)
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
           VER="${GITHUB_REF_NAME#v}"
           if npx ovsx get vscode-restclient.rest-client -v "$VER" --metadata >/dev/null 2>&1; then
-            echo "Open VSX ya tiene $VER"
+            echo "Open VSX already has $VER"
           else
             npx ovsx publish "rest-client-${GITHUB_REF_NAME}.vsix" -p "$OVSX_PAT"
           fi
-      - name: El runner suelto, para la acción de GitHub y para npx sin npm
+      - name: The standalone runner, for the GitHub action and for npx without npm
         run: cp dist/cli.js httpkeeper-cli.js
-      - name: npm (se salta si ya está esta versión)
+      - name: npm (skipped if this version is already there)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           VER="${GITHUB_REF_NAME#v}"
           if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "Sin NPM_TOKEN: npm se salta (el paquete de la organizacion esta pendiente de decidir en #4)"
+            echo "No NPM_TOKEN: skipping npm (the org package is still undecided, see #4)"
             exit 0
           fi
           node scripts/preparar-npm.mjs
           if npm view "httpkeeper-cli@$VER" version >/dev/null 2>&1; then
-            echo "npm ya tiene $VER"
+            echo "npm already has $VER"
           else
             printf '//registry.npmjs.org/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > "$RUNNER_TEMP/npmrc"
             (cd npm && npm publish --access public --userconfig "$RUNNER_TEMP/npmrc")
             rm -f "$RUNNER_TEMP/npmrc"
           fi
-      - name: Publicación en GitHub
+      - name: GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: |
