@@ -2,7 +2,7 @@
     "name": "rest-client",
     "displayName": "REST Client",
     "description": "%ext.description%",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "publisher": "vscode-restclient",
     "author": {
         "name": "The Visual Studio Code REST Client Team",

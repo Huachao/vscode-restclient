@@ -55,9 +55,9 @@ runs:
       run: |
         set -euo pipefail
         if [ "$HK_VERSION" = "latest" ]; then
-          url="https://github.com/TecniartGalicia/httpkeeper/releases/latest/download/httpkeeper-cli.js"
+          url="https://github.com/vscode-restclient/vscode-restclient/releases/latest/download/httpkeeper-cli.js"
         else
-          url="https://github.com/TecniartGalicia/httpkeeper/releases/download/v${HK_VERSION#v}/httpkeeper-cli.js"
+          url="https://github.com/vscode-restclient/vscode-restclient/releases/download/v${HK_VERSION#v}/httpkeeper-cli.js"
         fi
         curl -fsSL "$url" -o "$RUNNER_TEMP/httpkeeper-cli.js"
         args=("$HK_FILE" --timeout "$HK_TIMEOUT")

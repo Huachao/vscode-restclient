@@ -1,6 +1,6 @@
 {
   "name": "httpkeeper-cli",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "Run .http files (REST Client / JetBrains HTTP Client format) from the terminal: assertions, environments, secrets, SSE, WebSocket, JUnit output and an MCP server for agents. The command is `httpkeeper`. Runner of the HttpKeeper VS Code extension.",
   "bin": {
     "httpkeeper": "cli.js"

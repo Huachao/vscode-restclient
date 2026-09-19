@@ -13,5 +13,7 @@
                 }
             ]
         }
-    }
+    },
+    "include-component-in-tag": false,
+    "bootstrap-sha": "15f795c81263b6ffc7b941f294a24f9d757f9aba"
 }

@@ -23,9 +23,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      # La descarga de VS Code desde el CDN de Microsoft ya tumbo la CI dos
-      # veces (timeout el 4-sep, colgada 30 minutos el 9-sep): con la cache,
-      # test-electron encuentra la instalacion y no sale a la red.
+      # Downloading VS Code from Microsoft's CDN has taken CI down twice (a
+      # timeout on Sep 4, a 30-minute hang on Sep 9): with the cache,
+      # test-electron finds the install and never reaches the network.
       - uses: actions/cache@v4
         with:
           path: .vscode-test
