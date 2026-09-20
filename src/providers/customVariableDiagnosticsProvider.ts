@@ -8,7 +8,6 @@ import { disposeAll } from '../utils/dispose';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { Selector } from '../utils/selector';
-import { SECCION, SECCION_HEREDADA } from '../utils/configuracionHeredada';
 
 import { VariableProcessor } from "../utils/variableProcessor";
 
@@ -57,8 +56,7 @@ export class CustomVariableDiagnosticsProvider {
     private queueAll(event?: ConfigurationChangeEvent) {
         workspace.textDocuments
             .filter(document => event === undefined
-                || event.affectsConfiguration(SECCION, document.uri)
-                || event.affectsConfiguration(SECCION_HEREDADA, document.uri))
+                || event.affectsConfiguration('rest-client', document.uri))
             .forEach(document => this.queue(document));
     }
 

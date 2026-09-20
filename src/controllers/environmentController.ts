@@ -62,7 +62,7 @@ export class EnvironmentController {
                 return;
             }
         } else {
-            item = await window.showQuickPick(itemPickList, { placeHolder: l10n.t('Select HttpKeeper environment') });
+            item = await window.showQuickPick(itemPickList, { placeHolder: l10n.t('Select Rest Client environment') });
             if (!item) {
                 return;
             }

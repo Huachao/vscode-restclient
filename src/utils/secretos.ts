@@ -11,7 +11,7 @@ import { l10n, Memento, SecretStorage, window } from 'vscode';
 export class Secretos {
     private static almacen: SecretStorage | undefined;
     private static estado: Memento | undefined;
-    private static readonly CLAVE_NOMBRES = 'httpkeeper.secretNames';
+    private static readonly CLAVE_NOMBRES = 'rest-client.secretNames';
 
     public static inicializar(almacen: SecretStorage, estado: Memento) {
         this.almacen = almacen;
@@ -65,6 +65,6 @@ export class Secretos {
     }
 
     private static clave(nombre: string): string {
-        return `httpkeeper.secret.${nombre}`;
+        return `rest-client.secret.${nombre}`;
     }
 }

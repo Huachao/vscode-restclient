@@ -85,12 +85,5 @@ const huecos = (s) => [...s.matchAll(/\{(\d+)\}/g)].map((m) => m[1]).sort().join
 const descuadre = [...literales.keys()].filter((k) => k in bundleEs && huecos(k) !== huecos(bundleEs[k]));
 ok('los huecos {0} cuadran en las dos lenguas', descuadre.length === 0, descuadre.join(' | '));
 
-// Un fork que se deja el nombre viejo por dentro se nota enseguida.
-// Nombrar a la otra extension por su identificador (humao.rest-client) es
-// legitimo: el aviso de doble instalacion habla DE ella. Lo que se caza es
-// el resto de rebranding: 'REST Client' a secas como si fuera esta.
-const restoNombreViejo = [...literales.keys(), ...Object.values(bundleEs)].filter((s) => /REST Client/i.test(s) && !s.includes('humao.rest-client'));
-ok('ninguna cadena visible dice todavia REST Client', restoNombreViejo.length === 0, restoNombreViejo.join(' | '));
-
 console.log(`\n===== ${fallos} fallos`);
 process.exit(fallos ? 1 : 0);

@@ -72,7 +72,7 @@ export class HistoryController {
     }
 
     private async createTempFile(): Promise<string> {
-        const file = path.join(tmpdir(), `httpkeeper-${uuidv4()}.http`);
+        const file = path.join(tmpdir(), `rest-client-${uuidv4()}.http`);
         await fs.ensureFile(file);
         return file;
     }

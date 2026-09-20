@@ -1894,7 +1894,7 @@ Author: Mike Hall <mikehall314@gmail.com>
 
 ==============================================================================
 
-escalade@3.1.2
+escalade@3.2.0
 License: MIT
 Repository: lukeed/escalade
 Author: Luke Edwards

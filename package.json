@@ -87,32 +87,32 @@
             {
                 "command": "rest-client.request",
                 "title": "%cmd.request%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.rerun-last-request",
                 "title": "%cmd.rerun-last-request%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.cancel-request",
                 "title": "%cmd.cancel-request%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.switch-environment",
                 "title": "%cmd.switch-environment%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.history",
                 "title": "%cmd.history%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.clear-history",
                 "title": "%cmd.clear-history%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.save-response",
@@ -121,7 +121,7 @@
                     "light": "./images/save.svg",
                     "dark": "./images/save-inverse.svg"
                 },
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.save-response-body",
@@ -130,7 +130,7 @@
                     "light": "./images/save-body.svg",
                     "dark": "./images/save-body-inverse.svg"
                 },
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.copy-response-body",
@@ -139,12 +139,12 @@
                     "light": "./images/copy.svg",
                     "dark": "./images/copy-inverse.svg"
                 },
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.generate-codesnippet",
                 "title": "%cmd.generate-codesnippet%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.copy-codesnippet",
@@ -153,57 +153,57 @@
                     "light": "./images/copy.svg",
                     "dark": "./images/copy-inverse.svg"
                 },
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.copy-request-as-curl",
                 "title": "%cmd.copy-request-as-curl%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.clear-aad-token-cache",
                 "title": "%cmd.clear-aad-token-cache%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.clear-cookies",
                 "title": "%cmd.clear-cookies%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.fold-response",
                 "title": "%cmd.fold-response%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.unfold-response",
                 "title": "%cmd.unfold-response%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.preview-html-response-body",
                 "title": "%cmd.preview-html-response-body%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.show-raw-response",
                 "title": "%cmd.show-raw-response%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.import-swagger",
                 "title": "%cmd.import-swagger%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.set-secret",
                 "title": "%cmd.set-secret%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             },
             {
                 "command": "rest-client.delete-secret",
                 "title": "%cmd.delete-secret%",
-                "category": "HttpKeeper"
+                "category": "Rest Client"
             }
         ],
         "menus": {
@@ -369,15 +369,15 @@
         ],
         "configuration": {
             "type": "object",
-            "title": "HttpKeeper",
+            "title": "REST Client",
             "properties": {
-                "httpkeeper.followredirect": {
+                "rest-client.followredirect": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
                     "description": "%cfg.followredirect%"
                 },
-                "httpkeeper.defaultHeaders": {
+                "rest-client.defaultHeaders": {
                     "type": "object",
                     "default": {
                         "User-Agent": "vscode-restclient"
@@ -385,48 +385,48 @@
                     "scope": "resource",
                     "description": "%cfg.defaultHeaders%"
                 },
-                "httpkeeper.timeoutinmilliseconds": {
+                "rest-client.timeoutinmilliseconds": {
                     "type": "integer",
                     "default": 0,
                     "scope": "resource",
                     "description": "%cfg.timeoutinmilliseconds%"
                 },
-                "httpkeeper.showResponseInDifferentTab": {
+                "rest-client.showResponseInDifferentTab": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
                     "description": "%cfg.showResponseInDifferentTab%"
                 },
-                "httpkeeper.requestNameAsResponseTabTitle": {
+                "rest-client.requestNameAsResponseTabTitle": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
                     "description": "%cfg.requestNameAsResponseTabTitle%"
                 },
-                "httpkeeper.rememberCookiesForSubsequentRequests": {
+                "rest-client.rememberCookiesForSubsequentRequests": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
                     "description": "%cfg.rememberCookiesForSubsequentRequests%"
                 },
-                "httpkeeper.excludeHostsForProxy": {
+                "rest-client.excludeHostsForProxy": {
                     "type": "array",
                     "default": [],
                     "scope": "resource",
                     "description": "%cfg.excludeHostsForProxy%"
                 },
-                "httpkeeper.fontSize": {
+                "rest-client.fontSize": {
                     "type": "number",
                     "scope": "resource",
                     "markdownDescription": "%cfg.fontSize%"
                 },
-                "httpkeeper.fontFamily": {
+                "rest-client.fontFamily": {
                     "type": "string",
                     "default": null,
                     "scope": "resource",
                     "description": "%cfg.fontFamily%"
                 },
-                "httpkeeper.fontWeight": {
+                "rest-client.fontWeight": {
                     "type": "string",
                     "enum": [
                         "normal",
@@ -446,7 +446,7 @@
                     "scope": "resource",
                     "description": "%cfg.fontWeight%"
                 },
-                "httpkeeper.environmentVariables": {
+                "rest-client.environmentVariables": {
                     "type": "object",
                     "default": {
                         "$shared": {}
@@ -471,7 +471,7 @@
                         ]
                     }
                 },
-                "httpkeeper.mimeAndFileExtensionMapping": {
+                "rest-client.mimeAndFileExtensionMapping": {
                     "type": "object",
                     "default": {},
                     "scope": "resource",
@@ -484,19 +484,19 @@
                     },
                     "markdownDescription": "%cfg.mimeAndFileExtensionMapping%"
                 },
-                "httpkeeper.previewResponseInUntitledDocument": {
+                "rest-client.previewResponseInUntitledDocument": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
                     "description": "%cfg.previewResponseInUntitledDocument%"
                 },
-                "httpkeeper.oidcScopes": {
+                "rest-client.oidcScopes": {
                     "type": "array",
                     "default": [],
                     "scope": "resource",
                     "description": "%cfg.oidcScopes%"
                 },
-                "httpkeeper.oidcCertificates": {
+                "rest-client.oidcCertificates": {
                     "type": "object",
                     "default": {},
                     "scope": "resource",
@@ -538,7 +538,7 @@
                         ]
                     }
                 },
-                "httpkeeper.certificates": {
+                "rest-client.certificates": {
                     "type": "object",
                     "default": {},
                     "scope": "resource",
@@ -580,13 +580,13 @@
                         ]
                     }
                 },
-                "httpkeeper.suppressResponseBodyContentTypeValidationWarning": {
+                "rest-client.suppressResponseBodyContentTypeValidationWarning": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
                     "description": "%cfg.suppressResponseBodyContentTypeValidationWarning%"
                 },
-                "httpkeeper.previewOption": {
+                "rest-client.previewOption": {
                     "type": "string",
                     "enum": [
                         "full",
@@ -604,19 +604,19 @@
                     "scope": "resource",
                     "description": "%cfg.previewOption%"
                 },
-                "httpkeeper.disableHighlightResponseBodyForLargeResponse": {
+                "rest-client.disableHighlightResponseBodyForLargeResponse": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
                     "markdownDescription": "%cfg.disableHighlightResponseBodyForLargeResponse%"
                 },
-                "httpkeeper.disableAddingHrefLinkForLargeResponse": {
+                "rest-client.disableAddingHrefLinkForLargeResponse": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
                     "markdownDescription": "%cfg.disableAddingHrefLinkForLargeResponse%"
                 },
-                "httpkeeper.largeResponseBodySizeLimitInMB": {
+                "rest-client.largeResponseBodySizeLimitInMB": {
                     "type": "number",
                     "default": 5,
                     "minimum": 0,
@@ -624,7 +624,7 @@
                     "scope": "resource",
                     "markdownDescription": "%cfg.largeResponseBodySizeLimitInMB%"
                 },
-                "httpkeeper.previewColumn": {
+                "rest-client.previewColumn": {
                     "type": "string",
                     "enum": [
                         "current",
@@ -638,13 +638,13 @@
                     "scope": "resource",
                     "description": "%cfg.previewColumn%"
                 },
-                "httpkeeper.previewResponsePanelTakeFocus": {
+                "rest-client.previewResponsePanelTakeFocus": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
                     "description": "%cfg.previewResponsePanelTakeFocus%"
                 },
-                "httpkeeper.formParamEncodingStrategy": {
+                "rest-client.formParamEncodingStrategy": {
                     "type": "string",
                     "enum": [
                         "automatic",
@@ -660,19 +660,19 @@
                     "scope": "resource",
                     "markdownDescription": "%cfg.formParamEncodingStrategy%"
                 },
-                "httpkeeper.addRequestBodyLineIndentationAroundBrackets": {
+                "rest-client.addRequestBodyLineIndentationAroundBrackets": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
                     "markdownDescription": "%cfg.addRequestBodyLineIndentationAroundBrackets%"
                 },
-                "httpkeeper.decodeEscapedUnicodeCharacters": {
+                "rest-client.decodeEscapedUnicodeCharacters": {
                     "type": "boolean",
                     "default": false,
                     "scope": "resource",
                     "description": "%cfg.decodeEscapedUnicodeCharacters%"
                 },
-                "httpkeeper.logLevel": {
+                "rest-client.logLevel": {
                     "type": "string",
                     "enum": [
                         "error",
@@ -684,19 +684,19 @@
                     "scope": "resource",
                     "description": "%cfg.logLevel%"
                 },
-                "httpkeeper.enableSendRequestCodeLens": {
+                "rest-client.enableSendRequestCodeLens": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
                     "description": "%cfg.enableSendRequestCodeLens%"
                 },
-                "httpkeeper.enableCustomVariableReferencesCodeLens": {
+                "rest-client.enableCustomVariableReferencesCodeLens": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
                     "description": "%cfg.enableCustomVariableReferencesCodeLens%"
                 },
-                "httpkeeper.useContentDispositionFilename": {
+                "rest-client.useContentDispositionFilename": {
                     "type": "boolean",
                     "default": true,
                     "scope": "resource",
@@ -840,7 +840,7 @@
     },
     "pricing": "Free",
     "preview": true,
-    "qna": "https://github.com/TecniartGalicia/httpkeeper/discussions",
+    "qna": "https://github.com/vscode-restclient/vscode-restclient/discussions",
     "l10n": "./l10n",
     "capabilities": {
         "untrustedWorkspaces": {

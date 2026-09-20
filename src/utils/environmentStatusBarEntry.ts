@@ -8,8 +8,8 @@ export class EnvironmentStatusEntry {
         this.environmentEntry = window.createStatusBarItem('environment', StatusBarAlignment.Right, 100);
         this.environmentEntry.command = 'rest-client.switch-environment';
         this.environmentEntry.text = environment;
-        this.environmentEntry.tooltip = l10n.t('Switch HttpKeeper environment');
-        this.environmentEntry.name = l10n.t('HttpKeeper environment');
+        this.environmentEntry.tooltip = l10n.t('Switch Rest Client environment');
+        this.environmentEntry.name = l10n.t('Rest Client environment');
         this.environmentEntry.show();
 
         window.onDidChangeActiveTextEditor(this.showHideStatusBar, this);

@@ -21,3 +21,4 @@ media/demo/
 # Paquete npm: cli.js y LICENSE se copian con npm run preparar-npm
 npm/cli.js
 npm/LICENSE
+.vscode/bookmarks.json

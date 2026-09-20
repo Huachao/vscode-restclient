@@ -32,9 +32,9 @@ async function enviar(contenido: string, marca: string, segundos = 20): Promise<
 }
 
 const ajuste = (clave: string, valor: unknown) =>
-  vscode.workspace.getConfiguration('httpkeeper').update(clave, valor, vscode.ConfigurationTarget.Global);
+  vscode.workspace.getConfiguration('rest-client').update(clave, valor, vscode.ConfigurationTarget.Global);
 
-describe('HttpKeeper · peticiones reales', () => {
+describe('Rest Client · peticiones reales', () => {
   before(async () => {
     const ext = vscode.extensions.getExtension('vscode-restclient.rest-client');
     assert.ok(ext, 'la extensión no está cargada');
@@ -144,20 +144,13 @@ describe('HttpKeeper · peticiones reales', () => {
 
   describe('compatibilidad', () => {
     it('P-10 · un ajuste propio se aplica', async () => {
-      await ajuste('defaultHeaders', { 'User-Agent': 'httpkeeper-propio' });
+      await ajuste('defaultHeaders', { 'User-Agent': 'rest-client-propio' });
       try {
-        const t = await enviar(`GET ${BASE}/cabeceras` + BR, 'httpkeeper-propio');
-        assert.ok(t.includes('httpkeeper-propio'), 'no se aplicó la cabecera por defecto');
+        const t = await enviar(`GET ${BASE}/cabeceras` + BR, 'rest-client-propio');
+        assert.ok(t.includes('rest-client-propio'), 'no se aplicó la cabecera por defecto');
       } finally {
         await ajuste('defaultHeaders', undefined);
       }
-    });
-
-    // El settings.json de la suite trae "rest-client.defaultHeaders" puesto,
-    // como el de cualquiera que venga de REST Client.
-    it('P-16 · sin ajuste propio se hereda el de REST Client', async () => {
-      const t = await enviar(`GET ${BASE}/cabeceras` + BR, 'viene-de-restclient');
-      assert.ok(t.includes('viene-de-restclient'), 'no se heredó la configuración de REST Client');
     });
 
     it('P-16 · el ajuste propio gana al heredado', async () => {
@@ -173,7 +166,7 @@ describe('HttpKeeper · peticiones reales', () => {
   });
 });
 
-describe('HttpKeeper · resolución de localhost', () => {
+describe('Rest Client · resolución de localhost', () => {
   before(async () => {
     const ext = vscode.extensions.getExtension('vscode-restclient.rest-client');
     await ext!.activate();
@@ -189,7 +182,7 @@ ${t.slice(0, 200)}`);
   });
 });
 
-describe('HttpKeeper · vista previa', () => {
+describe('Rest Client · vista previa', () => {
   before(async () => {
     const ext = vscode.extensions.getExtension('vscode-restclient.rest-client');
     await ext!.activate();
@@ -219,7 +212,7 @@ describe('HttpKeeper · vista previa', () => {
   });
 });
 
-describe('HttpKeeper · variables de petición', () => {
+describe('Rest Client · variables de petición', () => {
   before(async () => {
     const ext = vscode.extensions.getExtension('vscode-restclient.rest-client');
     await ext!.activate();

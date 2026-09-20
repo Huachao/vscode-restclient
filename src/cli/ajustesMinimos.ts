@@ -14,7 +14,7 @@ import { PreviewOption } from '../models/previewOption';
 export function ajustesMinimos(): IRestClientSettings {
     return {
         followRedirect: true,
-        defaultHeaders: { 'User-Agent': 'httpkeeper' },
+        defaultHeaders: { 'User-Agent': 'vscode-restclient' },
         timeoutInMilliseconds: 0,
         showResponseInDifferentTab: false,
         requestNameAsResponseTabTitle: false,

@@ -10,7 +10,7 @@ const BR = String.fromCharCode(10);
 const j = (...l: string[]) => l.join(BR);
 
 const ajuste = (clave: string, valor: unknown) =>
-  vscode.workspace.getConfiguration('httpkeeper').update(clave, valor, vscode.ConfigurationTarget.Global);
+  vscode.workspace.getConfiguration('rest-client').update(clave, valor, vscode.ConfigurationTarget.Global);
 
 /** Carpeta del espacio de trabajo de la prueba: ahí van los ficheros de verdad. */
 function carpeta(): string {
@@ -49,7 +49,7 @@ async function enviarFichero(ruta: string, linea: number, marca: string, segundo
   throw new Error(`sin respuesta con "${marca}" en ${segundos} s. Documentos: ${abiertos}`);
 }
 
-describe('HttpKeeper · formato JetBrains y secretos', () => {
+describe('Rest Client · formato JetBrains y secretos', () => {
   before(async () => {
     const ext = vscode.extensions.getExtension('vscode-restclient.rest-client');
     assert.ok(ext, 'la extensión no está cargada');
@@ -114,7 +114,7 @@ describe('HttpKeeper · formato JetBrains y secretos', () => {
   });
 });
 
-describe('HttpKeeper · streaming', () => {
+describe('Rest Client · streaming', () => {
   before(async () => {
     const ext = vscode.extensions.getExtension('vscode-restclient.rest-client');
     await ext!.activate();
@@ -181,7 +181,7 @@ describe('HttpKeeper · streaming', () => {
   });
 });
 
-describe('HttpKeeper · herramientas para agentes', () => {
+describe('Rest Client · herramientas para agentes', () => {
   before(async () => {
     const ext = vscode.extensions.getExtension('vscode-restclient.rest-client');
     await ext!.activate();

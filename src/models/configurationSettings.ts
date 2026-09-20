@@ -1,6 +1,5 @@
 import { CharacterPair, Event, EventEmitter, languages, ViewColumn, window, workspace } from 'vscode';
 import configuration from '../../language-configuration.json';
-import { configuracionHeredada } from '../utils/configuracionHeredada';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { RequestHeaders } from './base';
 import { FormParamEncodingStrategy, fromString as ParseFormParamEncodingStr } from './formParamEncodingStrategy';
@@ -252,12 +251,11 @@ export class SystemSettings implements IRestClientSettings {
     private initializeSettings() {
         const document = getCurrentTextDocument();
         // Lee lo propio y, si el usuario no lo tocó, lo que tuviera en REST Client.
-        const restClientSettings = configuracionHeredada(document?.uri);
+        const restClientSettings = workspace.getConfiguration('rest-client', document?.uri);
         this._followRedirect = restClientSettings.get<boolean>("followredirect", true);
-        this._defaultHeaders = restClientSettings.get<RequestHeaders>("defaultHeaders",
-                                                                     {
-                                                                         "User-Agent": "httpkeeper"
-                                                                     });
+        this._defaultHeaders = restClientSettings.get<RequestHeaders>('defaultHeaders', {
+            'User-Agent': 'vscode-restclient',
+        });
         this._showResponseInDifferentTab = restClientSettings.get<boolean>("showResponseInDifferentTab", false);
         this._requestNameAsResponseTabTitle = restClientSettings.get<boolean>("requestNameAsResponseTabTitle", false);
         this._rememberCookiesForSubsequentRequests = restClientSettings.get<boolean>("rememberCookiesForSubsequentRequests", true);

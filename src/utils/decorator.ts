@@ -1,7 +1,7 @@
 /**
  * Marca métodos que antes enviaban telemetría.
  *
- * HttpKeeper no envía nada a ninguna parte: el decorador se conserva vacío para
+ * Rest Client no envía nada a ninguna parte: el decorador se conserva vacío para
  * no tocar diez controladores y para que quede constancia de dónde estaba.
  */
 export function trace(_eventName: string): MethodDecorator {

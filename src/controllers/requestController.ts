@@ -171,7 +171,7 @@ export class RequestController {
                 this._webview.anadirTrozo(trozo.toString('utf8'));
             } catch (e) {
                 Logger.error('Streaming panel failed:', e);
-                console.error('[httpkeeper] streaming panel failed:', e);
+                console.error('[rest-client] streaming panel failed:', e);
             }
         };
 
@@ -217,7 +217,7 @@ export class RequestController {
             }
 
             if (error.code === 'ETIMEDOUT') {
-                error.message = `Request timed out. Double-check your network connection and/or raise the timeout duration (currently set to ${settings.timeoutInMilliseconds}ms) as needed: 'httpkeeper.timeoutinmilliseconds'. Details: ${error}.`;
+                error.message = `Request timed out. Double-check your network connection and/or raise the timeout duration (currently set to ${settings.timeoutInMilliseconds}ms) as needed: 'rest-client.timeoutinmilliseconds'. Details: ${error}.`;
             } else if (error.code === 'ECONNREFUSED') {
                 error.message = `The connection was rejected. Either the requested service isn’t running on the requested server/port, the proxy settings in vscode are misconfigured, or a firewall is blocking requests. Details: ${error}.`;
             } else if (error.code === 'ENETUNREACH') {
