@@ -16,6 +16,7 @@ import { FileVariableReferencesCodeLensProvider } from './providers/fileVariable
 import { HttpCodeLensProvider } from './providers/httpCodeLensProvider';
 import { HttpCompletionItemProvider } from './providers/httpCompletionItemProvider';
 import { HttpDocumentSymbolProvider } from './providers/httpDocumentSymbolProvider';
+import { HttpFoldingRangeProvider } from './providers/httpFoldingRangeProvider';
 import { MarkdownCodeLensProvider } from './providers/markdownCodeLensProvider';
 import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
 import { RequestVariableDefinitionProvider } from './providers/requestVariableDefinitionProvider';
@@ -23,6 +24,20 @@ import { RequestVariableHoverProvider } from './providers/requestVariableHoverPr
 import { AadTokenCache } from './utils/aadTokenCache';
 import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
 import { UserDataManager } from './utils/userDataManager';
+
+async function executeRegionFoldCommand(collapse: boolean): Promise<void> {
+    const editor = window.activeTextEditor;
+    if (!editor || editor.document.languageId !== 'http') {
+        return;
+    }
+    HttpFoldingRangeProvider.onlyRegionsMode = true;
+    try {
+        const cmd = collapse ? 'editor.foldAll' : 'editor.unfoldAll';
+        await commands.executeCommand(cmd);
+    } finally {
+        HttpFoldingRangeProvider.onlyRegionsMode = false;
+    }
+}
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -85,6 +100,9 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(languages.registerDefinitionProvider(documentSelector, new RequestVariableDefinitionProvider()));
     context.subscriptions.push(languages.registerReferenceProvider(documentSelector, new FileVariableReferenceProvider()));
     context.subscriptions.push(languages.registerDocumentSymbolProvider(documentSelector, new HttpDocumentSymbolProvider()));
+    context.subscriptions.push(languages.registerFoldingRangeProvider(documentSelector, new HttpFoldingRangeProvider()));
+    context.subscriptions.push(commands.registerCommand('rest-client.foldAllRegions', () => executeRegionFoldCommand(true)));
+    context.subscriptions.push(commands.registerCommand('rest-client.unfoldAllRegions', () => executeRegionFoldCommand(false)));
 
     const diagnosticsProvider = new CustomVariableDiagnosticsProvider();
     context.subscriptions.push(diagnosticsProvider);
