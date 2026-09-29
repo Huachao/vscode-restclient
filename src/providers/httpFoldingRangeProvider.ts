@@ -2,7 +2,7 @@ import { FoldingRange, FoldingRangeKind, FoldingRangeProvider, TextDocument } fr
 
 const RegionStartRegex = /^\s*#{3,}\s*region\b(.*)$/i;
 const RegionEndRegex = /^\s*#{3,}\s*endregion\b/i;
-const DelimiterRegex = /^\s*#{3,}\s*$/;
+const DelimiterRegex = /^\s*#{3,}/;
 const RequestStartRegex = /^\s*(get|post|put|delete|patch|head|options|connect|trace|lock|unlock|propfind|proppatch|copy|move|mkcol|mkcalendar|acl|search|curl)\b/i;
 
 export class HttpFoldingRangeProvider implements FoldingRangeProvider {
@@ -45,7 +45,7 @@ export class HttpFoldingRangeProvider implements FoldingRangeProvider {
             if (DelimiterRegex.test(line)) {
                 if (requestStartLine !== -1) {
                     if (!HttpFoldingRangeProvider.onlyRegionsMode) {
-                        ranges.push(new FoldingRange(requestStartLine, i));
+                        ranges.push(new FoldingRange(requestStartLine, i - 1));
                     }
                     requestStartLine = -1;
                 }
