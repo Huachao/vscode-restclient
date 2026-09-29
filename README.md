@@ -423,6 +423,52 @@ Currently, auto completion will be enabled for following seven categories:
 A single `http` file may define lots of requests and file level custom variables, it will be difficult to find the request/variable you want. We leverage from the _Goto Symbol Feature_ of _Visual Studio Code_ to support to navigate(goto) to request/variable with shortcut `Ctrl+Shift+O`(`Cmd+Shift+O` for macOS), or simply press `F1`, type `@`.
 ![Goto Symbols](https://raw.githubusercontent.com/Huachao/vscode-restclient/master/images/navigate.png)
 
+### Code Folding
+REST Client supports code folding in `.http` or `.rest` files to help you organize and manage multiple requests.
+
+#### Request Block Folding
+Each HTTP request block (from a request method like `GET`/`POST` to the next `###` delimiter) can be folded individually by clicking the fold icon next to the method line number.
+
+#### Region Folding with `###region` / `###endregion`
+You can also wrap multiple requests with `###region` and `###endregion` markers to create named foldable regions. The `###region` marker accepts an optional region name:
+
+```http
+###region Auth API
+GET https://httpbin.org/get
+###
+
+GET https://httpbin.org/post
+###endregion
+
+###region User API
+GET https://httpbin.org/headers
+###
+###endregion
+```
+
+Regions support **nesting**:
+
+```http
+###region API
+###region Public
+GET https://httpbin.org/get
+###endregion
+###region Private
+GET https://httpbin.org/headers
+###endregion
+###endregion
+```
+
+#### Fold/Unfold All Regions
+To quickly collapse or expand all region blocks in the file, use one of the following approaches:
+
+| Action | Windows/Linux | macOS |
+|--------|---------------|-------|
+| Fold All Regions | `Ctrl+K Ctrl+8` | `Cmd+K Cmd+8` |
+| Unfold All Regions | `Ctrl+K Ctrl+9` | `Cmd+K Cmd+9` |
+
+Or open the command palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and search for `Rest Client: Fold All Regions` or `Rest Client: Unfold All Regions`.
+
 ## Environments
 Environments give you the ability to customize requests using variables, and you can easily switch environment without changing requests in `http` file. A common usage is having different configurations for different web service environments, like devbox, sandbox, and production. We also support the __shared__ environment(identified by special environment name _$shared_) to provide a set of variables that are available in all environments. And you can define the same name variable in your specified environment to overwrite the value in shared environment. Currently, active environment's name is displayed at the right bottom of `Visual Studio Code`, when you click it, you can switch environment in the pop-up list. And you can also switch environment using shortcut `Ctrl+Alt+E`(`Cmd+Alt+E` for macOS), or press `F1` and then select/type `Rest Client: Switch Environment`.
 

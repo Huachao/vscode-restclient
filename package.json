@@ -2,7 +2,7 @@
   "name": "rest-client",
   "displayName": "REST Client",
   "description": "REST Client for Visual Studio Code",
-  "version": "0.26.0",
+  "version": "0.26.1",
   "publisher": "humao",
   "author": {
     "name": "Huachao Mao",
@@ -183,6 +183,16 @@
         "command": "rest-client.import-swagger",
         "title": "Import from file",
         "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.foldAllRegions",
+        "title": "Fold All Regions",
+        "category": "Rest Client"
+      },
+      {
+        "command": "rest-client.unfoldAllRegions",
+        "title": "Unfold All Regions",
+        "category": "Rest Client"
       }
     ],
     "menus": {
@@ -344,6 +354,18 @@
         "key": "ctrl+alt+c",
         "mac": "cmd+alt+c",
         "when": "editorTextFocus && editorLangId == 'plaintext'"
+      },
+      {
+        "command": "rest-client.foldAllRegions",
+        "key": "ctrl+k ctrl+8",
+        "mac": "cmd+k cmd+8",
+        "when": "editorTextFocus && editorLangId == 'http'"
+      },
+      {
+        "command": "rest-client.unfoldAllRegions",
+        "key": "ctrl+k ctrl+9",
+        "mac": "cmd+k cmd+9",
+        "when": "editorTextFocus && editorLangId == 'http'"
       }
     ],
     "configuration": {

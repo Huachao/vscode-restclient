@@ -233,6 +233,14 @@
     "comments": {
       "patterns": [
         {
+          "match": "^\\s*#{3,}region\\b.*$",
+          "name": "markup.heading.region.http"
+        },
+        {
+          "match": "^\\s*#{3,}endregion\\b.*$",
+          "name": "markup.heading.endregion.http"
+        },
+        {
           "match": "^\\s*\\#{1,}.*$",
           "name": "comment.line.sharp.http"
         },
