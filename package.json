@@ -527,14 +527,17 @@
           "type": "object",
           "default": {},
           "scope": "resource",
-          "description": "Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file)",
-          "pattern": "^(?!http(s?)://)",
+          "description": "Certificate paths for different hosts. The path can be absolute path or relative path(relative to workspace or current http file). Host keys support wildcards: `*.example.com` (one subdomain level), `**.example.com` (any subdomain depth) and `:*` (any port, e.g. `example.com:*`)",
+          "propertyNames": {
+            "pattern": "^(?!.*://)(?:[^*]+|\\*\\*?\\.[^*:]+(?::\\*|:\\d+)?|[^*]+:\\*)$",
+            "patternErrorMessage": "Invalid host key. Use e.g. foo.com, foo.com:8443, *.example.com, **.example.com or foo.com:*. A wildcard must be a whole leading label (*. or **.) or the port (:*), and the key must not contain a scheme."
+          },
           "additionalProperties": {
             "anyOf": [
               {
                 "type": "object",
                 "default": {},
-                "description": "Certifcate paths for specific host(e.g., foo.com, bar.org:8081), port is optional",
+                "description": "Certificate paths for a specific host (e.g., foo.com, bar.org:8081, *.example.com, **.example.com, foo.com:*)",
                 "properties": {
                   "cert": {
                     "type": "string",
@@ -703,7 +706,8 @@
     "vscode:prepublish": "webpack --mode production",
     "webpack": "webpack --mode development",
     "watch": "webpack --mode development --watch",
-    "tslint": "tslint --project tsconfig.json"
+    "tslint": "tslint --project tsconfig.json",
+    "test": "tsc -p tsconfig.test.json && mocha \"out/test/**/*.test.js\""
   },
   "devDependencies": {
     "@types/aws4": "^1.5.1",

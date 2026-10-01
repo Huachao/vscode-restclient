@@ -4,6 +4,7 @@ import * as path from 'path';
 import { CookieJar, Store } from 'tough-cookie';
 import * as url from 'url';
 import { Uri, window } from 'vscode';
+import Logger from '../logger';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import { IRestClientSettings, SystemSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
@@ -11,6 +12,7 @@ import { HttpResponse } from '../models/httpResponse';
 import { awsCognito } from './auth/awsCognito';
 import { awsSignature } from './auth/awsSignature';
 import { digest } from './auth/digest';
+import { findHostCertificate } from './hostCertificateMatcher';
 import { MimeUtility } from './mimeUtility';
 import { getHeader, removeHeader } from './misc';
 import { convertBufferToStream, convertStreamToBuffer } from './streamUtility';
@@ -212,16 +214,28 @@ export class HttpClient {
     }
 
     private getRequestCertificate(requestUrl: string, settings: IRestClientSettings): Certificate | null {
-        const host = url.parse(requestUrl).host;
-        if (!host || !(host in settings.hostCertificates)) {
+        const match = findHostCertificate(requestUrl, settings.hostCertificates, HttpClient.warnInvalidCertificateKey);
+        if (!match) {
             return null;
         }
 
-        const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = settings.hostCertificates[host];
+        Logger.verbose(`Using client certificate configured for "${match.key}"`);
+        const { cert: certPath, key: keyPath, pfx: pfxPath, passphrase } = match.value;
         const cert = this.resolveCertificate(certPath);
         const key = this.resolveCertificate(keyPath);
         const pfx = this.resolveCertificate(pfxPath);
         return { cert, key, pfx, passphrase };
+    }
+
+    private static readonly warnedInvalidCertificateKeys = new Set<string>();
+
+    private static warnInvalidCertificateKey(key: string): void {
+        if (HttpClient.warnedInvalidCertificateKeys.has(key)) {
+            return;
+        }
+
+        HttpClient.warnedInvalidCertificateKeys.add(key);
+        Logger.warn(`Ignoring invalid key "${key}" in rest-client.certificates. A wildcard must be a leading "*." or "**." label, or a ":*" port.`);
     }
 
     private static ignoreProxy(requestUrl: string, excludeHostsForProxy: string[]): Boolean {
