@@ -335,7 +335,7 @@ Authorization: Digest user passwd
 ```
 
 ### SSL Client Certificates
-We support `PFX`, `PKCS12`, and `PEM` certificates. Before using your certificates, you need to set the certificates paths(absolute/relative to workspace/relative to current http file) in the setting file for expected host name(port is optional). For each host, you can specify the key `cert`, `key`, `pfx` and `passphrase`.
+We support `PFX`, `PKCS12`, and `PEM` certificates. Before using your certificates, you need to set the certificates paths(absolute/relative to workspace/relative to current http file) in the setting file for the expected host. The host key can include a port (e.g. `localhost:8081`). A key without a port only applies to requests that don't specify a port in the URL. For each host, you can specify the key `cert`, `key`, `pfx` and `passphrase`.
 - `cert`: Path of public x509 certificate
 - `key`: Path of private key
 - `pfx`: Path of PKCS #12 or PFX certificate
@@ -362,6 +362,26 @@ Or if you have certificate in `PFX` or `PKCS12` format, setting code can be like
     }
 }
 ```
+
+To use the same certificate for several hosts, you can use wildcards in the host key:
+- `*.example.com` matches exactly one extra subdomain label, like wildcard TLS certificates, e.g. `api.example.com` but not `v1.api.example.com`
+- `**.example.com` matches subdomains of any depth, e.g. `api.example.com` and `v1.api.example.com`
+- Neither of them matches `example.com` itself; add a separate `example.com` key for that
+- `:*` matches any port (or no port), e.g. `example.com:*` or `*.example.com:*`
+
+```json
+"rest-client.certificates": {
+    "**.example.com:*": {
+        "cert": "/Users/demo/Certificates/client.crt",
+        "key": "/Users/demo/Keys/client.key"
+    },
+    "special.example.com": {
+        "pfx": "/Users/demo/Certificates/special.p12"
+    }
+}
+```
+
+If multiple keys match a request, the most specific one is used, regardless of the order in the settings file. Exact hosts win over `*.` wildcards, `*.` wildcards win over `**.` wildcards, and for `**.` wildcards a longer domain suffix wins. Only when the host match is equally specific is the port considered: an explicit port wins over a key without a port, which wins over `:*`.
 
 ### Azure Active Directory(Azure AD)
 Azure AD is Microsoft’s multi-tenant, cloud-based directory and identity management service, you can refer to the [System Variables](#system-variables) section for more details.
