@@ -23,7 +23,6 @@ import { MarkdownCodeLensProvider } from './providers/markdownCodeLensProvider';
 import { RequestVariableCompletionItemProvider } from "./providers/requestVariableCompletionItemProvider";
 import { RequestVariableDefinitionProvider } from './providers/requestVariableDefinitionProvider';
 import { RequestVariableHoverProvider } from './providers/requestVariableHoverProvider';
-import { AadTokenCache } from './utils/aadTokenCache';
 import { ConfigurationDependentRegistration } from './utils/dependentRegistration';
 import { UserDataManager } from './utils/userDataManager';
 
@@ -85,7 +84,6 @@ export async function activate(context: ExtensionContext) {
         await SecretStore.remove(name);
         window.setStatusBarMessage(l10n.t('Secret "{0}" deleted', name), 4000);
     }));
-    context.subscriptions.push(registerCommandSafely('rest-client.clear-aad-token-cache', () => AadTokenCache.clear()));
     context.subscriptions.push(registerCommandSafely('rest-client.clear-cookies', () => requestController.clearCookies()));
     context.subscriptions.push(registerCommandSafely('vscode-restclient._openDocumentLink', args => {
         workspace.openTextDocument(Uri.parse(args.path)).then(window.showTextDocument, error => {

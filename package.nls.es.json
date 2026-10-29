@@ -14,7 +14,6 @@
     "cmd.generate-codesnippet": "Generar fragmento de código",
     "cmd.copy-request-as-curl": "Copiar la petición como cURL",
     "cmd.copy-codesnippet": "Copiar el fragmento de código",
-    "cmd.clear-aad-token-cache": "Borrar los tokens de Azure guardados",
     "cmd.clear-cookies": "Borrar las cookies",
     "cfg.followredirect": "Seguir las respuestas 3xx como redirecciones.",
     "cfg.defaultHeaders": "Cabeceras que se añaden a cada petición cuando no las lleva escritas.",

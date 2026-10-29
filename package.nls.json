@@ -12,7 +12,6 @@
     "cmd.generate-codesnippet": "Generate Code Snippet",
     "cmd.copy-codesnippet": "Copy Code Snippet",
     "cmd.copy-request-as-curl": "Copy Request As cURL",
-    "cmd.clear-aad-token-cache": "Clear Azure AD Token Cache",
     "cmd.clear-cookies": "Clear cookies",
     "cmd.fold-response": "Fold Response",
     "cmd.unfold-response": "Unfold Response",

@@ -42,7 +42,7 @@ export function digest(user: string, pass: string): AfterResponseHook {
 
             const qop = /(^|,)\s*auth\s*($|,)/.test(challenge.qop) && 'auth';
             const nc = qop && '00000001';
-            const cnonce = qop && uuidv4().replace(/-/g, '');
+            const cnonce = qop ? uuidv4().replace(/-/g, '') : '';
             const ha1 = ha1Compute(challenge.algorithm, user, challenge.realm, pass, challenge.nonce, cnonce);
             const ha2 = md5(method + ':' + path);
             const digestResponse = qop

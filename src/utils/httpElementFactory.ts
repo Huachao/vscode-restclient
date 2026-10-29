@@ -166,12 +166,6 @@ export class HttpElementFactory {
             Constants.RandomIntegerJetBrainsDescription,
             new SnippetString(`{{$\${name:${Constants.RandomIntegerJetBrainsVariableName.slice(1)}}(\${1:min},\${2:max})}}`)));
         originalElements.push(new HttpElement(
-            Constants.AzureActiveDirectoryVariableName,
-            ElementType.SystemVariable,
-            null,
-            Constants.AzureActiveDirectoryDescription,
-            new SnippetString(`{{$\${name:${Constants.AzureActiveDirectoryVariableName.slice(1)}}}}`)));
-        originalElements.push(new HttpElement(
                 Constants.OidcVariableName,
                 ElementType.SystemVariable,
                 null,

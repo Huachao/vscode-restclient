@@ -28,8 +28,6 @@ export const IsoTimestampDescription = "Add the current UTC datetime in ISO 8601
 export const RandomIntegerJetBrainsVariableName = "$random.integer";
 export const RandomIntegerJetBrainsDescription = "Random integer between min (included) and max (excluded): {{$random.integer(min,max)}} (JetBrains alias of $randomInt)";
 export const DotenvDescription = "Returns the environment value stored in a .env file";
-export const AzureActiveDirectoryVariableName = "$aadToken";
-export const AzureActiveDirectoryDescription = "Prompts to sign in to Azure AD and adds the token to the request";
 export const AzureActiveDirectoryV2TokenVariableName = "$aadV2Token";
 export const AzureActiveDirectoryV2TokenDescription = "Prompts to sign in to Azure AD V2 and adds the token to the request";
 
@@ -44,9 +42,7 @@ export const OIdcForceNewOption = "new";
  * authorizing the right app to act on their behalf. We're using Visual Studio Code's client id since that is the
  * overarching app people will think of when they are signing in.
  */
-export const AzureActiveDirectoryClientId = "aebc6443-996d-45c2-90f0-388ff96faa56";
 export const AzureActiveDirectoryForceNewOption = "new";
-export const AzureActiveDirectoryDefaultTenantId = "common";
 export const AzureActiveDirectoryDefaultDisplayName = "Default Directory";
 export const AzureClouds: { [key: string]: { aad: string, arm: string, armAudience?: string } } = {
     // default cloud must be first

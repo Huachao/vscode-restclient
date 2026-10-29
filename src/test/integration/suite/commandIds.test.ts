@@ -23,7 +23,6 @@ const ORIGINAL_IDS = [
     'rest-client.generate-codesnippet',
     'rest-client.copy-codesnippet',
     'rest-client.copy-request-as-curl',
-    'rest-client.clear-aad-token-cache',
     'rest-client.clear-cookies',
     'rest-client.fold-response',
     'rest-client.unfold-response',
