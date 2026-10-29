@@ -2,17 +2,16 @@ import * as fs from 'fs-extra';
 import * as iconv from 'iconv-lite';
 import * as path from 'path';
 import { CookieJar, Store } from 'tough-cookie';
+import { window } from 'vscode';
 import * as url from 'url';
 import { findHostCertificate } from '../core/hostCertificateMatcher';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import type { IRestClientSettings } from '../models/configurationSettings';
 import { HttpRequest } from '../models/httpRequest';
 import { HttpResponse } from '../models/httpResponse';
-import { awsCognito } from './auth/awsCognito';
 import { awsSignature } from './auth/awsSignature';
 import { digest } from './auth/digest';
 import { MimeUtility } from './mimeUtility';
-import { proxyAgents } from './proxyAgents';
 import { base64, getHeader, removeHeader } from './misc';
 import { convertBufferToStream, convertStreamToBuffer } from './streamUtility';
 import { UserDataManager } from './userDataManager';
@@ -178,20 +177,9 @@ export class HttpClient {
 
         const authorization = getHeader(clonedHeaders, 'Authorization') as string | undefined;
         if (originalRequestBody) {
-            if (typeof originalRequestBody !== 'string') {
-                const buffer = await convertStreamToBuffer(originalRequestBody);
-                requestBody = buffer;
-                
-                if (authorization) {
-                    const [scheme] = authorization.split(/\s+/);
-                    const normalizedScheme = scheme.toLowerCase();
-                    if (normalizedScheme === 'aws' || normalizedScheme === 'cognito') {
-                        clonedHeaders['X-Amz-Content-Sha256'] = crypto.createHash('sha256').update(buffer).digest('hex');
-                    }
-                }
-            } else {
-                requestBody = originalRequestBody;
-            }
+            requestBody = (typeof originalRequestBody !== 'string') 
+                ? await convertStreamToBuffer(originalRequestBody)
+                : originalRequestBody;
         }
 
         const options: OptionsOfBufferResponseBody = {
@@ -202,75 +190,120 @@ export class HttpClient {
             decompress: true,
             followRedirect: settings.followRedirect,
             throwHttpErrors: false,
-            retry: 0,
+            retry: { limit: 0 },
             hooks: {
                 afterResponse: [],
                 beforeRequest: [],
             },
             https: {
-                rejectUnauthorized: false
-            }
+                rejectUnauthorized: false,
+            },
         };
 
         if (settings.timeoutInMilliseconds > 0) {
-            options.timeout = settings.timeoutInMilliseconds;
+            options.timeout = { request: settings.timeoutInMilliseconds };
         }
 
         if (settings.rememberCookiesForSubsequentRequests) {
             options.cookieJar = new CookieJar(this.cookieStore);
         }
 
-        // TODO: refactor auth
         if (authorization) {
-            const [scheme, user, ...args] = authorization.split(/\s+/);
+            const [scheme, ...args] = authorization.split(/\s+/);
             const normalizedScheme = scheme.toLowerCase();
-            if (normalizedScheme === 'basic' && user !== undefined) {
-                // `Basic user:password` with colons or spaces INSIDE the
-                // password: split on the FIRST `:` of everything after the
-                // scheme. It used to split on every space and every `:`, so
-                // «admin:it's a total eclipse» arrived truncated (upstream
-                // #1419).
-                const rest = [user, ...args].join(' ');
-                const colon = rest.indexOf(':');
-                let credential: string | undefined;
-                if (colon >= 0) {
-                    credential = rest;
-                } else if (args.length > 0) {
-                    credential = `${user}:${args.join(' ')}`;
-                }
-                // With no `:` and no second argument, what is there is already
-                // the base64 of `user:password`: left untouched, as always.
-                if (credential !== undefined) {
-                    // The header is built here rather than left to `got` via
-                    // `username`/`password`: got puts it in the URL, which
-                    // escapes it («it's%20a%20total%3A%20eclipse»).
-                    removeHeader(options.headers!, 'Authorization');
-                    (options.headers as Record<string, string>)['Authorization'] = `Basic ${base64(credential)}`;
-                }
-            } else if (args.length > 0) {
-                const pass = args.join(' ');
-                if (normalizedScheme === 'digest') {
-                    removeHeader(options.headers!, 'Authorization');
-                    options.hooks!.afterResponse!.push(digest(user, pass));
-                } else if (normalizedScheme === 'aws') {
-                    removeHeader(options.headers!, 'Authorization');
-                    options.hooks!.beforeRequest!.push(awsSignature(authorization));
-                } else if (normalizedScheme === 'cognito') {
-                    removeHeader(options.headers!, 'Authorization');
-                   options.hooks!.beforeRequest!.push(await awsCognito(authorization));
-                }
+
+            switch (normalizedScheme) {
+                case 'basic':
+                    if (args.length > 0) {
+                        const firstArg = args[0];
+                        removeHeader(options.headers!, 'Authorization');
+                        // Issue #8 : Check if the username contains ":", if yes, split it into username and password
+                        // Case 1 : "Basic user:password"
+                        if (firstArg.includes(':')) {
+                            const fullArg = args.join(' ');
+                            const colonIndex = fullArg.indexOf(':');
+                            options.username = fullArg.substring(0, colonIndex);
+                            options.password = fullArg.substring(colonIndex + 1);
+                        }
+                        // Case 2: "Basic user password" if no password, it works anyway
+                        else {
+                            options.username = args.shift()!;
+                            options.password = args.join(' ');
+                        }
+                        // No password means user is basé64 encoded user:password
+                        const credential = (options.password.length > 0) 
+                            ? base64(`${options.username}:${options.password}`)
+                            : `${options.username}`;
+                        (options.headers as Record<string, string>)['Authorization'] = `Basic ${credential}`
+                    }
+                    break;
+                case 'digest':
+                    if (args.length > 0) {
+                        const user = args.shift()!;
+                        const pass = args.join(' ');
+                        removeHeader(options.headers!, 'Authorization');
+                        options.hooks!.afterResponse!.push(digest(user, pass));
+                    }
+                    break;
+                case 'bearer':
+                    // Keep the Authorization header as is.
+                    break;
+                case 'aws':
+                    if (requestBody !== undefined) {
+                       options.headers!['X-Amz-Content-Sha256'] = crypto.createHash('sha256').update(requestBody).digest('hex');
+                    }
+                    if (args.length >= 3) {
+                        removeHeader(options.headers!, 'Authorization');
+                        options.hooks!.beforeRequest!.push(awsSignature(authorization));
+                    } else {
+                        window.showWarningMessage(
+                            `Invalid AWS authorization header, the format should be "Authorization: AWS [region:<region>] [service:<service>] [token:<sessionToken>] <accessKeyId> <secretAccessKey>". The Authorization header will be sent as is.`
+                        );
+                    }
+                    break;
+                case 'cognito':
+                    if (requestBody !== undefined) {
+                       options.headers!['X-Amz-Content-Sha256'] = crypto.createHash('sha256').update(requestBody).digest('hex');
+                    }
+                    if (args.length >= 4) {
+                        removeHeader(options.headers!, 'Authorization');
+                        const { awsCognito } = await require('./auth/awsCognito');
+                        options.hooks!.beforeRequest!.push(await awsCognito(authorization));
+                    } else {
+                        window.showWarningMessage(
+                            `Invalid Cognito authorization header, the format should be "Authorization: Cognito [...] <username> <password> <userPoolId> <clientId>". The Authorization header will be sent as is.`
+                        );
+                    }
+                    break;
+                default:
+                    window.showWarningMessage(
+                        `Authorization scheme ${scheme} is not supported, the Authorization header will be sent as is.`
+                    );
             }
         }
 
         // set certificate
         const certificate = this.getRequestCertificate(httpRequest.url, settings);
-        Object.assign(options, certificate);
+        if (certificate) {
+            Object.assign(options, certificate);
+        }
 
-        // set proxy
-        if (settings.proxy && !HttpClient.ignoreProxy(httpRequest.url, settings.excludeHostsForProxy)) {
-            const agents = await proxyAgents(settings.proxy, settings.proxyStrictSSL);
-            if (agents) {
-                options.agent = agents;
+        // Set proxy
+        if (
+            settings.proxy &&
+            !HttpClient.ignoreProxy(httpRequest.url, settings.excludeHostsForProxy)
+        ) {
+            if (httpRequest.url.startsWith('http:')) {
+                // Dynamically import to avoid loading the module when not needed
+                const { HttpProxyAgent } = await import('http-proxy-agent');
+                options.agent = {
+                    http: new HttpProxyAgent(settings.proxy),
+                };
+            } else {
+                const { HttpsProxyAgent } = await import('https-proxy-agent');
+                options.agent = {
+                    https: new HttpsProxyAgent(settings.proxy),
+                };
             }
         }
 

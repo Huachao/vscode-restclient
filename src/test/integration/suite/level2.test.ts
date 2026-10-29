@@ -269,6 +269,17 @@ describe('RestClient · what was ported from rest-client-next', () => {
       assert.ok(item.range, `"${String(item.label)}" does not replace the gap between the braces`);
     }
   });
+
+  it('P-50 · Basic Auth: the password preserves spaces and apostrophes with a space separator', async () => {
+    // "admin:it's a total eclipse": it used to be split on every space and
+    // every ':', and arrived truncated.
+    const key = "it's a super eclipse";
+    const file = write('basic3.http', j(`GET ${BASE}/echo/basic3`, `Authorization: Basic admin ${key}`, ''));
+    const t = await sendFile(file, 0, '/echo/basic3');
+    const recibida = /"authorization":\s*"Basic ([^"]+)"/.exec(t)?.[1] ?? '';
+    assert.ok(recibida, 'no Authorization header arrived: ' + t.slice(0, 200));
+    assert.strictEqual(Buffer.from(recibida, 'base64').toString('utf8'), `admin:${key}`);
+  });
 });
 
 describe('the QUERY method (ported from upstream #1438)', () => {
