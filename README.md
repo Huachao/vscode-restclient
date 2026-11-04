@@ -9,7 +9,7 @@ REST Client was created by [Huachao Mao](https://github.com/Huachao) and reached
 Full details in the [CHANGELOG](CHANGELOG.md); the longer story, with screenshots, in [docs/HTTPKEEPER.md](docs/HTTPKEEPER.md).
 
 - **Fake data**: `{{$faker internet.email}}` — any [Faker](https://fakerjs.dev) module, lazily loaded, same syntax as rest-client-next.
-- **A test suite** (123 tests: 77 unit and 46 integration, run inside a real VS Code), **0 vulnerabilities** in production dependencies (from 75), **400 packages** (from 1,487), **telemetry removed**.
+- **A test suite** (125 tests: 79 unit and 46 integration, run inside a real VS Code), **0 vulnerabilities** in production dependencies (from 75), **400 packages** (from 1,487), **telemetry removed**.
 - **Bugs fixed**: the response not showing up in Cursor, a re-sent request with mangled headers, a JSONPath with several matches returning only the first, XPath request variables.
 - **A terminal runner** for CI (`npx @vscode-restclient/cli api.http`, `--junit`, GitHub Action) that **runs a whole file in order**, with later requests using earlier responses, and checks **assertions written in the file** (`# @assert status == 200`). In the editor, Send Request shows the verdict of the assertions under the response.
 - **The JetBrains format, complete**: `http-client.env.json` / `http-client.private.env.json`, `import ./other.http`, `run #name`, request variables across files, `{{$secret NAME}}`, `{{$uuid}}`, `{{$isoTimestamp}}`, `{{$random.integer(min,max)}}`.
