@@ -861,6 +861,6 @@
         "uuid": "^11.1.0",
         "http-cache-semantics": "^4.3.0",
         "source-map-js": "^1.2.2",
-        "follow-redirects": "^1.16.1"
+        "follow-redirects": "^1.16.2"
     }
 }

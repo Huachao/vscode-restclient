@@ -1926,7 +1926,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ==============================================================================
 
-follow-redirects@1.16.1
+follow-redirects@1.16.2
 License: MIT
 Repository: https://github.com/follow-redirects/follow-redirects
 Author: Ruben Verborgh <ruben@verborgh.org> (https://ruben.verborgh.org/)
