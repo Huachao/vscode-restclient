@@ -3,6 +3,15 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2](https://github.com/vscode-restclient/vscode-restclient/compare/v1.3.1...v1.3.2) (2026-11-04)
+
+
+### Bug Fixes
+
+* AWS Signature v4 sends the request and signs its real path ([#48](https://github.com/vscode-restclient/vscode-restclient/issues/48)) ([9dc6f7e](https://github.com/vscode-restclient/vscode-restclient/commit/9dc6f7e63447d189a6639c85c2e10b2a8f300fa8))
+* **deps:** follow-redirects 1.16.1 and sanitize-html 2.18.1 close two… ([#49](https://github.com/vscode-restclient/vscode-restclient/issues/49)) ([5519972](https://github.com/vscode-restclient/vscode-restclient/commit/5519972445a4a629cfb0760b3158c98aed2ee6bf))
+* **deps:** follow-redirects 1.16.2 closes GHSA-mrwp-f3q8-3g9p ([#51](https://github.com/vscode-restclient/vscode-restclient/issues/51)) ([1e543ab](https://github.com/vscode-restclient/vscode-restclient/commit/1e543ab4dcba030dd284ba978dc9fe32b1d94628))
+
 ## [1.3.1](https://github.com/vscode-restclient/vscode-restclient/compare/v1.3.0...v1.3.1) (2026-10-18)
 
 
