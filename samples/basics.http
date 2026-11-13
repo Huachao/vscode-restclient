@@ -1,0 +1,71 @@
+# ==== Examples with httpbun.com ====
+# httpbun.com is a simple HTTP Request & Response Service.
+
+@host = https://httpbun.com
+@var1 = variableValue
+
+# ==== GET ====
+### A simple GET request.
+GET {{host}}/get
+
+### Basic Authentication.
+GET {{host}}/basic-auth/user/pass
+Authorization: Basic user pass
+
+# ==== Cookies ====
+### Set cookies
+GET {{host}}/cookies/set?foo=bar
+
+### Check cookies
+GET {{host}}/cookies
+
+# ==== Issue 3 - change to @xmldom/xmldom ====
+### POST with XML body.
+# @name testXml
+POST {{host}}/post
+Content-Type: application/xml
+Authorization: Basic user pass
+
+<note>
+  <to>User</to>
+  <from>Tester</from>
+  <heading>Reminder</heading>
+  <body>This is a test for {{var1}}.</body>
+</note>
+
+### GET Xml Document
+# @name testGetXml
+GET {{host}}/xml
+Accept: application/xml
+
+### GET bytes
+# @name testBytes
+GET {{host}}/bytes/10
+Accept: application/octet-stream
+
+### Extracting data from the XML response of the previous request and using it in a new request.
+GET {{host}}/get
+X-User-Id: {{testXml.response.body.asXml.//slideshow/slide[1]/title}}
+
+### Issue #8: Special characters in Basic Auth credentials.
+
+# The first space in the password is changed in colon
+# --> admin:it's:a total eclipse
+GET {{host}}/basic-auth/admin/it's a total eclipse
+Content-type: application/json
+Authorization: Basic admin:it's a total eclipse
+
+### Faker
+POST {{host}}/post
+Content-Type: application/json
+
+{
+    "name": "{{$faker name.firstName}}",
+    "email": "{{$faker internet.email}}"
+}
+
+### Head Request
+HEAD {{host}}/get
+
+### 404 request
+GET {{host}}/status/404

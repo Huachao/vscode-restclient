@@ -1,0 +1,62 @@
+#### Test file for variable descriptions
+
+@apiKey = abc123 | API key for external service
+@baseUrl = https://api.example.com
+@port = 8080 | Port number for the API
+@secret = mypassword | Secret password for authentication
+
+# @name testRequest
+GET {{baseUrl}}:{{port}}/test HTTP/1.1
+Authorization: Bearer {{apiKey}}
+X-Secret: {{secret}}
+
+### Test file for variable descriptions with quoted values
+
+# Case 1: Simple value without description
+@simple = abc123
+
+# Case 2: Simple value with description
+@apiKey = abc123 | API key for external service
+
+# Case 3: Quoted value without description
+@quotedOnly = "abcd"
+
+# Case 4: Quoted value with description
+@quotedWithDesc = "abcd" | description
+
+# Case 5: Value containing pipe without quotes (old behavior - pipe splits)
+@containsPipe = abcd | desc
+
+# Case 6: Value containing pipe with quotes (new feature)
+@quotedPipe = "abcd | desc"
+
+# Case 7: Quoted value containing pipe with description
+@quotedPipeDesc = "abcd | desc" | description
+
+# Case 8: Mixed quotes
+@mixedSingle = 'single quote value'
+@mixedDouble = "double quote value"
+
+# Case 9: Escape sequences
+@withEscape = "ab\"cd" | value with escaped quote
+@withNewline = "line1\nline2" | multi-line value
+
+# Case 10: Real-world examples
+@host = api.example.com
+@port = 8080 | Port number
+@secret = "my.password@123" | Secret with special chars
+@url = "https://api.example.com/v1" | Base API URL
+
+# @name testRequest
+GET {{host}}:{{port}}/test HTTP/1.1
+Authorization: Bearer {{apiKey}}
+X-Secret: {{secret}}
+X-URL: {{url}}
+
+###
+
+POST {{host}}
+
+{
+    "quote": "{{quotedPipeDesc}}"
+}

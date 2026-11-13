@@ -1,0 +1,23 @@
+@tenantId = {{aadV2TenantId}}
+@clientId = {{aadV2ClientId}}
+@clientSecret = {{$dotenv AZURE_SECRET}}
+
+###
+# 1️⃣ Token request to Azure Entra ID directly
+POST https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{clientId}}&
+scope=https%3A%2F%2Fgraph.microsoft.com%2F.default&
+client_secret={{clientSecret}}&
+grant_type=client_credentials
+
+###
+# 2️⃣ Token request using the built-in helper function $aadV2Token
+# Note: Environment variables is needed for this function to work.
+#       aadV2ClientSecret to hold the client secret
+#       aadV2AppUri to hold the app URI e. g. scope=<app-uri>/.default
+#       aadV2TenantId to hold the tenant ID (optional, if not set, it will use common endpoint)
+#       aadV2ClientId to hold the client ID (optional, if not set, it will use the default client ID)
+GET https://httpbin.org/anything
+Authorization: Bearer {{$aadV2Token appOnly}}
