@@ -1,20 +1,6 @@
 import { TextDocument } from "vscode";
-import { HttpResponse } from '../../models/httpResponse';
 import { VariableType } from "../../models/variableType";
-
-export type HttpVariableValue = string | {} | HttpResponse;
-
-export interface HttpVariable {
-    name: string;
-    value?: HttpVariableValue;
-    error?: any;
-    warning?: any;
-}
-
-export interface HttpVariableContext {
-    rawRequest: string;
-    parsedRequest: string;
-}
+import { HttpVariable, HttpVariableContext} from "../../models/httpVariable";
 
 export interface HttpVariableProvider {
     readonly type: VariableType;

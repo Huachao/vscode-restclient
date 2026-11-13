@@ -5,7 +5,8 @@ import { SystemSettings } from '../../models/configurationSettings';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { fileEnvironments } from '../editorEnvironments';
-import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
+import { HttpVariable } from '../../models/httpVariable';
+import { HttpVariableProvider } from './httpVariableProvider';
 
 /**
  * Variables of the selected environment. They come from two places, combined:

@@ -3,7 +3,6 @@ import * as iconv from 'iconv-lite';
 import * as path from 'path';
 import { CookieJar, Store } from 'tough-cookie';
 import { window } from 'vscode';
-import * as url from 'url';
 import { findHostCertificate } from '../core/hostCertificateMatcher';
 import { RequestHeaders, ResponseHeaders } from '../models/base';
 import type { IRestClientSettings } from '../models/configurationSettings';
@@ -99,9 +98,9 @@ export class HttpClient {
         const requestUrl = encodeUrl(httpRequest.url);
         const request: CancelableRequest<Response<Buffer>> = got(requestUrl, options);
         httpRequest.setUnderlyingRequest(request);
-        (request as any).on('response', res => {
+        (request as any).on('response', (res: any) => {
             if (res.rawHeaders) {
-                headersSize += res.rawHeaders.map(h => h.length).reduce((a, b) => a + b, 0);
+                headersSize += res.rawHeaders.map((h: string) => h.length).reduce((a: number, b: number) => a + b, 0);
                 headersSize += (res.rawHeaders.length) / 2;
             }
             const meta: ResponseMeta = {
@@ -110,7 +109,7 @@ export class HttpClient {
                 version: res.httpVersion ?? '1.1',
                 headers: HttpClient.normalizeHeaderNames(res.headers, res.rawHeaders ?? [])
             };
-            res.on('data', chunk => {
+            res.on('data', (chunk: Buffer) => {
                 bodySize += chunk.length;
                 onReceive?.(chunk, meta);
             });
@@ -350,7 +349,7 @@ export class HttpClient {
             return false;
         }
 
-        const resolvedUrl = url.parse(requestUrl);
+        const resolvedUrl = new URL(requestUrl);
         const hostName = resolvedUrl.hostname?.toLowerCase();
         const port = resolvedUrl.port;
         const excludeHostsProxyList = Array.from(new Set(excludeHostsForProxy.map(eh => eh.toLowerCase())));
@@ -405,14 +404,19 @@ export class HttpClient {
         return undefined;
     }
 
-    private static normalizeHeaderNames<T extends RequestHeaders | ResponseHeaders>(headers: T, rawHeaders: string[]): T {
+    private static normalizeHeaderNames<T extends RequestHeaders | ResponseHeaders>(
+        headers: T,
+        rawHeaders: string[]
+    ): T {
         const headersDic: { [key: string]: string } = rawHeaders.reduce(
-            (prev, cur) => {
+            (prev: { [key: string]: string }, cur: string) => {
                 if (!(cur.toLowerCase() in prev)) {
                     prev[cur.toLowerCase()] = cur;
                 }
                 return prev;
-            }, {});
+            },
+            {}
+        );
         const adjustedResponseHeaders = {} as RequestHeaders | ResponseHeaders;
         for (const header in headers) {
             const adjustedHeaderName = headersDic[header] || header;

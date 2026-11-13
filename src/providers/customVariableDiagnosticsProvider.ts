@@ -8,7 +8,6 @@ import { disposeAll } from '../utils/dispose';
 import { RequestVariableCache } from "../utils/requestVariableCache";
 import { RequestVariableCacheValueProcessor } from "../utils/requestVariableCacheValueProcessor";
 import { Selector } from '../utils/selector';
-
 import { VariableProcessor } from "../utils/variableProcessor";
 
 interface VariableWithPosition {
@@ -210,8 +209,8 @@ export class CustomVariableDiagnosticsProvider {
     }
     private hasPromptVariableDefintion(defs: Map<string, PromptVariableDefinitionWithRange[]>, variable: VariableWithPosition): boolean {
         const { name, begin, end } = variable;
-        return defs.get(name)?.some(({ name, range: [rangeStart, rangeEnd] }) => {
-            return name === name
+        return defs.get(name)?.some(({ name: defName, range: [rangeStart, rangeEnd] }) => {
+            return name === defName
                 && rangeStart <= begin.line
                 && end.line <= rangeEnd;
         }) || false;

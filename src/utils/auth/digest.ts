@@ -1,24 +1,23 @@
-import * as url from 'url';
 import { md5 } from '../misc';
-
 import type { AfterResponseHook } from 'got';
-
 import { v4 as uuidv4 } from 'uuid';
 
 export function digest(user: string, pass: string): AfterResponseHook {
     return (response, retryWithMergedOptions) => {
-        if (response.statusCode === 401
-            && response.headers['www-authenticate']
-            && response.headers['www-authenticate'].split(' ')[0].toLowerCase() === 'digest') {
+        if (
+            response.statusCode === 401 &&
+            response.headers['www-authenticate'] &&
+            response.headers['www-authenticate'].split(' ')[0].toLowerCase() === 'digest'
+        ) {
             const authHeader = response.headers['www-authenticate'];
             const method = (response as any).request.options.method;
-            const path = url.parse(response.url).path;
-            const challenge = {
+            const path = new URL(response.url).pathname;
+            const challenge: { [key: string]: string } = {
                 qop: '',
                 algorithm: '',
                 realm: '',
                 nonce: '',
-                opaque: ''
+                opaque: '',
             };
             const re = /([a-z0-9_-]+)=(?:"([^"]+)"|([a-z0-9_-]+))/gi;
 
@@ -31,7 +30,14 @@ export function digest(user: string, pass: string): AfterResponseHook {
                 challenge[match[1]] = match[2] || match[3];
             }
 
-            const ha1Compute = function (algorithm, user, realm, pass, nonce, cnonce) {
+            const ha1Compute = function (
+                algorithm: string | undefined,
+                user: string,
+                realm: string,
+                pass: string,
+                nonce: string,
+                cnonce: string
+            ) {
                 const ha1 = md5(user + ':' + realm + ':' + pass);
                 if (algorithm?.toLowerCase() === 'md5-sess') {
                     return md5(ha1 + ':' + nonce + ':' + cnonce);
@@ -58,12 +64,12 @@ export function digest(user: string, pass: string): AfterResponseHook {
                 nc: nc,
                 cnonce: cnonce,
                 algorithm: challenge.algorithm,
-                opaque: challenge.opaque
+                opaque: challenge.opaque,
             };
 
             const authParams: string[] = [];
             for (const [key, value] of Object.entries(authValues)) {
-                if (authValues[key]) {
+                if (authValues[key as keyof typeof authValues]) {
                     if (key === 'qop' || key === 'nc' || key === 'algorithm') {
                         authParams.push(key + '=' + value);
                     } else {
@@ -73,8 +79,8 @@ export function digest(user: string, pass: string): AfterResponseHook {
             }
             const updatedOptions = {
                 headers: {
-                    authorization: 'Digest ' + authParams.join(', ')
-                }
+                    authorization: 'Digest ' + authParams.join(', '),
+                },
             };
             return retryWithMergedOptions(updatedOptions);
         }

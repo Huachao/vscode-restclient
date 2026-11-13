@@ -5,7 +5,8 @@ import { DocumentCache } from '../../models/documentCache';
 import { ResolveErrorMessage } from '../../models/httpVariableResolveResult';
 import { VariableType } from '../../models/variableType';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
-import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
+import { HttpVariable } from '../../models/httpVariable';
+import { HttpVariableProvider } from './httpVariableProvider';
 import { RequestVariableProvider } from './requestVariableProvider';
 import { SystemVariableProvider } from './systemVariableProvider';
 

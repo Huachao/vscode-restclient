@@ -12,7 +12,8 @@ import { fakerRegex, loadFaker, resolveFakerPath } from '../fakerShared';
 import { AadV2TokenProvider } from '../aadV2TokenProvider';
 import { CALLBACK_PORT, OidcClient } from '../auth/oidcClient';
 import { EnvironmentVariableProvider } from './environmentVariableProvider';
-import { HttpVariable, HttpVariableContext, HttpVariableProvider } from './httpVariableProvider';
+import { HttpVariable, HttpVariableContext } from '../../models/httpVariable';
+import { HttpVariableProvider } from './httpVariableProvider';
 import { SecretStore } from '../secrets';
 
 import { v4 as uuidv4 } from 'uuid';

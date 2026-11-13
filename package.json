@@ -795,6 +795,7 @@
         "@types/mocha": "^5.2.7",
         "@types/node": "^20.19.43",
         "@types/node-fetch": "^2.6.11",
+        "@types/tough-cookie": "^4.0.5",
         "@types/vscode": "^1.81.0",
         "@vscode/test-electron": "^3.1.0",
         "glob": "^13.0.6",

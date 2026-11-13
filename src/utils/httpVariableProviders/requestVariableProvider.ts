@@ -6,7 +6,8 @@ import { ResolveErrorMessage, ResolveResult, ResolveState, ResolveWarningMessage
 import { VariableType } from '../../models/variableType';
 import { RequestVariableCache } from '../requestVariableCache';
 import { RequestVariableCacheValueProcessor } from '../requestVariableCacheValueProcessor';
-import { HttpVariable, HttpVariableProvider } from './httpVariableProvider';
+import { HttpVariable} from '../../models/httpVariable';
+import { HttpVariableProvider } from './httpVariableProvider';
 
 export class RequestVariableProvider implements HttpVariableProvider {
     private static _instance: RequestVariableProvider;
