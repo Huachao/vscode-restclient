@@ -5,12 +5,6 @@ import { ElementType, HttpElement } from '../../models/httpElement';
 export function getSystemVariableSnippets(): HttpElement[] {
     const elements: HttpElement[] = [
         new HttpElement(
-            Constants.FakerVariableName,
-            ElementType.SystemVariable,
-            null,
-            Constants.FakerVariableDescription,
-            new SnippetString(`{{$\${name:${Constants.FakerVariableName.slice(1)}} \${1:internet.email}}}`)),
-        new HttpElement(
             Constants.GuidVariableName,
             ElementType.SystemVariable,
             null,
@@ -118,6 +112,43 @@ export function getSystemVariableSnippets(): HttpElement[] {
             )
         ),
     ];
+
+    // Faker.js variables
+    const popularFakerMethods = [
+        { path: 'internet.email', desc: 'Generate a random email address' },
+        { path: 'internet.username', desc: 'Generate a random username' },
+        { path: 'internet.url', desc: 'Generate a random URL' },
+        { path: 'person.fullName', desc: 'Generate a random full name' },
+        { path: 'person.firstName', desc: 'Generate a random first name' },
+        { path: 'person.lastName', desc: 'Generate a random last name' },
+        { path: 'phone.number', desc: 'Generate a random phone number' },
+        { path: 'location.city', desc: 'Generate a random city name' },
+        { path: 'location.country', desc: 'Generate a random country name' },
+        { path: 'company.name', desc: 'Generate a random company name' },
+        { path: 'lorem.paragraph', desc: 'Generate a random paragraph' },
+        {
+            path: 'number.int',
+            desc: 'Generate random integer (params: min max)',
+            snippet: 'number.int ${1:1} ${2:100}',
+        },
+        { path: 'string.uuid', desc: 'Generate a random UUID' },
+        { path: 'date.past', desc: 'Generate a past date' },
+        { path: 'date.future', desc: 'Generate a future date' },
+    ];
+
+    popularFakerMethods.forEach(({ path, desc, snippet }) => {
+        elements.push(
+            new HttpElement(
+                `${Constants.FakerVariableName} ${path}`,
+                ElementType.SystemVariable,
+                null,
+                desc,
+                new SnippetString(
+                    `{{$\${name:${Constants.FakerVariableName.slice(1)} ${snippet || path}}}}`
+                )
+            )
+        );
+    });
 
     return elements;
 }
