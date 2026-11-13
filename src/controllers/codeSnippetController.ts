@@ -1,12 +1,10 @@
 import { EOL } from 'os';
-import * as url from 'url';
 import { Clipboard, env, ExtensionContext, l10n, QuickInputButtons, window } from 'vscode';
 import Logger from '../logger';
 import { IRestClientSettings, RequestSettings, RestClientSettings } from '../models/configurationSettings';
 import { HARCookie, HARHeader, HARHttpRequest, HARPostData } from '../models/harHttpRequest';
 import { HttpRequest } from '../models/httpRequest';
 import { RequestParserFactory } from '../models/requestParserFactory';
-import { trace } from "../utils/decorator";
 import { base64 } from '../utils/misc';
 import { Selector } from '../utils/selector';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
@@ -86,8 +84,8 @@ export class CodeSnippetController {
                 target = selectedItem as any as CodeSnippetTarget;
                 quickPick.items = (target as CodeSnippetTarget).clients.map(
                     client => ({
-                        label: client.title,
-                        detail: client.link,
+                    label: client.title,
+                    detail: client.link,
                         ...client
                     })
                 );
@@ -101,14 +99,13 @@ export class CodeSnippetController {
                     this._webview.render(result, `${tt}-${ct}`, tk);
                 } catch (reason) {
                     Logger.error('Unable to preview generated code snippet:', reason);
-                    window.showErrorMessage(reason);
+                    window.showErrorMessage(String(reason));
                 }
             }
         });
         quickPick.show();
     }
 
-    @trace('Copy Request As cURL')
     public async copyAsCurl() {
         const editor = window.activeTextEditor;
         const document = getCurrentTextDocument();
@@ -126,10 +123,13 @@ export class CodeSnippetController {
         const settings: IRestClientSettings = new RestClientSettings(requestSettings);
 
         // parse http request
-        const httpRequest = await RequestParserFactory.createRequestParser(text, settings).parseHttpRequest();
+        const httpRequest = await RequestParserFactory.createRequestParser(
+            text,
+            settings
+        ).parseHttpRequest();
 
         const harHttpRequest = this.convertToHARHttpRequest(httpRequest);
-        const addPrefix = !(url.parse(harHttpRequest.url).protocol);
+        const addPrefix = !new URL(harHttpRequest.url).protocol;
         const originalUrl = harHttpRequest.url;
         if (addPrefix) {
             // Add protocol for url that doesn't specify protocol to pass the HTTPSnippet validation #328
@@ -139,7 +139,11 @@ export class CodeSnippetController {
         if (addPrefix) {
             snippet.requests[0].fullUrl = originalUrl;
         }
-        const result = snippet.convert('shell', 'curl', process.platform === 'win32' ? { indent: false } : {});
+        const result = snippet.convert(
+            'shell',
+            'curl',
+            process.platform === 'win32' ? { indent: false } : {}
+        );
         await this.clipboard.writeText(result);
     }
 
@@ -151,7 +155,9 @@ export class CodeSnippetController {
             if (!headerValue) {
                 continue;
             }
-            const headerValues = Array.isArray(headerValue) ? headerValue : [headerValue.toString()];
+            const headerValues = Array.isArray(headerValue)
+                ? headerValue
+                : [headerValue.toString()];
             for (let value of headerValues) {
                 if (key.toLowerCase() === 'authorization') {
                     value = CodeSnippetController.normalizeAuthHeader(value);
@@ -173,10 +179,14 @@ export class CodeSnippetController {
         // convert body
         let body: HARPostData | undefined;
         if (request.body) {
-            const contentTypeHeader = headers.find(header => header.name.toLowerCase() === 'content-type');
+            const contentTypeHeader = headers.find(
+                header => header.name.toLowerCase() === 'content-type'
+            );
             const mimeType: string = contentTypeHeader?.value ?? 'application/json';
             if (typeof request.body === 'string') {
-                const normalizedBody = request.body.split(EOL).reduce((prev, cur) => prev.concat(cur.trim()), '');
+                const normalizedBody = request.body
+                    .split(EOL)
+                    .reduce((prev, cur) => prev.concat(cur.trim()), '');
                 body = new HARPostData(mimeType, normalizedBody);
             } else {
                 body = new HARPostData(mimeType, request.rawBody!);

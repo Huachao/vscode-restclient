@@ -1,5 +1,3 @@
-import * as url from 'url';
-
 export interface HostCertificateSettings {
     cert?: string;
     key?: string;
@@ -36,7 +34,7 @@ export function findHostCertificate<T extends HostCertificateSettings>(
     hostCertificates: { [key: string]: T },
     onInvalidKey?: (key: string) => void
 ): HostCertificateMatch<T> | undefined {
-    const { host, hostname, port } = url.parse(requestUrl);
+    const { host, hostname, port } = new URL(requestUrl);
     if (!host || !hostname) {
         return undefined;
     }
@@ -44,7 +42,7 @@ export function findHostCertificate<T extends HostCertificateSettings>(
     const requestHost = host.toLowerCase();
     const requestHostname = hostname.toLowerCase();
     const requestPort = port || undefined;
-    // url.parse retains explicit default ports and brackets around IPv6 hosts.
+    // URL parse retains explicit default ports and brackets around IPv6 hosts.
     const hostWithoutPort = requestPort ? requestHost.slice(0, -requestPort.length - 1) : requestHost;
     let best: { keys: string[]; score: Score } | undefined;
 
