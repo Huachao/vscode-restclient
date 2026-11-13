@@ -5,7 +5,6 @@ import { EOL, tmpdir } from 'os';
 import * as path from 'path';
 import { l10n, QuickPickItem, window, workspace } from 'vscode';
 import { HistoricalHttpRequest } from '../models/httpRequest';
-import { trace } from "../utils/decorator";
 import { formatHeaders } from '../utils/misc';
 import { UserDataManager } from '../utils/userDataManager';
 
@@ -17,7 +16,6 @@ export class HistoryController {
     public constructor() {
     }
 
-    @trace('History')
     public async save() {
         const requests = await UserDataManager.getRequestHistory();
         if (requests.length === 0) {
@@ -48,7 +46,6 @@ export class HistoryController {
         await window.showTextDocument(document);
     }
 
-    @trace('Clear History')
     public async clear() {
         const btn = await window.showInformationMessage(
             l10n.t('Do you really want to clear request history?'),

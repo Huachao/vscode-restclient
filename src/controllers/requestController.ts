@@ -7,7 +7,6 @@ import { IRestClientSettings, RequestSettings, RestClientSettings } from '../mod
 import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
 import { RequestMetadata } from '../models/requestMetadata';
 import { RequestParserFactory } from '../models/requestParserFactory';
-import { trace } from "../utils/decorator";
 import { OnReceive, HttpClient } from '../utils/httpClient';
 import { isEventStream } from '../core/sse';
 import { talk, bodyMessages, DEFAULT_LISTEN_MS } from '../core/websocket';
@@ -39,7 +38,6 @@ export class RequestController {
         this._textDocumentView = new HttpResponseTextDocumentView();
     }
 
-    @trace('Request')
     public async run(range: Range) {
         const editor = window.activeTextEditor;
         const document = getCurrentTextDocument();
@@ -122,7 +120,6 @@ export class RequestController {
         return response;
     }
 
-    @trace('Rerun Request')
     public async rerun() {
         if (!this._lastRequestSettingTuple) {
             return;
@@ -134,7 +131,6 @@ export class RequestController {
         await this.runCore(request, settings, undefined, assertions);
     }
 
-    @trace('Cancel Request')
     public async cancel() {
         this._lastPendingRequest?.cancel();
 

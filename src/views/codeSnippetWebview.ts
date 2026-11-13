@@ -1,5 +1,4 @@
 import { Clipboard, env, ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
-import { trace } from '../utils/decorator';
 import { registerCommandSafely } from '../utils/safeCommands';
 import { disposeAll } from '../utils/dispose';
 import { BaseWebview } from './baseWebview';
@@ -69,7 +68,6 @@ export class CodeSnippetWebview extends BaseWebview {
         disposeAll(this.panels);
     }
 
-    @trace('Copy Code Snippet')
     private async copy() {
         if (this.activeCodeSnippet) {
             await this.clipboard.writeText(this.activeCodeSnippet);

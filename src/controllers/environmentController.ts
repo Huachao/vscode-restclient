@@ -1,7 +1,6 @@
 import { EventEmitter, l10n, QuickPickItem, window } from 'vscode';
 import * as Constants from '../common/constants';
 import { SystemSettings } from '../models/configurationSettings';
-import { trace } from "../utils/decorator";
 import { fileEnvironments } from '../utils/editorEnvironments';
 import { EnvironmentStatusEntry } from '../utils/environmentStatusBarEntry';
 import { UserDataManager } from '../utils/userDataManager';
@@ -36,7 +35,6 @@ export class EnvironmentController {
      * With no argument it asks; with a name it switches directly (the tests
      * and any automation use this). `''` goes back to «no environment».
      */
-    @trace('Switch Environment')
     public async switchEnvironment(name?: string) {
         const fromSettings = Object.keys(this.settings.environmentVariables)
             .filter(name => name !== EnvironmentController.sharedEnvironmentName);
