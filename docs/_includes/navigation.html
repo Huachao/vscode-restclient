@@ -1,0 +1,17 @@
+<nav class="sidebar-nav">
+    <h2>Navigation</h2>
+    <ul class="nav-list">
+        {% for nav in site.navigation %}
+        <li>
+            <a
+                href="{{ nav.url | relative_url }}"
+                {% if page.url == nav.url %}
+                class="active"
+                {% endif %}
+            >
+                {{ nav.title }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</nav>

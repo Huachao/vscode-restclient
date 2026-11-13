@@ -1,0 +1,37 @@
+title: REST Client CE
+description: Documentation for REST Client CE - Send HTTP requests directly in VS Code
+author: REST Client CE Team
+baseurl: /vscode-restclient
+url: https://vscode-restclient.github.io
+markdown: kramdown
+theme: null
+plugins:
+    - jekyll-seo-tag
+    - jekyll-sitemap
+
+navigation:
+    - title: Home
+      url: /
+    - title: Features
+      url: /features
+    - title: Usage
+      url: /usage
+    - title: Commands
+      url: /commands
+    - title: Metadata Directives
+      url: /metadata
+    - title: Authentication
+      url: /authentication
+    - title: Variables
+      url: /variables
+    - title: Settings
+      url: /settings
+    - title: HTTP Language
+      url: /http-language
+
+defaults:
+    - scope:
+          path: ''
+      values:
+          layout: page
+          author: REST Client CE Team

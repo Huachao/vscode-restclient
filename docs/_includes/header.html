@@ -1,0 +1,18 @@
+<header class="site-header">
+    <div class="header-content">
+        <a href="{{ '/' | relative_url }}" class="site-title">
+            <img
+                src="{{ '/assets/images/rest_icon.png' | relative_url }}"
+                alt="REST Client CE Logo"
+                class="site-logo"
+            />
+        </a>
+        <nav class="top-nav">
+            <ul>
+                {% for nav in site.navigation %}
+                <li><a href="{{ nav.url | relative_url }}">{{ nav.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+</header>

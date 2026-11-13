@@ -1,0 +1,450 @@
+/* ==========================================================================
+   CSS Variables / Root Styles
+   ========================================================================== */
+:root {
+    --color-primary: #0066cc;
+    --color-primary-dark: #0052a3;
+    --color-text: #24292e;
+    --color-text-light: #586069;
+    --color-background: #ffffff;
+    --color-background-secondary: #f6f8fa;
+    --color-border: #e1e4e8;
+    --color-border-dark: #d1d5da;
+    --font-family-base:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji';
+    --font-family-heading: var(--font-family-base);
+    --font-family-code: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    --max-width: 1200px;
+    --sidebar-width: 280px;
+    --header-height: 60px;
+}
+
+/* ==========================================================================
+   Global Styles
+   ========================================================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    color: var(--color-text);
+    background-color: var(--color-background);
+    font-family: var(--font-family-base);
+    font-size: 1rem;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================================
+   Header Styles
+   ========================================================================== */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    background-color: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+
+.header-content {
+    max-width: var(--max-width);
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.site-title {
+    text-decoration: none;
+    color: var(--color-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.site-title:hover {
+    color: var(--color-primary);
+}
+
+.site-logo {
+    width: 50%;
+    max-width: 80px;
+    height: auto;
+    display: block;
+}
+
+.top-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 1.5rem;
+}
+
+.top-nav a {
+    text-decoration: none;
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.top-nav a:hover {
+    color: var(--color-primary);
+}
+
+/* ==========================================================================
+   Container / Layout
+   ========================================================================== */
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: calc(var(--header-height) + 2rem) 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    gap: 3rem;
+    width: 100%;
+    flex: 1;
+}
+
+/* ==========================================================================
+   Sidebar Navigation
+   ========================================================================== */
+.sidebar-nav {
+    position: sticky;
+    top: calc(var(--header-height) + 2rem);
+    max-height: calc(100vh - var(--header-height) - 4rem);
+    overflow-y: auto;
+}
+
+.sidebar-nav h2 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-light);
+    margin: 0 0 1rem 0;
+    font-weight: 600;
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-list li {
+    margin-bottom: 0.5rem;
+}
+
+.nav-list a {
+    display: block;
+    text-decoration: none;
+    color: var(--color-text-light);
+    font-size: 0.95rem;
+    padding: 0.25rem 0;
+    border-left: 2px solid transparent;
+    padding-left: 1rem;
+    transition: all 0.2s;
+}
+
+.nav-list a:hover {
+    color: var(--color-primary);
+    border-left-color: var(--color-primary);
+}
+
+.nav-list a.active {
+    color: var(--color-primary);
+    border-left-color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   Main Content
+   ========================================================================== */
+.content {
+    min-width: 0; /* Prevent overflow in flex/grid items */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.page-content {
+    max-width: 800px;
+}
+
+.page-content h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.75rem;
+}
+
+.page-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+}
+
+.page-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    color: var(--color-text);
+}
+
+.page-content h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+}
+
+.page-content p {
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+}
+
+.page-content a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.page-content a:hover {
+    text-decoration: underline;
+}
+
+.page-description {
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+    margin-bottom: 2rem;
+}
+
+/* ==========================================================================
+   Lists
+   ========================================================================== */
+.page-content ul,
+.page-content ol {
+    margin: 0 0 1.25rem 0;
+    padding-left: 1.5rem;
+}
+
+.page-content li {
+    margin-bottom: 0.5rem;
+}
+
+.page-content li > ul,
+.page-content li > ol {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Code & Pre
+   ========================================================================== */
+code {
+    font-family: var(--font-family-code);
+    font-size: 0.875em;
+    background-color: var(--color-background-secondary);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+pre {
+    font-family: var(--font-family-code);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    background-color: var(--color-background-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 1rem;
+    overflow: auto;
+    margin: 1.25rem 0;
+}
+
+pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+}
+
+thead {
+    background-color: var(--color-background-secondary);
+    border-bottom: 2px solid var(--color-border);
+}
+
+th,
+td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+tbody tr:hover {
+    background-color: var(--color-background-secondary);
+}
+
+/* ==========================================================================
+   Blockquotes
+   ========================================================================== */
+blockquote {
+    margin: 1.5rem 0;
+    padding: 0 1rem;
+    color: var(--color-text-light);
+    border-left: 4px solid var(--color-border);
+}
+
+blockquote > :first-child {
+    margin-top: 0;
+}
+
+blockquote > :last-child {
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Images
+   ========================================================================== */
+.page-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+}
+
+/* ==========================================================================
+   Horizontal Rule
+   ========================================================================== */
+hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 3rem 0;
+}
+
+/* ==========================================================================
+   Footer Styles
+   ========================================================================== */
+.site-footer {
+    background-color: var(--color-background-secondary);
+    border-top: 1px solid var(--color-border);
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+.footer-content {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+}
+
+.footer-content p {
+    margin: 0.5rem 0;
+}
+
+.footer-content a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.footer-content a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-nav {
+        position: static;
+        max-height: none;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 1rem;
+    }
+
+    .nav-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .nav-list a {
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        padding-left: 0;
+    }
+
+    .nav-list a:hover,
+    .nav-list a.active {
+        border-left: none;
+        border-bottom-color: var(--color-primary);
+    }
+}
+
+@media (max-width: 600px) {
+    html {
+        font-size: 15px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .site-title {
+        margin-bottom: 0.5rem;
+    }
+
+    .top-nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        align-items: center;
+    }
+}

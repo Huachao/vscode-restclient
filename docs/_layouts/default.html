@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+        <meta
+            name="description"
+            content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}"
+        />
+        <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>
+            hljs.highlightAll();
+        </script>
+    </head>
+    <body>
+        {% include header.html %}
+
+        <div class="container">
+            {% include navigation.html %}
+
+            <main class="content">{{ content }}</main>
+        </div>
+
+        {% include footer.html %}
+    </body>
+</html>
